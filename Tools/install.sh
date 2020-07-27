@@ -1,8 +1,8 @@
 #!/bin/bash
 
 set -o errexit
-echo "\e[94mPlease enter absolute filepath to shopware devellopement or production directory"
-echo "\e[94mexample for devellopement : /home/username/dev/shopware6/devellopement"
+echo "\e[94mPlease enter absolute filepath to shopware directory"
+echo "\e[94mexample for devellopement : username/home/Documents/docker-cms/shopware{version}/shopware"
 read SHOPWAREPATH
 
 copy_directory(){
