@@ -19,8 +19,8 @@
         "shopware-plugin-class": "Lengow\\Connector\\Connector",
         "copyright": "(c) by Lengow SAS",
         "label": {
-            "de-DE": "Lengow Shopware",
-            "en-GB": "LengowShopware"
+            "de-DE": "Lengow Für Shopware",
+            "en-GB": "Lengow For Shopware"
         }
     }
 }
