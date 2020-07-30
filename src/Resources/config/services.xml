@@ -1,0 +1,34 @@
+<?xml version="1.0" ?>
+
+<container xmlns="http://symfony.com/schema/dic/services"
+           xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+           xsi:schemaLocation="http://symfony.com/schema/dic/services http://symfony.com/schema/dic/services/services-1.0.xsd">
+
+    <services>
+
+        <service id="Lengow\Connector\Core\Content\Connector\EntityDefinition\ActionDefinition">
+            <tag name="shopware.entity.definition" entity="lengow_action" />
+        </service>
+
+        <service id="Lengow\Connector\Core\Content\Connector\EntityDefinition\OrderDefinition">
+            <tag name="shopware.entity.definition" entity="lengow_order" />
+        </service>
+
+        <service id="Lengow\Connector\Core\Content\Connector\EntityDefinition\OrderErrorDefinition">
+            <tag name="shopware.entity.definition" entity="lengow_order_error" />
+        </service>
+
+        <service id="Lengow\Connector\Core\Content\Connector\EntityDefinition\OrderLineDefinition">
+            <tag name="shopware.entity.definition" entity="lengow_order_line" />
+        </service>
+
+        <service id="Lengow\Connector\Core\Content\Connector\EntityDefinition\ProductDefinition">
+            <tag name="shopware.entity.definition" entity="lengow_product" />
+        </service>
+
+        <service id="Lengow\Connector\Core\Content\Connector\EntityDefinition\SettingsDefinition">
+            <tag name="shopware.entity.definition" entity="lengow_settings" />
+        </service>
+
+    </services>
+</container>

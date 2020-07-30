@@ -39,9 +39,9 @@ class ProductDefinition extends EntityDefinition
     }
 
     /**
-     * @return ProductEntity
+     * @return string
      */
-    public function getEntityClass(): ProductEntity
+    public function getEntityClass(): string
     {
         return ProductEntity::class;
     }

@@ -40,9 +40,9 @@ class OrderDefinition extends EntityDefinition
     }
 
     /**
-     * @return OrderEntity
+     * @return string
      */
-    public function getEntityClass(): OrderEntity
+    public function getEntityClass(): string
     {
         return OrderEntity::class;
     }

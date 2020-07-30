@@ -38,9 +38,9 @@ class OrderLineDefinition extends EntityDefinition
     }
 
     /**
-     * @return OrderLineEntity
+     * @return string
      */
-    public function getEntityClass(): OrderLineEntity
+    public function getEntityClass(): string
     {
         return OrderLineEntity::class;
     }

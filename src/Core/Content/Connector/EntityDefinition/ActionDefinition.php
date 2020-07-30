@@ -19,7 +19,7 @@ use Shopware\Core\Framework\DataAbstractionLayer\FieldCollection;
 // Foreign key class
 use Shopware\Core\Checkout\Order\OrderDefinition as ShopwareOrderDefinition;
 // Entity class
-use namespace Lengow\Connector\Core\Content\Connector\Entity\ActionEntity;
+use Lengow\Connector\Core\Content\Connector\Entity\ActionEntity;
 
 /**
  * Class ActionDefinition
@@ -38,9 +38,9 @@ class ActionDefinition extends EntityDefinition
     }
 
     /**
-     * @return ActionEntity
+     * @return string
      */
-    public function getEntityClass() : ActionEntity
+    public function getEntityClass() : string
     {
         return ActionEntity::class;
     }

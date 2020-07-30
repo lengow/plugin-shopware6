@@ -38,9 +38,9 @@ class OrderErrorDefinition extends EntityDefinition
     }
 
     /**
-     * @return OrderErrorEntity
+     * @return string
      */
-    public function getEntityClass() : OrderErrorEntity
+    public function getEntityClass() : string
     {
         return OrderErrorEntity::class;
     }

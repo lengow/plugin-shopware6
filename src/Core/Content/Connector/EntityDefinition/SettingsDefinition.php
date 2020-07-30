@@ -38,9 +38,9 @@ class SettingsDefinition extends EntityDefinition
     }
 
     /**
-     * @return SettingsEntity
+     * @return string
      */
-    public function getEntityClass(): SettingsEntity
+    public function getEntityClass(): string
     {
         return SettingsEntity::class;
     }
