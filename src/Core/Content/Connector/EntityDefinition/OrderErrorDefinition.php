@@ -14,6 +14,7 @@ use Shopware\Core\Framework\DataAbstractionLayer\Field\IntField;
 use Shopware\Core\Framework\DataAbstractionLayer\Field\IdField;
 use Shopware\Core\Framework\DataAbstractionLayer\Field\DateField;
 use Shopware\Core\Framework\DataAbstractionLayer\Field\StringField;
+use Shopware\Core\Framework\DataAbstractionLayer\Field\BoolField;
 // Model Return Type
 use Shopware\Core\Framework\DataAbstractionLayer\FieldCollection;
 // Foreign key class
@@ -50,15 +51,20 @@ class OrderErrorDefinition extends EntityDefinition
      */
     protected function defineFields(): FieldCollection
     {
-        return new FieldCollection([
-            (new IdField    ('id',              'id'))->addFlags(new Required(), new PrimaryKey()),
-            (new FkField    ('lengow_order_id', 'lengowOrderId', LengowOrderDefinition::class))->addFlags(new PrimaryKey(), new SetNullOnDelete()),
-            (new StringField('message',         'message')),
-            (new IntField   ('type',            'type'))->addFlags(new Required()),
-            (new IntField   ('is_finished',     'isFinished'))->addFlags(new Required()),
-            (new IntField   ('mail',            'mail'))->addFlags(new Required()),
-            (new DateField  ('createdAt',       'createdAt')),
-            (new DateField  ('updatedAt',       'updatedAt')),
-        ]);
+        return new FieldCollection(
+            [
+                (new IdField('id', 'id'))->addFlags(new Required(), new PrimaryKey()),
+                (new FkField('lengow_order_id', 'lengowOrderId', LengowOrderDefinition::class))->addFlags(
+                    new PrimaryKey(),
+                    new SetNullOnDelete()
+                ),
+                (new StringField('message', 'message')),
+                (new IntField('type', 'type'))->addFlags(new Required()),
+                (new BoolField('is_finished', 'isFinished'))->addFlags(new Required()),
+                (new BoolField('mail', 'mail'))->addFlags(new Required()),
+                (new DateField('createdAt', 'createdAt')),
+                (new DateField('updatedAt', 'updatedAt')),
+            ]
+        );
     }
 }

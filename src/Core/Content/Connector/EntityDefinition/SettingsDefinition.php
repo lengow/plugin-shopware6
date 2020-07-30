@@ -50,13 +50,17 @@ class SettingsDefinition extends EntityDefinition
      */
     protected function defineFields(): FieldCollection
     {
-        return new FieldCollection([
-            (new IdField    ('id',               'id'))->addFlags(new Required(), new PrimaryKey()),
-            (new FkField    ('sales_channel_id', 'salesChannelId', ShopwareSalesChannelDefinition::class))->addFlags(new Required(), new PrimaryKey(), new SetNullOnDelete()),
-            (new StringField('name',             'name'))->addFlags(new Required()),
-            (new StringField('value',            'value')),
-            (new DateField  ('created_at',       'createdAt'))->addFlags(new Required()),
-            (new DateField  ('updated_at',       'updatedAt'))->addFlags(new Required()),
-        ]);
+        return new FieldCollection(
+            [
+                (new IdField('id', 'id'))->addFlags(new Required(), new PrimaryKey()),
+                (new FkField(
+                    'sales_channel_id', 'salesChannelId', ShopwareSalesChannelDefinition::class
+                ))->addFlags(new Required(), new PrimaryKey(), new SetNullOnDelete()),
+                (new StringField('name', 'name'))->addFlags(new Required()),
+                (new StringField('value', 'value')),
+                (new DateField('created_at', 'createdAt'))->addFlags(new Required()),
+                (new DateField('updated_at', 'updatedAt'))->addFlags(new Required()),
+            ]
+        );
     }
 }

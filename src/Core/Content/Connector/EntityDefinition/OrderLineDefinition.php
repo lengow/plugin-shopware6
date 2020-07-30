@@ -50,13 +50,23 @@ class OrderLineDefinition extends EntityDefinition
      */
     protected function defineFields(): FieldCollection
     {
-        return new FieldCollection([
-            (new IdField      ('id',            'id'))->addFlags(new Required(), new PrimaryKey()),
-            (new FkField      ('order_id',      'orderId', ShopwareOrderDefinition::class))->addFlags(new Required(), new PrimaryKey(), new SetNullOnDelete()),
-            (new FkField      ('product_id',    'productId', ShopwareProductDefinition::class))->addFlags(new Required(), new PrimaryKey(), new SetNullOnDelete()),
-            (new StringField  ('order_line_id', 'orderLineId'))->addFlags(new Required()),
-            (new DateField    ('created_at',    'createdAt')),
-            (new DateField    ('updated_at',    'updatedAt'))
-        ]);
+        return new FieldCollection(
+            [
+                (new IdField('id', 'id'))->addFlags(new Required(), new PrimaryKey()),
+                (new FkField('order_id', 'orderId', ShopwareOrderDefinition::class))->addFlags(
+                    new Required(),
+                    new PrimaryKey(),
+                    new SetNullOnDelete()
+                ),
+                (new FkField('product_id', 'productId', ShopwareProductDefinition::class))->addFlags(
+                    new Required(),
+                    new PrimaryKey(),
+                    new SetNullOnDelete()
+                ),
+                (new StringField('order_line_id', 'orderLineId'))->addFlags(new Required()),
+                (new DateField('created_at', 'createdAt')),
+                (new DateField('updated_at', 'updatedAt')),
+            ]
+        );
     }
 }

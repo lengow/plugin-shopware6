@@ -51,10 +51,18 @@ class ProductDefinition extends EntityDefinition
      */
     public function defineFields(): FieldCollection
     {
-        return new FieldCollection([
-            (new FkField    ('product_id',       'productId', ShopwareProductDefinition::class))->addFlags(new Required(), new PrimaryKey(), new SetNullOnDelete()),
-            (new FkField    ('sales_channel_id', 'salesChannelId', ShopwareSalesChannelDefinition::class))->addFlags(new Required(), new PrimaryKey(), new SetNullOnDelete()),
-            (new DateField  ('created_at',       'createdAt'))->addFlags(new Required())
-        ]);
+        return new FieldCollection(
+            [
+                (new FkField('product_id', 'productId', ShopwareProductDefinition::class))->addFlags(
+                    new Required(),
+                    new PrimaryKey(),
+                    new SetNullOnDelete()
+                ),
+                (new FkField(
+                    'sales_channel_id', 'salesChannelId', ShopwareSalesChannelDefinition::class
+                ))->addFlags(new Required(), new PrimaryKey(), new SetNullOnDelete()),
+                (new DateField('created_at', 'createdAt'))->addFlags(new Required()),
+            ]
+        );
     }
 }
