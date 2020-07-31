@@ -55,23 +55,16 @@ class Migration1595860347Init extends MigrationStep
                 `extra`                JSON          NULL DEFAULT NULL,
                 PRIMARY KEY (`id`),
                 FOREIGN KEY (order_id)         REFERENCES `order`(id),
-                FOREIGN KEY (sales_channel_id) REFERENCES sales_channel(id)
+                FOREIGN KEY (sales_channel_id) REFERENCES sales_channel(id),
+                INDEX (
+                    `order_id`,
+                    `order_sku`,
+                    `sales_channel_id`,
+                    `marketplace_sku`,
+                    `marketplace_name`,
+                    `marketplace_label`
+                )
             ) DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
-        ');
-
-        /**
-         * add Index to lengow_order table
-         */
-        $connection->executeUpdate('
-            Create Index `IX_order` ON `lengow_order`
-            (
-                `order_id`,
-                `order_sku`,
-                `sales_channel_id`,
-                `marketplace_sku`,
-                `marketplace_name`,
-                `marketplace_label`
-            );
         ');
 
         /**
@@ -90,18 +83,9 @@ class Migration1595860347Init extends MigrationStep
                 `updated_at`    DATETIME(3)  NULL DEFAULT NULL,
                 FOREIGN KEY (`order_id`)   REFERENCES `order`(`id`),
                 FOREIGN KEY (`product_id`) REFERENCES product(`id`),
-                PRIMARY KEY (`id`)
+                PRIMARY KEY (`id`),
+                INDEX (`order_id`)
             ) DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
-        ');
-
-        /**
-         * add Index to lengow_order_line table
-         */
-        $connection->executeUpdate('
-            Create Index `IX_order_line` ON `lengow_order_line`
-            (
-                `order_id`
-            );
         ');
 
         /**
@@ -120,18 +104,9 @@ class Migration1595860347Init extends MigrationStep
                 `created_at`      DATETIME(3) NULL DEFAULT NULL,
                 `updated_at`      DATETIME(3) NULL DEFAULT NULL,
                 FOREIGN KEY (`lengow_order_id`) REFERENCES lengow_order(`id`),
-                PRIMARY KEY (`id`)
+                PRIMARY KEY (`id`),
+                INDEX (`lengow_order_id`)
             ) DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
-1        ');
-
-        /**
-         * add Index to lengow_order_error table
-         */
-        $connection->executeUpdate('
-            Create Index `IX_order_error` ON `lengow_order_error`
-            (
-                `lengow_order_id`
-            );
         ');
 
         /**
@@ -152,18 +127,9 @@ class Migration1595860347Init extends MigrationStep
                 `created_at`     DATETIME(3)  NULL DEFAULT NULL,
                 `updated_at`     DATETIME(3)  NULL DEFAULT NULL,
                 FOREIGN KEY (`order_id`) REFERENCES `order`(`id`),
-                PRIMARY KEY (`id`)
+                PRIMARY KEY (`id`),
+                INDEX (`order_id`)
             ) DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
-        ');
-
-        /**
-         * add Index to lengow_action table
-         */
-        $connection->executeUpdate('
-            Create Index `IX_action` ON `lengow_action`
-            (
-                `order_id`
-            );
         ');
 
         /**
@@ -180,19 +146,9 @@ class Migration1595860347Init extends MigrationStep
                 `created_at`       DATETIME(3)  NOT NULL,
                 `updated_at`       DATETIME(3)  NOT NULL,
                 FOREIGN KEY (`sales_channel_id`) REFERENCES sales_channel(`id`),
-                PRIMARY KEY (`id`)
+                PRIMARY KEY (`id`),
+                INDEX (`sales_channel_id`, `name`)
             ) DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
-        ');
-
-        /**
-         * add Index to lengow_settings table
-         */
-        $connection->executeUpdate('
-            Create Index `IX_settings` ON `lengow_settings`
-            (
-                `sales_channel_id`,
-                `name`
-            );
         ');
 
         /**
@@ -207,21 +163,10 @@ class Migration1595860347Init extends MigrationStep
                 `sales_channel_id` BINARY(16)  NOT NULL,
                 `created_at`       DATETIME(3) NOT NULL,
                 FOREIGN KEY (`sales_channel_id`) REFERENCES sales_channel(`id`),
-                FOREIGN KEY (`product_id`)       REFERENCES product(`id`)
+                FOREIGN KEY (`product_id`)       REFERENCES product(`id`),
+                INDEX (`product_id`, `sales_channel_id`)
             ) DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
         ');
-
-        /**
-         * add Index to lengow_product table
-         */
-        $connection->executeUpdate('
-            Create Index `IX_product` ON `lengow_product`
-            (
-                `product_id`,
-                `sales_channel_id`
-            );
-        ');
-
     }
 
     public function updateDestructive(Connection $connection): void
