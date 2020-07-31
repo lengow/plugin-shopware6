@@ -17,12 +17,12 @@ class OrderLineEntity extends Entity
     use EntityIdTrait;
 
     /**
-     * @var ShopwareOrderEntity|null
+     * @var ShopwareOrderEntity
      */
     protected $order;
 
     /**
-     * @var ShopwareProductEntity|null
+     * @var ShopwareProductEntity
      */
     protected $product;
 
@@ -42,33 +42,33 @@ class OrderLineEntity extends Entity
     protected $updatedAt;
 
     /**
-     * @return ShopwareOrderEntity|null
+     * @return ShopwareOrderEntity
      */
-    public function getOrder(): ?ShopwareOrderEntity
+    public function getOrder(): ShopwareOrderEntity
     {
         return $this->order;
     }
 
     /**
-     * @param ShopwareOrderEntity|null $order
+     * @param ShopwareOrderEntity $order
      */
-    public function setOrder(?ShopwareOrderEntity $order): void
+    public function setOrder(ShopwareOrderEntity $order): void
     {
         $this->order = $order;
     }
 
     /**
-     * @return ShopwareProductEntity|null
+     * @return ShopwareProductEntity
      */
-    public function getProduct(): ?ShopwareProductEntity
+    public function getProduct(): ShopwareProductEntity
     {
         return $this->product;
     }
 
     /**
-     * @param ShopwareProductEntity|null $product
+     * @param ShopwareProductEntity $product
      */
-    public function setProduct(?ShopwareProductEntity $product): void
+    public function setProduct(ShopwareProductEntity $product): void
     {
         $this->product = $product;
     }
