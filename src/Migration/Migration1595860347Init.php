@@ -60,6 +60,21 @@ class Migration1595860347Init extends MigrationStep
         ');
 
         /**
+         * add Index to lengow_order table
+         */
+        $connection->executeUpdate('
+            Create Index `IX_order` ON `lengow_order`
+            (
+                `order_id`,
+                `order_sku`,
+                `sales_channel_id`,
+                `marketplace_sku`,
+                `marketplace_name`,
+                `marketplace_label`
+            );
+        ');
+
+        /**
          * create lengow_order_line table
          * this table reference 2 shopware base tables :
          * order (FK order_id)
@@ -77,6 +92,16 @@ class Migration1595860347Init extends MigrationStep
                 FOREIGN KEY (`product_id`) REFERENCES product(`id`),
                 PRIMARY KEY (`id`)
             ) DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
+        ');
+
+        /**
+         * add Index to lengow_order_line table
+         */
+        $connection->executeUpdate('
+            Create Index `IX_order_line` ON `lengow_order_line`
+            (
+                `order_id`
+            );
         ');
 
         /**
@@ -100,6 +125,16 @@ class Migration1595860347Init extends MigrationStep
 1        ');
 
         /**
+         * add Index to lengow_order_error table
+         */
+        $connection->executeUpdate('
+            Create Index `IX_order_error` ON `lengow_order_error`
+            (
+                `lengow_order_id`
+            );
+        ');
+
+        /**
          * create lengow_action table
          * this table reference 1 shopware base table :
          * order (FK order_id)
@@ -119,6 +154,16 @@ class Migration1595860347Init extends MigrationStep
                 FOREIGN KEY (`order_id`) REFERENCES `order`(`id`),
                 PRIMARY KEY (`id`)
             ) DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
+        ');
+
+        /**
+         * add Index to lengow_action table
+         */
+        $connection->executeUpdate('
+            Create Index `IX_action` ON `lengow_action`
+            (
+                `order_id`
+            );
         ');
 
         /**
@@ -159,7 +204,7 @@ class Migration1595860347Init extends MigrationStep
     public function updateDestructive(Connection $connection): void
     {
         $connection->executeUpdate('
-            DROP TABLE
+            DROP TABLE IF EXISTS
             `lengow_settings`,
             `lengow_product`,
         ');
