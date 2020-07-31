@@ -185,6 +185,17 @@ class Migration1595860347Init extends MigrationStep
         ');
 
         /**
+         * add Index to lengow_settings table
+         */
+        $connection->executeUpdate('
+            Create Index `IX_settings` ON `lengow_settings`
+            (
+                `sales_channel_id`,
+                `name`
+            );
+        ');
+
+        /**
          * create lengow_product assoc table
          * this table reference 2 shopware base tables :
          * product (FK product_id)
@@ -199,6 +210,18 @@ class Migration1595860347Init extends MigrationStep
                 FOREIGN KEY (`product_id`)       REFERENCES product(`id`)
             ) DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
         ');
+
+        /**
+         * add Index to lengow_product table
+         */
+        $connection->executeUpdate('
+            Create Index `IX_product` ON `lengow_product`
+            (
+                `product_id`,
+                `sales_channel_id`
+            );
+        ');
+
     }
 
     public function updateDestructive(Connection $connection): void
