@@ -1,6 +1,6 @@
 <?php declare(strict_types=1);
 
-namespace Lengow\Connector\Core\Content\Connector\EntityDefinition;
+namespace Lengow\Connector\Entity\Lengow\Settings;
 
 // Definition base class
 use Shopware\Core\Framework\DataAbstractionLayer\EntityDefinition;
@@ -10,25 +10,25 @@ use Shopware\Core\Framework\DataAbstractionLayer\Field\Flag\Required;
 use Shopware\Core\Framework\DataAbstractionLayer\Field\Flag\SetNullOnDelete;
 // Field types
 use Shopware\Core\Framework\DataAbstractionLayer\Field\FkField;
-use Shopware\Core\Framework\DataAbstractionLayer\Field\IntField;
 use Shopware\Core\Framework\DataAbstractionLayer\Field\IdField;
 use Shopware\Core\Framework\DataAbstractionLayer\Field\DateField;
 use Shopware\Core\Framework\DataAbstractionLayer\Field\StringField;
-use Shopware\Core\Framework\DataAbstractionLayer\Field\BoolField;
+use Shopware\Core\Framework\DataAbstractionLayer\Field\OneToOneAssociationField;
 // Model Return Type
 use Shopware\Core\Framework\DataAbstractionLayer\FieldCollection;
-// Foreign key class
-use Lengow\Connector\Core\Content\Connector\OrderDefinition as LengowOrderDefinition;
+// OneToOne association class
+use Shopware\Core\System\SalesChannel\SalesChannelDefinition as ShopwareSalesChannelDefinition;
 // Entity class
-use Lengow\Connector\Core\Content\Connector\Entity\OrderErrorEntity;
+use Lengow\Connector\Entity\Lengow\Settings\SettingsEntity as LengowSettingsEntity;
 
 /**
- * Class OrderErrorDefinition
+ * Class SettingsDefinition
  * @package Lengow\Connector\Core\Content\Connector\EntityDefinition
  */
-class OrderErrorDefinition extends EntityDefinition
+class SettingsDefinition extends EntityDefinition
 {
-    public const ENTITY_NAME = 'lengow_order_error';
+
+    public const ENTITY_NAME = 'lengow_settings';
 
     /**
      * @return string
@@ -41,9 +41,9 @@ class OrderErrorDefinition extends EntityDefinition
     /**
      * @return string
      */
-    public function getEntityClass() : string
+    public function getEntityClass(): string
     {
-        return OrderErrorEntity::class;
+        return LengowSettingsEntity::class;
     }
 
     /**
@@ -54,16 +54,19 @@ class OrderErrorDefinition extends EntityDefinition
         return new FieldCollection(
             [
                 (new IdField('id', 'id'))->addFlags(new Required(), new PrimaryKey()),
-                (new FkField('lengow_order_id', 'lengowOrderId', LengowOrderDefinition::class))->addFlags(
-                    new PrimaryKey(),
-                    new SetNullOnDelete()
+                (new OneToOneAssociationField(
+                    'salesChannel',
+                    'id',
+                    'sales_channel_id',
+                    ShopwareSalesChannelDefinition::class
+                ))->addFlags(
+                    new Required(),
+                    new setNullOnDelete()
                 ),
-                (new StringField('message', 'message')),
-                (new IntField('type', 'type'))->addFlags(new Required()),
-                (new BoolField('is_finished', 'isFinished'))->addFlags(new Required()),
-                (new BoolField('mail', 'mail'))->addFlags(new Required()),
-                (new DateField('createdAt', 'createdAt')),
-                (new DateField('updatedAt', 'updatedAt')),
+                (new StringField('name', 'name'))->addFlags(new Required()),
+                (new StringField('value', 'value')),
+                (new DateField('created_at', 'createdAt'))->addFlags(new Required()),
+                (new DateField('updated_at', 'updatedAt'))->addFlags(new Required()),
             ]
         );
     }

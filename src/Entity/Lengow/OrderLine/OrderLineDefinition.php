@@ -1,6 +1,6 @@
 <?php declare(strict_types=1);
 
-namespace Lengow\Connector\Core\Content\Connector\EntityDefinition;
+namespace Lengow\Connector\Entity\Lengow\OrderLine;
 
 // Definition base class
 use Shopware\Core\Framework\DataAbstractionLayer\EntityDefinition;
@@ -13,13 +13,14 @@ use Shopware\Core\Framework\DataAbstractionLayer\Field\FkField;
 use Shopware\Core\Framework\DataAbstractionLayer\Field\IdField;
 use Shopware\Core\Framework\DataAbstractionLayer\Field\DateField;
 use Shopware\Core\Framework\DataAbstractionLayer\Field\StringField;
+use Shopware\Core\Framework\DataAbstractionLayer\Field\OneToOneAssociationField;
 // Model Return Type
 use Shopware\Core\Framework\DataAbstractionLayer\FieldCollection;
-// Foreign key class
+// OneToOne association class
 use Shopware\Core\Checkout\Order\OrderDefinition as ShopwareOrderDefinition;
 use Shopware\Core\Content\Product\ProductDefinition as ShopwareProductDefinition;
 // Entity class
-use Lengow\Connector\Core\Content\Connector\Entity\OrderLineEntity;
+use Lengow\Connector\Entity\Lengow\OrderLine\OrderLineEntity as LengowOrderLineEntity;
 
 /**
  * Class OrderLineDefinition
@@ -42,7 +43,7 @@ class OrderLineDefinition extends EntityDefinition
      */
     public function getEntityClass(): string
     {
-        return OrderLineEntity::class;
+        return LengowOrderLineEntity::class;
     }
 
     /**
@@ -53,14 +54,17 @@ class OrderLineDefinition extends EntityDefinition
         return new FieldCollection(
             [
                 (new IdField('id', 'id'))->addFlags(new Required(), new PrimaryKey()),
-                (new FkField('order_id', 'orderId', ShopwareOrderDefinition::class))->addFlags(
+                (new OneToOneAssociationField('order', 'id', 'order_id', ShopwareOrderDefinition::class))->addFlags(
                     new Required(),
-                    new PrimaryKey(),
-                    new SetNullOnDelete()
+                    new setNullOnDelete()
                 ),
-                (new FkField('product_id', 'productId', ShopwareProductDefinition::class))->addFlags(
+                (new OneToOneAssociationField(
+                    'product',
+                    'id',
+                    'product_id',
+                    ShopwareProductDefinition::class
+                ))->addFlags(
                     new Required(),
-                    new PrimaryKey(),
                     new SetNullOnDelete()
                 ),
                 (new StringField('order_line_id', 'orderLineId'))->addFlags(new Required()),

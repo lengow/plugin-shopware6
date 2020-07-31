@@ -1,9 +1,11 @@
 <?php declare(strict_types=1);
 
-namespace Lengow\Connector\Core\Content\Connector\Entity;
+namespace Lengow\Connector\Entity\Lengow\Action;
 
 use Shopware\Core\Framework\DataAbstractionLayer\Entity;
 use Shopware\Core\Framework\DataAbstractionLayer\EntityIdTrait;
+// OneToOne association class
+use Shopware\Core\Checkout\Order\OrderEntity as ShopwareOrderEntity;
 
 /**
  * Class ActionEntity
@@ -14,9 +16,9 @@ class ActionEntity extends Entity
     use EntityIdTrait;
 
     /**
-     * @var string
+     * @var ShopwareOrderEntity|null
      */
-    protected $orderId;
+    protected $order;
 
     /**
      * @var int
@@ -24,7 +26,7 @@ class ActionEntity extends Entity
     protected $actionId;
 
     /**
-     * @var string
+     * @var string|null
      */
     protected $orderLineSku;
 
@@ -39,7 +41,7 @@ class ActionEntity extends Entity
     protected $retry;
 
     /**
-     * @var string
+     * @var array|null
      */
     protected $parameters;
 
@@ -49,29 +51,29 @@ class ActionEntity extends Entity
     protected $state;
 
     /**
-     * @var \DateTime
+     * @var \DateTime|null
      */
     protected $createdAt;
 
     /**
-     * @var \DateTime
+     * @var \DateTime|null
      */
     protected $updatedAt;
 
     /**
-     * @return string
+     * @return ShopwareOrderEntity|null
      */
-    public function getOrderId(): string
+    public function getOrder(): ?ShopwareOrderEntity
     {
-        return $this->orderId;
+        return $this->order;
     }
 
     /**
-     * @param string $orderId
+     * @param ShopwareOrderEntity|null $order
      */
-    public function setOrderId(string $orderId): void
+    public function setOrder(?ShopwareOrderEntity $order): void
     {
-        $this->orderId = $orderId;
+        $this->order = $order;
     }
 
     /**
@@ -91,17 +93,17 @@ class ActionEntity extends Entity
     }
 
     /**
-     * @return string
+     * @return string|null
      */
-    public function getOrderLineSku(): string
+    public function getOrderLineSku(): ?string
     {
         return $this->orderLineSku;
     }
 
     /**
-     * @param string $orderLineSku
+     * @param string|null $orderLineSku
      */
-    public function setOrderLineSku(string $orderLineSku): void
+    public function setOrderLineSku(?string $orderLineSku): void
     {
         $this->orderLineSku = $orderLineSku;
     }
@@ -139,17 +141,17 @@ class ActionEntity extends Entity
     }
 
     /**
-     * @return string
+     * @return array|null
      */
-    public function getParameters(): string
+    public function getParameters(): ?array
     {
         return $this->parameters;
     }
 
     /**
-     * @param string $parameters
+     * @param array|null $parameters
      */
-    public function setParameters(string $parameters): void
+    public function setParameters(?array $parameters): void
     {
         $this->parameters = $parameters;
     }
@@ -171,35 +173,36 @@ class ActionEntity extends Entity
     }
 
     /**
-     * @return \DateTime
+     * @return \DateTime|null
      */
-    public function getCreatedAt(): \DateTime
+    public function getCreatedAt(): ?\DateTime
     {
         return $this->createdAt;
     }
 
     /**
-     * @param \DateTime $createdAt
+     * @param \DateTime|null $createdAt
      */
-    public function setCreatedAt(\DateTime $createdAt): void
+    public function setCreatedAt(?\DateTime $createdAt): void
     {
         $this->createdAt = $createdAt;
     }
 
     /**
-     * @return \DateTime
+     * @return \DateTime|null
      */
-    public function getUpdatedAt(): \DateTime
+    public function getUpdatedAt(): ?\DateTime
     {
         return $this->updatedAt;
     }
 
     /**
-     * @param \DateTime $updatedAt
+     * @param \DateTime|null $updatedAt
      */
-    public function setUpdatedAt(\DateTime $updatedAt): void
+    public function setUpdatedAt(?\DateTime $updatedAt): void
     {
         $this->updatedAt = $updatedAt;
     }
+
 
 }

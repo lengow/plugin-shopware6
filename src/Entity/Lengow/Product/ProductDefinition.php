@@ -1,6 +1,6 @@
 <?php declare(strict_types=1);
 
-namespace Lengow\Connector\Core\Content\Connector\EntityDefinition;
+namespace Lengow\Connector\Entity\Lengow\Product;
 
 // Definition base class
 use Shopware\Core\Framework\DataAbstractionLayer\EntityDefinition;
@@ -10,24 +10,26 @@ use Shopware\Core\Framework\DataAbstractionLayer\Field\Flag\Required;
 use Shopware\Core\Framework\DataAbstractionLayer\Field\Flag\SetNullOnDelete;
 // Field types
 use Shopware\Core\Framework\DataAbstractionLayer\Field\FkField;
+use Shopware\Core\Framework\DataAbstractionLayer\Field\IntField;
 use Shopware\Core\Framework\DataAbstractionLayer\Field\IdField;
 use Shopware\Core\Framework\DataAbstractionLayer\Field\DateField;
 use Shopware\Core\Framework\DataAbstractionLayer\Field\StringField;
+use Shopware\Core\Framework\DataAbstractionLayer\Field\OneToOneAssociationField;
 // Model Return Type
 use Shopware\Core\Framework\DataAbstractionLayer\FieldCollection;
-// Foreign key class
+// OneToOne association class
+use Shopware\Core\Content\Product\ProductDefinition as ShopwareProductDefinition;
 use Shopware\Core\System\SalesChannel\SalesChannelDefinition as ShopwareSalesChannelDefinition;
 // Entity class
-use Lengow\Connector\Core\Content\Connector\Entity\SettingsEntity;
+use Lengow\Connector\Entity\Lengow\Product\ProductEntity as LengowProductEntity;
 
 /**
- * Class SettingsDefinition
+ * Class ProductDefinition
  * @package Lengow\Connector\Core\Content\Connector\EntityDefinition
  */
-class SettingsDefinition extends EntityDefinition
+class ProductDefinition extends EntityDefinition
 {
-
-    public const ENTITY_NAME = 'lengow_settings';
+    public const ENTITY_NAME = 'lengow_product';
 
     /**
      * @return string
@@ -42,24 +44,35 @@ class SettingsDefinition extends EntityDefinition
      */
     public function getEntityClass(): string
     {
-        return SettingsEntity::class;
+        return LengowProductEntity::class;
     }
 
     /**
      * @return FieldCollection
      */
-    protected function defineFields(): FieldCollection
+    public function defineFields(): FieldCollection
     {
         return new FieldCollection(
             [
-                (new IdField('id', 'id'))->addFlags(new Required(), new PrimaryKey()),
-                (new FkField(
-                    'sales_channel_id', 'salesChannelId', ShopwareSalesChannelDefinition::class
-                ))->addFlags(new Required(), new PrimaryKey(), new SetNullOnDelete()),
-                (new StringField('name', 'name'))->addFlags(new Required()),
-                (new StringField('value', 'value')),
+                (new OneToOneAssociationField(
+                    'product',
+                    'id',
+                    'product_id',
+                    ShopwareProductDefinition::class
+                ))->addFlags(
+                    new Required(),
+                    new SetNullOnDelete()
+                ),
+                (new OneToOneAssociationField(
+                    'salesChannel',
+                    'id',
+                    'sales_channel_id',
+                    ShopwareSalesChannelDefinition::class
+                ))->addFlags(
+                    new Required(),
+                    new setNullOnDelete()
+                ),
                 (new DateField('created_at', 'createdAt'))->addFlags(new Required()),
-                (new DateField('updated_at', 'updatedAt'))->addFlags(new Required()),
             ]
         );
     }

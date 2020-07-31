@@ -1,6 +1,6 @@
 <?php declare(strict_types=1);
 
-namespace Lengow\Connector\Core\Content\Connector\EntityDefinition;
+namespace Lengow\Connector\Entity\Lengow\Order;
 
 // Definition base class
 use Shopware\Core\Framework\DataAbstractionLayer\EntityDefinition;
@@ -16,13 +16,16 @@ use Shopware\Core\Framework\DataAbstractionLayer\Field\IdField;
 use Shopware\Core\Framework\DataAbstractionLayer\Field\DateField;
 use Shopware\Core\Framework\DataAbstractionLayer\Field\StringField;
 use Shopware\Core\Framework\DataAbstractionLayer\Field\BoolField;
+use Shopware\Core\Framework\DataAbstractionLayer\Field\OneToOneAssociationField;
+use Shopware\Core\Framework\DataAbstractionLayer\Field\JsonField;
+
 // Model Return Type
 use Shopware\Core\Framework\DataAbstractionLayer\FieldCollection;
-// Foreign key class
+// OneToOne association class
 use Shopware\Core\Checkout\Order\OrderDefinition as ShopwareOrderDefinition;
 use Shopware\Core\System\SalesChannel\SalesChannelDefinition as ShopwareSalesChannelDefinition;
 // Entity class
-use Lengow\Connector\Core\Content\Connector\Entity\OrderEntity;
+use Lengow\Connector\Entity\Lengow\Order\OrderEntity as LengowOrderEntity;
 
 /**
  * Class OrderDefinition
@@ -45,7 +48,7 @@ class OrderDefinition extends EntityDefinition
      */
     public function getEntityClass(): string
     {
-        return OrderEntity::class;
+        return LengowOrderEntity::class;
     }
 
     /**
@@ -56,15 +59,18 @@ class OrderDefinition extends EntityDefinition
         return new FieldCollection(
             [
                 (new IdField('id', 'id'))->addFlags(new Required(), new PrimaryKey()),
-                (new FkField('order_id', 'orderId', ShopwareOrderDefinition::class))->addFlags(
-                    new PrimaryKey(),
-                    new SetNullOnDelete()
+                (new OneToOneAssociationField('order', 'id', 'order_id', ShopwareOrderDefinition::class))->addFlags(
+                    new setNullOnDelete()
                 ),
                 (new IntField ('order_sku', 'orderSku')),
-                (new FkField('sales_channel_id', 'salesChannelId', ShopwareSalesChannelDefinition::class))->addFlags(
+                (new OneToOneAssociationField(
+                    'salesChannel',
+                    'id',
+                    'sales_channel_id',
+                    ShopwareSalesChannelDefinition::class
+                ))->addFlags(
                     new Required(),
-                    new PrimaryKey(),
-                    new SetNullOnDelete()
+                    new setNullOnDelete()
                 ),
                 (new IntField('delivery_address_id', 'deliveryAddressId')),
                 (new StringField('delivery_country_iso', 'deliveryCountryIso')),
@@ -75,7 +81,7 @@ class OrderDefinition extends EntityDefinition
                 (new IntField('order_process_state', 'orderProcessState'))->addFlags(new Required()),
                 (new DateField('order_date', 'orderDate')),
                 (new IntField('order_item', 'orderItem')),
-                (new StringField('order_types', 'orderTypes')),
+                (new JsonField('order_types', 'orderTypes')),
                 (new StringField('currency', 'currency')),
                 (new FloatField('total_paid', 'totalPaid')),
                 (new FloatField('commission', 'commission')),
@@ -92,7 +98,7 @@ class OrderDefinition extends EntityDefinition
                 (new DateField('created_at', 'createdAt')),
                 (new DateField('updated_at', 'updatedAt')),
                 (new DateField('imported_at', 'importedAt')),
-                (new StringField('extra', 'extra')),
+                (new JsonField('extra', 'extra')),
             ]
         );
     }

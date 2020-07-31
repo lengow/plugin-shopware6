@@ -1,9 +1,11 @@
 <?php declare(strict_types=1);
 
-namespace Lengow\Connector\Core\Content\Connector\Entity;
+namespace Lengow\Connector\Entity\Lengow\OrderError;
 
 use Shopware\Core\Framework\DataAbstractionLayer\Entity;
 use Shopware\Core\Framework\DataAbstractionLayer\EntityIdTrait;
+// OneToOne association class
+use Lengow\Connector\Entity\Lengow\Order\OrderEntity as LengowOrderEntity;
 
 /**
  * Class OrderErrorEntity
@@ -14,12 +16,12 @@ class OrderErrorEntity extends Entity
     use EntityIdTrait;
 
     /**
-     * @var string
+     * @var LengowOrderEntity|null
      */
-    protected $lengowOrderId;
+    protected $order;
 
     /**
-     * @var string
+     * @var string|null
      */
     protected $message;
 
@@ -39,43 +41,43 @@ class OrderErrorEntity extends Entity
     protected $mail;
 
     /**
-     * @var \DateTime
+     * @var \DateTime|null
      */
     protected $createdAt;
 
     /**
-     * @var \DateTime
+     * @var \DateTime|null
      */
     protected $updatedAt;
 
     /**
-     * @return string
+     * @return LengowOrderEntity|null
      */
-    public function getLengowOrderId(): string
+    public function getOrder(): ?LengowOrderEntity
     {
-        return $this->lengowOrderId;
+        return $this->order;
     }
 
     /**
-     * @param string $lengowOrderId
+     * @param LengowOrderEntity|null $order
      */
-    public function setLengowOrderId(string $lengowOrderId): void
+    public function setOrder(?LengowOrderEntity $order): void
     {
-        $this->lengowOrderId = $lengowOrderId;
+        $this->order = $order;
     }
 
     /**
-     * @return string
+     * @return string|null
      */
-    public function getMessage(): string
+    public function getMessage(): ?string
     {
         return $this->message;
     }
 
     /**
-     * @param string $message
+     * @param string|null $message
      */
-    public function setMessage(string $message): void
+    public function setMessage(?string $message): void
     {
         $this->message = $message;
     }
@@ -129,33 +131,33 @@ class OrderErrorEntity extends Entity
     }
 
     /**
-     * @return \DateTime
+     * @return \DateTime|null
      */
-    public function getCreatedAt(): \DateTime
+    public function getCreatedAt(): ?\DateTime
     {
         return $this->createdAt;
     }
 
     /**
-     * @param \DateTime $createdAt
+     * @param \DateTime|null $createdAt
      */
-    public function setCreatedAt(\DateTime $createdAt): void
+    public function setCreatedAt(?\DateTime $createdAt): void
     {
         $this->createdAt = $createdAt;
     }
 
     /**
-     * @return \DateTime
+     * @return \DateTime|null
      */
-    public function getUpdatedAt(): \DateTime
+    public function getUpdatedAt(): ?\DateTime
     {
         return $this->updatedAt;
     }
 
     /**
-     * @param \DateTime $updatedAt
+     * @param \DateTime|null $updatedAt
      */
-    public function setUpdatedAt(\DateTime $updatedAt): void
+    public function setUpdatedAt(?\DateTime $updatedAt): void
     {
         $this->updatedAt = $updatedAt;
     }

@@ -6,27 +6,27 @@
 
     <services>
 
-        <service id="Lengow\Connector\Core\Content\Connector\EntityDefinition\ActionDefinition">
+        <service id="Lengow\Connector\Entity\Lengow\Action\ActionDefinition">
             <tag name="shopware.entity.definition" entity="lengow_action" />
         </service>
 
-        <service id="Lengow\Connector\Core\Content\Connector\EntityDefinition\OrderDefinition">
+        <service id="Lengow\Connector\Entity\Lengow\Order\OrderDefinition">
             <tag name="shopware.entity.definition" entity="lengow_order" />
         </service>
 
-        <service id="Lengow\Connector\Core\Content\Connector\EntityDefinition\OrderErrorDefinition">
+        <service id="Lengow\Connector\Entity\Lengow\OrderError\OrderErrorDefinition">
             <tag name="shopware.entity.definition" entity="lengow_order_error" />
         </service>
 
-        <service id="Lengow\Connector\Core\Content\Connector\EntityDefinition\OrderLineDefinition">
+        <service id="Lengow\Connector\Entity\Lengow\OrderLine\OrderLineDefinition">
             <tag name="shopware.entity.definition" entity="lengow_order_line" />
         </service>
 
-        <service id="Lengow\Connector\Core\Content\Connector\EntityDefinition\ProductDefinition">
+        <service id="Lengow\Connector\Entity\Lengow\Product\ProductDefinition">
             <tag name="shopware.entity.definition" entity="lengow_product" />
         </service>
 
-        <service id="Lengow\Connector\Core\Content\Connector\EntityDefinition\SettingsDefinition">
+        <service id="Lengow\Connector\Entity\Lengow\Settings\SettingsDefinition">
             <tag name="shopware.entity.definition" entity="lengow_settings" />
         </service>
 

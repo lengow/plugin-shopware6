@@ -1,9 +1,11 @@
 <?php declare(strict_types=1);
 
-namespace Lengow\Connector\Core\Content\Connector\Entity;
+namespace Lengow\Connector\Entity\Lengow\Settings;
 
 use Shopware\Core\Framework\DataAbstractionLayer\Entity;
 use Shopware\Core\Framework\DataAbstractionLayer\EntityIdTrait;
+// OneToOne association class
+use Shopware\Core\System\SalesChannel\SalesChannelEntity as ShopwareSalesChannelEntity;
 
 /**
  * Class SettingsEntity
@@ -14,9 +16,9 @@ class SettingsEntity extends Entity
     use EntityIdTrait;
 
     /**
-     * @var string
+     * @var ShopwareSalesChannelEntity|null
      */
-    protected $salesChannelId;
+    protected $salesChannel;
 
     /**
      * @var string
@@ -24,7 +26,7 @@ class SettingsEntity extends Entity
     protected $name;
 
     /**
-     * @var string
+     * @var string|null
      */
     protected $value;
 
@@ -39,19 +41,19 @@ class SettingsEntity extends Entity
     protected $updatedAt;
 
     /**
-     * @return string
+     * @return ShopwareSalesChannelEntity|null
      */
-    public function getSalesChannelId(): string
+    public function getSalesChannel(): ?ShopwareSalesChannelEntity
     {
-        return $this->salesChannelId;
+        return $this->salesChannel;
     }
 
     /**
-     * @param string $salesChannelId
+     * @param ShopwareSalesChannelEntity|null $salesChannel
      */
-    public function setSalesChannelId(string $salesChannelId): void
+    public function setSalesChannel(?ShopwareSalesChannelEntity $salesChannel): void
     {
-        $this->salesChannelId = $salesChannelId;
+        $this->salesChannel = $salesChannel;
     }
 
     /**
@@ -71,17 +73,17 @@ class SettingsEntity extends Entity
     }
 
     /**
-     * @return string
+     * @return string|null
      */
-    public function getValue(): string
+    public function getValue(): ?string
     {
         return $this->value;
     }
 
     /**
-     * @param string $value
+     * @param string|null $value
      */
-    public function setValue(string $value): void
+    public function setValue(?string $value): void
     {
         $this->value = $value;
     }
@@ -117,5 +119,4 @@ class SettingsEntity extends Entity
     {
         $this->updatedAt = $updatedAt;
     }
-
 }

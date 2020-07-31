@@ -1,9 +1,12 @@
 <?php declare(strict_types=1);
 
-namespace Lengow\Connector\Core\Content\Connector\Entity;
+namespace Lengow\Connector\Entity\Lengow\Order;
 
 use Shopware\Core\Framework\DataAbstractionLayer\Entity;
 use Shopware\Core\Framework\DataAbstractionLayer\EntityIdTrait;
+// OneToOne association class
+use Shopware\Core\Checkout\Order\OrderEntity as ShopwareOrderEntity;
+use Shopware\Core\System\SalesChannel\SalesChannelEntity as ShopwareSalesChannelEntity;
 
 /**
  * Class OrderEntity
@@ -14,19 +17,19 @@ class OrderEntity extends Entity
     use EntityIdTrait;
 
     /**
-     * @var string
+     * @var ShopwareOrderEntity|null
      */
-    protected $orderId;
+    protected $order;
 
     /**
-     * @var int
+     * @var int|null
      */
     protected $orderSku;
 
     /**
-     * @var string
+     * @var ShopwareSalesChannelEntity|null
      */
-    protected $salesChannelId;
+    protected $salesChannel;
 
     /**
      * @var int
@@ -34,7 +37,7 @@ class OrderEntity extends Entity
     protected $deliveryAddressId;
 
     /**
-     * @var string
+     * @var string|null
      */
     protected $deliveryCountryIso;
 
@@ -49,7 +52,7 @@ class OrderEntity extends Entity
     protected $marketplaceName;
 
     /**
-     * @var string
+     * @var string|null
      */
     protected $marketplaceLabel;
 
@@ -69,57 +72,57 @@ class OrderEntity extends Entity
     protected $orderDate;
 
     /**
-     * @var int
+     * @var int|null
      */
     protected $orderItem;
 
     /**
-     * @var string
+     * @var array|null
      */
     protected $orderTypes;
 
     /**
-     * @var string
+     * @var string|null
      */
     protected $currency;
 
     /**
-     * @var float
+     * @var float|null
      */
     protected $totalPaid;
 
     /**
-     * @var float
+     * @var float|null
      */
     protected $commission;
 
     /**
-     * @var string
+     * @var string|null
      */
     protected $customerName;
 
     /**
-     * @var string
+     * @var string|null
      */
     protected $customerEmail;
 
     /**
-     * @var string
+     * @var string|null
      */
     protected $carrier;
 
     /**
-     * @var string
+     * @var string|null
      */
     protected $carrierMethod;
 
     /**
-     * @var string
+     * @var string|null
      */
     protected $carrierTracking;
 
     /**
-     * @var string
+     * @var string|null
      */
     protected $carrierIdRelay;
 
@@ -139,76 +142,76 @@ class OrderEntity extends Entity
     protected $isReimported;
 
     /**
-     * @var string
+     * @var string|null
      */
     protected $message;
 
     /**
-     * @var \DateTime
+     * @var \DateTime|null
      */
     protected $createdAt;
 
     /**
-     * @var \DateTime
+     * @var \DateTime|null
      */
     protected $updatedAt;
 
     /**
-     * @var \DateTime
+     * @var \DateTime|null
      */
     protected $importedAt;
 
     /**
-     * @var string
+     * @var array|null
      */
     protected $extra;
 
     /**
-     * @return string
+     * @return ShopwareOrderEntity|null
      */
-    public function getOrderId(): string
+    public function getOrder(): ?ShopwareOrderEntity
     {
-        return $this->orderId;
+        return $this->order;
     }
 
     /**
-     * @param string $orderId
+     * @param ShopwareOrderEntity|null $order
      */
-    public function setOrderId(string $orderId): void
+    public function setOrder(?ShopwareOrderEntity $order): void
     {
-        $this->orderId = $orderId;
+        $this->order = $order;
     }
 
     /**
-     * @return int
+     * @return int|null
      */
-    public function getOrderSku(): int
+    public function getOrderSku(): ?int
     {
         return $this->orderSku;
     }
 
     /**
-     * @param int $orderSku
+     * @param int|null $orderSku
      */
-    public function setOrderSku(int $orderSku): void
+    public function setOrderSku(?int $orderSku): void
     {
         $this->orderSku = $orderSku;
     }
 
     /**
-     * @return string
+     * @return ShopwareSalesChannelEntity|null
      */
-    public function getSalesChannelId(): string
+    public function getSalesChannel(): ?ShopwareSalesChannelEntity
     {
-        return $this->salesChannelId;
+        return $this->salesChannel;
     }
 
     /**
-     * @param string $salesChannelId
+     * @param ShopwareSalesChannelEntity|null $salesChannel
      */
-    public function setSalesChannelId(string $salesChannelId): void
+    public function setSalesChannel(?ShopwareSalesChannelEntity $salesChannel): void
     {
-        $this->salesChannelId = $salesChannelId;
+        $this->salesChannel = $salesChannel;
     }
 
     /**
@@ -228,17 +231,17 @@ class OrderEntity extends Entity
     }
 
     /**
-     * @return string
+     * @return string|null
      */
-    public function getDeliveryCountryIso(): string
+    public function getDeliveryCountryIso(): ?string
     {
         return $this->deliveryCountryIso;
     }
 
     /**
-     * @param string $deliveryCountryIso
+     * @param string|null $deliveryCountryIso
      */
-    public function setDeliveryCountryIso(string $deliveryCountryIso): void
+    public function setDeliveryCountryIso(?string $deliveryCountryIso): void
     {
         $this->deliveryCountryIso = $deliveryCountryIso;
     }
@@ -276,17 +279,17 @@ class OrderEntity extends Entity
     }
 
     /**
-     * @return string
+     * @return string|null
      */
-    public function getMarketplaceLabel(): string
+    public function getMarketplaceLabel(): ?string
     {
         return $this->marketplaceLabel;
     }
 
     /**
-     * @param string $marketplaceLabel
+     * @param string|null $marketplaceLabel
      */
-    public function setMarketplaceLabel(string $marketplaceLabel): void
+    public function setMarketplaceLabel(?string $marketplaceLabel): void
     {
         $this->marketplaceLabel = $marketplaceLabel;
     }
@@ -340,177 +343,177 @@ class OrderEntity extends Entity
     }
 
     /**
-     * @return int
+     * @return int|null
      */
-    public function getOrderItem(): int
+    public function getOrderItem(): ?int
     {
         return $this->orderItem;
     }
 
     /**
-     * @param int $orderItem
+     * @param int|null $orderItem
      */
-    public function setOrderItem(int $orderItem): void
+    public function setOrderItem(?int $orderItem): void
     {
         $this->orderItem = $orderItem;
     }
 
     /**
-     * @return string
+     * @return array|null
      */
-    public function getOrderTypes(): string
+    public function getOrderTypes(): ?array
     {
         return $this->orderTypes;
     }
 
     /**
-     * @param string $orderTypes
+     * @param array|null $orderTypes
      */
-    public function setOrderTypes(string $orderTypes): void
+    public function setOrderTypes(?array $orderTypes): void
     {
         $this->orderTypes = $orderTypes;
     }
 
     /**
-     * @return string
+     * @return string|null
      */
-    public function getCurrency(): string
+    public function getCurrency(): ?string
     {
         return $this->currency;
     }
 
     /**
-     * @param string $currency
+     * @param string|null $currency
      */
-    public function setCurrency(string $currency): void
+    public function setCurrency(?string $currency): void
     {
         $this->currency = $currency;
     }
 
     /**
-     * @return float
+     * @return float|null
      */
-    public function getTotalPaid(): float
+    public function getTotalPaid(): ?float
     {
         return $this->totalPaid;
     }
 
     /**
-     * @param float $totalPaid
+     * @param float|null $totalPaid
      */
-    public function setTotalPaid(float $totalPaid): void
+    public function setTotalPaid(?float $totalPaid): void
     {
         $this->totalPaid = $totalPaid;
     }
 
     /**
-     * @return float
+     * @return float|null
      */
-    public function getCommission(): float
+    public function getCommission(): ?float
     {
         return $this->commission;
     }
 
     /**
-     * @param float $commission
+     * @param float|null $commission
      */
-    public function setCommission(float $commission): void
+    public function setCommission(?float $commission): void
     {
         $this->commission = $commission;
     }
 
     /**
-     * @return string
+     * @return string|null
      */
-    public function getCustomerName(): string
+    public function getCustomerName(): ?string
     {
         return $this->customerName;
     }
 
     /**
-     * @param string $customerName
+     * @param string|null $customerName
      */
-    public function setCustomerName(string $customerName): void
+    public function setCustomerName(?string $customerName): void
     {
         $this->customerName = $customerName;
     }
 
     /**
-     * @return string
+     * @return string|null
      */
-    public function getCustomerEmail(): string
+    public function getCustomerEmail(): ?string
     {
         return $this->customerEmail;
     }
 
     /**
-     * @param string $customerEmail
+     * @param string|null $customerEmail
      */
-    public function setCustomerEmail(string $customerEmail): void
+    public function setCustomerEmail(?string $customerEmail): void
     {
         $this->customerEmail = $customerEmail;
     }
 
     /**
-     * @return string
+     * @return string|null
      */
-    public function getCarrier(): string
+    public function getCarrier(): ?string
     {
         return $this->carrier;
     }
 
     /**
-     * @param string $carrier
+     * @param string|null $carrier
      */
-    public function setCarrier(string $carrier): void
+    public function setCarrier(?string $carrier): void
     {
         $this->carrier = $carrier;
     }
 
     /**
-     * @return string
+     * @return string|null
      */
-    public function getCarrierMethod(): string
+    public function getCarrierMethod(): ?string
     {
         return $this->carrierMethod;
     }
 
     /**
-     * @param string $carrierMethod
+     * @param string|null $carrierMethod
      */
-    public function setCarrierMethod(string $carrierMethod): void
+    public function setCarrierMethod(?string $carrierMethod): void
     {
         $this->carrierMethod = $carrierMethod;
     }
 
     /**
-     * @return string
+     * @return string|null
      */
-    public function getCarrierTracking(): string
+    public function getCarrierTracking(): ?string
     {
         return $this->carrierTracking;
     }
 
     /**
-     * @param string $carrierTracking
+     * @param string|null $carrierTracking
      */
-    public function setCarrierTracking(string $carrierTracking): void
+    public function setCarrierTracking(?string $carrierTracking): void
     {
         $this->carrierTracking = $carrierTracking;
     }
 
     /**
-     * @return string
+     * @return string|null
      */
-    public function getCarrierIdRelay(): string
+    public function getCarrierIdRelay(): ?string
     {
         return $this->carrierIdRelay;
     }
 
     /**
-     * @param string $carrierIdRelay
+     * @param string|null $carrierIdRelay
      */
-    public function setCarrierIdRelay(string $carrierIdRelay): void
+    public function setCarrierIdRelay(?string $carrierIdRelay): void
     {
         $this->carrierIdRelay = $carrierIdRelay;
     }
@@ -518,7 +521,7 @@ class OrderEntity extends Entity
     /**
      * @return bool
      */
-    public function getSentMarketplace(): bool
+    public function isSentMarketplace(): bool
     {
         return $this->sentMarketplace;
     }
@@ -534,7 +537,7 @@ class OrderEntity extends Entity
     /**
      * @return bool
      */
-    public function getIsInError(): bool
+    public function isInError(): bool
     {
         return $this->isInError;
     }
@@ -550,7 +553,7 @@ class OrderEntity extends Entity
     /**
      * @return bool
      */
-    public function getIsReimported(): bool
+    public function isReimported(): bool
     {
         return $this->isReimported;
     }
@@ -564,81 +567,81 @@ class OrderEntity extends Entity
     }
 
     /**
-     * @return string
+     * @return string|null
      */
-    public function getMessage(): string
+    public function getMessage(): ?string
     {
         return $this->message;
     }
 
     /**
-     * @param string $message
+     * @param string|null $message
      */
-    public function setMessage(string $message): void
+    public function setMessage(?string $message): void
     {
         $this->message = $message;
     }
 
     /**
-     * @return \DateTime
+     * @return \DateTime|null
      */
-    public function getCreatedAt(): \DateTime
+    public function getCreatedAt(): ?\DateTime
     {
         return $this->createdAt;
     }
 
     /**
-     * @param \DateTime $createdAt
+     * @param \DateTime|null $createdAt
      */
-    public function setCreatedAt(\DateTime $createdAt): void
+    public function setCreatedAt(?\DateTime $createdAt): void
     {
         $this->createdAt = $createdAt;
     }
 
     /**
-     * @return \DateTime
+     * @return \DateTime|null
      */
-    public function getUpdatedAt(): \DateTime
+    public function getUpdatedAt(): ?\DateTime
     {
         return $this->updatedAt;
     }
 
     /**
-     * @param \DateTime $updatedAt
+     * @param \DateTime|null $updatedAt
      */
-    public function setUpdatedAt(\DateTime $updatedAt): void
+    public function setUpdatedAt(?\DateTime $updatedAt): void
     {
         $this->updatedAt = $updatedAt;
     }
 
     /**
-     * @return \DateTime
+     * @return \DateTime|null
      */
-    public function getImportedAt(): \DateTime
+    public function getImportedAt(): ?\DateTime
     {
         return $this->importedAt;
     }
 
     /**
-     * @param \DateTime $importedAt
+     * @param \DateTime|null $importedAt
      */
-    public function setImportedAt(\DateTime $importedAt): void
+    public function setImportedAt(?\DateTime $importedAt): void
     {
         $this->importedAt = $importedAt;
     }
 
     /**
-     * @return string
+     * @return array|null
      */
-    public function getExtra(): string
+    public function getExtra(): ?array
     {
         return $this->extra;
     }
 
     /**
-     * @param string $extra
+     * @param array|null $extra
      */
-    public function setExtra(string $extra): void
+    public function setExtra(?array $extra): void
     {
         $this->extra = $extra;
     }

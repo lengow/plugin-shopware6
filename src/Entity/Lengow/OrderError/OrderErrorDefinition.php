@@ -1,0 +1,75 @@
+<?php declare(strict_types=1);
+
+namespace Lengow\Connector\Entity\Lengow\OrderError;
+
+// Definition base class
+use Shopware\Core\Framework\DataAbstractionLayer\EntityDefinition;
+// Field flags
+use Shopware\Core\Framework\DataAbstractionLayer\Field\Flag\PrimaryKey;
+use Shopware\Core\Framework\DataAbstractionLayer\Field\Flag\Required;
+use Shopware\Core\Framework\DataAbstractionLayer\Field\Flag\SetNullOnDelete;
+// Field types
+use Shopware\Core\Framework\DataAbstractionLayer\Field\FkField;
+use Shopware\Core\Framework\DataAbstractionLayer\Field\IntField;
+use Shopware\Core\Framework\DataAbstractionLayer\Field\IdField;
+use Shopware\Core\Framework\DataAbstractionLayer\Field\DateField;
+use Shopware\Core\Framework\DataAbstractionLayer\Field\StringField;
+use Shopware\Core\Framework\DataAbstractionLayer\Field\BoolField;
+use Shopware\Core\Framework\DataAbstractionLayer\Field\OneToOneAssociationField;
+// Model Return Type
+use Shopware\Core\Framework\DataAbstractionLayer\FieldCollection;
+// OneToOne association class
+use Lengow\Connector\Core\Content\Connector\OrderDefinition as LengowOrderDefinition;
+// Entity class
+use Lengow\Connector\Entity\Lengow\OrderError\OrderErrorEntity as LengowOrderErrorEntity;
+
+/**
+ * Class OrderErrorDefinition
+ * @package Lengow\Connector\Core\Content\Connector\EntityDefinition
+ */
+class OrderErrorDefinition extends EntityDefinition
+{
+    public const ENTITY_NAME = 'lengow_order_error';
+
+    /**
+     * @return string
+     */
+    public function getEntityName(): string
+    {
+        return self::ENTITY_NAME;
+    }
+
+    /**
+     * @return string
+     */
+    public function getEntityClass() : string
+    {
+        return LengowOrderErrorEntity::class;
+    }
+
+    /**
+     * @return FieldCollection
+     */
+    protected function defineFields(): FieldCollection
+    {
+        return new FieldCollection(
+            [
+                (new IdField('id', 'id'))->addFlags(new Required(), new PrimaryKey()),
+                (new OneToOneAssociationField(
+                    'order',
+                    'id',
+                    'lengow_order_id',
+                    LengowOrderDefinition::class
+                ))->addFlags(
+                    new setNullOnDelete()
+                ),
+                (new StringField('message', 'message')),
+                (new IntField('type', 'type'))->addFlags(new Required()),
+                (new BoolField('is_finished', 'isFinished'))->addFlags(new Required()),
+                (new BoolField('mail', 'mail'))->addFlags(new Required()),
+                (new DateField('createdAt', 'createdAt')),
+                (new DateField('updatedAt', 'updatedAt')),
+            ]
+        );
+    }
+}
