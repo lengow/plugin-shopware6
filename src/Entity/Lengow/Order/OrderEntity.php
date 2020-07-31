@@ -10,7 +10,7 @@ use Shopware\Core\System\SalesChannel\SalesChannelEntity as ShopwareSalesChannel
 
 /**
  * Class OrderEntity
- * @package Lengow\Connector\Core\Content\Connector\Entity
+ * @package Lengow\Connector\Entity\Lengow\Order
  */
 class OrderEntity extends Entity
 {
@@ -27,7 +27,7 @@ class OrderEntity extends Entity
     protected $orderSku;
 
     /**
-     * @var ShopwareSalesChannelEntity|null
+     * @var ShopwareSalesChannelEntity
      */
     protected $salesChannel;
 
@@ -199,17 +199,17 @@ class OrderEntity extends Entity
     }
 
     /**
-     * @return ShopwareSalesChannelEntity|null
+     * @return ShopwareSalesChannelEntity
      */
-    public function getSalesChannel(): ?ShopwareSalesChannelEntity
+    public function getSalesChannel(): ShopwareSalesChannelEntity
     {
         return $this->salesChannel;
     }
 
     /**
-     * @param ShopwareSalesChannelEntity|null $salesChannel
+     * @param ShopwareSalesChannelEntity $salesChannel
      */
-    public function setSalesChannel(?ShopwareSalesChannelEntity $salesChannel): void
+    public function setSalesChannel(ShopwareSalesChannelEntity $salesChannel): void
     {
         $this->salesChannel = $salesChannel;
     }

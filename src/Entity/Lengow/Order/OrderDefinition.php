@@ -18,7 +18,6 @@ use Shopware\Core\Framework\DataAbstractionLayer\Field\StringField;
 use Shopware\Core\Framework\DataAbstractionLayer\Field\BoolField;
 use Shopware\Core\Framework\DataAbstractionLayer\Field\OneToOneAssociationField;
 use Shopware\Core\Framework\DataAbstractionLayer\Field\JsonField;
-
 // Model Return Type
 use Shopware\Core\Framework\DataAbstractionLayer\FieldCollection;
 // OneToOne association class
@@ -29,7 +28,7 @@ use Lengow\Connector\Entity\Lengow\Order\OrderEntity as LengowOrderEntity;
 
 /**
  * Class OrderDefinition
- * @package Lengow\Connector\Core\Content\Connector\EntityDefinition
+ * @package Lengow\Connector\Entity\Lengow\Order
  */
 class OrderDefinition extends EntityDefinition
 {

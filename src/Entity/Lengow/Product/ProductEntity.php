@@ -10,17 +10,17 @@ use Shopware\Core\System\SalesChannel\SalesChannelEntity as ShopwareSalesChannel
 
 /**
  * Class ProductEntity
- * @package Lengow\Connector\Core\Content\Connector\Entity
+ * @package Lengow\Connector\Entity\Lengow\Product
  */
 class ProductEntity extends Entity
 {
     /**
-     * @var ShopwareProductEntity|null
+     * @var ShopwareProductEntity
      */
     protected $product;
 
     /**
-     * @var ShopwareSalesChannelEntity|null
+     * @var ShopwareSalesChannelEntity
      */
     protected $salesChannel;
 
@@ -30,33 +30,33 @@ class ProductEntity extends Entity
     protected $createdAt;
 
     /**
-     * @return ShopwareProductEntity|null
+     * @return ShopwareProductEntity
      */
-    public function getProduct(): ?ShopwareProductEntity
+    public function getProduct(): ShopwareProductEntity
     {
         return $this->product;
     }
 
     /**
-     * @param ShopwareProductEntity|null $product
+     * @param ShopwareProductEntity $product
      */
-    public function setProduct(?ShopwareProductEntity $product): void
+    public function setProduct(ShopwareProductEntity $product): void
     {
         $this->product = $product;
     }
 
     /**
-     * @return ShopwareSalesChannelEntity|null
+     * @return ShopwareSalesChannelEntity
      */
-    public function getSalesChannel(): ?ShopwareSalesChannelEntity
+    public function getSalesChannel(): ShopwareSalesChannelEntity
     {
         return $this->salesChannel;
     }
 
     /**
-     * @param ShopwareSalesChannelEntity|null $salesChannel
+     * @param ShopwareSalesChannelEntity $salesChannel
      */
-    public function setSalesChannel(?ShopwareSalesChannelEntity $salesChannel): void
+    public function setSalesChannel(ShopwareSalesChannelEntity $salesChannel): void
     {
         $this->salesChannel = $salesChannel;
     }

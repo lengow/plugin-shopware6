@@ -24,7 +24,7 @@ use Lengow\Connector\Entity\Lengow\OrderLine\OrderLineEntity as LengowOrderLineE
 
 /**
  * Class OrderLineDefinition
- * @package Lengow\Connector\Core\Content\Connector\EntityDefinition
+ * @package Lengow\Connector\Entity\Lengow\OrderLine
  */
 class OrderLineDefinition extends EntityDefinition
 {

@@ -9,14 +9,14 @@ use Lengow\Connector\Entity\Lengow\Order\OrderEntity as LengowOrderEntity;
 
 /**
  * Class OrderErrorEntity
- * @package Lengow\Connector\Core\Content\Connector\Entity
+ * @package Lengow\Connector\Entity\Lengow\OrderError
  */
 class OrderErrorEntity extends Entity
 {
     use EntityIdTrait;
 
     /**
-     * @var LengowOrderEntity|null
+     * @var LengowOrderEntity
      */
     protected $order;
 
@@ -51,17 +51,17 @@ class OrderErrorEntity extends Entity
     protected $updatedAt;
 
     /**
-     * @return LengowOrderEntity|null
+     * @return LengowOrderEntity
      */
-    public function getOrder(): ?LengowOrderEntity
+    public function getOrder(): LengowOrderEntity
     {
         return $this->order;
     }
 
     /**
-     * @param LengowOrderEntity|null $order
+     * @param LengowOrderEntity $order
      */
-    public function setOrder(?LengowOrderEntity $order): void
+    public function setOrder(LengowOrderEntity $order): void
     {
         $this->order = $order;
     }

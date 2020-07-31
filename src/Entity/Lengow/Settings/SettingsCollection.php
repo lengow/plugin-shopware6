@@ -6,11 +6,15 @@ use Shopware\Core\Framework\DataAbstractionLayer\EntityCollection;
 // Entity class
 use Lengow\Connector\Entity\Lengow\Settings\SettingsEntity as LengowSettingsEntity;
 
+/**
+ * Class SettingsCollection
+ * @package Lengow\Connector\Entity\Lengow\Settings
+ */
 class SettingsCollection extends EntityCollection
 {
     /**
-     * @method void                add(LengowSettingsEntity $entity)
-     * @method void                set(string $key, LengowSettingsEntity $entity)
+     * @method void                      add(LengowSettingsEntity $entity)
+     * @method void                      set(string $key, LengowSettingsEntity $entity)
      * @method LengowSettingsEntity[]    getIterator()
      * @method LengowSettingsEntity[]    getElements()
      * @method LengowSettingsEntity|null get(string $key)

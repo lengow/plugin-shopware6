@@ -9,7 +9,7 @@ use Shopware\Core\System\SalesChannel\SalesChannelEntity as ShopwareSalesChannel
 
 /**
  * Class SettingsEntity
- * @package Lengow\Connector\Core\Content\Connector\Entity
+ * @package Lengow\Connector\Entity\Lengow\Settings
  */
 class SettingsEntity extends Entity
 {

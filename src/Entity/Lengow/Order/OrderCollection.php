@@ -6,11 +6,15 @@ use Shopware\Core\Framework\DataAbstractionLayer\EntityCollection;
 // Entity class
 use Lengow\Connector\Entity\Lengow\Order\OrderEntity as LengowOrderEntity;
 
+/**
+ * Class OrderCollection
+ * @package Lengow\Connector\Entity\Lengow\Order
+ */
 class OrderCollection extends EntityCollection
 {
     /**
-     * @method void              add(LengowOrderEntity $entity)
-     * @method void              set(string $key, LengowOrderEntity $entity)
+     * @method void                    add(LengowOrderEntity $entity)
+     * @method void                    set(string $key, LengowOrderEntity $entity)
      * @method LengowOrderEntity[]     getIterator()
      * @method LengowOrderEntity[]     getElements()
      * @method LengowOrderEntity|null  get(string $key)

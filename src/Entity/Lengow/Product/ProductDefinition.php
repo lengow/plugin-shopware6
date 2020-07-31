@@ -25,7 +25,7 @@ use Lengow\Connector\Entity\Lengow\Product\ProductEntity as LengowProductEntity;
 
 /**
  * Class ProductDefinition
- * @package Lengow\Connector\Core\Content\Connector\EntityDefinition
+ * @package Lengow\Connector\Entity\Lengow\Product
  */
 class ProductDefinition extends EntityDefinition
 {

@@ -25,7 +25,7 @@ use Lengow\Connector\Entity\Lengow\OrderError\OrderErrorEntity as LengowOrderErr
 
 /**
  * Class OrderErrorDefinition
- * @package Lengow\Connector\Core\Content\Connector\EntityDefinition
+ * @package Lengow\Connector\Entity\Lengow\OrderError
  */
 class OrderErrorDefinition extends EntityDefinition
 {

@@ -10,7 +10,7 @@ use Shopware\Core\Content\Product\ProductEntity as ShopwareProductEntity;
 
 /**
  * Class OrderLineEntity
- * @package Lengow\Connector\Core\Content\Connector\Entity
+ * @package Lengow\Connector\Entity\Lengow\OrderLine
  */
 class OrderLineEntity extends Entity
 {

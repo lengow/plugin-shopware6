@@ -23,7 +23,7 @@ use Lengow\Connector\Entity\Lengow\Settings\SettingsEntity as LengowSettingsEnti
 
 /**
  * Class SettingsDefinition
- * @package Lengow\Connector\Core\Content\Connector\EntityDefinition
+ * @package Lengow\Connector\Entity\Lengow\Settings
  */
 class SettingsDefinition extends EntityDefinition
 {

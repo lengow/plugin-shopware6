@@ -9,14 +9,14 @@ use Shopware\Core\Checkout\Order\OrderEntity as ShopwareOrderEntity;
 
 /**
  * Class ActionEntity
- * @package Lengow\Connector\Core\Content\Connector\Entity
+ * @package Lengow\Connector\Entity\Lengow\Action
  */
 class ActionEntity extends Entity
 {
     use EntityIdTrait;
 
     /**
-     * @var ShopwareOrderEntity|null
+     * @var ShopwareOrderEntity
      */
     protected $order;
 
@@ -41,7 +41,7 @@ class ActionEntity extends Entity
     protected $retry;
 
     /**
-     * @var array|null
+     * @var array
      */
     protected $parameters;
 
@@ -61,17 +61,17 @@ class ActionEntity extends Entity
     protected $updatedAt;
 
     /**
-     * @return ShopwareOrderEntity|null
+     * @return ShopwareOrderEntity|
      */
-    public function getOrder(): ?ShopwareOrderEntity
+    public function getOrder(): ShopwareOrderEntity
     {
         return $this->order;
     }
 
     /**
-     * @param ShopwareOrderEntity|null $order
+     * @param ShopwareOrderEntity$order
      */
-    public function setOrder(?ShopwareOrderEntity $order): void
+    public function setOrder(ShopwareOrderEntity $order): void
     {
         $this->order = $order;
     }
@@ -141,7 +141,7 @@ class ActionEntity extends Entity
     }
 
     /**
-     * @return array|null
+     * @return array
      */
     public function getParameters(): ?array
     {
@@ -149,9 +149,9 @@ class ActionEntity extends Entity
     }
 
     /**
-     * @param array|null $parameters
+     * @param array $parameters
      */
-    public function setParameters(?array $parameters): void
+    public function setParameters(array $parameters): void
     {
         $this->parameters = $parameters;
     }

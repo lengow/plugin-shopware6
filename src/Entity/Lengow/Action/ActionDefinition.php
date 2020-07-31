@@ -25,7 +25,7 @@ use Lengow\Connector\Entity\Lengow\Action\ActionEntity as LengowActionEntity;
 
 /**
  * Class ActionDefinition
- * @package Lengow\Connector\Core\Content\Connector\EntityDefinition
+ * @package Lengow\Connector\Entity\Lengow\Action
  */
 class ActionDefinition extends EntityDefinition
 {
