@@ -30,5 +30,10 @@
             <tag name="shopware.entity.definition" entity="lengow_settings" />
         </service>
 
+        <service id="Lengow\Connector\Service\LengowPayment">
+            <argument type="service" id="Shopware\Core\Checkout\Order\Aggregate\OrderTransaction\OrderTransactionStateHandler"/>
+            <tag name="shopware.payment.method.sync" />
+        </service>
+
     </services>
 </container>

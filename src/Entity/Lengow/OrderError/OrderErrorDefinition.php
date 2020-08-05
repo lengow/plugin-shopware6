@@ -19,7 +19,7 @@ use Shopware\Core\Framework\DataAbstractionLayer\Field\OneToOneAssociationField;
 // Model Return Type
 use Shopware\Core\Framework\DataAbstractionLayer\FieldCollection;
 // OneToOne association class
-use Lengow\Connector\Core\Content\Connector\OrderDefinition as LengowOrderDefinition;
+use Lengow\Connector\Entity\Lengow\Order\OrderDefinition as LengowOrderDefinition;
 // Entity class
 use Lengow\Connector\Entity\Lengow\OrderError\OrderErrorEntity as LengowOrderErrorEntity;
 
