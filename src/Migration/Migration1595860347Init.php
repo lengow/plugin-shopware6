@@ -4,6 +4,7 @@ namespace Lengow\Connector\Migration;
 
 use Doctrine\DBAL\Connection;
 use Shopware\Core\Framework\Migration\MigrationStep;
+use Shopware\Core\Framework\Uuid\Uuid;
 
 class Migration1595860347Init extends MigrationStep
 {
@@ -167,6 +168,21 @@ class Migration1595860347Init extends MigrationStep
                 INDEX (`product_id`, `sales_channel_id`)
             ) DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
         ');
+
+        /**
+         * Add lengow_technical_error new order state in state_machine_state table
+         * order state are linked to state_machine (order.state here)
+         */
+        $uuid = Uuid::randomHex(); // Generate new uuid for insert
+        $connection->executeUpdate('
+            INSERT IGNORE INTO state_machine_state VALUES (
+                UNHEX("' . $uuid . '"),
+                "lengow_technical_error",
+                (SELECT id FROM state_machine WHERE technical_name = "order.state"),
+                NOW(),
+                null
+            );
+        ');
     }
 
     public function updateDestructive(Connection $connection): void
@@ -176,5 +192,8 @@ class Migration1595860347Init extends MigrationStep
             `lengow_settings`,
             `lengow_product`,
         ');
+
+        // we dont remove lengow_technical_error order state because it can cause
+        // inconsistency if it has been used on order that are still in the database
     }
 }
