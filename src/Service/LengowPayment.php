@@ -20,7 +20,7 @@ class LengowPayment implements SynchronousPaymentHandlerInterface
     private $transactionStateHandler;
 
     /**
-     * LengowPayment constructor.
+     * LengowPayment constructor
      *
      * @param OrderTransactionStateHandler $transactionStateHandler
      */
@@ -34,9 +34,10 @@ class LengowPayment implements SynchronousPaymentHandlerInterface
      * @param RequestDataBag $dataBag
      * @param SalesChannelContext $salesChannelContext
      */
-    public function pay(SyncPaymentTransactionStruct $transaction,
-                        RequestDataBag $dataBag,
-                        SalesChannelContext $salesChannelContext): void
-    {
+    public function pay(
+        SyncPaymentTransactionStruct $transaction,
+        RequestDataBag $dataBag,
+        SalesChannelContext $salesChannelContext
+    ): void {
     }
 }

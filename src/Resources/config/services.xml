@@ -6,6 +6,8 @@
 
     <services>
 
+        <!-- Entity -->
+
         <service id="Lengow\Connector\Entity\Lengow\Action\ActionDefinition">
             <tag name="shopware.entity.definition" entity="lengow_action" />
         </service>
@@ -30,9 +32,30 @@
             <tag name="shopware.entity.definition" entity="lengow_settings" />
         </service>
 
+        <!-- Actual service -->
+
         <service id="Lengow\Connector\Service\LengowPayment">
             <argument type="service" id="Shopware\Core\Checkout\Order\Aggregate\OrderTransaction\OrderTransactionStateHandler"/>
             <tag name="shopware.payment.method.sync" />
+        </service>
+
+        <service id="Lengow\Connector\Service\LengowAccess">
+            <argument type="service" id="lengow_settings.repository"/>
+            <argument type="service" id="Shopware\Core\System\SystemConfig\SystemConfigService" />
+        </service>
+
+        <!-- Front Controller -->
+
+        <service id="Lengow\Connector\Storefront\Controller\LengowExportController">
+            <argument type="service" id="Lengow\Connector\Service\LengowAccess"/>
+            <argument type="service" id="Shopware\Core\System\SystemConfig\SystemConfigService" />
+            <tag name="controller.service_arguments"/>
+        </service>
+
+        <service id="Lengow\Connector\Storefront\Controller\LengowCronController">
+            <argument type="service" id="Lengow\Connector\Service\LengowAccess"/>
+            <argument type="service" id="Shopware\Core\System\SystemConfig\SystemConfigService" />
+            <tag name="controller.service_arguments"></tag>
         </service>
 
     </services>

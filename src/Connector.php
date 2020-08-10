@@ -2,7 +2,6 @@
 
 namespace Lengow\Connector;
 
-use Lengow\Connector\Service\LengowPayment;
 use Doctrine\DBAL\Connection;
 use Shopware\Core\Framework\Context;
 use Shopware\Core\Framework\DataAbstractionLayer\EntityRepositoryInterface;
@@ -12,6 +11,7 @@ use Shopware\Core\Framework\Plugin;
 use Shopware\Core\Framework\Plugin\Context\InstallContext;
 use Shopware\Core\Framework\Plugin\Context\UninstallContext;
 use Shopware\Core\Framework\Plugin\Util\PluginIdProvider;
+use Lengow\Connector\Service\LengowPayment;
 
 /**
  * Class Connector

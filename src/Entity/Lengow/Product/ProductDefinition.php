@@ -56,8 +56,8 @@ class ProductDefinition extends EntityDefinition
             [
                 (new OneToOneAssociationField(
                     'product',
-                    'id',
                     'product_id',
+                    'id',
                     ShopwareProductDefinition::class
                 ))->addFlags(
                     new Required(),
@@ -65,8 +65,8 @@ class ProductDefinition extends EntityDefinition
                 ),
                 (new OneToOneAssociationField(
                     'salesChannel',
-                    'id',
                     'sales_channel_id',
+                    'id',
                     ShopwareSalesChannelDefinition::class
                 ))->addFlags(
                     new Required(),

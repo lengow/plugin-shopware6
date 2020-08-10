@@ -56,8 +56,8 @@ class SettingsDefinition extends EntityDefinition
                 (new IdField('id', 'id'))->addFlags(new Required(), new PrimaryKey()),
                 (new OneToOneAssociationField(
                     'salesChannel',
-                    'id',
                     'sales_channel_id',
+                    'id',
                     ShopwareSalesChannelDefinition::class
                 ))->addFlags(
                     new Required(),

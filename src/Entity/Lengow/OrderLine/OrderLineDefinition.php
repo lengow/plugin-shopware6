@@ -60,8 +60,8 @@ class OrderLineDefinition extends EntityDefinition
                 ),
                 (new OneToOneAssociationField(
                     'product',
-                    'id',
                     'product_id',
+                    'id',
                     ShopwareProductDefinition::class
                 ))->addFlags(
                     new Required(),

@@ -57,8 +57,8 @@ class OrderErrorDefinition extends EntityDefinition
                 (new IdField('id', 'id'))->addFlags(new Required(), new PrimaryKey()),
                 (new OneToOneAssociationField(
                     'order',
-                    'id',
                     'lengow_order_id',
+                    'id',
                     LengowOrderDefinition::class
                 ))->addFlags(
                     new setNullOnDelete()
