@@ -11,6 +11,9 @@ use Shopware\Core\Framework\Plugin;
 use Shopware\Core\Framework\Plugin\Context\InstallContext;
 use Shopware\Core\Framework\Plugin\Context\UninstallContext;
 use Shopware\Core\Framework\Plugin\Util\PluginIdProvider;
+use Symfony\Component\Config\FileLocator;
+use Symfony\Component\DependencyInjection\ContainerBuilder;
+use Symfony\Component\DependencyInjection\Loader\XmlFileLoader;
 use Lengow\Connector\Service\LengowPayment;
 
 /**
@@ -19,6 +22,20 @@ use Lengow\Connector\Service\LengowPayment;
  */
 class Connector extends Plugin
 {
+    /**
+     * {@inheritdoc}
+     */
+    public function build(ContainerBuilder $container): void
+    {
+        parent::build($container);
+
+        $loader = new XmlFileLoader($container, new FileLocator(__DIR__ . '/DependencyInjection/'));
+        $loader->load('entity.xml');
+        $loader->load('front_controller.xml');
+        $loader->load('service.xml');
+        $loader->load('util.xml');
+    }
+
     /**
      * @param InstallContext $context
      */

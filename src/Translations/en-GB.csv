@@ -1,0 +1,53 @@
+settings.lengow_main_settings.label|Main settings
+settings.lengow_main_settings.description|Below you will find your Lengow login details.<br />Account ID, Access Token and Secret Token are automatically completed at your first connection : please do not change them.
+settings.lengow_main_settings.account.label|Account ID
+settings.lengow_main_settings.account.description|Your Lengow account ID. Please do not change it.
+settings.lengow_main_settings.access.label|Access Token
+settings.lengow_main_settings.access.description|Your access token. Please do not change it.
+settings.lengow_main_settings.secret.label|Secret Token
+settings.lengow_main_settings.secret.description|Your secret token. Please do not change it.
+settings.lengow_main_settings.enable.label|Enable shop
+settings.lengow_main_settings.enable.description|Enable shop to work with Lengow
+settings.lengow_main_settings.catalog.label|Catalogues ID
+settings.lengow_main_settings.catalog.description|Your catalogues ID to import orders.<br />Separate them by ' ; '
+settings.lengow_main_settings.ip_enable.label|Enable authorisation by IP
+settings.lengow_main_settings.ip_enable.description|Enable this option if you want your export to be secured by IP. By default, your export is secured by a unique key.
+settings.lengow_main_settings.ip.label|Authorised IPs
+settings.lengow_main_settings.ip.description|Authorise IP to get access to your export feed.<br />Separate them ' ; '
+settings.lengow_main_settings.tracking_enable.label|Enable Lengow tracking
+settings.lengow_main_settings.tracking_enable.description|This tracker allows you to retrieve order statistics generated on your site directly in Lengow.
+settings.lengow_main_settings.tracking_id.label|Tracker Product ID
+settings.lengow_main_settings.tracking_id.description|The name of the unique identifier entered in the Lengow
+settings.lengow_export_settings.label|Export settings
+settings.lengow_export_settings.description|Define the settings to create your feed.
+settings.lengow_export_settings.disabled_products.label|Export inactive products
+settings.lengow_export_settings.disabled_products.description|Enable this option if you want to export inactive products
+settings.lengow_export_settings.lengow_selection.label|Export specific products only
+settings.lengow_export_settings.lengow_selection.description|Activate this option if you do not want to export all of your avaible products. Then select your products one by one.
+settings.lengow_export_settings.dispatcher.label|Default carrier
+settings.lengow_export_settings.dispatcher.description|Select the default carrier to calculate shipping costs
+settings.lengow_import_settings.label|Import settings
+settings.lengow_import_settings.description|All your orders are centralized in your Lengow platform : choose here if you want to synchronize and import your orders in your Shopware backoffice. It will also decrease your products stock in your backoffice
+settings.lengow_import_settings.ship_mp_enabled.label|Import orders shipped by marketplaces
+settings.lengow_import_settings.decrease_stock.label|Decrease my stock with the orders shipped by marketplaces
+settings.lengow_import_settings.decrease_stock.description|Use this option to take into account your orders sent by marketplaces on your stock in your Shopware backoffice
+settings.lengow_import_settings.dispatcher.label|Default carrier
+settings.lengow_import_settings.dispatcher.description|Select the default carrier that you would like to apply to your orders
+settings.lengow_import_settings.import_days.label|Synchronize all orders updated since
+settings.lengow_import_settings.import_days.description|Choose a number of days (Max 10 days)
+settings.lengow_import_settings.debug_mode.label|Activate Debug Mode
+settings.lengow_import_settings.debug_mode.description|Use Debug Mode for testing and to simulate fictitious orders. Please note that you have to activate this setting on your pre-production server ONLY
+settings.lengow_import_settings.report_mail_enabled.label|I would like to be notified when there are issues regarding order importation
+settings.lengow_import_settings.report_mail_address.label|Mail for the report email
+settings.lengow_import_settings.report_mail_address.description|Email separated by ;
+settings.lengow_import_settings.currency_conversion_title.label|Convert the currency of your order
+settings.lengow_import_settings.currency_conversion_title.description|All orders imported into Shopware will be automatically converted into the currency you've selected in Lengow
+settings.lengow_import_settings.import_btob.label|Enable import of B2B orders without tax
+settings.lengow_import_settings.import_btob.description|Activate this option to import B2B orders without tax
+settings.lengow_order_status_settings.label|Order Status
+settings.lengow_order_status_settings.description|Match your Lengow order status to retrieve them in your orders easily
+settings.lengow_order_status_settings.id_waiting_shipment.label|Orders in preparation
+settings.lengow_order_status_settings.id_shipped.label|Shipped orders
+settings.lengow_order_status_settings.id_canceled.label|Cancelled orders
+settings.lengow_order_status_settings.id_shipped_by_mp.label|Orders shipped by marketplace
+|

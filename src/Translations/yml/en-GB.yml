@@ -1,0 +1,86 @@
+en:
+  administration:
+    lengow-connector:
+  backend:
+    settings:
+      lengow_main_settings:
+        label: "Main settings"
+        description: "Below you will find your Lengow login details.\nAccount ID, Access Token and Secret Token are automatically completed at your first connection : please do not change them."
+        account:
+          label: "Account ID"
+          description: "Your Lengow account ID. Please do not change it."
+        access:
+          label: "Access Token"
+          description: "Your access token. Please do not change it."
+        secret:
+          label: "Secret Token"
+          description: "Your secret token. Please do not change it."
+        enable:
+          label: "Enable shop"
+          description: "Enable shop to work with Lengow"
+        catalog:
+          label: "Catalogues ID"
+          description: "Your catalogues ID to import orders.\nSeparate them by ' ; '"
+        ip_enable:
+          label: "Enable authorisation by IP"
+          description: "Enable this option if you want your export to be secured by IP. By default, your export is secured by a unique key."
+        ip:
+          label: "Authorised IPs"
+          description: "Authorise IP to get access to your export feed.\nSeparate them ' ; '"
+        tracking_enable:
+          label: "Enable Lengow tracking"
+          description: "This tracker allows you to retrieve order statistics generated on your site directly in Lengow."
+        tracking_id:
+          label: "Tracker Product ID"
+          description: "The name of the unique identifier entered in the Lengow"
+      lengow_export_settings:
+        label: "Export settings"
+        description: "Define the settings to create your feed."
+        disabled_products:
+          label: "Export inactive products"
+          description: "Enable this option if you want to export inactive products"
+        lengow_selection:
+          label: "Export specific products only"
+          description: "Activate this option if you do not want to export all of your avaible products. Then select your products one by one."
+        dispatcher:
+          label: "Default carrier"
+          description: "Select the default carrier to calculate shipping costs"
+      lengow_import_settings:
+        label: "Import settings"
+        description: "All your orders are centralized in your Lengow platform : choose here if you want to synchronize and import your orders in your Shopware backoffice. It will also decrease your products stock in your backoffice"
+        ship_mp_enabled:
+          label: "Import orders shipped by marketplaces"
+        decrease_stock:
+          label: "Decrease my stock with the orders shipped by marketplaces"
+          description: "Use this option to take into account your orders sent by marketplaces on your stock in your Shopware backoffice"
+        dispatcher:
+          label: "Default carrier"
+          description: "Select the default carrier that you would like to apply to your orders"
+        import_days:
+          label: "Synchronize all orders updated since"
+          description: "Choose a number of days (Max 10 days)"
+        debug_mode:
+          label: "Activate Debug Mode"
+          description: "Use Debug Mode for testing and to simulate fictitious orders. Please note that you have to activate this setting on your pre-production server ONLY"
+        report_mail_enabled:
+          label: "I would like to be notified when there are issues regarding order importation"
+        report_mail_address:
+          label: "Mail for the report email"
+          description: "Email separated by ;"
+        currency_conversion_title:
+          label: "Convert the currency of your order"
+          description: "All orders imported into Shopware will be automatically converted into the currency you've selected in Lengow"
+        import_btob:
+          label: "Enable import of B2B orders without tax"
+          description: "Activate this option to import B2B orders without tax"
+      lengow_order_status_settings:
+        label: "Order Status"
+        description: "Match your Lengow order status to retrieve them in your orders easily"
+        id_waiting_shipment:
+          label: "Orders in preparation"
+        id_shipped:
+          label: "Shipped orders"
+        id_canceled:
+          label: "Cancelled orders"
+        id_shipped_by_mp:
+          label: "Orders shipped by marketplace"

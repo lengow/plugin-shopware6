@@ -1,0 +1,22 @@
+<?xml version="1.0" ?>
+
+<container xmlns="http://symfony.com/schema/dic/services"
+           xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+           xsi:schemaLocation="http://symfony.com/schema/dic/services http://symfony.com/schema/dic/services/services-1.0.xsd">
+
+    <services>
+
+        <service id="Lengow\Connector\Storefront\Controller\LengowExportController">
+            <argument type="service" id="Lengow\Connector\Service\LengowAccess"/>
+            <argument type="service" id="Shopware\Core\System\SystemConfig\SystemConfigService" />
+            <tag name="controller.service_arguments"/>
+        </service>
+
+        <service id="Lengow\Connector\Storefront\Controller\LengowCronController">
+            <argument type="service" id="Lengow\Connector\Service\LengowAccess"/>
+            <argument type="service" id="Shopware\Core\System\SystemConfig\SystemConfigService" />
+            <tag name="controller.service_arguments"/>
+        </service>
+
+    </services>
+</container>

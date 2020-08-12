@@ -1,0 +1,28 @@
+<?xml version="1.0" ?>
+
+<container xmlns="http://symfony.com/schema/dic/services"
+           xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+           xsi:schemaLocation="http://symfony.com/schema/dic/services http://symfony.com/schema/dic/services/services-1.0.xsd">
+
+    <services>
+
+        <service id="Lengow\Connector\Service\LengowAccess">
+            <argument type="service" id="lengow_settings.repository"/>
+            <argument type="service" id="Shopware\Core\System\SystemConfig\SystemConfigService" />
+        </service>
+
+        <service id="Lengow\Connector\Service\LengowLogMessage">
+            <argument type="service" id="Lengow\Connector\Service\LengowTranslation"/>
+        </service>
+
+        <service id="Lengow\Connector\Service\LengowPayment">
+            <argument type="service" id="Shopware\Core\Checkout\Order\Aggregate\OrderTransaction\OrderTransactionStateHandler"/>
+            <tag name="shopware.payment.method.sync" />
+        </service>
+
+        <service id="Lengow\Connector\Service\LengowTranslation">
+            <argument type="service" id="Lengow\Connector\Util\EnvironmentInfoProvider"/>
+        </service>
+
+    </services>
+</container>
