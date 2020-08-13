@@ -63,6 +63,7 @@ class ProductDefinition extends EntityDefinition
                     new Required(),
                     new SetNullOnDelete()
                 ),
+                (new FkField('sales_channel_id', 'salesChannelId', ShopwareSalesChannelDefinition::class)),
                 (new OneToOneAssociationField(
                     'salesChannel',
                     'sales_channel_id',

@@ -63,8 +63,6 @@ class ActionDefinition extends EntityDefinition
              (new IntField('retry', 'retry'))->addFlags(new Required()),
              (new JsonField('parameters', 'parameters'))->addFlags(new Required()),
              (new IntField('state', 'state'))->addFlags(new Required()),
-             (new DateField('created_at', 'createdAt')),
-             (new DateField('updated_at', 'updatedAt')),
         ]);
     }
 }

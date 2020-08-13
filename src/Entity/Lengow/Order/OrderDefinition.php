@@ -62,6 +62,7 @@ class OrderDefinition extends EntityDefinition
                     new setNullOnDelete()
                 ),
                 (new IntField ('order_sku', 'orderSku')),
+                (new FkField('sales_channel_id', 'salesChannelId', ShopwareSalesChannelDefinition::class)),
                 (new OneToOneAssociationField(
                     'salesChannel',
                     'sales_channel_id',
@@ -94,8 +95,6 @@ class OrderDefinition extends EntityDefinition
                 (new BoolField('is_in_error', 'isInError'))->addFlags(new Required()),
                 (new BoolField('is_reimported', 'isReimported')),
                 (new StringField('message', 'message')),
-                (new DateField('created_at', 'createdAt')),
-                (new DateField('updated_at', 'updatedAt')),
                 (new DateField('imported_at', 'importedAt')),
                 (new JsonField('extra', 'extra')),
             ]

@@ -68,8 +68,6 @@ class OrderLineDefinition extends EntityDefinition
                     new SetNullOnDelete()
                 ),
                 (new StringField('order_line_id', 'orderLineId'))->addFlags(new Required()),
-                (new DateField('created_at', 'createdAt')),
-                (new DateField('updated_at', 'updatedAt')),
             ]
         );
     }

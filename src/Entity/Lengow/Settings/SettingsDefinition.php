@@ -54,19 +54,17 @@ class SettingsDefinition extends EntityDefinition
         return new FieldCollection(
             [
                 (new IdField('id', 'id'))->addFlags(new Required(), new PrimaryKey()),
+                (new FkField('sales_channel_id', 'salesChannelId', ShopwareSalesChannelDefinition::class)),
                 (new OneToOneAssociationField(
                     'salesChannel',
                     'sales_channel_id',
                     'id',
                     ShopwareSalesChannelDefinition::class
                 ))->addFlags(
-                    new Required(),
                     new setNullOnDelete()
                 ),
                 (new StringField('name', 'name'))->addFlags(new Required()),
                 (new StringField('value', 'value')),
-                (new DateField('created_at', 'createdAt'))->addFlags(new Required()),
-                (new DateField('updated_at', 'updatedAt'))->addFlags(new Required()),
             ]
         );
     }

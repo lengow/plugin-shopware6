@@ -6,9 +6,15 @@
 
     <services>
 
-        <service id="Lengow\Connector\Service\LengowAccess">
+        <service id="Lengow\Connector\Service\LengowConfiguration">
             <argument type="service" id="lengow_settings.repository"/>
             <argument type="service" id="Shopware\Core\System\SystemConfig\SystemConfigService" />
+            <argument type="service" id="system_config.repository"/>
+        </service>
+
+        <service id="Lengow\Connector\Service\LengowAccess">
+            <argument type="service" id="Lengow\Connector\Service\LengowConfiguration"/>
+            <argument type="service" id="sales_channel.repository"/>
         </service>
 
         <service id="Lengow\Connector\Service\LengowLogMessage">

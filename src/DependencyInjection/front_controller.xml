@@ -8,14 +8,14 @@
 
         <service id="Lengow\Connector\Storefront\Controller\LengowExportController">
             <argument type="service" id="Lengow\Connector\Service\LengowAccess"/>
-            <argument type="service" id="Shopware\Core\System\SystemConfig\SystemConfigService" />
+            <argument type="service" id="Lengow\Connector\Service\LengowConfiguration"/>
             <tag name="controller.service_arguments"/>
         </service>
 
         <service id="Lengow\Connector\Storefront\Controller\LengowCronController">
             <argument type="service" id="Lengow\Connector\Service\LengowAccess"/>
-            <argument type="service" id="Shopware\Core\System\SystemConfig\SystemConfigService" />
-            <tag name="controller.service_arguments"/>
+            <argument type="service" id="Lengow\Connector\Service\LengowConfiguration"/>
+            <tag name="controller.service_arguments"></tag>
         </service>
 
     </services>

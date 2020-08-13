@@ -67,8 +67,6 @@ class OrderErrorDefinition extends EntityDefinition
                 (new IntField('type', 'type'))->addFlags(new Required()),
                 (new BoolField('is_finished', 'isFinished'))->addFlags(new Required()),
                 (new BoolField('mail', 'mail'))->addFlags(new Required()),
-                (new DateField('createdAt', 'createdAt')),
-                (new DateField('updatedAt', 'updatedAt')),
             ]
         );
     }

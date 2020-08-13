@@ -2,10 +2,11 @@
 
 namespace Lengow\Connector\Service;
 
-use Shopware\Core\Framework\DataAbstractionLayer\EntityRepositoryInterface;
+use Shopware\Core\System\SalesChannel\SalesChannelContext;
+use Shopware\Core\Framework\Context;
 use Shopware\Core\Framework\DataAbstractionLayer\Search\Criteria;
 use Shopware\Core\Framework\DataAbstractionLayer\Search\Filter\EqualsFilter;
-use Shopware\Core\System\SystemConfig\SystemConfigService;
+use Shopware\Core\Framework\DataAbstractionLayer\EntityRepositoryInterface;
 
 /**
  * Class LengowAccess
@@ -45,59 +46,72 @@ class LengowAccess
         '185.61.176.140',
         '185.61.176.141',
         '185.61.176.142',
-        '172.18.0.3', // TODO REMOVE DEV PURPOSE
     ];
 
     /**
-     * @var EntityRepositoryInterface $settingsRepository Lengow settings access
+     * @var LengowConfiguration configuration access service
      */
-    private $settingsRepository; // TODO use lengowConfig
+    private $lengowConfiguration;
 
     /**
-     * @var SystemConfigService $systemConfigService Shopware settings access
+     * @var EntityRepositoryInterface $salesChannelRepository sales channel repository
      */
-    private $systemConfigService; // TODO use lengowConfig
+    private $salesChannelRepository;
 
     /**
      * LengowAccess constructor
      *
-     * @param EntityRepositoryInterface $settingsRepository Lengow settings access
-     * @param SystemConfigService $systemConfigService Shopware settings access
+     * @param LengowConfiguration $lengowConfiguration configuration access service
+     * @param EntityRepositoryInterface $salesChannelRepository shopware sales channel repository
      */
-    public function __construct(EntityRepositoryInterface $settingsRepository, SystemConfigService $systemConfigService)
-    {
-        $this->settingsRepository = $settingsRepository; // TODO use lengowConfig
-        $this->systemConfigService = $systemConfigService; // TODO use lengowConfig
+    public function __construct(
+        LengowConfiguration $lengowConfiguration,
+        EntityRepositoryInterface $salesChannelRepository
+    ) {
+        $this->lengowConfiguration = $lengowConfiguration;
+        $this->salesChannelRepository = $salesChannelRepository;
     }
 
     /**
-     * @param null $salesChannelId sales channel id
+     * @param string|null $salesChannelId sales channel id
      *
      * @return bool
      */
-    public function handleSalesChannel($salesChannelId = null): bool
+    public function checkSalesChannel(string $salesChannelId = null): bool
     {
         if ($salesChannelId === null) {
             return false;
         }
-        // TODO try to find the shop (howto is still a riddle)
-        return true;
+        $criteria = new Criteria();
+        $criteria->addFilter(new EqualsFilter('id', $salesChannelId));
+        $result = $this->salesChannelRepository->search(
+            $criteria,
+            Context::createDefaultContext()
+        );
+        $salesChannel = (array) $result->getEntities()->getElements();
+        if ($salesChannel) {
+            return true;
+        }
+        return false;
     }
 
     /**
-     * @param string $token Authorization token
-     * @param null $salesChannelId sales channel id
+     * @param string|null $token Authorization token
+     * @param string|null $salesChannelId sales channel id
+     * @param bool $isGlobal token is global
      *
      * @return bool
      */
-    public function checkWebserviceAccess(string $token, $salesChannelId = null) : bool
-    {
+    public function checkWebserviceAccess(
+        string $token = null,
+        string $salesChannelId = null,
+        bool $isGlobal = true
+    ): bool {
         if ($this->checkIp($_SERVER['REMOTE_ADDR'])
-            || (!$this->systemConfigService->get('Connector.config.AuthorizedIpListCheckbox') // TODO use lengowConfig
-                 && $this->checkToken($token, $salesChannelId))) {
+            || ( ! $this->lengowConfiguration->get('lengowIpEnabled')
+                 && $this->checkToken($token, $salesChannelId, $isGlobal))) {
             return true;
         }
-
         return false;
     }
 
@@ -119,8 +133,9 @@ class LengowAccess
      */
     public function getAuthorizedIps() : array
     {
-        $ips = $this->systemConfigService->get('Connector.config.AuthorizedIpList'); // TODO use lengowConfig
-        $ipEnable = $this->systemConfigService->get('Connector.config.AuthorizedIpListCheckbox'); // TODO use lengowConfig
+        $ips = $this->lengowConfiguration->get('lengowAuthorizedIp');
+        $ipEnable = $this->lengowConfiguration->get('lengowIpEnabled');
+
         if ($ipEnable && $ips !== null) {
             $ips = trim(str_replace(["\r\n", ',', '-', '|', ' '], ';', $ips), ';');
             $ips = explode(';', $ips);
@@ -132,22 +147,28 @@ class LengowAccess
     }
 
     /**
-     * @param $token client token
-     * @param null $salesChannelId sales channel id
+     * @param string $token client token
+     * @param string|null $salesChannelId sales channel id
+     * @param bool $isGlobal token is global
      *
      * @return bool
      */
-    public function checkToken($token, $salesChannelId = null) : bool
+    public function checkToken(
+        string $token,
+        string $salesChannelId = null,
+        bool $isGlobal
+    ): bool
     {
         // TODO ici si le token n'existe pas encore on le créé
         // TODO on va aussi créer un token pour tout les autres shops & un global.
-        $globalTokenEntity = $this->settingsRepository->search( // TODO use lengowConfig
-            (new Criteria())->addFilter(new EqualsFilter('name', 'lengowGlobalToken')),
-            \Shopware\Core\Framework\Context::createDefaultContext()
-        );
-        $results = (array) $globalTokenEntity->getEntities()->getElements();
-        if (!empty($results)) {
-            return $results[array_key_first($results)]->getValue() === $token;
+
+        if (!$isGlobal) {
+            $configToken = $this->lengowConfiguration->get('lengowChannelToken', $salesChannelId);
+        } else {
+            $configToken = $this->lengowConfiguration->get('lengowGlobalToken');
+        }
+        if ($token && !empty($configToken)) {
+            return $configToken === $token;
         }
         return false;
     }
