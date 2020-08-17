@@ -336,7 +336,7 @@ class LengowConfiguration
      * @param string $value new config value
      * @param string|null $salesChannelId sales channel
      */
-    private function setInShopwareConfig(string $key, string $value, ?string $salesChannelId = null) : void
+    private function setInShopwareConfig(string $key, string $value, ?string $salesChannelId = null): void
     {
         $this->systemConfigService->set(self::LENGOW_SETTING_PATH . $key, $value, $salesChannelId);
     }

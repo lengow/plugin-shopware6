@@ -23,7 +23,7 @@ class LengowCronController extends LengowAbstractFrontController
      *
      * @Route("/lengow/cron", name="frontend.lengow.cron", methods={"GET"})
      */
-    public function cron(Request $request, SalesChannelContext $context) : void
+    public function cron(Request $request, SalesChannelContext $context): void
     {
         $this->checkAccess($request, $context);
         $cronArgs = $this->createGetArgArray($request);

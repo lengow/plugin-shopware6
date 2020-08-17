@@ -27,13 +27,13 @@ class LengowLogMessage
      * Encode log message with params for translation
      *
      * @param string $key log message key
-     * @param array|null $params log message parameters
+     * @param array $params log message parameters
      *
      * @return string
      */
-    public function encodeLogMessage(string $key, $params = null): string
+    public function encodeLogMessage(string $key, array $params = []): string
     {
-        if ($params === null || empty($params)) {
+        if (empty($params)) {
             return $key;
         }
         $allParams = [];
@@ -49,11 +49,11 @@ class LengowLogMessage
      *
      * @param string $message key to translate
      * @param string|null $isoCode language translation iso code
-     * @param array|null $params array parameters to display in the translation message
+     * @param array $params array parameters to display in the translation message
      *
      * @return string
      */
-    public function decodeLogMessage(string $message, $isoCode = null, $params = null): string
+    public function decodeLogMessage(string $message, string $isoCode = null, array $params = []): string
     {
         if (preg_match('/^(([a-z\_]*\.){1,3}[a-z\_]*)(\[(.*)\]|)$/', $message, $result)) {
             if ($result[1] ?? false) {

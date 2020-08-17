@@ -50,4 +50,7 @@ settings.lengow_order_status_settings.id_waiting_shipment.label|Orders in prepar
 settings.lengow_order_status_settings.id_shipped.label|Shipped orders
 settings.lengow_order_status_settings.id_canceled.label|Cancelled orders
 settings.lengow_order_status_settings.id_shipped_by_mp.label|Orders shipped by marketplace
-|
+log.export.unauthorised_ip|Unauthorized access for IP: %{ip}
+log.export.unauthorised_token|Unauthorised access for this token: %{token}
+log.export.empty_token|Unauthorised access: token parameter is empty
+log.export.specify_sales_channel|No sales channel specified or invalid sales channel uuid

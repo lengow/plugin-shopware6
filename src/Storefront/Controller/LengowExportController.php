@@ -36,7 +36,7 @@ class LengowExportController extends LengowAbstractFrontController
      *
      * @return array
      */
-    protected function createGetArgArray(Request $request) : array
+    protected function createGetArgArray(Request $request): array
     {
         return [
             'format' => $request->query->get('format'),

@@ -17,6 +17,11 @@
             <argument type="service" id="sales_channel.repository"/>
         </service>
 
+        <service id="Lengow\Connector\Service\LengowLog">
+            <argument type="service" id="Lengow\Connector\Service\LengowLogMessage"/>
+            <argument type="service" id="Lengow\Connector\Util\EnvironmentInfoProvider"/>
+        </service>
+
         <service id="Lengow\Connector\Service\LengowLogMessage">
             <argument type="service" id="Lengow\Connector\Service\LengowTranslation"/>
         </service>

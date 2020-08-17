@@ -98,18 +98,16 @@ class LengowAccess
     /**
      * @param string|null $token Authorization token
      * @param string|null $salesChannelId sales channel id
-     * @param bool $isGlobal token is global
      *
      * @return bool
      */
-    public function checkWebserviceAccess(
-        string $token = null,
-        string $salesChannelId = null,
-        bool $isGlobal = true
-    ): bool {
+    public function checkWebserviceAccess(string $token = null, string $salesChannelId = null): bool
+    {
         if ($this->checkIp($_SERVER['REMOTE_ADDR'])
-            || ( ! $this->lengowConfiguration->get('lengowIpEnabled')
-                 && $this->checkToken($token, $salesChannelId, $isGlobal))) {
+            || ($token
+                && !(bool)$this->lengowConfiguration->get('lengowIpEnabled')
+                && $this->checkToken($token, $salesChannelId))
+        ) {
             return true;
         }
         return false;
@@ -120,7 +118,7 @@ class LengowAccess
      *
      * @return bool
      */
-    public function checkIp(string $ip) : bool
+    public function checkIp(string $ip): bool
     {
         if (in_array($ip, $this->getAuthorizedIps(), true)) {
             return true;
@@ -131,7 +129,7 @@ class LengowAccess
     /**
      * @return array authorized ip
      */
-    public function getAuthorizedIps() : array
+    public function getAuthorizedIps(): array
     {
         $ips = $this->lengowConfiguration->get('lengowAuthorizedIp');
         $ipEnable = $this->lengowConfiguration->get('lengowIpEnabled');
@@ -149,20 +147,15 @@ class LengowAccess
     /**
      * @param string $token client token
      * @param string|null $salesChannelId sales channel id
-     * @param bool $isGlobal token is global
      *
      * @return bool
      */
-    public function checkToken(
-        string $token,
-        string $salesChannelId = null,
-        bool $isGlobal
-    ): bool
+    public function checkToken(string $token, string $salesChannelId = null): bool
     {
         // TODO ici si le token n'existe pas encore on le créé
         // TODO on va aussi créer un token pour tout les autres shops & un global.
 
-        if (!$isGlobal) {
+        if ($salesChannelId) {
             $configToken = $this->lengowConfiguration->get('lengowChannelToken', $salesChannelId);
         } else {
             $configToken = $this->lengowConfiguration->get('lengowGlobalToken');

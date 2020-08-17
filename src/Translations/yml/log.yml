@@ -1,2 +1,8 @@
 en:
   backend:
+    log:
+      export:
+        unauthorised_ip: "Unauthorized access for IP: %{ip}"
+        unauthorised_token: "Unauthorised access for this token: %{token}"
+        empty_token: "Unauthorised access: token parameter is empty"
+        specify_sales_channel: "No sales channel specified or invalid sales channel uuid"

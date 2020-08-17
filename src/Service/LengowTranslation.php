@@ -16,7 +16,7 @@ class LengowTranslation
     public const DEFAULT_ISO_CODE = 'en-GB';
 
     /**
-     * @var EnvironmentInfoProvider
+     * @var EnvironmentInfoProvider Environment info provider utility
      */
     private $environmentInfoProvider;
 
