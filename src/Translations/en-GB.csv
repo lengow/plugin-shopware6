@@ -54,3 +54,13 @@ log.export.unauthorised_ip|Unauthorized access for IP: %{ip}
 log.export.unauthorised_token|Unauthorised access for this token: %{token}
 log.export.empty_token|Unauthorised access: token parameter is empty
 log.export.specify_sales_channel|No sales channel specified or invalid sales channel uuid
+log.connector.call_api|call %{call_type} %{curl_url}
+log.connector.error_api|API call failed - %{error_code} - %{error_message}
+log.connector.curl_disabled|Curl extension is not enabled on the server
+log.connector.method_not_valid|method %{type} is not valid
+log.connector.timeout_api|API call has been blocked by a timeout
+log.connector.error_curl|Curl error %{error_code} - %{error_message}
+log.connector.token_not_return|no authorization token returned
+log.connector.token_is_empty|the returned authorization token is empty
+log.connector.api_not_available|Lengow APIs are not available
+log.connector.retry_get_token|API call failed - authorization token expired - attempt to recover a new token

@@ -262,6 +262,22 @@ class LengowConfiguration
     }
 
     /**
+     * Get valid account id / access token / secret token
+     *
+     * @return array
+     */
+    public function getAccessIds(): array
+    {
+        $accountId = (int)$this->get('lengowAccountId');
+        $accessToken = $this->get('lengowAccessToken');
+        $secretToken = $this->get('lengowSecretToken');
+        if ($accountId !== 0 && !empty($accessToken) && !empty($secretToken)) {
+            return [$accountId, $accessToken, $secretToken];
+        }
+        return [null, null, null];
+    }
+
+    /**
      * @param string $key config name
      * @param string|null $salesChannelId sales channel
      *

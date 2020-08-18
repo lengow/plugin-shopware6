@@ -43,6 +43,7 @@
             <helpText>Enable shop to work with Lengow</helpText>
             <helpText lang="fr-FR">Activer la boutique pour la connecter à la plateforme Lengow</helpText>
             <helpText lang="de-DE">Verbindung zwischen Lengow und Shop aktivieren</helpText>
+            <defaultValue>0</defaultValue>
         </component>
         <component name="sw-tagged-field">
             <name>lengowCatalogId</name>
@@ -61,6 +62,7 @@
             <helpText>Enable this option if you want your export to be secured by IP. By default, your export is secured by a unique key.</helpText>
             <helpText lang="fr-FR">Activez cette option si vous voulez sécuriser votre export par ip. Par défaut, votre export est sécurisé par une clé unique.</helpText>
             <helpText lang="de-DE">Aktivieren Sie diese Option, wenn Sie Ihren Export über IP sichern wollen. Standartmäßig ist ihr Export über einen Sicherheitsschlüssel gespeichert.</helpText>
+            <defaultValue>0</defaultValue>
         </component>
         <component name="sw-tagged-field">
             <name>lengowAuthorizedIp</name>
@@ -79,6 +81,7 @@
             <helpText>This tracker allows you to retrieve order statistics generated on your site directly in Lengow.</helpText>
             <helpText lang="fr-FR">Ce tracker vous permet de récupérer les statistiques de commandes de votre site directement sur la plateforme Lengow.</helpText>
             <helpText lang="de-DE">Mit diesem Tracker können Sie die auf Ihrer Website generierten Bestellstatistiken direkt in Lengow abrufen.</helpText>
+            <defaultValue>0</defaultValue>
         </component>
         <component name="sw-text-field">
             <name>lengowTrackingId</name>
@@ -95,7 +98,7 @@
         <title>Export settings</title>
         <title lang="fr-FR">Paramètres d'exportation</title>
         <title lang="de-DE">Exporteinstellungen</title>
-        <input-field type="checkbox">
+        <component name="sw-switch-field">
             <name>lengowExportDisabledProduct</name>
             <label>Export inactive products</label>
             <label lang="fr-FR">Export des produits inactifs</label>
@@ -104,8 +107,8 @@
             <helpText lang="fr-FR">Activez cette option si vous souhaitez exporter les produits inactifs</helpText>
             <helpText lang="de-DE">Verwenden Sie diese Option, um inaktive Produkte zu exportieren</helpText>
             <defaultValue>0</defaultValue>
-        </input-field>
-        <input-field type="checkbox">
+        </component>
+        <component name="sw-switch-field">
             <name>lengowExportSelectionEnabled</name>
             <label>Export specific products only</label>
             <label lang="fr-FR">Exporter seulement les produits sélectionnés</label>
@@ -114,8 +117,8 @@
             <helpText lang="fr-FR">Activez cette option si vous ne voulez pas exporter tous vos produits disponibles. Sélectionnez ensuite les produits un par un.</helpText>
             <helpText lang="de-DE">Aktivieren Sie diese Option, wenn Sie nicht alle verfügbare Produkte exportieren möchten. Danach Ihre Produkte einzeln auswählen.</helpText>
             <defaultValue>0</defaultValue>
-        </input-field>
-        <input-field type="single-select">
+        </component>
+        <component name="sw-single-select">
             <name>lengowDefaultDispatcher</name>
             <options>
                 <option>
@@ -134,20 +137,20 @@
             <helpText>Select the default carrier to calculate shipping costs</helpText>
             <helpText lang="fr-FR">Sélectionnez un transporteur par défaut pour calculer les frais de livraison</helpText>
             <helpText lang="de-DE">Wählen Sie den Standard-Zulieferer um die Versandkosten zu berechen</helpText>
-        </input-field>
+        </component>
     </card>
     <card>
         <title>Import settings</title>
         <title lang="fr-FR">Paramètres d'importation</title>
         <title lang="de-DE">Importeinstellungen</title>
-        <input-field type="checkbox">
+        <component name="sw-switch-field">
             <name>lengowImportShipMpEnabled</name>
             <label>Import orders shipped by marketplaces</label>
             <label lang="fr-FR">Importez les commandes expédiées par les marketplaces</label>
             <label lang="de-DE">Durch einen Marktplatz versandte Bestellungen importieren</label>
             <defaultValue>0</defaultValue>
-        </input-field>
-        <input-field type="checkbox">
+        </component>
+        <component name="sw-switch-field">
             <name>lengowImportStockMpEnabled</name>
             <label>Decrease my stock with the orders shipped by marketplaces</label>
             <label lang="fr-FR">Décrémenter les stocks des commandes expédiées par les marketplaces</label>
@@ -156,8 +159,8 @@
             <helpText lang="fr-FR">Activez cette option pour prendre en compte les commandes des marketplaces sur les stocks de votre backoffice Shopware.</helpText>
             <helpText lang="de-DE">Verwenden Sie diese Option, damit Bestellungen auf Marktplätzen in Ihrem Shopware-Backoffice einbezogen werden</helpText>
             <defaultValue>0</defaultValue>
-        </input-field>
-        <input-field type="single-select">
+        </component>
+        <component name="sw-single-select">
             <name>lengowImportDefaultDispatcher</name>
             <options>
                 <option>
@@ -176,8 +179,8 @@
             <helpText>Select the default carrier that you would like to apply to your orders</helpText>
             <helpText lang="fr-FR">Sélectionnez le transporteur par défaut à appliquer à vos commandes.</helpText>
             <helpText lang="de-DE">Wählen Sie den Standard-Zulieferer aus, den Sie für Ihre Bestellungen verwenden wollen</helpText>
-        </input-field>
-        <input-field type="int">
+        </component>
+        <component name="sw-number-field">
             <name>lengowImportDays</name>
             <label>Synchronize all orders updated since</label>
             <label lang="fr-FR">Synchroniser les commandes misent à jour depuis X jours (max 10)</label>
@@ -186,7 +189,7 @@
             <helpText lang="fr-FR">Choisissez le nombre de jours (Max 10 jours)</helpText>
             <helpText lang="de-DE">Anzahl der Tage auswählen (Max. 10 Tage)</helpText>
             <defaultValue>3</defaultValue>
-        </input-field>
+        </component>
         <component name="sw-switch-field">
             <name>lengowImportDebugEnabled</name>
             <label>Activate debug mode</label>
@@ -195,12 +198,14 @@
             <helpText>Use Debug Mode for testing and to simulate fictitious orders. Please note that you have to activate this setting on your pre-production server ONLY</helpText>
             <helpText lang="fr-FR">Utilisez le Debug Mode pour tester et simuler des commandes fictives. Pour rappel, vous devez activer ce paramètre UNIQUEMENT sur votre serveur de préproduction</helpText>
             <helpText lang="de-DE">Dieser Modus zur Prüfung und Auftragsimulation verwenden. Diese Einstellung NUR auf Ihrem Pre-Production Server aktivieren</helpText>
+            <defaultValue>0</defaultValue>
         </component>
         <component name="sw-switch-field">
             <name>lengowImportReportMailEnabled</name>
             <label>I would like to be notified when there are issues regarding order importation</label>
             <label lang="fr-FR">Je veux être notifié en cas de problème lors de l'importation de mes commandes</label>
             <label lang="de-DE">Bei Problemen während des Importes der Bestellungen möchte ich benachrichtigt werden</label>
+            <defaultValue>1</defaultValue>
         </component>
         <component name="sw-text-field">
             <name>lengowImportReportMailAddress</name>
