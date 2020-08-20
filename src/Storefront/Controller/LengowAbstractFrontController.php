@@ -7,7 +7,7 @@ use Shopware\Core\System\SalesChannel\SalesChannelContext;
 use Symfony\Component\HttpFoundation\Request;
 use Lengow\Connector\Service\LengowAccess;
 use Lengow\Connector\Service\LengowConfiguration;
-use Lengow\Connector\Service\LengowMessage;
+use Lengow\Connector\Service\LengowLog;
 use Lengow\Connector\Service\LengowTranslation;
 
 /**
@@ -27,26 +27,26 @@ abstract class LengowAbstractFrontController extends StorefrontController
     protected $lengowConfiguration;
 
     /**
-     * @var LengowMessage Lengow message service
+     * @var LengowLog Lengow log service
      */
-    protected $lengowMessage;
+    protected $lengowLog;
 
     /**
      * LengowAbstractFrontController constructor.
      *
      * @param LengowAccess $lengowAccess Lengow access security service
      * @param LengowConfiguration $lengowConfiguration Lengow configuration accessor service
-     * @param LengowMessage $lengowMessage Lengow message service
+     * @param LengowLog $lengowLog Lengow log service
      */
     public function __construct(
         LengowAccess $lengowAccess,
         LengowConfiguration $lengowConfiguration,
-        LengowMessage $lengowMessage
+        LengowLog $lengowLog
     )
     {
         $this->lengowAccessService = $lengowAccess;
         $this->lengowConfiguration = $lengowConfiguration;
-        $this->lengowMessage = $lengowMessage;
+        $this->lengowLog = $lengowLog;
     }
 
     /**
@@ -65,7 +65,7 @@ abstract class LengowAbstractFrontController extends StorefrontController
         if (!$import && !$this->lengowAccessService->checkSalesChannel($salesChannelId)) {
             header('HTTP/1.1 400 Bad Request');
             die(
-                $this->lengowMessage->decode(
+                $this->lengowLog->decodeMessage(
                     'log.export.specify_sales_channel',
                     LengowTranslation::DEFAULT_ISO_CODE
                 )
@@ -74,19 +74,19 @@ abstract class LengowAbstractFrontController extends StorefrontController
 
         if (!$this->lengowAccessService->checkWebserviceAccess($token, $salesChannelId)) {
             if ($this->lengowConfiguration->get('AuthorizedIpListCheckbox')) {
-                $errorMessage = $this->lengowMessage->decode(
+                $errorMessage = $this->lengowLog->decodeMessage(
                     'log.export.unauthorised_ip',
                     LengowTranslation::DEFAULT_ISO_CODE,
                     ['ip' => $_SERVER['REMOTE_ADDR']]
                 );
             } else {
                 $errorMessage = ($token && $token !== '')
-                    ? $this->lengowMessage->decode(
+                    ? $this->lengowLog->decodeMessage(
                         'log.export.unauthorised_token',
                         LengowTranslation::DEFAULT_ISO_CODE,
                         ['token' => $token]
                     )
-                    : $this->lengowMessage->decode(
+                    : $this->lengowLog->decodeMessage(
                         'log.export.empty_token',
                         LengowTranslation::DEFAULT_ISO_CODE
                     );

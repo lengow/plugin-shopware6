@@ -18,7 +18,7 @@ use Shopware\Core\Framework\Uuid\Uuid;
  */
 class LengowConfiguration
 {
-    private const LENGOW_SETTING_PATH = 'Connector.config.';
+    public const LENGOW_SETTING_PATH = 'Connector.config.';
 
     /**
      * @var array $lengowSettings specific Lengow settings in lengow_settings table
@@ -60,6 +60,7 @@ class LengowConfiguration
         'lengowCatalogId' => [
             'channel' => true,
             'update' => true,
+            'type' => 'array',
         ],
         'lengowIpEnabled' => [
             'global' => true,
@@ -67,6 +68,7 @@ class LengowConfiguration
         ],
         'lengowAuthorizedIp' => [
             'global' => true,
+            'type' => 'array',
         ],
         'lengowTrackingEnable' => [
             'global' => true,
@@ -138,6 +140,7 @@ class LengowConfiguration
         ],
         'lengowImportReportMailAddress' => [
             'global' => true,
+            'type' => 'array',
         ],
         'lengowImportShipMpEnabled' => [
             'global' => true,
@@ -205,20 +208,29 @@ class LengowConfiguration
     private $systemConfigRepository;
 
     /**
+     * @var LengowLog $lengowLog Lengow log service
+     */
+    private $lengowLog;
+
+    /**
      * LengowConfiguration constructor
      *
      * @param EntityRepositoryInterface $settingsRepository Lengow settings access
      * @param SystemConfigService $systemConfigService Shopware settings access
      * @param EntityRepositoryInterface $systemConfigRepository shopware settings repository
+     * @param LengowLog $lengowLog Lengow log service
      */
     public function __construct(
         EntityRepositoryInterface $settingsRepository,
         SystemConfigService $systemConfigService,
-        EntityRepositoryInterface $systemConfigRepository
-    ) {
+        EntityRepositoryInterface $systemConfigRepository,
+        LengowLog $lengowLog
+    )
+    {
         $this->settingsRepository = $settingsRepository;
         $this->systemConfigService = $systemConfigService;
         $this->systemConfigRepository = $systemConfigRepository;
+        $this->lengowLog = $lengowLog;
     }
 
     /**
@@ -246,7 +258,6 @@ class LengowConfiguration
      * @param string|null $salesChannelId sales channel
      *
      * @return EntityWrittenContainerEvent|void|null
-     * @throws Exception
      */
     public function set(string $key, string $value, ?string $salesChannelId = null)
     {
@@ -275,6 +286,66 @@ class LengowConfiguration
             return [$accountId, $accessToken, $secretToken];
         }
         return [null, null, null];
+    }
+
+    /**
+     * Check value and create a log if necessary
+     *
+     * @param string $key name of Lengow setting
+     * @param mixed $value setting value
+     * @param string|null $salesChannelId Shopware sales channel id
+     */
+    public function checkAndLog(string $key, $value, string $salesChannelId = null): void
+    {
+        if (!array_key_exists($key, self::$lengowSettings)) {
+            return;
+        }
+        $setting = self::$lengowSettings[$key];
+        $oldValue = $this->get($key, $salesChannelId);
+        if (isset($setting['type']) && $setting['type'] === 'boolean') {
+            $value = (int)$value;
+            $oldValue = (int)$oldValue;
+        } elseif (isset($setting['type']) && $setting['type'] === 'array') {
+            $value = implode(',', $value);
+            $oldValue = implode(',', $oldValue);
+        }
+        if ($oldValue !== $value) {
+            if (isset($setting['secret']) && $setting['secret']) {
+                $value = preg_replace("/[a-zA-Z0-9]/", '*', $value);
+                $oldValue = preg_replace("/[a-zA-Z0-9]/", '*', $oldValue);
+            }
+            if ($salesChannelId === null && isset($setting['global']) && $setting['global']) {
+                $this->lengowLog->write(
+                    LengowLog::CODE_SETTING,
+                    $this->lengowLog->encodeMessage(
+                        'log.setting.setting_change',
+                        [
+                            'key' => $key,
+                            'old_value' => $oldValue,
+                            'value' => $value,
+                        ]
+                    )
+                );
+            }
+            if ($salesChannelId && isset($setting['channel']) && $setting['channel']) {
+                $this->lengowLog->write(
+                    LengowLog::CODE_SETTING,
+                    $this->lengowLog->encodeMessage(
+                        'log.setting.setting_change_for_sales_channel',
+                        [
+                            'key' => $key,
+                            'old_value' => $oldValue,
+                            'value' => $value,
+                            'sales_channel_id' => $salesChannelId,
+                        ]
+                    )
+                );
+            }
+            // save last update date for a specific settings (change synchronisation interval time)
+            if (isset($setting['update']) && $setting['update']) {
+                $this->set('lengowLastSettingUpdate', (string)time());
+            }
+        }
     }
 
     /**
@@ -322,14 +393,14 @@ class LengowConfiguration
      * @param mixed $value new config value
      * @param string|null $salesChannelId sales channel
      *
-     * @return EntityWrittenContainerEvent
-     * @throws Exception
+     * @return EntityWrittenContainerEvent|null
      */
     private function setInLengowConfig(
         string $key,
         string $value,
         ?string $salesChannelId = null
-    ): EntityWrittenContainerEvent {
+    ): ?EntityWrittenContainerEvent
+    {
         $id = $this->getId($key, $salesChannelId, true);
         $data = [
             'id' => $id ?? Uuid::randomHex(),
@@ -339,12 +410,16 @@ class LengowConfiguration
             'updated_at' => new \DateTime()
         ];
 
-        return $this->settingsRepository->upsert(
-            [
-                $data,
-            ],
-            Context::createDefaultContext()
-        );
+        try {
+            return $this->settingsRepository->upsert(
+                [
+                    $data,
+                ],
+                Context::createDefaultContext()
+            );
+        } catch (Exception $e) {
+            return null;
+        }
     }
 
     /**

@@ -17,3 +17,6 @@ en:
         token_is_empty: "the returned authorization token is empty"
         api_not_available: "Lengow APIs are not available"
         retry_get_token: "API call failed - authorization token expired - attempt to recover a new token"
+      setting:
+        setting_change: "%{key} - old value %{old_value} replaced with %{value}"
+        setting_change_for_sales_channel: "%{key} - old value %{old_value} replaced with %{value} for shop %{sales_channel_id}"

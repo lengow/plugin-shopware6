@@ -33,6 +33,7 @@ class Connector extends Plugin
         $loader->load('entity.xml');
         $loader->load('front_controller.xml');
         $loader->load('service.xml');
+        $loader->load('subscriber.xml');
         $loader->load('util.xml');
     }
 

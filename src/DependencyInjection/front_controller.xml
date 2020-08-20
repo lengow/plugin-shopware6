@@ -9,14 +9,14 @@
         <service id="Lengow\Connector\Storefront\Controller\LengowExportController">
             <argument type="service" id="Lengow\Connector\Service\LengowAccess"/>
             <argument type="service" id="Lengow\Connector\Service\LengowConfiguration"/>
-            <argument type="service" id="Lengow\Connector\Service\LengowMessage"/>
+            <argument type="service" id="Lengow\Connector\Service\LengowLog"/>
             <tag name="controller.service_arguments"/>
         </service>
 
         <service id="Lengow\Connector\Storefront\Controller\LengowCronController">
             <argument type="service" id="Lengow\Connector\Service\LengowAccess"/>
             <argument type="service" id="Lengow\Connector\Service\LengowConfiguration"/>
-            <argument type="service" id="Lengow\Connector\Service\LengowMessage"/>
+            <argument type="service" id="Lengow\Connector\Service\LengowLog"/>
             <tag name="controller.service_arguments"/>
         </service>
 

@@ -139,11 +139,6 @@ class LengowConnector
     private $lengowLog;
 
     /**
-     * @var LengowMessage Lengow message service
-     */
-    private $lengowMessage;
-
-    /**
      * @var array success HTTP codes for request
      */
     private $successCodes = [
@@ -207,17 +202,11 @@ class LengowConnector
      *
      * @param LengowConfiguration $lengowConfiguration Lengow configuration service
      * @param LengowLog $lengowLog Lengow log service
-     * @param LengowMessage $lengowMessage Lengow message service
      */
-    public function __construct(
-        LengowConfiguration $lengowConfiguration,
-        LengowLog $lengowLog,
-        LengowMessage $lengowMessage
-    )
+    public function __construct(LengowConfiguration $lengowConfiguration, LengowLog $lengowLog)
     {
         $this->lengowConfiguration = $lengowConfiguration;
         $this->lengowLog = $lengowLog;
-        $this->lengowMessage = $lengowMessage;
         list($this->accountId, $this->accessToken, $this->secret) = $this->lengowConfiguration->getAccessIds();
     }
 
@@ -246,14 +235,14 @@ class LengowConnector
             }
             if (!$this->isCurlActivated()) {
                 throw new LengowException(
-                    $this->lengowMessage->encode('log.connector.curl_disabled'),
+                    $this->lengowLog->encodeMessage('log.connector.curl_disabled'),
                     self::CODE_500
                 );
             }
             $this->connect(false, $logOutput);
         } catch (Exception $e) {
-            $message = $this->lengowMessage->decode($e->getMessage(), LengowTranslation::DEFAULT_ISO_CODE);
-            $error = $this->lengowMessage->encode(
+            $message = $this->lengowLog->decodeMessage($e->getMessage(), LengowTranslation::DEFAULT_ISO_CODE);
+            $error = $this->lengowLog->encodeMessage(
                 'log.connector.error_api',
                 [
                     'error_code' => $e->getCode(),
@@ -285,7 +274,7 @@ class LengowConnector
             }
             if (!in_array($type, [self::GET, self::POST, self::PUT, self::PATCH])) {
                 throw new LengowException(
-                    $this->lengowMessage->encode('log.connector.method_not_valid', ['type' => $type]),
+                    $this->lengowLog->encodeMessage('log.connector.method_not_valid', ['type' => $type]),
                     self::CODE_500
                 );
             }
@@ -298,8 +287,8 @@ class LengowConnector
                 $logOutput
             );
         } catch (LengowException $e) {
-            $message = $this->lengowMessage->decode($e->getMessage(), LengowTranslation::DEFAULT_ISO_CODE);
-            $error = $this->lengowMessage->encode(
+            $message = $this->lengowLog->decodeMessage($e->getMessage(), LengowTranslation::DEFAULT_ISO_CODE);
+            $error = $this->lengowLog->encodeMessage(
                 'log.connector.error_api',
                 [
                     'error_code' => $e->getCode(),
@@ -457,7 +446,7 @@ class LengowConnector
             if (in_array($e->getCode(), $this->authorizationCodes)) {
                 $this->lengowLog->write(
                     LengowLog::CODE_CONNECTOR,
-                    $this->lengowMessage->encode('log.connector.retry_get_token'),
+                    $this->lengowLog->encodeMessage('log.connector.retry_get_token'),
                     $logOutput
                 );
                 $this->connect(true, $logOutput);
@@ -516,13 +505,13 @@ class LengowConnector
         // return a specific error for get_token
         if (!isset($data['token'])) {
             throw new LengowException(
-                $this->lengowMessage->encode('log.connector.token_not_return'),
+                $this->lengowLog->encodeMessage('log.connector.token_not_return'),
                 self::CODE_500
             );
         }
         if (strlen($data['token']) === 0) {
             throw new LengowException(
-                $this->lengowMessage->encode('log.connector.token_is_empty'),
+                $this->lengowLog->encodeMessage('log.connector.token_is_empty'),
                 self::CODE_500
             );
         }
@@ -603,7 +592,7 @@ class LengowConnector
         }
         $this->lengowLog->write(
             LengowLog::CODE_CONNECTOR,
-            $this->lengowMessage->encode(
+            $this->lengowLog->encodeMessage(
                 'log.connector.call_api',
                 [
                     'call_type' => $type,
@@ -638,10 +627,10 @@ class LengowConnector
         if ($result === false) {
             // recovery of Curl errors
             if (in_array($curlErrorNumber, [CURLE_OPERATION_TIMEDOUT, CURLE_OPERATION_TIMEOUTED])) {
-                throw new LengowException($this->lengowMessage->encode('log.connector.timeout_api'), self::CODE_504);
+                throw new LengowException($this->lengowLog->encodeMessage('log.connector.timeout_api'), self::CODE_504);
             }
             throw new LengowException(
-                $this->lengowMessage->encode(
+                $this->lengowLog->encodeMessage(
                     'log.connector.error_curl',
                     [
                         'error_code' => $curlErrorNumber,
@@ -657,7 +646,7 @@ class LengowConnector
             if (isset($result['error'])) {
                 throw new LengowException($result['error']['message'], $httpCode);
             }
-            throw new LengowException($this->lengowMessage->encode('log.connector.api_not_available'), $httpCode);
+            throw new LengowException($this->lengowLog->encodeMessage('log.connector.api_not_available'), $httpCode);
         }
     }
 

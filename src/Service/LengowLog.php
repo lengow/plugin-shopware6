@@ -3,7 +3,6 @@
 namespace Lengow\Connector\Service;
 
 use Lengow\Connector\Components\LengowFile;
-use Lengow\Connector\Exception\LengowException;
 use Lengow\Connector\Util\EnvironmentInfoProvider;
 
 /**
@@ -63,9 +62,9 @@ class LengowLog
     private const LOG_LIFE = 20;
 
     /**
-     * @var LengowMessage Lengow message service
+     * @var LengowTranslation Lengow translation service
      */
-    private $lengowMessage;
+    private $lengowTranslation;
 
     /**
      * @var EnvironmentInfoProvider Environment info provider utility
@@ -80,19 +79,65 @@ class LengowLog
     /**
      * LengowLog Construct
      *
-     * @param LengowMessage $lengowMessage Lengow message service
+     * @param LengowTranslation $lengowTranslation Lengow translation service
      * @param EnvironmentInfoProvider $environmentInfoProvider Environment info provider utility
      */
-    public function __construct(
-        LengowMessage $lengowMessage,
-        EnvironmentInfoProvider $environmentInfoProvider
-    )
+    public function __construct(LengowTranslation $lengowTranslation, EnvironmentInfoProvider $environmentInfoProvider)
     {
-        $this->lengowMessage = $lengowMessage;
+        $this->lengowTranslation = $lengowTranslation;
         $this->environmentInfoProvider = $environmentInfoProvider;
         // init new LengowFile for logging
         $fileName = 'logs-' . date('Y-m-d') . '.txt';
         $this->lengowFile = new LengowFile(self::LOG_FOLDER_NAME, $fileName, $this->environmentInfoProvider);
+    }
+
+    /**
+     * Encode message with params for translation
+     *
+     * @param string $key message key
+     * @param array $params message parameters
+     *
+     * @return string
+     */
+    public function encodeMessage(string $key, array $params = []): string
+    {
+        if (empty($params)) {
+            return $key;
+        }
+        $allParams = [];
+        foreach ($params as $param => $value) {
+            $value = str_replace(['|', '=='], ['', ''], $value);
+            $allParams[] = $param . '==' . $value;
+        }
+        return $key . '[' . join('|', $allParams) . ']';
+    }
+
+    /**
+     * Decode message with params for translation
+     *
+     * @param string $message key to translate
+     * @param string|null $isoCode language translation iso code
+     * @param array $params array parameters to display in the translation message
+     *
+     * @return string
+     */
+    public function decodeMessage(string $message, string $isoCode = null, array $params = []): string
+    {
+        if (preg_match('/^(([a-z\_]*\.){1,3}[a-z\_]*)(\[(.*)\]|)$/', $message, $result)) {
+            if ($result[1] ?? false) {
+                $key = $result[1];
+                if (isset($result[4]) && empty($params)) {
+                    $strParam = $result[4];
+                    $allParams = explode('|', $strParam);
+                    foreach ($allParams as $param) {
+                        $result = explode('==', $param);
+                        $params[$result[0]] = $result[1];
+                    }
+                }
+                $message = $this->lengowTranslation->t($key, $params, $isoCode);
+            }
+        }
+        return $message;
     }
 
     /**
@@ -105,7 +150,7 @@ class LengowLog
      */
     public function write(string $category, string $message = '', bool $display = false, $marketplaceSku = null): void
     {
-        $decodedMessage = $this->lengowMessage->decode($message, LengowTranslation::DEFAULT_ISO_CODE);
+        $decodedMessage = $this->decodeMessage($message, LengowTranslation::DEFAULT_ISO_CODE);
         $log = date('Y-m-d H:i:s');
         $log .= ' - ' . (empty($category) ? '' : '[' . $category . '] ');
         $log .= '' . (empty($marketplaceSku) ? '' : 'order ' . $marketplaceSku . ': ');

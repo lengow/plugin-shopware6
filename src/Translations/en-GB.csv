@@ -64,3 +64,5 @@ log.connector.token_not_return|no authorization token returned
 log.connector.token_is_empty|the returned authorization token is empty
 log.connector.api_not_available|Lengow APIs are not available
 log.connector.retry_get_token|API call failed - authorization token expired - attempt to recover a new token
+log.setting.setting_change|%{key} - old value %{old_value} replaced with %{value}
+log.setting.setting_change_for_sales_channel|%{key} - old value %{old_value} replaced with %{value} for shop %{sales_channel_id}
