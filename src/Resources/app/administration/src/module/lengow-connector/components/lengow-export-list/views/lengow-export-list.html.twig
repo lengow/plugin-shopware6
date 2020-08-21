@@ -1,0 +1,103 @@
+{% block lengow_export_product_list %}
+    <sw-page class="sw-product-list">
+        <template #content>
+            <!-- Sales channel selector -->
+            {% block lengow_export_choose_sales_channel %}
+                <div class="sw-system-config__global-sales-channel-switch">
+                    <sw-sales-channel-switch  @change-sales-channel-id="onSalesChannelChanged">
+                    </sw-sales-channel-switch>
+                </div>
+            {% endblock %}
+            {% block lengow_export_filters %}
+                <div class="sw-card__content">
+                    <sw-single-select
+                            v-if="salesChannelSelected"
+                            v-model="activeFilterText"
+                            :options="isActiveOptions"
+                            label="choose to see only active / inactive product"
+                            @change="onActiveFilter">
+                    </sw-single-select>
+                    <sw-single-select
+                            v-if="salesChannelSelected"
+                            v-model="stockFilterText"
+                            :options="isWithStockOptions"
+                            label="choose to see only with stock |  w/ stock product"
+                            @change="onStockFilter">
+                    </sw-single-select>
+                    <div class="sw-block-field__block">
+                        <sw-text-field
+                                v-if="salesChannelSelected"
+                                v-model="searchFilterText"
+                                class="sw-field sw-simple-search-field__input sw-field--small"
+                                label="Search by id | name | reference"
+                                @input="onSearchFilter">
+                        </sw-text-field>
+                    </div>
+                </div>
+            {% endblock %}
+            {% block lengow_export_product_list_content %}
+                <div class="sw-product-list__content"  v-if="salesChannelSelected">
+                    {% block lengow_export_product_list_grid %}
+                        <sw-entity-listing ref="swProductGrid"
+                                           class="sw-product-list-grid"
+                                           :items="products"
+                                           :columns="productColumns"
+                                           :repository="productRepository"
+                                           detailRoute="sw.product.detail"
+                                           :showSelection="true"
+                                           :isLoading="isLoading"
+                                           identifier="sw-product-list"
+                                           @column-sort="onColumnSort"
+                                           @paginate="onColumnSort"
+                                           @selection-change="updateSelection"
+                                           @update-records="updateTotal">
+                            <template #delete-action>
+                                <span></span> <!-- Remove delete action from entity listing -->
+                            </template>
+                            {% block lengow_export_product_list_grid_columns %}
+                                {% block lengow_export_product_list_grid_columns_name_preview %}
+                                    <template #preview-name="{ item }">
+                                        <sw-media-preview-v2 :source="item.cover ? item.cover.media : null"></sw-media-preview-v2>
+                                    </template>
+                                {% endblock %}
+                                {% block lengow_export_product_list_grid_columns_active %}
+                                    <template #column-active="{ item }">
+                                        {% block lengow_export_product_list_grid_columns_active_content %}
+                                            <template>
+                                                <sw-icon v-if="item.active" name="small-default-checkmark-line-medium" small class="is--active"></sw-icon>
+                                                <sw-icon v-else name="small-default-x-line-medium" small class="is--inactive"></sw-icon>
+                                            </template>
+                                        {% endblock %}
+                                    </template>
+                                {% endblock %}
+                                {% block lengow_export_product_list_grid_columns_price %}
+                                    <template v-for="currency in currencies"
+                                              :slot="`column-price-${currency.isoCode}`"
+                                              slot-scope="{ item }">
+                                        {{ getCurrencyPriceByCurrencyId(currency.id, item.price).gross | currency(currency.isoCode) }}
+                                    </template>
+                                {% endblock %}
+                                {% block lengow_export_product_list_grid_columns_stock %}
+                                    <template #column-stock="{ item, compact }">
+                                        {% block lengow_export_product_list_grid_columns_stock_content %}
+                                            <template>
+                                                {{ item.stock }}
+                                                <sw-color-badge :variant="item.stock | stockColorVariant"></sw-color-badge>
+                                            </template>
+                                        {% endblock %}
+                                    </template>
+                                {% endblock %}
+                            {% endblock %}
+                        </sw-entity-listing>
+                    {% endblock %}
+                    {% block lengow_export_product_list_empty_state %}
+                        <sw-empty-state v-if="!isLoading && !total" :title="$tc('sw-product.list.messageEmpty')"></sw-empty-state>
+                    {% endblock %}
+                    {% block lengow_export_product_list_grid_loader %}
+                        <sw-loader v-if="isLoading || !salesChannelSelected"></sw-loader>
+                    {% endblock %}
+                </div>
+            {% endblock %}
+        </template>
+    </sw-page>
+{% endblock %}

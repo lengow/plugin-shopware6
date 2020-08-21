@@ -22,7 +22,7 @@ error_reporting(E_ALL);
 ini_set('display_errors', 1);
 
 $csvFolder = '/src/Translations/';
-$jsonFolder = '/src/app/administration/src/module/lengow-connector/snippet/';
+$jsonFolder = '/src/Resources/app/administration/src/module/lengow-connector/snippet/';
 
 $directory = dirname(dirname(__FILE__)) . $csvFolder . 'yml/';
 $listFiles = array_diff(scandir($directory), ['..', '.', 'index.php']);
