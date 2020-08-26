@@ -84,3 +84,15 @@ en:
           label: "Cancelled orders"
         id_shipped_by_mp:
           label: "Orders shipped by marketplace"
+    lengow_log:
+      error:
+        nb_order_imported: "%{nb_order} order(s) imported"
+        nb_order_updated: "%{nb_order} order(s) updated"
+        nb_order_with_error: "%{nb_order} order(s) with errors"
+        rest_time_to_import: "Please wait %{rest_time} seconds before syncing your orders again"
+        credentials_not_valid: "Account ID, token access or secret token are not valid"
+        no_catalog_for_sales_channel: "No catalog ID valid for the sales channel %{sales_channel_name} (%{sales_channel_id})"
+        order_not_found: "Lengow error: order cannot be found in Lengow feed"
+      exception:
+        no_connection_webservice: "connection did not work with the Lengow webservice in sales channel %{sales_channel_name} (%{sales_channel_id})"
+        error_lengow_webservice: "Lengow webservice: %{error_code} - \"%{error_message}\" in sales channel %{sales_channel_name} (%{sales_channel_id})"

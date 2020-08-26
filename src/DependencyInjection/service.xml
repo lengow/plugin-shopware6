@@ -11,6 +11,7 @@
             <argument type="service" id="Shopware\Core\System\SystemConfig\SystemConfigService" />
             <argument type="service" id="system_config.repository"/>
             <argument type="service" id="Lengow\Connector\Service\LengowLog"/>
+            <argument type="service" id="Lengow\Connector\Util\EnvironmentInfoProvider"/>
         </service>
 
         <service id="Lengow\Connector\Service\LengowAccess">
@@ -19,6 +20,12 @@
         </service>
 
         <service id="Lengow\Connector\Service\LengowConnector">
+            <argument type="service" id="Lengow\Connector\Service\LengowConfiguration"/>
+            <argument type="service" id="Lengow\Connector\Service\LengowLog"/>
+        </service>
+
+        <service id="Lengow\Connector\Service\LengowImport">
+            <argument type="service" id="Lengow\Connector\Service\LengowConnector"/>
             <argument type="service" id="Lengow\Connector\Service\LengowConfiguration"/>
             <argument type="service" id="Lengow\Connector\Service\LengowLog"/>
         </service>

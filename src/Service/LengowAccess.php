@@ -2,7 +2,6 @@
 
 namespace Lengow\Connector\Service;
 
-use Shopware\Core\System\SalesChannel\SalesChannelContext;
 use Shopware\Core\Framework\Context;
 use Shopware\Core\Framework\DataAbstractionLayer\Search\Criteria;
 use Shopware\Core\Framework\DataAbstractionLayer\Search\Filter\EqualsFilter;
@@ -120,10 +119,7 @@ class LengowAccess
      */
     public function checkIp(string $ip): bool
     {
-        if (in_array($ip, $this->getAuthorizedIps(), true)) {
-            return true;
-        }
-        return false;
+        return in_array($ip, $this->getAuthorizedIps(), true);
     }
 
     /**
@@ -131,17 +127,15 @@ class LengowAccess
      */
     public function getAuthorizedIps(): array
     {
+        $authorizedIps = [];
         $ips = $this->lengowConfiguration->get('lengowAuthorizedIp');
         $ipEnable = $this->lengowConfiguration->get('lengowIpEnabled');
-
-        if ($ipEnable && $ips !== null) {
-            $ips = trim(str_replace(["\r\n", ',', '-', '|', ' '], ';', $ips), ';');
-            $ips = explode(';', $ips);
-            $authorizedIps = array_merge($ips, self::$ipsLengow);
-        } else {
-            $authorizedIps = self::$ipsLengow;
+        if ($ipEnable && !empty($ips)) {
+            foreach ($ips as $ip) {
+                $authorizedIps[] = trim(str_replace(["\r\n", ',', '-', '|', ' ', '/'], ';', $ip), ';');
+            }
         }
-        return $authorizedIps;
+        return array_merge($authorizedIps, self::$ipsLengow);
     }
 
     /**
@@ -152,14 +146,7 @@ class LengowAccess
      */
     public function checkToken(string $token, string $salesChannelId = null): bool
     {
-        // TODO ici si le token n'existe pas encore on le créé
-        // TODO on va aussi créer un token pour tout les autres shops & un global.
-
-        if ($salesChannelId) {
-            $configToken = $this->lengowConfiguration->get('lengowChannelToken', $salesChannelId);
-        } else {
-            $configToken = $this->lengowConfiguration->get('lengowGlobalToken');
-        }
+        $configToken = $this->lengowConfiguration->getToken($salesChannelId);
         if ($token && !empty($configToken)) {
             return $configToken === $token;
         }

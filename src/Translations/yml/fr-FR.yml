@@ -84,3 +84,16 @@ fr:
           label: "Commandes annulées"
         id_shipped_by_mp:
           label: "Commandes expédiées par les marketplaces"
+    lengow_log:
+      error:
+        nb_order_imported: "%{nb_order} commande(s) importée(s)"
+        nb_order_updated: "%{nb_order} commande(s) mise(s) à jour"
+        nb_order_with_error: "%{nb_order} commande(s) avec erreurs"
+        no_notification: "Pas de nouvelle notification sur vos commandes"
+        rest_time_to_import: "Attendez %{rest_time} secondes avant de synchroniser de nouveau vos commandes"
+        credentials_not_valid: "Votre identifiant de compte, votre jeton d'accès ou votre jeton secret ne sont pas valides"
+        no_catalog_for_sales_channel: "Aucun identifiant de catalogue valide pour le sales channel %{sales_channel_name} (%{sales_channel_id})"
+        order_not_found: "Erreur Lengow : la commande ne peut être trouvée dans le flux Lengow"
+      exception:
+        no_connection_webservice: "la connexion ne se fait pas avec Lengow pour le sales channel %{sales_channel_name} (%{sales_channel_id}) funktionierte nicht"
+        error_lengow_webservice: "l'API Lengow : %{error_code} - \"%{error_message}\" pour le sales channel %{sales_channel_name} (%{sales_channel_id})"

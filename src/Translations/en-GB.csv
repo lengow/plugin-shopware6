@@ -50,10 +50,29 @@ settings.lengow_order_status_settings.id_waiting_shipment.label|Orders in prepar
 settings.lengow_order_status_settings.id_shipped.label|Shipped orders
 settings.lengow_order_status_settings.id_canceled.label|Cancelled orders
 settings.lengow_order_status_settings.id_shipped_by_mp.label|Orders shipped by marketplace
+lengow_log.error.nb_order_imported|%{nb_order} order(s) imported
+lengow_log.error.nb_order_updated|%{nb_order} order(s) updated
+lengow_log.error.nb_order_with_error|%{nb_order} order(s) with errors
+lengow_log.error.rest_time_to_import|Please wait %{rest_time} seconds before syncing your orders again
+lengow_log.error.credentials_not_valid|Account ID, token access or secret token are not valid
+lengow_log.error.no_catalog_for_sales_channel|No catalog ID valid for the sales channel %{sales_channel_name} (%{sales_channel_id})
+lengow_log.error.order_not_found|Lengow error: order cannot be found in Lengow feed
+lengow_log.exception.no_connection_webservice|connection did not work with the Lengow webservice in sales channel %{sales_channel_name} (%{sales_channel_id})
+lengow_log.exception.error_lengow_webservice|Lengow webservice: %{error_code} - "%{error_message}" in sales channel %{sales_channel_name} (%{sales_channel_id})
 log.export.unauthorised_ip|Unauthorized access for IP: %{ip}
 log.export.unauthorised_token|Unauthorised access for this token: %{token}
 log.export.empty_token|Unauthorised access: token parameter is empty
 log.export.specify_sales_channel|No sales channel specified or invalid sales channel uuid
+log.import.debug_mode_active|WARNING! Debug Mode is activated
+log.import.start|## start %{type} import ##
+log.import.end|## end %{type} import ##
+log.import.import_failed|import failed - %{decoded_message}
+log.import.start_for_sales_channel|start import in sales channel %{sales_channel_name} (%{sales_channel_id})
+log.import.catalog_id_already_used|catalog ID %{catalog_id} is already used by sales channel %{sales_channel_name} (%{sales_channel_id})
+log.import.find_one_order|%{nb_order} order found for order ID: %{marketplace_sku} and marketplace: %{marketplace_name} with account ID: %{account_id}
+log.import.find_all_orders|%{nb_order} order(s) found for sales channel %{sales_channel_name} (%{sales_channel_id})
+log.import.connector_get_order|get order with order ID: %{marketplace_sku} and marketplace: %{marketplace_name}
+log.import.connector_get_all_order|get orders between %{date_from} and %{date_to} for catalogs ID: %{catalog_id}
 log.connector.call_api|call %{call_type} %{curl_url}
 log.connector.error_api|API call failed - %{error_code} - %{error_message}
 log.connector.curl_disabled|Curl extension is not enabled on the server
@@ -65,4 +84,4 @@ log.connector.token_is_empty|the returned authorization token is empty
 log.connector.api_not_available|Lengow APIs are not available
 log.connector.retry_get_token|API call failed - authorization token expired - attempt to recover a new token
 log.setting.setting_change|%{key} - old value %{old_value} replaced with %{value}
-log.setting.setting_change_for_sales_channel|%{key} - old value %{old_value} replaced with %{value} for shop %{sales_channel_id}
+log.setting.setting_change_for_sales_channel|%{key} - old value %{old_value} replaced with %{value} for sales channel %{sales_channel_id}

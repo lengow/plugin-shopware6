@@ -6,6 +6,17 @@ en:
         unauthorised_token: "Unauthorised access for this token: %{token}"
         empty_token: "Unauthorised access: token parameter is empty"
         specify_sales_channel: "No sales channel specified or invalid sales channel uuid"
+      import:
+        debug_mode_active: "WARNING! Debug Mode is activated"
+        start: "## start %{type} import ##"
+        end: "## end %{type} import ##"
+        import_failed: "import failed - %{decoded_message}"
+        start_for_sales_channel: "start import in sales channel %{sales_channel_name} (%{sales_channel_id})"
+        catalog_id_already_used: "catalog ID %{catalog_id} is already used by sales channel %{sales_channel_name} (%{sales_channel_id})"
+        find_one_order: "%{nb_order} order found for order ID: %{marketplace_sku} and marketplace: %{marketplace_name} with account ID: %{account_id}"
+        find_all_orders: "%{nb_order} order(s) found for sales channel %{sales_channel_name} (%{sales_channel_id})"
+        connector_get_order: "get order with order ID: %{marketplace_sku} and marketplace: %{marketplace_name}"
+        connector_get_all_order: "get orders between %{date_from} and %{date_to} for catalogs ID: %{catalog_id}"
       connector:
         call_api: "call %{call_type} %{curl_url}"
         error_api: "API call failed - %{error_code} - %{error_message}"
@@ -19,4 +30,4 @@ en:
         retry_get_token: "API call failed - authorization token expired - attempt to recover a new token"
       setting:
         setting_change: "%{key} - old value %{old_value} replaced with %{value}"
-        setting_change_for_sales_channel: "%{key} - old value %{old_value} replaced with %{value} for shop %{sales_channel_id}"
+        setting_change_for_sales_channel: "%{key} - old value %{old_value} replaced with %{value} for sales channel %{sales_channel_id}"

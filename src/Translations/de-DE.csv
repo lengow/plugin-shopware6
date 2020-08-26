@@ -50,3 +50,12 @@ settings.lengow_order_status_settings.id_waiting_shipment.label|Lieferung in Vor
 settings.lengow_order_status_settings.id_shipped.label|Versandte Bestellungen
 settings.lengow_order_status_settings.id_canceled.label|Stornierte Bestellungen
 settings.lengow_order_status_settings.id_shipped_by_mp.label|Bestellung von Marktplatz versandt
+lengow_log.error.nb_order_imported|%{nb_order} Bestellung(en) importiert
+lengow_log.error.nb_order_updated|%{nb_order} Bestellung(en) aktualisiert
+lengow_log.error.nb_order_with_error|%{nb_order} Bestellung(en) mit Fehlern
+lengow_log.error.rest_time_to_import|Bitte warten Sie %{rest_time} Sekunden, bevor Sie Ihre Bestellungen erneut synchronisieren
+lengow_log.error.credentials_not_valid|Konto-Nr., Access-Token oder Access-Token-Secret ungültig
+lengow_log.error.no_catalog_for_sales_channel|Keine gültige Katalog-Nr. für den sales channel %{sales_channel_name} (%{sales_channel_id})
+lengow_log.error.order_not_found|Fehler Lengow: Bestellung kann in Lengow nicht gefunden werden
+lengow_log.exception.no_connection_webservice|verbindung mit dem Lengow Webservice im sales channel %{sales_channel_name} (%{sales_channel_id}) funktionierte nicht
+lengow_log.exception.error_lengow_webservice|Lengow Webservice : %{error_code} - "%{error_message}" auf sales channel %{sales_channel_name} (%{sales_channel_id})

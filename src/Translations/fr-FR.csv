@@ -50,3 +50,13 @@ settings.lengow_order_status_settings.id_waiting_shipment.label|Commandes en pr�
 settings.lengow_order_status_settings.id_shipped.label|Commandes expédiées
 settings.lengow_order_status_settings.id_canceled.label|Commandes annulées
 settings.lengow_order_status_settings.id_shipped_by_mp.label|Commandes expédiées par les marketplaces
+lengow_log.error.nb_order_imported|%{nb_order} commande(s) importée(s)
+lengow_log.error.nb_order_updated|%{nb_order} commande(s) mise(s) à jour
+lengow_log.error.nb_order_with_error|%{nb_order} commande(s) avec erreurs
+lengow_log.error.no_notification|Pas de nouvelle notification sur vos commandes
+lengow_log.error.rest_time_to_import|Attendez %{rest_time} secondes avant de synchroniser de nouveau vos commandes
+lengow_log.error.credentials_not_valid|Votre identifiant de compte, votre jeton d'accès ou votre jeton secret ne sont pas valides
+lengow_log.error.no_catalog_for_sales_channel|Aucun identifiant de catalogue valide pour le sales channel %{sales_channel_name} (%{sales_channel_id})
+lengow_log.error.order_not_found|Erreur Lengow : la commande ne peut être trouvée dans le flux Lengow
+lengow_log.exception.no_connection_webservice|la connexion ne se fait pas avec Lengow pour le sales channel %{sales_channel_name} (%{sales_channel_id}) funktionierte nicht
+lengow_log.exception.error_lengow_webservice|l'API Lengow : %{error_code} - "%{error_message}" pour le sales channel %{sales_channel_name} (%{sales_channel_id})

@@ -242,13 +242,10 @@ class LengowConnector
             $this->connect(false, $logOutput);
         } catch (Exception $e) {
             $message = $this->lengowLog->decodeMessage($e->getMessage(), LengowTranslation::DEFAULT_ISO_CODE);
-            $error = $this->lengowLog->encodeMessage(
-                'log.connector.error_api',
-                [
-                    'error_code' => $e->getCode(),
-                    'error_message' => $message,
-                ]
-            );
+            $error = $this->lengowLog->encodeMessage('log.connector.error_api', [
+                'error_code' => $e->getCode(),
+                'error_message' => $message,
+            ]);
             $this->lengowLog->write(LengowLog::CODE_CONNECTOR, $error, $logOutput);
             return false;
         }
@@ -274,7 +271,9 @@ class LengowConnector
             }
             if (!in_array($type, [self::GET, self::POST, self::PUT, self::PATCH])) {
                 throw new LengowException(
-                    $this->lengowLog->encodeMessage('log.connector.method_not_valid', ['type' => $type]),
+                    $this->lengowLog->encodeMessage('log.connector.method_not_valid', [
+                        'type' => $type
+                    ]),
                     self::CODE_500
                 );
             }
@@ -288,13 +287,10 @@ class LengowConnector
             );
         } catch (LengowException $e) {
             $message = $this->lengowLog->decodeMessage($e->getMessage(), LengowTranslation::DEFAULT_ISO_CODE);
-            $error = $this->lengowLog->encodeMessage(
-                'log.connector.error_api',
-                [
-                    'error_code' => $e->getCode(),
-                    'error_message' => $message,
-                ]
-            );
+            $error = $this->lengowLog->encodeMessage('log.connector.error_api', [
+                'error_code' => $e->getCode(),
+                'error_message' => $message,
+            ]);
             $this->lengowLog->write(LengowLog::CODE_CONNECTOR, $error, $logOutput);
             return false;
         }
@@ -592,13 +588,10 @@ class LengowConnector
         }
         $this->lengowLog->write(
             LengowLog::CODE_CONNECTOR,
-            $this->lengowLog->encodeMessage(
-                'log.connector.call_api',
-                [
-                    'call_type' => $type,
-                    'curl_url' => $opts[CURLOPT_URL],
-                ]
-            ),
+            $this->lengowLog->encodeMessage('log.connector.call_api', [
+                'call_type' => $type,
+                'curl_url' => $opts[CURLOPT_URL],
+            ]),
             $logOutput
         );
         curl_setopt_array($ch, $opts);
@@ -630,13 +623,10 @@ class LengowConnector
                 throw new LengowException($this->lengowLog->encodeMessage('log.connector.timeout_api'), self::CODE_504);
             }
             throw new LengowException(
-                $this->lengowLog->encodeMessage(
-                    'log.connector.error_curl',
-                    [
-                        'error_code' => $curlErrorNumber,
-                        'error_message' => $curlError,
-                    ]
-                ),
+                $this->lengowLog->encodeMessage('log.connector.error_curl', [
+                    'error_code' => $curlErrorNumber,
+                    'error_message' => $curlError,
+                ]),
                 self::CODE_500
             );
         }

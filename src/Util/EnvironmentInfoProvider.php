@@ -4,8 +4,10 @@ namespace Lengow\Connector\Util;
 
 use Shopware\Core\Kernel;
 use Shopware\Core\Framework\Context;
+use Shopware\Core\Framework\DataAbstractionLayer\EntityCollection;
 use Shopware\Core\Framework\DataAbstractionLayer\EntityRepositoryInterface;
 use Shopware\Core\Framework\DataAbstractionLayer\Search\Criteria;
+use Shopware\Core\Framework\DataAbstractionLayer\Search\Filter\EqualsFilter;
 use Shopware\Core\System\Language\LanguageCollection;
 use Shopware\Core\System\SalesChannel\Aggregate\SalesChannelDomain\SalesChannelDomainCollection;
 use Lengow\Connector\Connector;
@@ -27,6 +29,11 @@ class EnvironmentInfoProvider
     private $languageRepository;
 
     /**
+     * @var EntityRepositoryInterface sales channel repository
+     */
+    private $salesChannelRepository;
+
+    /**
      * @var EntityRepositoryInterface sales channel domain repository
      */
     private $salesChannelDomainRepository;
@@ -36,16 +43,19 @@ class EnvironmentInfoProvider
      *
      * @param Kernel $kernel Shopware kernel
      * @param EntityRepositoryInterface $languageRepository language repository
+     * @param EntityRepositoryInterface $salesChannelRepository sales channel repository
      * @param EntityRepositoryInterface $salesChannelDomainRepository sales channel domain repository
      */
     public function __construct(
         Kernel $kernel,
         EntityRepositoryInterface $languageRepository,
+        EntityRepositoryInterface $salesChannelRepository,
         EntityRepositoryInterface $salesChannelDomainRepository
     )
     {
         $this->kernel = $kernel;
         $this->languageRepository = $languageRepository;
+         $this->salesChannelRepository = $salesChannelRepository;
         $this->salesChannelDomainRepository = $salesChannelDomainRepository;
     }
 
@@ -143,5 +153,18 @@ class EnvironmentInfoProvider
             }
         }
         return $baseUrl;
+    }
+
+    /**
+     * Get all active Shopware sales channels
+     *
+     * @return EntityCollection
+     */
+    public function getActiveSalesChannels(): EntityCollection
+    {
+        $context = Context::createDefaultContext();
+        $criteria = new Criteria();
+        $criteria->addFilter(new EqualsFilter('active', true));
+        return $this->salesChannelRepository->search($criteria, $context)->getEntities();
     }
 }
