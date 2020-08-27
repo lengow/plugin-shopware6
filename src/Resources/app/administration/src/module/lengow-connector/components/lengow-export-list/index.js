@@ -49,6 +49,10 @@ Component.register('lengow-export-list', {
                 active: null,
                 search: null,
             },
+            productSelection: false,
+            productSelectionSelectAll: false,
+            selection: [],
+            totalSelected: 0,
         };
     },
 
@@ -88,6 +92,10 @@ Component.register('lengow-export-list', {
 
         currencyRepository() {
             return this.repositoryFactory.create('currency');
+        },
+
+        lengowProductRepository() {
+            return this.repositoryFactory.create('lengow_product');
         },
 
         currenciesColumns() {
@@ -276,7 +284,6 @@ Component.register('lengow-export-list', {
             productCriteria.addAssociation('manufacturer');
 
             const currencyCriteria = new Criteria(1, 500);
-
             return Promise.all([
                 this.productRepository.search(productCriteria, Shopware.Context.api),
                 this.currencyRepository.search(currencyCriteria, Shopware.Context.api),
@@ -284,18 +291,94 @@ Component.register('lengow-export-list', {
                 .then(result => {
                     const [products, currencies] = result;
                     this.total = products.total;
+                    products.forEach(product => {
+                        // eslint-disable-next-line no-param-reassign
+                        product.extensions.activeInLengow.active =
+                            typeof product.extensions.activeInLengow.activeArray[
+                                this.currentSalesChannelId
+                            ] !== 'undefined';
+                    });
                     this.products = products;
                     this.baseProducts = this.products;
-
                     this.currencies = currencies;
                     this.isLoading = false;
                     this.productIds = [];
-                    this.selection = {};
                 })
                 .catch(() => {
                     this.isLoading = false;
                     this.productIds = [];
                 });
+        },
+
+        onSelectAllProducts() {
+            this.selection = this.products;
+            this.totalSelected = this.selection.total;
+            this.$refs.swProductGrid.records.forEach(item => {
+                if (this.$refs.swProductGrid.isSelected(item.id) !== true) {
+                    this.$refs.swProductGrid.selectItem(true, item);
+                }
+            });
+        },
+
+        updateSelection(selected) {
+            const selectedItem = Object.values(selected);
+            this.selection = [];
+            selectedItem.forEach(item => {
+                this.selection.push(item.id);
+            });
+            this.totalSelected = this.selection.length;
+        },
+
+        onPublishOnLengow() {
+            const lengowProductCriteria = new Criteria();
+            lengowProductCriteria.addFilter(Criteria.equalsAny('productId', this.selection));
+            this.lengowProductRepository
+                .search(lengowProductCriteria, Shopware.Context.api)
+                .then(result => {
+                    const ids = [];
+                    result.forEach(item => {
+                        ids.push(item.productId);
+                    });
+                    const toPublish = this.selection.filter(x => !ids.includes(x));
+                    toPublish.forEach(productId => {
+                        const lengowProduct = this.lengowProductRepository.create(Shopware.Context.api);
+                        lengowProduct.productId = productId;
+                        lengowProduct.salesChannelId = this.currentSalesChannelId;
+                        this.lengowProductRepository.save(lengowProduct, Shopware.Context.api);
+                    });
+                });
+        },
+
+        onUnpublishOnLengow() {
+            const lengowProductCriteria = new Criteria();
+            lengowProductCriteria.addFilter(Criteria.equalsAny('productId', this.selection));
+            lengowProductCriteria.addFilter(Criteria.equals('salesChannelId', this.currentSalesChannelId));
+            this.lengowProductRepository
+                .searchIds(lengowProductCriteria, Shopware.Context.api)
+                .then(result => {
+                    result.data.forEach(lengowProductId => {
+                        this.lengowProductRepository.delete(lengowProductId, Shopware.Context.api);
+                    });
+                });
+        },
+
+        OnActivateOnLengow(selected) {
+            const selectedItem = Object.values(selected)[0];
+            if (selectedItem.extensions.activeInLengow.active) {
+                const lengowProduct = this.lengowProductRepository.create(Shopware.Context.api);
+                lengowProduct.productId = selectedItem.id;
+                lengowProduct.salesChannelId = this.currentSalesChannelId;
+                this.lengowProductRepository.save(lengowProduct, Shopware.Context.api);
+                return;
+            }
+            const lengowProductCriteria = new Criteria();
+            lengowProductCriteria.addFilter(Criteria.equals('productId', selectedItem.id));
+            lengowProductCriteria.addFilter(Criteria.equals('salesChannelId', this.currentSalesChannelId));
+            this.lengowProductRepository
+                .searchIds(lengowProductCriteria, Shopware.Context.api)
+                .then(result =>
+                    this.lengowProductRepository.delete(result.data[0], Shopware.Context.api),
+                );
         },
 
         updateTotal({ total }) {
@@ -320,6 +403,12 @@ Component.register('lengow-export-list', {
         getProductColumns() {
             return [
                 {
+                    property: 'extensions.activeInLengow.active',
+                    label: 'active in lengow',
+                    inlineEdit: 'boolean',
+                    align: 'center',
+                },
+                {
                     property: 'name',
                     label: this.$tc('sw-product.list.columnName'),
                     routerLink: 'sw.product.detail',
@@ -341,7 +430,7 @@ Component.register('lengow-export-list', {
                 },
                 {
                     property: 'active',
-                    label: `${this.$tc('sw-product.list.columnActive')} in shopware`,
+                    label: `${this.$tc('sw-product.list.columnActive')}`,
                     inlineEdit: 'boolean',
                     allowResize: true,
                     align: 'center',
@@ -366,7 +455,7 @@ Component.register('lengow-export-list', {
         onColumnSort(column) {
             this.$refs.swProductGrid.loading = true;
 
-            const context = Object.assign({...Shopware.Context.api});
+            const context = { ...Shopware.Context.api };
             context.currencyId = column.currencyId;
 
             return this.$refs.swProductGrid.repository

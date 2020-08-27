@@ -7,14 +7,9 @@ use Shopware\Core\Framework\DataAbstractionLayer\EntityDefinition;
 // Field flags
 use Shopware\Core\Framework\DataAbstractionLayer\Field\Flag\PrimaryKey;
 use Shopware\Core\Framework\DataAbstractionLayer\Field\Flag\Required;
-use Shopware\Core\Framework\DataAbstractionLayer\Field\Flag\SetNullOnDelete;
 // Field types
 use Shopware\Core\Framework\DataAbstractionLayer\Field\FkField;
-use Shopware\Core\Framework\DataAbstractionLayer\Field\IntField;
 use Shopware\Core\Framework\DataAbstractionLayer\Field\IdField;
-use Shopware\Core\Framework\DataAbstractionLayer\Field\DateField;
-use Shopware\Core\Framework\DataAbstractionLayer\Field\StringField;
-use Shopware\Core\Framework\DataAbstractionLayer\Field\OneToOneAssociationField;
 // Model Return Type
 use Shopware\Core\Framework\DataAbstractionLayer\FieldCollection;
 // OneToOne association class
@@ -54,26 +49,9 @@ class ProductDefinition extends EntityDefinition
     {
         return new FieldCollection(
             [
-                (new OneToOneAssociationField(
-                    'product',
-                    'product_id',
-                    'id',
-                    ShopwareProductDefinition::class
-                ))->addFlags(
-                    new Required(),
-                    new SetNullOnDelete()
-                ),
+                (new IdField('id', 'id'))->addFlags(new Required(), new PrimaryKey()),
+                (new FkField('product_id', 'productId', ShopwareProductDefinition::class)),
                 (new FkField('sales_channel_id', 'salesChannelId', ShopwareSalesChannelDefinition::class)),
-                (new OneToOneAssociationField(
-                    'salesChannel',
-                    'sales_channel_id',
-                    'id',
-                    ShopwareSalesChannelDefinition::class
-                ))->addFlags(
-                    new Required(),
-                    new setNullOnDelete()
-                ),
-                (new DateField('created_at', 'createdAt'))->addFlags(new Required()),
             ]
         );
     }

@@ -160,9 +160,11 @@ class Migration1595860347Init extends MigrationStep
          */
         $connection->executeUpdate('
             CREATE TABLE IF NOT EXISTS `lengow_product` (
+                `id`               BINARY(16)  NOT NULL,
                 `product_id`       BINARY(16)  NOT NULL,
                 `sales_channel_id` BINARY(16)  NOT NULL,
                 `created_at`       DATETIME(3) NOT NULL,
+                `updated_at`       DATETIME(3),
                 FOREIGN KEY (`sales_channel_id`) REFERENCES sales_channel(`id`),
                 FOREIGN KEY (`product_id`)       REFERENCES product(`id`),
                 INDEX (`product_id`, `sales_channel_id`)

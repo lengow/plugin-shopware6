@@ -11,5 +11,10 @@
             <tag name="kernel.event_subscriber"/>
         </service>
 
+        <service id="Lengow\Connector\Subscriber\ProductExtensionSubscriber">
+            <argument type="service" id="lengow_product.repository"/>
+            <tag name="kernel.event_subscriber"/>
+        </service>
+
     </services>
 </container>

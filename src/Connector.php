@@ -35,6 +35,7 @@ class Connector extends Plugin
         $loader->load('service.xml');
         $loader->load('subscriber.xml');
         $loader->load('util.xml');
+        $loader->load('extension.xml');
     }
 
     /**

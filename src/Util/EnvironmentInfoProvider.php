@@ -91,7 +91,10 @@ class EnvironmentInfoProvider
      */
     public function getPluginPath(): string
     {
-        return $this->kernel->getPluginLoader()->getPluginInstance(Connector::class)->getPath();
+        if ($this->kernel->getPluginLoader()->getPluginInstance(Connector::class)) {
+            return $this->kernel->getPluginLoader()->getPluginInstance(Connector::class)->getPath();
+        }
+        return '';
     }
 
     /**

@@ -9,16 +9,14 @@
                 </div>
             {% endblock %}
             {% block lengow_export_filters %}
-                <div class="sw-card__content">
+                <div class="sw-card__content" v-if="salesChannelSelected">
                     <sw-single-select
-                            v-if="salesChannelSelected"
                             v-model="activeFilterText"
                             :options="isActiveOptions"
                             label="choose to see only active / inactive product"
                             @change="onActiveFilter">
                     </sw-single-select>
                     <sw-single-select
-                            v-if="salesChannelSelected"
                             v-model="stockFilterText"
                             :options="isWithStockOptions"
                             label="choose to see only with stock |  w/ stock product"
@@ -26,13 +24,16 @@
                     </sw-single-select>
                     <div class="sw-block-field__block">
                         <sw-text-field
-                                v-if="salesChannelSelected"
                                 v-model="searchFilterText"
                                 class="sw-field sw-simple-search-field__input sw-field--small"
                                 label="Search by id | name | reference"
                                 @input="onSearchFilter">
                         </sw-text-field>
                     </div>
+                    <sw-switch-field
+                        v-model="productSelection"
+                        label="Activate product selection">
+                    </sw-switch-field>
                 </div>
             {% endblock %}
             {% block lengow_export_product_list_content %}
@@ -46,13 +47,38 @@
                                            detailRoute="sw.product.detail"
                                            :showSelection="true"
                                            :isLoading="isLoading"
-                                           identifier="sw-product-list"
                                            @column-sort="onColumnSort"
                                            @paginate="onColumnSort"
                                            @selection-change="updateSelection"
-                                           @update-records="updateTotal">
+                                           @update-records="updateTotal"
+                                           v-if="productSelection">
                             <template #delete-action>
                                 <span></span> <!-- Remove delete action from entity listing -->
+                            </template>
+                            <template #>
+                            </template>
+                            <template slot="bulk">
+                                {% block sw_data_grid_bulk_selected_count %}
+                                    <span class="sw-data-grid__bulk-selected bulk-link">Total Selected : </span>
+                                    <span class="sw-data-grid__bulk-selected sw-data-grid__bulk-selected-count">{{ totalSelected }}</span>
+                                {% endblock %}
+                                {% block sw_data_grid_bulk_selected_actions_content %}
+                                    <span class="sw-data-grid__bulk-selected bulk-link">
+                                        <a class="link link-default" @click="onSelectAllProducts">
+                                            Select All
+                                        </a>
+                                    </span>
+                                    <span class="sw-data-grid__bulk-selected bulk-link">
+                                        <a class="link link-default" @click="onPublishOnLengow">
+                                            Publish on lengow
+                                        </a>
+                                    </span>
+                                    <span class="sw-data-grid__bulk-selected bulk-link">
+                                        <a class="link link-default" @click="onUnpublishOnLengow">
+                                            Unpublish on lengow
+                                        </a>
+                                    </span>
+                                {% endblock %}
                             </template>
                             {% block lengow_export_product_list_grid_columns %}
                                 {% block lengow_export_product_list_grid_columns_name_preview %}
@@ -66,6 +92,16 @@
                                             <template>
                                                 <sw-icon v-if="item.active" name="small-default-checkmark-line-medium" small class="is--active"></sw-icon>
                                                 <sw-icon v-else name="small-default-x-line-medium" small class="is--inactive"></sw-icon>
+                                            </template>
+                                        {% endblock %}
+                                    </template>
+                                    <template #column-extensions.activeInLengow.active="{ item }">
+                                        {% block lengow_export_product_list_grid_columns_activeInLengow_content %}
+                                            <template>
+                                                <sw-switch-field
+                                                        v-model="item.extensions.activeInLengow.active"
+                                                        label="activate"
+                                                        @change="OnActivateOnLengow({ item })"></sw-switch-field>
                                             </template>
                                         {% endblock %}
                                     </template>
