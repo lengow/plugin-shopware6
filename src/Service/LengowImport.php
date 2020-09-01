@@ -53,6 +53,11 @@ class LengowImport
     private $lengowLog;
 
     /**
+     * @var LengowImportOrder Lengow import order service
+     */
+    private $lengowImportOrder;
+
+    /**
      * @var int account ID
      */
     private $accountId;
@@ -138,21 +143,24 @@ class LengowImport
     private $catalogIds = [];
 
     /**
-     * LengowConnector Construct
+     * LengowImport Construct
      *
      * @param LengowConnector $lengowConnector Lengow connector service
      * @param LengowConfiguration $lengowConfiguration Lengow configuration service
      * @param LengowLog $lengowLog Lengow log service
+     * @param LengowImportOrder $lengowImportOrder Lengow import order service
      */
     public function __construct(
         LengowConnector $lengowConnector,
         LengowConfiguration $lengowConfiguration,
-        LengowLog $lengowLog
+        LengowLog $lengowLog,
+        LengowImportOrder $lengowImportOrder
     )
     {
         $this->lengowConnector = $lengowConnector;
         $this->lengowConfiguration = $lengowConfiguration;
         $this->lengowLog = $lengowLog;
+        $this->lengowImportOrder = $lengowImportOrder;
     }
 
     /**
@@ -308,7 +316,12 @@ class LengowImport
                     } elseif ($totalOrders <= 0) {
                         continue;
                     }
-                    // TODO import orders
+                    $result = $this->importOrders($orders, $salesChannel);
+                    if (!$this->importOneOrder) {
+                        $orderNew += $result['order_new'];
+                        $orderUpdate += $result['order_update'];
+                        $orderError += $result['order_error'];
+                    }
                 } catch (LengowException $e) {
                     $errorMessage = $e->getMessage();
                 } catch (Exception $e) {
@@ -622,6 +635,140 @@ class LengowImport
             $finish = ($results->next === null || $this->importOneOrder);
         } while ($finish != true);
         return $orders;
+    }
+
+    /**
+     * Create or update order in Shopware
+     *
+     * @param array $orders API orders
+     * @param SalesChannelEntity $salesChannel Shopware sales channel instance
+     *
+     * @return array|false
+     */
+    private function importOrders(array $orders, SalesChannelEntity $salesChannel)
+    {
+        $orderNew = 0;
+        $orderUpdate = 0;
+        $orderError = 0;
+        $importFinished = false;
+        foreach ($orders as $orderData) {
+            if (!$this->importOneOrder) {
+                $this->setInProcess();
+            }
+            $nbPackage = 0;
+            $marketplaceSku = (string)$orderData->marketplace_order_id;
+            if ($this->debugMode) {
+                $marketplaceSku .= '--' . time();
+            }
+            // if order contains no package
+            if (empty($orderData->packages)) {
+                $this->lengowLog->write(
+                    LengowLog::CODE_IMPORT,
+                    $this->lengowLog->encodeMessage('log.import.error_no_package'),
+                    $this->logOutput,
+                    $marketplaceSku
+                );
+                continue;
+            }
+            // start import
+            foreach ($orderData->packages as $packageData) {
+                $nbPackage++;
+                // check whether the package contains a shipping address
+                if (!isset($packageData->delivery->id)) {
+                    $this->lengowLog->write(
+                        LengowLog::CODE_IMPORT,
+                        $this->lengowLog->encodeMessage('log.import.error_no_delivery_address'),
+                        $this->logOutput,
+                        $marketplaceSku
+                    );
+                    continue;
+                }
+                $packageDeliveryAddressId = (int)$packageData->delivery->id;
+                $firstPackage = $nbPackage > 1 ? false : true;
+                // check the package for re-import order
+                if ($this->importOneOrder) {
+                    if ($this->deliveryAddressId !== null && $this->deliveryAddressId !== $packageDeliveryAddressId) {
+                        $this->lengowLog->write(
+                            LengowLog::CODE_IMPORT,
+                            $this->lengowLog->encodeMessage('log.import.error_wrong_package_number'),
+                            $this->logOutput,
+                            $marketplaceSku
+                        );
+                        continue;
+                    }
+                }
+                try {
+                    // try to import or update order
+                    $this->lengowImportOrder->init(
+                        [
+                            'sales_channel' => $salesChannel,
+                            'debug_mode' => $this->debugMode,
+                            'log_output' => $this->logOutput,
+                            'marketplace_sku' => $marketplaceSku,
+                            'delivery_address_id' => $packageDeliveryAddressId,
+                            'order_data' => $orderData,
+                            'package_data' => $packageData,
+                            'first_package' => $firstPackage,
+                            'import_one_order' => $this->importOneOrder,
+                        ]
+                    );
+                    $order = $this->lengowImportOrder->exec();
+                } catch (LengowException $e) {
+                    $errorMessage = $e->getMessage();
+                } catch (Exception $e) {
+                    $errorMessage = '[Shopware error]: "' . $e->getMessage() . '" '
+                        . $e->getFile() . ' | ' . $e->getLine();
+                }
+                if (isset($errorMessage)) {
+                    $decodedMessage = $this->lengowLog->decodeMessage(
+                        $errorMessage,
+                        LengowTranslation::DEFAULT_ISO_CODE
+                    );
+                    $this->lengowLog->write(
+                        LengowLog::CODE_IMPORT,
+                        $this->lengowLog->encodeMessage('log.import.order_import_failed', [
+                            'decoded_message' => $decodedMessage
+                        ]),
+                        $this->logOutput,
+                        $marketplaceSku
+                    );
+                    unset($errorMessage);
+                    continue;
+                }
+                // sync to lengow if no debug_mode
+                if (!$this->debugMode && isset($order['order_new']) && $order['order_new']) {
+                    // TODO Synchronise order id with Lengow
+                }
+                // if re-import order -> return order information
+                if (isset($order) && $this->importOneOrder) {
+                    return $order;
+                }
+                if (isset($order)) {
+                    if (isset($order['order_new']) && $order['order_new']) {
+                        $orderNew++;
+                    } elseif (isset($order['order_update']) && $order['order_update']) {
+                        $orderUpdate++;
+                    } elseif (isset($order['order_error']) && $order['order_error']) {
+                        $orderError++;
+                    }
+                }
+                // clean process
+                unset($importOrder, $order);
+                // if limit is set
+                if ($this->limit > 0 && $orderNew === $this->limit) {
+                    $importFinished = true;
+                    break;
+                }
+            }
+            if ($importFinished) {
+                break;
+            }
+        }
+        return [
+            'order_new' => $orderNew,
+            'order_update' => $orderUpdate,
+            'order_error' => $orderError,
+        ];
     }
 
     /**

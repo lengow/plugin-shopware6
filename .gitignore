@@ -2,3 +2,4 @@
 **/.DS_Store
 src/Resources/public
 src/Logs/*.txt
+src/Config/marketplaces.json

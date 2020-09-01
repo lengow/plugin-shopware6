@@ -11,6 +11,7 @@ use Lengow\Connector\Service\LengowAccess;
 use Lengow\Connector\Service\LengowConfiguration;
 use Lengow\Connector\Service\LengowImport;
 use Lengow\Connector\Service\LengowLog;
+use Lengow\Connector\Service\LengowSync;
 
 /**
  * Class LengowCronController
@@ -40,22 +41,30 @@ class LengowCronController extends LengowAbstractFrontController
     private $lengowImport;
 
     /**
+     * @var LengowSync Lengow sync service
+     */
+    private $lengowSync;
+
+    /**
      * LengowAbstractFrontController constructor
      *
      * @param LengowAccess $lengowAccess Lengow access security service
      * @param LengowConfiguration $lengowConfiguration Lengow configuration accessor service
      * @param LengowLog $lengowLog Lengow log service
      * @param LengowImport $lengowImport Lengow import service
+     * @param LengowSync $lengowSync Lengow sync service
      */
     public function __construct(
         LengowAccess $lengowAccess,
         LengowConfiguration $lengowConfiguration,
         LengowLog $lengowLog,
-        LengowImport $lengowImport
+        LengowImport $lengowImport,
+        LengowSync $lengowSync
     )
     {
         parent::__construct($lengowAccess, $lengowConfiguration, $lengowLog);
         $this->lengowImport = $lengowImport;
+        $this->lengowSync = $lengowSync;
     }
 
     /**
@@ -70,9 +79,15 @@ class LengowCronController extends LengowAbstractFrontController
     {
         $this->checkAccess($request, $context);
         $cronArgs = $this->createGetArgArray($request);
-        // synchronise orders
-        $this->lengowImport->init($cronArgs);
-        $this->lengowImport->exec();
+        // synchronise orders between Lengow and Shopware
+        if ($cronArgs['sync'] === null || $cronArgs['sync'] === LengowSync::SYNC_ORDER) {
+            $this->lengowImport->init($cronArgs);
+            $this->lengowImport->exec();
+        }
+        // synchronise marketplaces between Lengow and Shopware
+        if ($cronArgs['sync'] === LengowSync::SYNC_MARKETPLACE) {
+            $this->lengowSync->getMarketplaces($cronArgs['force'], $cronArgs['log_output']);
+        }
         return new Response();
     }
 

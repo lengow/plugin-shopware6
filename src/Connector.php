@@ -31,6 +31,7 @@ class Connector extends Plugin
 
         $loader = new XmlFileLoader($container, new FileLocator(__DIR__ . '/DependencyInjection/'));
         $loader->load('entity.xml');
+        $loader->load('factory.xml');
         $loader->load('front_controller.xml');
         $loader->load('service.xml');
         $loader->load('subscriber.xml');

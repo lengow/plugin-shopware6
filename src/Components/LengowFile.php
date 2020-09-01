@@ -16,14 +16,19 @@ class LengowFile
     private $environmentInfoProvider;
 
     /**
+     * @var string folder name that contains the file
+     */
+    private $folderName;
+
+    /**
      * @var string file name
      */
     private $fileName;
 
     /**
-     * @var string folder name that contains the file
+     * @var string type of access
      */
-    private $folderName;
+    private $mode;
 
     /**
      * @var string file path
@@ -45,18 +50,21 @@ class LengowFile
      *
      * @param string $folderName Lengow folder name
      * @param string|null $fileName Lengow file name
+     * @param string $mode type of access
      * @param EnvironmentInfoProvider $environmentInfoProvider Environment info provider utility
      */
     public function __construct(
         string $folderName,
         string $fileName,
+        string $mode,
         EnvironmentInfoProvider $environmentInfoProvider
     )
     {
         $this->fileName = $fileName;
         $this->folderName = $folderName;
+        $this->mode = $mode;
         $this->environmentInfoProvider = $environmentInfoProvider;
-        $this->fileInstance = $this->getFileResource($this->getPath());
+        $this->fileInstance = $this->getFileResource($this->getPath(), $this->mode);
     }
 
     /**
@@ -67,7 +75,7 @@ class LengowFile
     public function write(string $txt): void
     {
         if (!$this->fileInstance) {
-            $this->fileInstance = fopen($this->getPath(), 'a+');
+            $this->fileInstance = fopen($this->getPath(), $this->mode);
         }
         fwrite($this->fileInstance, $txt);
     }
@@ -147,7 +155,7 @@ class LengowFile
      *
      * @return bool
      */
-    public function rename($newName): bool
+    public function rename(string $newName): bool
     {
         return rename($this->getPath(), $newName);
     }
@@ -180,7 +188,7 @@ class LengowFile
      *
      * @return resource|false
      */
-    private function getFileResource($path, $mode = 'a+')
+    private function getFileResource(string $path, string $mode)
     {
         return fopen($path, $mode);
     }

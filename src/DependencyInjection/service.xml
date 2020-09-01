@@ -28,16 +28,43 @@
             <argument type="service" id="Lengow\Connector\Service\LengowConnector"/>
             <argument type="service" id="Lengow\Connector\Service\LengowConfiguration"/>
             <argument type="service" id="Lengow\Connector\Service\LengowLog"/>
+            <argument type="service" id="Lengow\Connector\Service\LengowImportOrder"/>
+        </service>
+
+        <service id="Lengow\Connector\Service\LengowImportOrder">
+            <argument type="service" id="Lengow\Connector\Service\LengowConfiguration"/>
+            <argument type="service" id="Lengow\Connector\Service\LengowLog"/>
+            <argument type="service" id="Lengow\Connector\Factory\LengowMarketplaceFactory"/>
+            <argument type="service" id="Lengow\Connector\Service\LengowOrderError"/>
+            <argument type="service" id="Lengow\Connector\Service\LengowOrder"/>
+            <argument type="service" id="currency.repository"/>
         </service>
 
         <service id="Lengow\Connector\Service\LengowLog">
             <argument type="service" id="Lengow\Connector\Service\LengowTranslation"/>
             <argument type="service" id="Lengow\Connector\Util\EnvironmentInfoProvider"/>
+            <argument type="service" id="Lengow\Connector\Factory\LengowFileFactory"/>
+        </service>
+
+        <service id="Lengow\Connector\Service\LengowOrder">
+            <argument type="service" id="lengow_order.repository"/>
+        </service>
+
+        <service id="Lengow\Connector\Service\LengowOrderError">
+            <argument type="service" id="lengow_order_error.repository"/>
         </service>
 
         <service id="Lengow\Connector\Service\LengowPayment">
             <argument type="service" id="Shopware\Core\Checkout\Order\Aggregate\OrderTransaction\OrderTransactionStateHandler"/>
             <tag name="shopware.payment.method.sync" />
+        </service>
+
+        <service id="Lengow\Connector\Service\LengowSync">
+            <argument type="service" id="Lengow\Connector\Service\LengowConnector"/>
+            <argument type="service" id="Lengow\Connector\Service\LengowConfiguration"/>
+            <argument type="service" id="Lengow\Connector\Service\LengowLog"/>
+            <argument type="service" id="Lengow\Connector\Factory\LengowFileFactory"/>
+            <argument type="service" id="Lengow\Connector\Util\EnvironmentInfoProvider"/>
         </service>
 
         <service id="Lengow\Connector\Service\LengowTranslation">

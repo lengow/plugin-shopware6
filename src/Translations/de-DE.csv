@@ -57,5 +57,13 @@ lengow_log.error.rest_time_to_import|Bitte warten Sie %{rest_time} Sekunden, bev
 lengow_log.error.credentials_not_valid|Konto-Nr., Access-Token oder Access-Token-Secret ungültig
 lengow_log.error.no_catalog_for_sales_channel|Keine gültige Katalog-Nr. für den sales channel %{sales_channel_name} (%{sales_channel_id})
 lengow_log.error.order_not_found|Fehler Lengow: Bestellung kann in Lengow nicht gefunden werden
+lengow_log.error.no_product|Fehler Lengow: keine Produkte in der Bestellung
+lengow_log.error.no_change_rate|Fehler Lengow: kein Wechselkurs für Bestellwert verfügbar
+lengow_log.error.no_currency|Fehler Lengow: keine Währung in der Bestellung
+lengow_log.error.currency_not_available|währung %{currency_iso} in Ihrem Shop nicht verfügbar
+lengow_log.error.no_billing_address|Fehler Lengow: keine Rechnungsaddresse in der Bestellung
+lengow_log.error.no_country_for_billing_address|Fehler Lengow: Rechnungsadresse enthält das Land
+lengow_log.error.no_country_for_delivery_address|Fehler Lengow: Lieferaddresse enthält kein Land
+lengow_log.exception.marketplace_not_present|Lengow Fehler: %{marketplace_name} erscheint nicht in der Marketplace-Liste
 lengow_log.exception.no_connection_webservice|verbindung mit dem Lengow Webservice im sales channel %{sales_channel_name} (%{sales_channel_id}) funktionierte nicht
 lengow_log.exception.error_lengow_webservice|Lengow Webservice : %{error_code} - "%{error_message}" auf sales channel %{sales_channel_name} (%{sales_channel_id})

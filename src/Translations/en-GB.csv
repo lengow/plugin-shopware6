@@ -57,8 +57,16 @@ lengow_log.error.rest_time_to_import|Please wait %{rest_time} seconds before syn
 lengow_log.error.credentials_not_valid|Account ID, token access or secret token are not valid
 lengow_log.error.no_catalog_for_sales_channel|No catalog ID valid for the sales channel %{sales_channel_name} (%{sales_channel_id})
 lengow_log.error.order_not_found|Lengow error: order cannot be found in Lengow feed
+lengow_log.error.no_product|Lengow error: no product in the order
+lengow_log.error.no_change_rate|Lengow error: no exchange rates available for order prices
+lengow_log.error.no_currency|Lengow error: no currency in the order
+lengow_log.error.currency_not_available|the %{currency_iso} currency is not available in your shop
+lengow_log.error.no_billing_address|Lengow error: no billing address in the order
+lengow_log.error.no_country_for_billing_address|Lengow error: billing address doesn't contain the country
+lengow_log.error.no_country_for_delivery_address|Lengow error: delivery address doesn't contain the country
 lengow_log.exception.no_connection_webservice|connection did not work with the Lengow webservice in sales channel %{sales_channel_name} (%{sales_channel_id})
 lengow_log.exception.error_lengow_webservice|Lengow webservice: %{error_code} - "%{error_message}" in sales channel %{sales_channel_name} (%{sales_channel_id})
+lengow_log.exception.marketplace_not_present|Lengow error: %{marketplace_name} does not feature in the marketplace list
 log.export.unauthorised_ip|Unauthorized access for IP: %{ip}
 log.export.unauthorised_token|Unauthorised access for this token: %{token}
 log.export.empty_token|Unauthorised access: token parameter is empty
@@ -73,6 +81,16 @@ log.import.find_one_order|%{nb_order} order found for order ID: %{marketplace_sk
 log.import.find_all_orders|%{nb_order} order(s) found for sales channel %{sales_channel_name} (%{sales_channel_id})
 log.import.connector_get_order|get order with order ID: %{marketplace_sku} and marketplace: %{marketplace_name}
 log.import.connector_get_all_order|get orders between %{date_from} and %{date_to} for catalogs ID: %{catalog_id}
+log.import.marketplace_update_failed|marketplace update failed - %{decoded_message}
+log.import.error_no_package|import order failed - Lengow error: no package in the order
+log.import.error_wrong_package_number|import order failed - wrong package number
+log.import.error_no_delivery_address|import order failed - Lengow error: no delivery address in the order
+log.import.error_already_created|%{decoded_message} (created on the %{date_message})
+log.import.order_import_failed|import order failed - %{decoded_message}
+log.import.anonymized_order|order is anonymized and has not been imported
+log.import.old_order|Order is older than 3 months and has not been imported
+log.import.external_id_exist|already imported in Shopware with the order ID %{order_id}
+log.import.current_order_state_unavailable|current order's status [%{order_state_marketplace}] makes it unavailable to import for marketplace %{marketplace_name}
 log.connector.call_api|call %{call_type} %{curl_url}
 log.connector.error_api|API call failed - %{error_code} - %{error_message}
 log.connector.curl_disabled|Curl extension is not enabled on the server
