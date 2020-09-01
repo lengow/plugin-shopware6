@@ -2,8 +2,6 @@
 
 namespace Lengow\Connector\Components;
 
-use FontLib\Table\Type\name;
-
 /**
  * Class LengowMarketplace
  * @package Lengow\Connector\Components
