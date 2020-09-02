@@ -1,4 +1,7 @@
 import './components/lengow-export-list';
+import './components/lengow-dashboard';
+import './components/lengow-order-list';
+import './components/lengow-settings';
 
 Shopware.Module.register('lengow-connector', {
   color: '#ff3d58',
@@ -7,15 +10,29 @@ Shopware.Module.register('lengow-connector', {
   description: 'Lengow',
 
   routes: {
-    list: {
-      component: 'lengow-export-list',
-      path: 'list',
+    dashboard: {
+      component: 'lengow-dashboard',
+      path: 'dashboard',
     },
-    detail: {
-      component: 'lengow-export-detail',
-      path: 'detail/:id',
+    export: {
+      component: 'lengow-export-list',
+      path: 'export',
       meta: {
-        parentPath: 'lengow.export.list',
+        parentPath: 'lengow.connector.lengow-dashboard',
+      },
+    },
+    order: {
+      component: 'lengow-order-list',
+      path: 'order',
+      meta: {
+        parentPath: 'lengow.connector.lengow-dashboard',
+      },
+    },
+    settings: {
+      component: 'lengow-settings',
+      path: 'settings',
+      meta: {
+        parentPath: 'lengow.connector.lengow-dashboard',
       },
     },
   },
@@ -24,7 +41,7 @@ Shopware.Module.register('lengow-connector', {
     {
       label: 'Lengow',
       color: '#ff3d58',
-      path: 'lengow.connector.list',
+      path: 'lengow.connector.dashboard',
       icon: 'default-shopping-paper-bag-product',
       position: 100,
     },

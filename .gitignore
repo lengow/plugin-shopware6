@@ -2,4 +2,7 @@
 **/.DS_Store
 src/Resources/public
 src/Logs/*.txt
+.eslintrc.json
+node_modules
+package-lock.json
 src/Config/marketplaces.json

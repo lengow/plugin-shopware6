@@ -1,6 +1,24 @@
 fr:
   administration:
     lengow-connector:
+      "dashboard":
+        "banner":
+          "title": "Bonjour !"
+          "button": "Aller sur Lengow"
+        "products":
+          "title": "Produits"
+          "desc": "Consulter tous vos produits disponibles pour préparer votre catalogue"
+        "orders":
+          "title": "Commandes"
+          "desc": "Gérer vos commandes directement sur votre tableau de bord Shopware"
+        "settings":
+          "title": "Paramètres"
+          "desc": "Configurer les principaux paramètres de votre plugin Shopware"
+        "help":
+          "title": "Besoin d'aide ?"
+          "contact": "Prenez contact avec les équipes lengow"
+          "helpCenterLink": "Visitez notre help center"
+          "helpCenter": "pour plus d'informations sur la configuration de votre plugin Shopware"
   backend:
     settings:
       lengow_main_settings:

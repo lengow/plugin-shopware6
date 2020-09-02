@@ -1,3 +1,28 @@
 {
-    "lengow-connector": null
+    "lengow-connector": {
+        "dashboard": {
+            "banner": {
+                "title": "Hallo und herzlich willkommen!",
+                "button": "Zu Lengow wechseln"
+            },
+            "products": {
+                "title": "Produkte",
+                "desc": "Alle verfügbaren Produkte im Überblick, um Ihren Katalog vorzubereiten"
+            },
+            "orders": {
+                "title": "Bestellungen",
+                "desc": "Verwalten Sie Ihre Bestellungen direkt in Ihrem Shopware-Dashboard"
+            },
+            "settings": {
+                "title": "Einstellungen",
+                "desc": "Konfigurieren Sie Ihre Shopware-Plugins"
+            },
+            "help": {
+                "title": "Benötigen Sie Hilfe?",
+                "contact": "Kontaktieren Sie Lengow",
+                "helpCenterLink": "Schauen Sie im Help Center",
+                "helpCenter": "um detaillierte Informationen zu der korrekten Einrichtung des Shopware-Plugins zu finden"
+            }
+        }
+    }
 }

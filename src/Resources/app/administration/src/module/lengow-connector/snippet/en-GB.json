@@ -1,3 +1,28 @@
 {
-    "lengow-connector": null
+    "lengow-connector": {
+        "dashboard": {
+            "banner": {
+                "title": "Hello, Welcome among us !",
+                "button": "Go to Lengow"
+            },
+            "products": {
+                "title": "Products",
+                "desc": "Take a look at all available products so that you can prepare your catalogue"
+            },
+            "orders": {
+                "title": "Orders",
+                "desc": "Manage your orders directly on your Shopware dashboard"
+            },
+            "settings": {
+                "title": "Settings",
+                "desc": "Configure your Shopware plugin main settings"
+            },
+            "help": {
+                "title": "Need some help?",
+                "contact": "Get in touch with Lengow.",
+                "helpCenterLink": "Visit our Help Center",
+                "helpCenter": "for detailed information on how to configure your Shopware plugin properly"
+            }
+        }
+    }
 }
