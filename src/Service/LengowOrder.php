@@ -99,9 +99,11 @@ class LengowOrder
     {
         $context = Context::createDefaultContext();
         $criteria = new Criteria();
-        $criteria->addFilter(new EqualsFilter('marketplaceSku', $marketplaceSku));
-        $criteria->addFilter(new EqualsFilter('marketplaceName', $marketplaceName));
-        $criteria->addFilter(new EqualsFilter('deliveryAddressId', $deliveryAddressId));
+        $criteria->addFilter(new MultiFilter(MultiFilter::CONNECTION_AND, [
+            new EqualsFilter('marketplaceSku', $marketplaceSku),
+            new EqualsFilter('marketplaceName', $marketplaceName),
+            new EqualsFilter('deliveryAddressId', $deliveryAddressId),
+        ]));
         $criteria->addFilter(new MultiFilter(MultiFilter::CONNECTION_OR, [
             new EqualsFilter('orderProcessState', self::PROCESS_STATE_IMPORT),
             new EqualsFilter('orderProcessState', self::PROCESS_STATE_FINISH),
@@ -130,8 +132,10 @@ class LengowOrder
     {
         $context = Context::createDefaultContext();
         $criteria = new Criteria();
-        $criteria->addFilter(new EqualsFilter('order.id', $orderId));
-        $criteria->addFilter(new EqualsFilter('deliveryAddressId', $deliveryAddressId));
+        $criteria->addFilter(new MultiFilter(MultiFilter::CONNECTION_AND, [
+            new EqualsFilter('order.id', $orderId),
+            new EqualsFilter('deliveryAddressId', $deliveryAddressId),
+        ]));
         /** @var LengowOrderCollection $LengowOrderCollection */
         $LengowOrderCollection = $this->lengowOrderRepository->search($criteria, $context)->getEntities();
         return $LengowOrderCollection->count() !== 0 ? $LengowOrderCollection->first() : null;

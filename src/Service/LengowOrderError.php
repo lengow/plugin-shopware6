@@ -8,6 +8,7 @@ use Shopware\Core\Framework\DataAbstractionLayer\EntityCollection;
 use Shopware\Core\Framework\DataAbstractionLayer\EntityRepositoryInterface;
 use Shopware\Core\Framework\DataAbstractionLayer\Search\Criteria;
 use Shopware\Core\Framework\DataAbstractionLayer\Search\Filter\EqualsFilter;
+use Shopware\Core\Framework\DataAbstractionLayer\Search\Filter\MultiFilter;
 use Shopware\Core\Framework\Uuid\Uuid;
 use Lengow\Connector\Entity\Lengow\OrderError\OrderErrorCollection as LengowOrderErrorCollection;
 use Lengow\Connector\Entity\Lengow\Order\OrderEntity as LengowOrderEntity;
@@ -106,10 +107,12 @@ class LengowOrderError
     {
         $context = Context::createDefaultContext();
         $criteria = new Criteria();
-        $criteria->addFilter(new EqualsFilter('order.marketplaceSku', $marketplaceSku));
-        $criteria->addFilter(new EqualsFilter('order.deliveryAddressId', $deliveryAddressId));
-        $criteria->addFilter(new EqualsFilter('type', $type));
-        $criteria->addFilter(new EqualsFilter('isFinished', false));
+        $criteria->addFilter(new MultiFilter(MultiFilter::CONNECTION_AND, [
+            new EqualsFilter('order.marketplaceSku', $marketplaceSku),
+            new EqualsFilter('order.deliveryAddressId', $deliveryAddressId),
+            new EqualsFilter('type', $type),
+            new EqualsFilter('isFinished', false),
+        ]));
         /** @var LengowOrderErrorCollection $LengowOrderErrorCollection */
         $LengowOrderErrorCollection = $this->lengowOrderErrorRepository->search($criteria, $context)->getEntities();
         if ($LengowOrderErrorCollection->count() !== 0) {
@@ -131,8 +134,10 @@ class LengowOrderError
         $result = true;
         $context = Context::createDefaultContext();
         $criteria = new Criteria();
-        $criteria->addFilter(new EqualsFilter('order.id', $lengowOrderId));
-        $criteria->addFilter(new EqualsFilter('type', $type));
+        $criteria->addFilter(new MultiFilter(MultiFilter::CONNECTION_AND, [
+            new EqualsFilter('order.id', $lengowOrderId),
+            new EqualsFilter('type', $type),
+        ]));
         /** @var LengowOrderErrorCollection $LengowOrderErrorCollection */
         $LengowOrderErrorCollection = $this->lengowOrderErrorRepository->search($criteria, $context)->getEntities();
         foreach ($LengowOrderErrorCollection as $lengowOrderError) {

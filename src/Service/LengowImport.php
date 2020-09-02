@@ -686,16 +686,17 @@ class LengowImport
                 $packageDeliveryAddressId = (int)$packageData->delivery->id;
                 $firstPackage = $nbPackage > 1 ? false : true;
                 // check the package for re-import order
-                if ($this->importOneOrder) {
-                    if ($this->deliveryAddressId !== null && $this->deliveryAddressId !== $packageDeliveryAddressId) {
-                        $this->lengowLog->write(
-                            LengowLog::CODE_IMPORT,
-                            $this->lengowLog->encodeMessage('log.import.error_wrong_package_number'),
-                            $this->logOutput,
-                            $marketplaceSku
-                        );
-                        continue;
-                    }
+                if ($this->importOneOrder
+                    && $this->deliveryAddressId !== null
+                    && $this->deliveryAddressId !== $packageDeliveryAddressId
+                ) {
+                    $this->lengowLog->write(
+                        LengowLog::CODE_IMPORT,
+                        $this->lengowLog->encodeMessage('log.import.error_wrong_package_number'),
+                        $this->logOutput,
+                        $marketplaceSku
+                    );
+                    continue;
                 }
                 try {
                     // try to import or update order
