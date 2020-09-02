@@ -58,5 +58,13 @@ lengow_log.error.rest_time_to_import|Attendez %{rest_time} secondes avant de syn
 lengow_log.error.credentials_not_valid|Votre identifiant de compte, votre jeton d'accès ou votre jeton secret ne sont pas valides
 lengow_log.error.no_catalog_for_sales_channel|Aucun identifiant de catalogue valide pour le sales channel %{sales_channel_name} (%{sales_channel_id})
 lengow_log.error.order_not_found|Erreur Lengow : la commande ne peut être trouvée dans le flux Lengow
+lengow_log.error.no_product|Erreur Lengow : pas d'article dans cette commande
+lengow_log.error.no_change_rate|Erreur Lengow : pas de taux de change valide à appliquer sur les prix
+lengow_log.error.no_currency|Erreur Lengow : pas de devise dans cette commande
+lengow_log.error.currency_not_available|la devise %{currency_iso} n'est pas disponible dans votre boutique
+lengow_log.error.no_billing_address|Erreur Lengow : pas d'adresse de facturation dans cette commande
+lengow_log.error.no_country_for_billing_address|Erreur Lengow : l'adresse de facturation ne contient pas de pays
+lengow_log.error.no_country_for_delivery_address|Erreur Lengow : l'adresse de livraison ne contient pas de pays
+lengow_log.exception.marketplace_not_present|Erreur Lengow : la marketplace %{marketplace_name} n’apparaît pas dans la liste des marketplaces
 lengow_log.exception.no_connection_webservice|la connexion ne se fait pas avec Lengow pour le sales channel %{sales_channel_name} (%{sales_channel_id}) funktionierte nicht
 lengow_log.exception.error_lengow_webservice|l'API Lengow : %{error_code} - "%{error_message}" pour le sales channel %{sales_channel_name} (%{sales_channel_id})

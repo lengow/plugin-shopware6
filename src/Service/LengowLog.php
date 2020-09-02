@@ -3,6 +3,7 @@
 namespace Lengow\Connector\Service;
 
 use Lengow\Connector\Components\LengowFile;
+use Lengow\Connector\Factory\LengowFileFactory;
 use Lengow\Connector\Util\EnvironmentInfoProvider;
 
 /**
@@ -72,6 +73,11 @@ class LengowLog
     private $environmentInfoProvider;
 
     /**
+     * @var LengowFileFactory Lengow file factory
+     */
+    private $lengowFileFactory;
+
+    /**
      * @var LengowFile Lengow file instance
      */
     private $lengowFile;
@@ -81,14 +87,19 @@ class LengowLog
      *
      * @param LengowTranslation $lengowTranslation Lengow translation service
      * @param EnvironmentInfoProvider $environmentInfoProvider Environment info provider utility
+     * @param LengowFileFactory $lengowFileFactory Lengow file factory
      */
-    public function __construct(LengowTranslation $lengowTranslation, EnvironmentInfoProvider $environmentInfoProvider)
+    public function __construct(
+        LengowTranslation $lengowTranslation,
+        EnvironmentInfoProvider $environmentInfoProvider,
+        LengowFileFactory $lengowFileFactory
+    )
     {
         $this->lengowTranslation = $lengowTranslation;
         $this->environmentInfoProvider = $environmentInfoProvider;
+        $this->lengowFileFactory = $lengowFileFactory;
         // init new LengowFile for logging
-        $fileName = 'logs-' . date('Y-m-d') . '.txt';
-        $this->lengowFile = new LengowFile(self::LOG_FOLDER_NAME, $fileName, $this->environmentInfoProvider);
+        $this->lengowFile = $this->lengowFileFactory->create(self::LOG_FOLDER_NAME, 'logs-' . date('Y-m-d') . '.txt');
     }
 
     /**
@@ -197,7 +208,7 @@ class LengowLog
             $folderContent = scandir($folderPath);
             foreach ($folderContent as $fileName) {
                 if (!preg_match('/^\.[a-zA-Z\.]+$|^\.$|index\.php/', $fileName)) {
-                    $files[] = new LengowFile(self::LOG_FOLDER_NAME, $fileName, $this->environmentInfoProvider);
+                    $files[] = $this->lengowFileFactory->create(self::LOG_FOLDER_NAME, $fileName);
                 }
             }
         }
