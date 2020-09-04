@@ -18,7 +18,18 @@ en:
           "title": "Need some help?"
           "contact": "Get in touch with Lengow."
           "helpCenterLink": "Visit our Help Center"
+          "helpCenterTarget": "https://supportlengow.zendesk.com/hc/en-us/articles/360012203311"
           "helpCenter": "for detailed information on how to configure your Shopware plugin properly"
+      "products":
+        "activateSelectionLabel": "Activate product selection"
+        "datas":
+            "nbProductExportLabel": "Total product exported :"
+            "nbProductExportableLabel": "Total product exportable :"
+            "downloadLinkLabel": "Download link :"
+        "filters":
+            "activeFilterLabel": "Active / Inactive"
+            "stockFilterLabel": "With stock / Without stock"
+            "searchFilterLabel": "Search by id / name / reference"
   backend:
     settings:
       lengow_main_settings:

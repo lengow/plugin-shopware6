@@ -18,6 +18,7 @@ fr:
           "title": "Besoin d'aide ?"
           "contact": "Prenez contact avec les équipes lengow"
           "helpCenterLink": "Visitez notre help center"
+          "helpCenterTarget": "https://supportlengow.zendesk.com/hc/fr-fr/articles/360012203311"
           "helpCenter": "pour plus d'informations sur la configuration de votre plugin Shopware"
   backend:
     settings:

@@ -21,7 +21,21 @@
                 "title": "Benötigen Sie Hilfe?",
                 "contact": "Kontaktieren Sie Lengow",
                 "helpCenterLink": "Schauen Sie im Help Center",
+                "helpCenterTarget": "https:\/\/supportlengow.zendesk.com\/hc\/de-de\/articles\/360012203311",
                 "helpCenter": "um detaillierte Informationen zu der korrekten Einrichtung des Shopware-Plugins zu finden"
+            }
+        },
+        "products": {
+            "activateSelectionLabel": "Produktauswahl aktivieren",
+            "datas": {
+                "nbProductExportLabel": "Gesamtprodukt exportiert :",
+                "nbProductExportableLabel": "Gesamtprodukt exportierbar :",
+                "downloadLinkLabel": "Download-Link :"
+            },
+            "filters": {
+                "activeFilterLabel": "Aktiv \/ Inaktiv",
+                "stockFilterLabel": "Mit Lager \/ Ohne Lager",
+                "searchFilterLabel": "Suche nach ID \/ Name \/ Referenz"
             }
         }
     }

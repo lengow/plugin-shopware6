@@ -1,4 +1,5 @@
 import template from './views/lengow-export-list.html.twig';
+import './views/lengow-export-list.scss'
 
 const {
     Component,
@@ -61,6 +62,7 @@ Component.register('lengow-export-list', {
             .search(new Criteria(), Shopware.Context.api)
             .then(salesChannelCollection => {
                 this.onSalesChannelChanged(salesChannelCollection.first().id);
+                this.$refs.lgwSalesChannelSwitch.salesChannelId = salesChannelCollection.first().id;
             });
         this.SEARCHFILTER = 'search';
         this.ACTIVEFILTER = 'active';
@@ -96,6 +98,10 @@ Component.register('lengow-export-list', {
 
         lengowProductRepository() {
             return this.repositoryFactory.create('lengow_product');
+        },
+
+        systemConfigRepository() {
+            return this.repositoryFactory.create('system_config');
         },
 
         currenciesColumns() {
@@ -227,6 +233,19 @@ Component.register('lengow-export-list', {
             this.activeFilterText = 'all';
         },
 
+        setupSelectionActivated() {
+            const systemConfigCriteria = new Criteria();
+            systemConfigCriteria.addFilter(Criteria.equals('configurationKey', 'Connector.config.lengowExportSelectionEnabled'));
+            systemConfigCriteria.addFilter(Criteria.equals('salesChannelId', this.currentSalesChannelId));
+            this.systemConfigRepository
+                .search(systemConfigCriteria, Shopware.Context.api)
+                .then(result => {
+                    if (result.total > 0) {
+                        this.productSelection = result.first().configurationValue.active;
+                    }
+                });
+        },
+
         onSalesChannelChanged(salesChannelId) {
             this.salesChannelSelected = true;
             this.resetFilters();
@@ -247,6 +266,7 @@ Component.register('lengow-export-list', {
                                 const masterCategory = categoryCollection.first();
                                 this.processCategoryTree(masterCategory.id);
                             });
+                        this.setupSelectionActivated();
                     });
                 })
                 .catch(() => {
@@ -329,6 +349,25 @@ Component.register('lengow-export-list', {
             this.totalSelected = this.selection.length;
         },
 
+        onActivateSelection($active) {
+            const systemConfigCriteria = new Criteria();
+            systemConfigCriteria.addFilter(Criteria.equals('salesChannelId', this.currentSalesChannelId));
+            systemConfigCriteria.addFilter(Criteria.equals('configurationKey', 'Connector.config.lengowExportSelectionEnabled'));
+            this.systemConfigRepository
+                .search(systemConfigCriteria, Shopware.Context.api)
+                .then(result => {
+                    const systemConfig = this.systemConfigRepository.create(Shopware.Context.api);
+                    systemConfig.salesChannelId = this.currentSalesChannelId;
+                    systemConfig.configurationKey = 'Connector.config.lengowExportSelectionEnabled';
+                    systemConfig.configurationValue = {'active' : $active};
+                    if (result.total !== 0) {
+                        systemConfig.id = result.first().id;
+                        return this.systemConfigRepository.sync([systemConfig], Shopware.Context.api);
+                    }
+                    return this.systemConfigRepository.save(systemConfig, Shopware.Context.api);
+                });
+        },
+
         onPublishOnLengow() {
             const lengowProductCriteria = new Criteria();
             lengowProductCriteria.addFilter(Criteria.equalsAny('productId', this.selection));
@@ -346,6 +385,7 @@ Component.register('lengow-export-list', {
                         lengowProduct.salesChannelId = this.currentSalesChannelId;
                         this.lengowProductRepository.save(lengowProduct, Shopware.Context.api);
                     });
+                    this.onSalesChannelChanged(this.currentSalesChannelId);
                 });
         },
 
@@ -359,6 +399,7 @@ Component.register('lengow-export-list', {
                     result.data.forEach(lengowProductId => {
                         this.lengowProductRepository.delete(lengowProductId, Shopware.Context.api);
                     });
+                    this.onSalesChannelChanged(this.currentSalesChannelId);
                 });
         },
 
@@ -457,7 +498,6 @@ Component.register('lengow-export-list', {
 
             const context = { ...Shopware.Context.api };
             context.currencyId = column.currencyId;
-
             return this.$refs.swProductGrid.repository
                 .search(this.$refs.swProductGrid.items.criteria, context)
                 .then(this.$refs.swProductGrid.applyResult);

@@ -6,7 +6,7 @@
                             <div class="lgw-box lgw-home-header text-center">
                                 <img :src="'connector/lengow-white-big.png' | asset" alt="lengow" class="img-responsive">
                                 <h1 style="color: white">{{ $tc('lengow-connector.dashboard.banner.title') }}</h1>
-                                <sw-button :disabled="false" :square="false" :block="false" :isLoading="false" style="margin-top: 15px" class="lgw-btn">
+                                <sw-button :disabled="false" :square="false" :block="false" :isLoading="false" style="margin-top: 15px" class="lgw-btn" target="_blank" :link="lengow_url">
                                     {{ $tc('lengow-connector.dashboard.banner.button') }}
                                 </sw-button>
                             </div>
@@ -44,7 +44,12 @@
                             <div class="lgw-box">
                                 <h2>{{ $tc('lengow-connector.dashboard.help.title') }}</h2>
                                 <a>{{ $tc('lengow-connector.dashboard.help.contact') }}</a>
-                                <p><a href="https://supportlengow.zendesk.com/hc/en-us/articles/360012203311">{{ $tc('lengow-connector.dashboard.help.helpCenterLink') }}</a> {{ $tc('lengow-connector.dashboard.help.helpCenter') }}</p>
+                                <p>
+                                    <a :href="$tc('lengow-connector.dashboard.help.helpCenterTarget')" target="_blank">
+                                        {{ $tc('lengow-connector.dashboard.help.helpCenterLink') }}
+                                    </a>
+                                    {{ $tc('lengow-connector.dashboard.help.helpCenter') }}
+                                </p>
                             </div>
                         </div>
                     </div>

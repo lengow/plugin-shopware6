@@ -18,21 +18,21 @@ Shopware.Module.register('lengow-connector', {
       component: 'lengow-export-list',
       path: 'export',
       meta: {
-        parentPath: 'lengow.connector.lengow-dashboard',
+        parentPath: 'lengow.connector.dashboard',
       },
     },
     order: {
       component: 'lengow-order-list',
       path: 'order',
       meta: {
-        parentPath: 'lengow.connector.lengow-dashboard',
+        parentPath: 'lengow.connector.dashboard',
       },
     },
     settings: {
       component: 'lengow-settings',
       path: 'settings',
       meta: {
-        parentPath: 'lengow.connector.lengow-dashboard',
+        parentPath: 'lengow.connector.dashboard',
       },
     },
   },
