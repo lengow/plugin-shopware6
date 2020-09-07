@@ -58,6 +58,16 @@ class LengowImport
     private $lengowImportOrder;
 
     /**
+     * @var LengowOrder Lengow order service
+     */
+    private $lengowOrder;
+
+    /**
+     * @var LengowOrderError Lengow order error service
+     */
+    private $lengowOrderError;
+
+    /**
      * @var int account ID
      */
     private $accountId;
@@ -149,18 +159,24 @@ class LengowImport
      * @param LengowConfiguration $lengowConfiguration Lengow configuration service
      * @param LengowLog $lengowLog Lengow log service
      * @param LengowImportOrder $lengowImportOrder Lengow import order service
+     * @param LengowOrder $lengowOrder Lengow order service
+     * @param LengowOrderError $lengowOrderError Lengow order error service
      */
     public function __construct(
         LengowConnector $lengowConnector,
         LengowConfiguration $lengowConfiguration,
         LengowLog $lengowLog,
-        LengowImportOrder $lengowImportOrder
+        LengowImportOrder $lengowImportOrder,
+        LengowOrder $lengowOrder,
+        LengowOrderError $lengowOrderError
     )
     {
         $this->lengowConnector = $lengowConnector;
         $this->lengowConfiguration = $lengowConfiguration;
         $this->lengowLog = $lengowLog;
         $this->lengowImportOrder = $lengowImportOrder;
+        $this->lengowOrder = $lengowOrder;
+        $this->lengowOrderError = $lengowOrderError;
     }
 
     /**
@@ -331,7 +347,8 @@ class LengowImport
                 if (isset($errorMessage)) {
                     $syncOk = false;
                     if ($this->lengowOrderId !== null) {
-                        // TODO Finish old order errors and create a new one
+                        $this->lengowOrderError->finishOrderErrors($this->lengowOrderId);
+                        $this->lengowOrderError->create($this->lengowOrderId, $errorMessage);
                     }
                     $decodedMessage = $this->lengowLog->decodeMessage(
                         $errorMessage,

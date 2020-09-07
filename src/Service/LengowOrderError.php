@@ -11,7 +11,6 @@ use Shopware\Core\Framework\DataAbstractionLayer\Search\Filter\EqualsFilter;
 use Shopware\Core\Framework\DataAbstractionLayer\Search\Filter\MultiFilter;
 use Shopware\Core\Framework\Uuid\Uuid;
 use Lengow\Connector\Entity\Lengow\OrderError\OrderErrorCollection as LengowOrderErrorCollection;
-use Lengow\Connector\Entity\Lengow\Order\OrderEntity as LengowOrderEntity;
 
 /**
  * Class LengowOrderError
@@ -35,35 +34,74 @@ class LengowOrderError
     private $lengowOrderErrorRepository;
 
     /**
-     * LengowConfiguration constructor
+     * @var LengowLog $lengowLog Lengow log service
+     */
+    private $lengowLog;
+
+    /**
+     * @var array $_fieldList field list for the table lengow_order_line
+     * required => Required fields when creating registration
+     * update   => Fields allowed when updating registration
+     */
+    private $fieldList = [
+        'lengowOrderId' => ['required' => true, 'updated' => false],
+        'message' => ['required' => true, 'updated' => false],
+        'type' => ['required' => true, 'updated' => false],
+        'isFinished' => ['required' => false, 'updated' => true],
+        'mail' => ['required' => false, 'updated' => true],
+    ];
+
+    /**
+     * LengowOrderError constructor
      *
      * @param EntityRepositoryInterface $lengowOrderErrorRepository Lengow order error repository access
+     * @param LengowLog $lengowLog Lengow log service
      */
-    public function __construct(EntityRepositoryInterface $lengowOrderErrorRepository)
+    public function __construct(EntityRepositoryInterface $lengowOrderErrorRepository, LengowLog $lengowLog)
     {
         $this->lengowOrderErrorRepository = $lengowOrderErrorRepository;
+        $this->lengowLog = $lengowLog;
     }
 
     /**
      * Create an order error
      *
-     * @param LengowOrderEntity $lengowOrder Lengow order instance
+     * @param string $lengowOrderId Lengow order id
      * @param string $message error message
      * @param int $type error type (import or send)
      *
      * @return bool
      */
-    public function create(LengowOrderEntity $lengowOrder, string $message, int $type = self::TYPE_ERROR_IMPORT): bool
+    public function create(string $lengowOrderId, string $message, int $type = self::TYPE_ERROR_IMPORT): bool
     {
         $data = [
             'id' => Uuid::randomHex(),
-            'order' => $lengowOrder,
+            'lengowOrderId' => $lengowOrderId,
             'message' => $message,
             'type' => $type,
         ];
+        // checks if all mandatory data is present
+        foreach ($this->fieldList as $key => $value) {
+            if (!array_key_exists($key, $data) && $value['required']) {
+                $this->lengowLog->write(
+                    LengowLog::CODE_ORM,
+                    $this->lengowLog->encodeMessage('log.orm.field_is_required', [
+                        'field' => $key,
+                    ])
+                );
+                return false;
+            }
+        }
         try {
             $this->lengowOrderErrorRepository->create([$data], Context::createDefaultContext());
         } catch (Exception $e) {
+            $errorMessage = '[Shopware error] "' . $e->getMessage() . '" ' . $e->getFile() . ' | ' . $e->getLine();
+            $this->lengowLog->write(
+                LengowLog::CODE_ORM,
+                $this->lengowLog->encodeMessage('log.orm.record_insert_failed', [
+                    'decoded_message' => str_replace(PHP_EOL, '', $errorMessage),
+                ])
+            );
             return false;
         }
         return true;
@@ -73,22 +111,29 @@ class LengowOrderError
      * Update an order error
      *
      * @param string $orderErrorId Lengow order error id
-     * @param array $params additional parameters for update
+     * @param array $data additional parameters for update
      *
      * @return bool
      */
-    public function update(string $orderErrorId, array $params = []): bool
+    public function update(string $orderErrorId, array $data = []): bool
     {
-        $data = ['id' => $orderErrorId];
-        if (isset($params['is_finished'])) {
-            $data['is_finished'] = $params['is_finished'];
+        // update only authorized values
+        foreach ($this->fieldList as $key => $value) {
+            if (array_key_exists($key, $data) && !$value['updated']) {
+                unset($data[$key]);
+            }
         }
-        if (isset($params['mail'])) {
-            $data['mail'] = $params['mail'];
-        }
+        $data = array_merge($data, ['id' => $orderErrorId]);
         try {
             $this->lengowOrderErrorRepository->update([$data], Context::createDefaultContext());
         } catch (Exception $e) {
+            $errorMessage = '[Shopware error] "' . $e->getMessage() . '" ' . $e->getFile() . ' | ' . $e->getLine();
+            $this->lengowLog->write(
+                LengowLog::CODE_ORM,
+                $this->lengowLog->encodeMessage('log.orm.record_insert_failed', [
+                    'decoded_message' => str_replace(PHP_EOL, '', $errorMessage),
+                ])
+            );
             return false;
         }
         return true;
@@ -141,7 +186,7 @@ class LengowOrderError
         /** @var LengowOrderErrorCollection $LengowOrderErrorCollection */
         $LengowOrderErrorCollection = $this->lengowOrderErrorRepository->search($criteria, $context)->getEntities();
         foreach ($LengowOrderErrorCollection as $lengowOrderError) {
-            $success = $this->update($lengowOrderError->getId(), ['is_finished' => true]);
+            $success = $this->update($lengowOrderError->getId(), ['isFinished' => true]);
             if (!$success) {
                 $result = false;
             }

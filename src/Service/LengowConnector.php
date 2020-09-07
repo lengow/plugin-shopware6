@@ -310,6 +310,7 @@ class LengowConnector
         $token = $this->lengowConfiguration->get('lengowAuthorizationToken');
         $updatedAt = $this->lengowConfiguration->get('lengowLastAuthorizationTokenUpdate');
         if (!$force
+            && $token !== null
             && strlen($token) > 0
             && $updatedAt !== null
             && (time() - $updatedAt) < self::TOKEN_LIFETIME

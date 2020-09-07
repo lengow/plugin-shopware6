@@ -47,6 +47,14 @@ class SettingsDefinition extends EntityDefinition
     }
 
     /**
+     * @return array
+     */
+    public function getDefaults(): array
+    {
+        return [];
+    }
+
+    /**
      * @return FieldCollection
      */
     protected function defineFields(): FieldCollection
@@ -55,14 +63,8 @@ class SettingsDefinition extends EntityDefinition
             [
                 (new IdField('id', 'id'))->addFlags(new Required(), new PrimaryKey()),
                 (new FkField('sales_channel_id', 'salesChannelId', ShopwareSalesChannelDefinition::class)),
-                (new OneToOneAssociationField(
-                    'salesChannel',
-                    'sales_channel_id',
-                    'id',
-                    ShopwareSalesChannelDefinition::class
-                ))->addFlags(
-                    new setNullOnDelete()
-                ),
+                (new OneToOneAssociationField('salesChannel', 'sales_channel_id', 'id', ShopwareSalesChannelDefinition::class))
+                    ->addFlags(new setNullOnDelete()),
                 (new StringField('name', 'name'))->addFlags(new Required()),
                 (new StringField('value', 'value')),
             ]

@@ -47,6 +47,14 @@ class OrderLineDefinition extends EntityDefinition
     }
 
     /**
+     * @return array
+     */
+    public function getDefaults(): array
+    {
+        return [];
+    }
+
+    /**
      * @return FieldCollection
      */
     protected function defineFields(): FieldCollection
@@ -54,19 +62,12 @@ class OrderLineDefinition extends EntityDefinition
         return new FieldCollection(
             [
                 (new IdField('id', 'id'))->addFlags(new Required(), new PrimaryKey()),
-                (new OneToOneAssociationField('order', 'id', 'order_id', ShopwareOrderDefinition::class))->addFlags(
-                    new Required(),
-                    new setNullOnDelete()
-                ),
-                (new OneToOneAssociationField(
-                    'product',
-                    'product_id',
-                    'id',
-                    ShopwareProductDefinition::class
-                ))->addFlags(
-                    new Required(),
-                    new SetNullOnDelete()
-                ),
+                (new FkField('order_id', 'orderId', ShopwareOrderDefinition::class))->addFlags(new Required()),
+                (new OneToOneAssociationField('order', 'order_id', 'id', ShopwareOrderDefinition::class))
+                    ->addFlags(new setNullOnDelete()),
+                (new FkField('product_id', 'productId', ShopwareProductDefinition::class))->addFlags(new Required()),
+                (new OneToOneAssociationField('product', 'product_id', 'id', ShopwareProductDefinition::class))
+                    ->addFlags(new SetNullOnDelete()),
                 (new StringField('order_line_id', 'orderLineId'))->addFlags(new Required()),
             ]
         );

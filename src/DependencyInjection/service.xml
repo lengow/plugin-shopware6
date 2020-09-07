@@ -29,6 +29,8 @@
             <argument type="service" id="Lengow\Connector\Service\LengowConfiguration"/>
             <argument type="service" id="Lengow\Connector\Service\LengowLog"/>
             <argument type="service" id="Lengow\Connector\Service\LengowImportOrder"/>
+            <argument type="service" id="Lengow\Connector\Service\LengowOrder"/>
+            <argument type="service" id="Lengow\Connector\Service\LengowOrderError"/>
         </service>
 
         <service id="Lengow\Connector\Service\LengowImportOrder">
@@ -48,10 +50,12 @@
 
         <service id="Lengow\Connector\Service\LengowOrder">
             <argument type="service" id="lengow_order.repository"/>
+            <argument type="service" id="Lengow\Connector\Service\LengowLog"/>
         </service>
 
         <service id="Lengow\Connector\Service\LengowOrderError">
             <argument type="service" id="lengow_order_error.repository"/>
+            <argument type="service" id="Lengow\Connector\Service\LengowLog"/>
         </service>
 
         <service id="Lengow\Connector\Service\LengowPayment">

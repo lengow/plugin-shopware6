@@ -109,6 +109,11 @@ class OrderEntity extends Entity
     /**
      * @var string|null
      */
+    protected $customerVatNumber;
+
+    /**
+     * @var string|null
+     */
     protected $carrier;
 
     /**
@@ -452,6 +457,22 @@ class OrderEntity extends Entity
     public function setCustomerEmail(?string $customerEmail): void
     {
         $this->customerEmail = $customerEmail;
+    }
+
+    /**
+     * @return string|null
+     */
+    public function getCustomerVatNumber(): ?string
+    {
+        return $this->customerVatNumber;
+    }
+
+    /**
+     * @param string|null $customerVatNumber
+     */
+    public function setCustomerVatNumber(?string $customerVatNumber): void
+    {
+        $this->customerVatNumber = $customerVatNumber;
     }
 
     /**

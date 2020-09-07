@@ -13,7 +13,7 @@ use Shopware\Core\Framework\DataAbstractionLayer\Field\FkField;
 use Shopware\Core\Framework\DataAbstractionLayer\Field\FloatField;
 use Shopware\Core\Framework\DataAbstractionLayer\Field\IntField;
 use Shopware\Core\Framework\DataAbstractionLayer\Field\IdField;
-use Shopware\Core\Framework\DataAbstractionLayer\Field\DateField;
+use Shopware\Core\Framework\DataAbstractionLayer\Field\DateTimeField;
 use Shopware\Core\Framework\DataAbstractionLayer\Field\StringField;
 use Shopware\Core\Framework\DataAbstractionLayer\Field\BoolField;
 use Shopware\Core\Framework\DataAbstractionLayer\Field\OneToOneAssociationField;
@@ -51,6 +51,18 @@ class OrderDefinition extends EntityDefinition
     }
 
     /**
+     * @return array
+     */
+    public function getDefaults(): array
+    {
+        return [
+            'sentMarketplace' => false,
+            'isInError' => false,
+            'isReimported' => false,
+        ];
+    }
+
+    /**
      * @return FieldCollection
      */
     protected function defineFields(): FieldCollection
@@ -58,20 +70,14 @@ class OrderDefinition extends EntityDefinition
         return new FieldCollection(
             [
                 (new IdField('id', 'id'))->addFlags(new Required(), new PrimaryKey()),
-                (new OneToOneAssociationField('order', 'order_id', 'id', ShopwareOrderDefinition::class))->addFlags(
-                    new setNullOnDelete()
-                ),
+                (new FkField('order_id', 'orderId', ShopwareOrderDefinition::class)),
+                (new OneToOneAssociationField('order', 'order_id', 'id', ShopwareOrderDefinition::class))
+                    ->addFlags(new setNullOnDelete()),
                 (new IntField ('order_sku', 'orderSku')),
-                (new FkField('sales_channel_id', 'salesChannelId', ShopwareSalesChannelDefinition::class)),
-                (new OneToOneAssociationField(
-                    'salesChannel',
-                    'sales_channel_id',
-                    'id',
-                    ShopwareSalesChannelDefinition::class
-                ))->addFlags(
-                    new Required(),
-                    new setNullOnDelete()
-                ),
+                (new FkField('sales_channel_id', 'salesChannelId', ShopwareSalesChannelDefinition::class))
+                    ->addFlags(new Required()),
+                (new OneToOneAssociationField('salesChannel', 'sales_channel_id', 'id', ShopwareSalesChannelDefinition::class))
+                    ->addFlags(new setNullOnDelete()),
                 (new IntField('delivery_address_id', 'deliveryAddressId')),
                 (new StringField('delivery_country_iso', 'deliveryCountryIso')),
                 (new StringField('marketplace_sku', 'marketplaceSku')),
@@ -79,7 +85,7 @@ class OrderDefinition extends EntityDefinition
                 (new StringField('marketplace_label', 'marketplaceLabel')),
                 (new StringField('order_lengow_state', 'orderLengowState')),
                 (new IntField('order_process_state', 'orderProcessState'))->addFlags(new Required()),
-                (new DateField('order_date', 'orderDate')),
+                (new DateTimeField('order_date', 'orderDate')),
                 (new IntField('order_item', 'orderItem')),
                 (new JsonField('order_types', 'orderTypes')),
                 (new StringField('currency', 'currency')),
@@ -87,6 +93,7 @@ class OrderDefinition extends EntityDefinition
                 (new FloatField('commission', 'commission')),
                 (new StringField('customer_name', 'customerName')),
                 (new StringField('customer_email', 'customerEmail')),
+                (new StringField('customer_vat_number', 'customerVatNumber')),
                 (new StringField('carrier', 'carrier')),
                 (new StringField('carrier_method', 'carrierMethod')),
                 (new StringField('carrier_tracking', 'carrierTracking')),
@@ -95,7 +102,7 @@ class OrderDefinition extends EntityDefinition
                 (new BoolField('is_in_error', 'isInError'))->addFlags(new Required()),
                 (new BoolField('is_reimported', 'isReimported')),
                 (new StringField('message', 'message')),
-                (new DateField('imported_at', 'importedAt')),
+                (new DateTimeField('imported_at', 'importedAt')),
                 (new JsonField('extra', 'extra')),
             ]
         );

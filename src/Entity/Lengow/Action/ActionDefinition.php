@@ -48,21 +48,31 @@ class ActionDefinition extends EntityDefinition
     }
 
     /**
+     * @return array
+     */
+    public function getDefaults(): array
+    {
+        return [
+            'retry' => 0,
+        ];
+    }
+
+    /**
      * @return FieldCollection
      */
     protected function defineFields(): FieldCollection
     {
         return new FieldCollection([
-             (new IdField('id', 'id'))->addFlags(new Required(), new PrimaryKey()),
-             (new OneToOneAssociationField('order', 'id', 'order_id', ShopwareOrderDefinition::class))->addFlags(
-                new setNullOnDelete()
-             ),
-             (new IntField('action_id', 'actionId'))->addFlags(new Required()),
-             (new StringField('order_line_sku', 'orderLineSku')),
-             (new StringField('action_type', 'actionType'))->addFlags(new Required()),
-             (new IntField('retry', 'retry'))->addFlags(new Required()),
-             (new JsonField('parameters', 'parameters'))->addFlags(new Required()),
-             (new IntField('state', 'state'))->addFlags(new Required()),
+            (new IdField('id', 'id'))->addFlags(new Required(), new PrimaryKey()),
+            (new FkField('order_id', 'orderId', ShopwareOrderDefinition::class))->addFlags(new Required()),
+            (new OneToOneAssociationField('order', 'order_id', 'id', ShopwareOrderDefinition::class))
+                ->addFlags(new setNullOnDelete()),
+            (new IntField('action_id', 'actionId'))->addFlags(new Required()),
+            (new StringField('order_line_sku', 'orderLineSku')),
+            (new StringField('action_type', 'actionType'))->addFlags(new Required()),
+            (new IntField('retry', 'retry'))->addFlags(new Required()),
+            (new JsonField('parameters', 'parameters'))->addFlags(new Required()),
+            (new IntField('state', 'state'))->addFlags(new Required()),
         ]);
     }
 }

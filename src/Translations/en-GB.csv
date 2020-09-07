@@ -91,6 +91,11 @@ log.import.anonymized_order|order is anonymized and has not been imported
 log.import.old_order|Order is older than 3 months and has not been imported
 log.import.external_id_exist|already imported in Shopware with the order ID %{order_id}
 log.import.current_order_state_unavailable|current order's status [%{order_state_marketplace}] makes it unavailable to import for marketplace %{marketplace_name}
+log.import.lengow_order_saved|order saved in Lengow orders table
+log.import.lengow_order_not_saved|WARNING! Order could NOT be saved in Lengow orders table
+log.import.rewrite_processing_fee|rewrite amount without processing fee
+log.import.rewrite_shipping_cost|rewrite amount without shipping cost
+log.import.order_shipped_by_marketplace|order shipped by %{marketplace_name}
 log.connector.call_api|call %{call_type} %{curl_url}
 log.connector.error_api|API call failed - %{error_code} - %{error_message}
 log.connector.curl_disabled|Curl extension is not enabled on the server
@@ -101,5 +106,7 @@ log.connector.token_not_return|no authorization token returned
 log.connector.token_is_empty|the returned authorization token is empty
 log.connector.api_not_available|Lengow APIs are not available
 log.connector.retry_get_token|API call failed - authorization token expired - attempt to recover a new token
+log.orm.field_is_required|Error while creating record in database: %{field} is required
+log.orm.record_insert_failed|Error while inserting record in database: %{decoded_message}
 log.setting.setting_change|%{key} - old value %{old_value} replaced with %{value}
 log.setting.setting_change_for_sales_channel|%{key} - old value %{old_value} replaced with %{value} for sales channel %{sales_channel_id}

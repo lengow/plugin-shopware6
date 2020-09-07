@@ -48,6 +48,17 @@ class OrderErrorDefinition extends EntityDefinition
     }
 
     /**
+     * @return array
+     */
+    public function getDefaults(): array
+    {
+        return [
+            'isFinished' => false,
+            'mail' => false,
+        ];
+    }
+
+    /**
      * @return FieldCollection
      */
     protected function defineFields(): FieldCollection
@@ -55,14 +66,10 @@ class OrderErrorDefinition extends EntityDefinition
         return new FieldCollection(
             [
                 (new IdField('id', 'id'))->addFlags(new Required(), new PrimaryKey()),
-                (new OneToOneAssociationField(
-                    'order',
-                    'lengow_order_id',
-                    'id',
-                    LengowOrderDefinition::class
-                ))->addFlags(
-                    new setNullOnDelete()
-                ),
+                (new FkField('lengow_order_id', 'lengowOrderId', LengowOrderDefinition::class))
+                    ->addFlags(new Required()),
+                (new OneToOneAssociationField('order', 'lengow_order_id', 'id', LengowOrderDefinition::class))
+                    ->addFlags(new setNullOnDelete()),
                 (new StringField('message', 'message')),
                 (new IntField('type', 'type'))->addFlags(new Required()),
                 (new BoolField('is_finished', 'isFinished'))->addFlags(new Required()),
