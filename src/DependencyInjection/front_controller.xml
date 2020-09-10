@@ -10,6 +10,7 @@
             <argument type="service" id="Lengow\Connector\Service\LengowAccess"/>
             <argument type="service" id="Lengow\Connector\Service\LengowConfiguration"/>
             <argument type="service" id="Lengow\Connector\Service\LengowLog"/>
+            <argument type="service" id="Lengow\Connector\Service\LengowExport"/>
             <tag name="controller.service_arguments"/>
         </service>
 

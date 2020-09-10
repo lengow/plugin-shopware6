@@ -43,6 +43,14 @@
             <argument type="service" id="currency.repository"/>
         </service>
 
+        <service id="Lengow\Connector\Service\LengowExport">
+            <argument type="service" id="Lengow\Connector\Service\LengowConfiguration"/>
+            <argument type="service" id="product.repository"/>
+            <argument type="service" id="sales_channel.repository"/>
+            <argument type="service" id="category.repository"/>
+            <argument type="service" id="lengow_product.repository"/>
+        </service>
+
         <service id="Lengow\Connector\Service\LengowLog">
             <argument type="service" id="Lengow\Connector\Service\LengowTranslation"/>
             <argument type="service" id="Lengow\Connector\Util\EnvironmentInfoProvider"/>

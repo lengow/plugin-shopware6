@@ -11,28 +11,39 @@
                 {% endblock %}
                 {% block lengow_export_filters %}
                     <div class="sw-card__content" v-if="salesChannelSelected">
-                        <div class="lgw-row">
-                            <div class="lgw-col-4">
-                                <sw-switch-field class="text-center"
-                                                 v-model="productSelection"
-                                                 :label="$tc('lengow-connector.products.activateSelectionLabel')"
-                                                 @change="onActivateSelection">
-                                </sw-switch-field>
+                        <div class="lengow-box text-center">
+                            <div>
+                                <span style="float: right;"><sw-icon name="default-action-cloud-download" color="#3498db"></sw-icon></span>
+                            </div>
+                            <div v-if="!countLoading" class="lgw-tooltip">
+                                <span class="stats-big-value">{{ salesChannelName }}</span>
+                                <span class="lgw-tooltip-text">
+                                    {{ currentSalesChannelId }}
+                                    {{ salesChannelDomain }}
+                                </span>
+                            </div>
+                            <div v-if="!countLoading" class="margin-standard text-center">
+                                <p class="products-exported small light">
+                                    {{ $tc('lengow-connector.products.datas.nbProductExportLabel') }}
+                                    <span class="stats-big-value">{{ exportedCount }}</span>
+                                </p>
+                                <p class="products-available small light">
+                                    {{ $tc('lengow-connector.products.datas.nbProductExportableLabel') }}
+                                    <span class="stats-big-value">{{ exportableCount }}</span>
+                                </p>
+                            </div>
+                            <div v-else class="margin-standard text-center lgw-count-loader">
+                                <sw-loader size="10px"></sw-loader>
                             </div>
                         </div>
-                        <div class="lgw-row">
-                            <div class="lgw-col-4">
-                                <span>{{ $tc('lengow-connector.products.datas.nbProductExportLabel') }}</span>
-                            </div>
-                            <div class="lgw-col-4">
-                                <span>{{ $tc('lengow-connector.products.datas.nbProductExportableLabel') }}</span>
-                            </div>
-                            <div class="lgw-col-4">
-                                <span>{{ $tc('lengow-connector.products.datas.downloadLinkLabel') }}</span>
-                            </div>
+                        <div class="lgw-float-center">
+                            <sw-switch-field class="text-center"
+                                             v-model="productSelection"
+                                             :label="$tc('lengow-connector.products.activateSelectionLabel')"
+                                             @change="onActivateSelection">
+                            </sw-switch-field>
                         </div>
-                        <br />
-                        <hr /><br />
+                        <hr /><br/>
                         <div class="lgw-row" v-if="productSelection">
                             <div class="lgw-col-4">
                                 <sw-single-select

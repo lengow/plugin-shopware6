@@ -15,9 +15,9 @@ use Shopware\Core\System\SalesChannel\SalesChannelEntity as ShopwareSalesChannel
 class ProductEntity extends Entity
 {
     /**
-     * @var ShopwareProductEntity
+     * @var string
      */
-    protected $product;
+    protected $productId;
 
     /**
      * @var ShopwareSalesChannelEntity
@@ -30,19 +30,19 @@ class ProductEntity extends Entity
     protected $createdAt;
 
     /**
-     * @return ShopwareProductEntity
+     * @return string
      */
-    public function getProduct(): ShopwareProductEntity
+    public function getproductId(): string
     {
-        return $this->product;
+        return $this->productId;
     }
 
     /**
-     * @param ShopwareProductEntity $product
+     * @param string $productId
      */
-    public function setProduct(ShopwareProductEntity $product): void
+    public function setproductId(string $productId): void
     {
-        $this->product = $product;
+        $this->productId = $productId;
     }
 
     /**
