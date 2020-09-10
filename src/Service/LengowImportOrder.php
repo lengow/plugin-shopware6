@@ -68,6 +68,11 @@ class LengowImportOrder
     private $lengowOrder;
 
     /**
+     * @var LengowProduct Lengow product service
+     */
+    private $lengowProduct;
+
+    /**
      * @var EntityRepositoryInterface Shopware currency repository
      */
     private $currencyRepository;
@@ -204,6 +209,7 @@ class LengowImportOrder
      * @param LengowMarketplaceFactory $lengowMarketplaceFactory Lengow marketplace factory
      * @param LengowOrderError $lengowOrderError Lengow order error service
      * @param LengowOrder $lengowOrder Lengow order service
+     * @param LengowProduct $lengowProduct Lengow product service
      * @param EntityRepositoryInterface $currencyRepository Shopware currency repository
      */
     public function __construct(
@@ -212,6 +218,7 @@ class LengowImportOrder
         LengowMarketplaceFactory $lengowMarketplaceFactory,
         LengowOrderError $lengowOrderError,
         LengowOrder $lengowOrder,
+        LengowProduct $lengowProduct,
         EntityRepositoryInterface $currencyRepository
     )
     {
@@ -220,6 +227,7 @@ class LengowImportOrder
         $this->lengowMarketplaceFactory = $lengowMarketplaceFactory;
         $this->lengowOrderError = $lengowOrderError;
         $this->lengowOrder = $lengowOrder;
+        $this->lengowProduct = $lengowProduct;
         $this->currencyRepository = $currencyRepository;
     }
 
@@ -430,6 +438,11 @@ class LengowImportOrder
                     return false;
                 }
             }
+            // get all Shopware products
+            $products = $this->getProducts();
+            if (empty($products)) {
+                throw new LengowException($this->lengowLog->encodeMessage('lengow_log.exception.no_product_to_cart'));
+            }
         } catch (LengowException $e) {
             $errorMessage = $e->getMessage();
         } catch (Exception $e) {
@@ -443,7 +456,7 @@ class LengowImportOrder
             $this->lengowLog->write(
                 LengowLog::CODE_IMPORT,
                 $this->lengowLog->encodeMessage('log.import.order_import_failed', [
-                    'decoded_message' => $decodedMessage
+                    'decoded_message' => $decodedMessage,
                 ]),
                 $this->logOutput,
                 $this->marketplaceSku
@@ -570,7 +583,7 @@ class LengowImportOrder
             : (string)$this->orderData->comments;
         // create lengow order
         $this->lengowOrder->create([
-            //'salesChannelId' => $this->salesChannel->getId(),
+            'salesChannelId' => $this->salesChannel->getId(),
             'marketplaceSku' => $this->marketplaceSku,
             'marketplaceName' => $this->lengowMarketplace->getName(),
             'marketplaceLabel' => $this->lengowMarketplace->getLabel(),
@@ -693,4 +706,81 @@ class LengowImportOrder
         return '';
     }
 
+    /**
+     * Get products from the API
+     *
+     * @throws LengowException
+     *
+     * @return array
+     */
+    private function getProducts(): array
+    {
+        $products = [];
+        foreach ($this->packageData->cart as $apiProduct) {
+            $productData = $this->lengowProduct->extractProductDataFromAPI($apiProduct);
+            $apiProductId = $productData['merchant_product_id']->id ?? $productData['marketplace_product_id'];
+            if ($productData['marketplace_status'] !== null) {
+                $productState = $this->lengowMarketplace->getStateLengow($productData['marketplace_status']);
+                if ($productState === LengowOrder::STATE_CANCELED || $productState === LengowOrder::STATE_REFUSED) {
+                    $this->lengowLog->write(
+                        LengowLog::CODE_IMPORT,
+                        $this->lengowLog->encodeMessage('log.import.product_state_canceled', [
+                            'product_id' => $apiProductId,
+                            'product_state' => $productState,
+                        ]),
+                        $this->logOutput,
+                        $this->marketplaceSku
+                    );
+                    continue;
+                }
+            }
+            $product = null;
+            $productIds = [
+                'merchant_product_id' => (string)$productData['merchant_product_id']->id,
+                'marketplace_product_id' => (string)$productData['marketplace_product_id'],
+            ];
+            foreach ($productIds as $attributeName => $attributeValue) {
+                $product = $this->lengowProduct->searchProduct(
+                    $attributeName,
+                    $attributeValue,
+                    $this->logOutput,
+                    $this->marketplaceSku
+                );
+                if ($product) {
+                    break;
+                }
+            }
+            if ($product === null) {
+                throw new LengowException(
+                    $this->lengowLog->encodeMessage('lengow_log.exception.product_not_be_found', [
+                        'product_id' => $apiProductId,
+                    ])
+                );
+            }
+            // if found, id does not concerns a variation but a parent
+            if ($product && (int)$product->getChildCount() !== 0) {
+                throw new LengowException(
+                    $this->lengowLog->encodeMessage('lengow_log.exception.product_is_a_parent', [
+                        'product_number' => $product->getProductNumber(),
+                        'product_id' => $product->getId(),
+                    ])
+                );
+            }
+            $productId = $product->getId();
+            if (array_key_exists($productId, $products)) {
+                $products[$productId]['quantity'] += (int)$productData['quantity'];
+                $products[$productId]['amount'] += (float)$productData['amount'];
+                $products[$productId]['order_line_ids'][] = $productData['marketplace_order_line_id'];
+            } else {
+                $products[$productId] = [
+                    'shopware_product' => $product,
+                    'quantity' => (int)$productData['quantity'],
+                    'amount' => (float)$productData['amount'],
+                    'price_unit' => $productData['price_unit'],
+                    'order_line_ids' => [$productData['marketplace_order_line_id']],
+                ];
+            }
+        }
+        return $products;
+    }
 }

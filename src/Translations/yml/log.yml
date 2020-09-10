@@ -32,6 +32,9 @@ en:
         rewrite_processing_fee: "rewrite amount without processing fee"
         rewrite_shipping_cost: "rewrite amount without shipping cost"
         order_shipped_by_marketplace: "order shipped by %{marketplace_name}"
+        product_state_canceled: "product %{product_id} could not be added - status: %{state_product}"
+        product_advanced_search: "product not found with field %{attribute_name} (%{attribute_value}). Using advanced search"
+        product_be_found: "product %{product_number} (%{product_id}) found with field %{attribute_name} (%{attribute_value}) and attribute %{search_field}"
       connector:
         call_api: "call %{call_type} %{curl_url}"
         error_api: "API call failed - %{error_code} - %{error_message}"

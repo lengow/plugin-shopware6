@@ -67,6 +67,9 @@ lengow_log.error.no_country_for_delivery_address|Lengow error: delivery address 
 lengow_log.exception.no_connection_webservice|connection did not work with the Lengow webservice in sales channel %{sales_channel_name} (%{sales_channel_id})
 lengow_log.exception.error_lengow_webservice|Lengow webservice: %{error_code} - "%{error_message}" in sales channel %{sales_channel_name} (%{sales_channel_id})
 lengow_log.exception.marketplace_not_present|Lengow error: %{marketplace_name} does not feature in the marketplace list
+lengow_log.exception.no_product_to_cart|no product to be added to cart
+lengow_log.exception.product_is_a_parent|product %{product_number} (%{product_id}) is a parent. Product variation is needed
+lengow_log.exception.product_not_be_found|product %{product_id} could not be found
 log.export.unauthorised_ip|Unauthorized access for IP: %{ip}
 log.export.unauthorised_token|Unauthorised access for this token: %{token}
 log.export.empty_token|Unauthorised access: token parameter is empty
@@ -96,6 +99,9 @@ log.import.lengow_order_not_saved|WARNING! Order could NOT be saved in Lengow or
 log.import.rewrite_processing_fee|rewrite amount without processing fee
 log.import.rewrite_shipping_cost|rewrite amount without shipping cost
 log.import.order_shipped_by_marketplace|order shipped by %{marketplace_name}
+log.import.product_state_canceled|product %{product_id} could not be added - status: %{state_product}
+log.import.product_advanced_search|product not found with field %{attribute_name} (%{attribute_value}). Using advanced search
+log.import.product_be_found|product %{product_number} (%{product_id}) found with field %{attribute_name} (%{attribute_value}) and attribute %{search_field}
 log.connector.call_api|call %{call_type} %{curl_url}
 log.connector.error_api|API call failed - %{error_code} - %{error_message}
 log.connector.curl_disabled|Curl extension is not enabled on the server

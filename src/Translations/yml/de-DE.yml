@@ -133,3 +133,6 @@ de:
         marketplace_not_present: "Lengow Fehler: %{marketplace_name} erscheint nicht in der Marketplace-Liste"
         no_connection_webservice: "verbindung mit dem Lengow Webservice im sales channel %{sales_channel_name} (%{sales_channel_id}) funktionierte nicht"
         error_lengow_webservice: "Lengow Webservice : %{error_code} - \"%{error_message}\" auf sales channel %{sales_channel_name} (%{sales_channel_id})"
+        no_product_to_cart: "Es befinden sich kein Produkt im Warenkorb"
+        product_is_a_parent: "produkt %{product_number} (%{product_id})} ist ein Hauptartikel. Bitte Varianten angeben"
+        product_not_be_found: "produkt %{product_id} konnte nicht gefunden werden."

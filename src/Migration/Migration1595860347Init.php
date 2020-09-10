@@ -48,7 +48,7 @@ class Migration1595860347Init extends MigrationStep
                 `carrier_tracking`     VARCHAR(100)  NULL DEFAULT NULL,
                 `carrier_id_relay`     VARCHAR(100)  NULL DEFAULT NULL,
                 `sent_marketplace`     TINYINT(1)    NOT NULL DEFAULT 0,
-                `is_in_error`          TINYINT(1)    NOT NULL DEFAULT 0,
+                `is_in_error`          TINYINT(1)    NOT NULL DEFAULT 1,
                 `is_reimported`        TINYINT(1)    NOT NULL DEFAULT 0,
                 `message`              TEXT          NULL DEFAULT NULL,
                 `created_at`           DATETIME(3)   NOT NULL,

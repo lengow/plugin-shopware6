@@ -67,3 +67,6 @@ lengow_log.error.no_country_for_delivery_address|Fehler Lengow: Lieferaddresse e
 lengow_log.exception.marketplace_not_present|Lengow Fehler: %{marketplace_name} erscheint nicht in der Marketplace-Liste
 lengow_log.exception.no_connection_webservice|verbindung mit dem Lengow Webservice im sales channel %{sales_channel_name} (%{sales_channel_id}) funktionierte nicht
 lengow_log.exception.error_lengow_webservice|Lengow Webservice : %{error_code} - "%{error_message}" auf sales channel %{sales_channel_name} (%{sales_channel_id})
+lengow_log.exception.no_product_to_cart|Es befinden sich kein Produkt im Warenkorb
+lengow_log.exception.product_is_a_parent|produkt %{product_number} (%{product_id})} ist ein Hauptartikel. Bitte Varianten angeben
+lengow_log.exception.product_not_be_found|produkt %{product_id} konnte nicht gefunden werden.

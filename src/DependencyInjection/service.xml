@@ -39,6 +39,7 @@
             <argument type="service" id="Lengow\Connector\Factory\LengowMarketplaceFactory"/>
             <argument type="service" id="Lengow\Connector\Service\LengowOrderError"/>
             <argument type="service" id="Lengow\Connector\Service\LengowOrder"/>
+            <argument type="service" id="Lengow\Connector\Service\LengowProduct"/>
             <argument type="service" id="currency.repository"/>
         </service>
 
@@ -61,6 +62,11 @@
         <service id="Lengow\Connector\Service\LengowPayment">
             <argument type="service" id="Shopware\Core\Checkout\Order\Aggregate\OrderTransaction\OrderTransactionStateHandler"/>
             <tag name="shopware.payment.method.sync" />
+        </service>
+
+        <service id="Lengow\Connector\Service\LengowProduct">
+            <argument type="service" id="product.repository"/>
+            <argument type="service" id="Lengow\Connector\Service\LengowLog"/>
         </service>
 
         <service id="Lengow\Connector\Service\LengowSync">

@@ -57,7 +57,7 @@ class OrderDefinition extends EntityDefinition
     {
         return [
             'sentMarketplace' => false,
-            'isInError' => false,
+            'isInError' => true,
             'isReimported' => false,
         ];
     }
