@@ -452,7 +452,7 @@ Component.register('lengow-export-list', {
         onPublishOnLengow() {
             const lengowProductCriteria = new Criteria();
             lengowProductCriteria.addFilter(Criteria.equalsAny('productId', this.selection));
-            lengowProductCriteria.addFilter(Criteria.equalsAny('salesChannelId', this.currentSalesChannelId));
+            lengowProductCriteria.addFilter(Criteria.equals('salesChannelId', this.currentSalesChannelId));
             this.lengowProductRepository
                 .search(lengowProductCriteria, Shopware.Context.api)
                 .then(result => {
