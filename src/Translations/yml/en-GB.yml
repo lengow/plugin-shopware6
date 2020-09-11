@@ -30,6 +30,8 @@ en:
             "activeFilterLabel": "Active / Inactive"
             "stockFilterLabel": "With stock / Without stock"
             "searchFilterLabel": "Search by id / name / reference"
+        "columns":
+            "activeInLengow": "Active in Lengow"
   backend:
     settings:
       lengow_main_settings:

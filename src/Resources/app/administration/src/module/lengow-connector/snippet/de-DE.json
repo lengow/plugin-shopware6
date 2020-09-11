@@ -36,6 +36,9 @@
                 "activeFilterLabel": "Aktiv \/ Inaktiv",
                 "stockFilterLabel": "Mit Lager \/ Ohne Lager",
                 "searchFilterLabel": "Suche nach ID \/ Name \/ Referenz"
+            },
+            "columns": {
+                "activeInLengow": "Aktiv in Lengow"
             }
         }
     }

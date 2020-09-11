@@ -83,10 +83,9 @@
                                                detailRoute="sw.product.detail"
                                                :showSelection="true"
                                                :isLoading="isLoading"
-                                               @column-sort="onColumnSort"
-                                               @paginate="onColumnSort"
+                                               @column-sort="onStartSorting"
                                                @selection-change="updateSelection"
-                                               @update-records="updateTotal">
+                                               @update-records="onColumnSort">
                                 <template #delete-action>
                                     <span></span> <!-- Remove delete action from entity listing -->
                                 </template>

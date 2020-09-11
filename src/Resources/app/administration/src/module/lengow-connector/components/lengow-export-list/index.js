@@ -1,5 +1,5 @@
 import template from './views/lengow-export-list.html.twig';
-import './views/lengow-export-list.scss'
+import './views/lengow-export-list.scss';
 
 const {
     Component,
@@ -61,6 +61,7 @@ Component.register('lengow-export-list', {
             countLoading: true,
             salesChannelName: '',
             salesChannelDomain: '',
+            tempListActivated: [],
         };
     },
 
@@ -200,8 +201,8 @@ Component.register('lengow-export-list', {
             }
             return products.filter(
                 product =>
-                    product.id === value ||
-                    product.productNumber === value ||
+                    product.id.toLowerCase().includes(value.toLowerCase()) ||
+                    product.productNumber.toLowerCase().includes(value.toLowerCase()) ||
                     product.name.toLowerCase().includes(value.toLowerCase()),
             );
         },
@@ -345,6 +346,7 @@ Component.register('lengow-export-list', {
                     } else {
                         this.salesChannelDomain = 'Headless';
                     }
+                    this.setupSelectionActivated();
                 })
                 .catch(() => {
                     this.isLoading = false;
@@ -527,9 +529,11 @@ Component.register('lengow-export-list', {
             return [
                 {
                     property: 'extensions.activeInLengow.active',
-                    label: 'active in lengow',
+                    label: this.$tc('lengow-connector.products.columns.activeInLengow'),
                     inlineEdit: 'boolean',
                     align: 'center',
+                    allowResize: false,
+                    sortable: false,
                 },
                 {
                     property: 'name',
@@ -542,13 +546,13 @@ Component.register('lengow-export-list', {
                 {
                     property: 'productNumber',
                     naturalSorting: true,
-                    label: 'product ID',
+                    label: this.$tc('sw-product.list.columnProductNumber'),
                     align: 'right',
                     allowResize: true,
                 },
                 {
                     property: 'manufacturer.name',
-                    label: 'Brand',
+                    label: this.$tc('sw-product.list.columnManufacturer'),
                     allowResize: true,
                 },
                 {
@@ -560,13 +564,6 @@ Component.register('lengow-export-list', {
                 },
                 ...this.currenciesColumns,
                 {
-                    property: 'stock',
-                    label: this.$tc('sw-product.list.columnInStock'),
-                    inlineEdit: 'number',
-                    allowResize: true,
-                    align: 'right',
-                },
-                {
                     property: 'availableStock',
                     label: this.$tc('sw-product.list.columnAvailableStock'),
                     allowResize: true,
@@ -575,14 +572,24 @@ Component.register('lengow-export-list', {
             ];
         },
 
-        onColumnSort(column) {
-            this.$refs.swProductGrid.loading = true;
+        onStartSorting() {
+            this.$refs.swProductGrid.records.forEach(item => {
+                if (this.$refs.swProductGrid.isSelected(item.id) !== true &&
+                    item.extensions.activeInLengow.active
+                ) {
+                    this.tempListActivated.push(item.id);
+                }
+            });
+        },
 
-            const context = { ...Shopware.Context.api };
-            context.currencyId = column.currencyId;
-            return this.$refs.swProductGrid.repository
-                .search(this.$refs.swProductGrid.items.criteria, context)
-                .then(this.$refs.swProductGrid.applyResult);
+        onColumnSort(column) {
+            this.$refs.swProductGrid.records.forEach(item => {
+                if (this.$refs.swProductGrid.isSelected(item.id) !== true &&
+                    this.tempListActivated.includes(item.id)
+                ) {
+                    item.extensions.activeInLengow.active = true;
+                }
+            });
         },
     },
 });

@@ -24,6 +24,21 @@
                 "helpCenterTarget": "https:\/\/supportlengow.zendesk.com\/hc\/fr-fr\/articles\/360012203311",
                 "helpCenter": "pour plus d'informations sur la configuration de votre plugin Shopware"
             }
+        },
+        "products": {
+            "activateSelectionLabel": "Activer la selection produit",
+            "datas": {
+                "nbProductExportLabel": "Total produits exportés :",
+                "nbProductExportableLabel": "Total produits exportables :"
+            },
+            "filters": {
+                "activeFilterLabel": "Actif \/ Inactif",
+                "stockFilterLabel": "Avec stock \/ Sans stock",
+                "searchFilterLabel": "Recherche par id \/ nom \/ reference"
+            },
+            "columns": {
+                "activeInLengow": "Actif dans lengow"
+            }
         }
     }
 }
