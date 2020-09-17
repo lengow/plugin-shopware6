@@ -1,13 +1,9 @@
 #!/bin/bash
-
-set -o errexit
-echo "\e[94mPlease enter absolute filepath to shopware directory"
-echo "\e[94mexample for devellopement : username/home/Documents/docker-cms/shopware{version}/shopware"
-read SHOPWAREPATH
+MAGE=$1
 
 copy_directory(){
     ORIGINAL_DIRECTORY="$(dirname "$(pwd)")"
-    DESTINATION_DIRECTORY="$SHOPWAREPATH/custom/plugins/Lengow"
+    DESTINATION_DIRECTORY="$MAGE$1/custom/plugins/Lengow"
     if [ -d "$ORIGINAL_DIRECTORY" ]; then
         if [ -e "$DESTINATION_DIRECTORY" ]; then
             unlink $DESTINATION_DIRECTORY
