@@ -42,6 +42,16 @@ class LengowExport
      */
     private $lengowProductRepository;
 
+    /*
+     * @var EntityRepositoryInterface shopware currency repository
+     */
+    private $currencyRepository;
+
+    /*
+     * @var EntityRepositoryInterface shopware languages repository
+     */
+    private $languageRepository;
+
     /**
      * all export configuration parameters :
      * @var array [
@@ -61,19 +71,25 @@ class LengowExport
      * @param EntityRepositoryInterface $salesChannelRepository sales channel repository
      * @param EntityRepositoryInterface $categoryRepository category repository
      * @param EntityRepositoryInterface $lengowProductRepository lengow product repository
+     * @param EntityRepositoryInterface $currencyRepository lengow product repository
+     * @param EntityRepositoryInterface $languageRepository lengow product repository
      */
     public function __construct(
         LengowConfiguration $lengowConfiguration,
         EntityRepositoryInterface $productRepository,
         EntityRepositoryInterface $salesChannelRepository,
         EntityRepositoryInterface $categoryRepository,
-        EntityRepositoryInterface $lengowProductRepository
+        EntityRepositoryInterface $lengowProductRepository,
+        EntityRepositoryInterface $currencyRepository,
+        EntityRepositoryInterface $languageRepository
     ) {
         $this->lengowConfiguration = $lengowConfiguration;
         $this->productRepository = $productRepository;
         $this->salesChannelRepository = $salesChannelRepository;
         $this->categoryRepository = $categoryRepository;
         $this->lengowProductRepository = $lengowProductRepository;
+        $this->currencyRepository = $currencyRepository;
+        $this->languageRepository = $languageRepository;
     }
 
     /**
@@ -231,4 +247,151 @@ class LengowExport
         return (string) $categoryArray[array_key_first($categoryArray)]->getId();
     }
 
+    /**
+     * return json encoded string with all export parameters
+     *
+     * @return mixed All export params with example
+     */
+    public function getExportParams()
+    {
+        $exportParams = [];
+        $exportParams['mode'] = [
+            'Authorized Value' => ['size', 'total'],
+            'type' => 'string',
+            'example' => 'mode=size'
+        ];
+        $exportParams['format'] = [
+            'Authorized Value' => ['csv', 'json'],
+            'type' => 'string',
+            'example' => 'format=csv'
+        ];
+        $exportParams['limit'] = [
+            'Authorized Value' => ['0-999999'],
+            'type' => 'signed integer',
+            'example' => 'limit=100'
+        ];
+        $exportParams['offset'] = [
+            'Authorized Value' => ['0-999999'],
+            'type' => 'signed integer',
+            'example' => 'offset=100'
+        ];
+        $exportParams['product_ids'] = [
+            'Authorized Value' => ['all integers'],
+            'type' => 'integer',
+            'example' => 'product_ids=101,102,103'
+        ];
+        $exportParams['sales_channel_id'] = [
+            'Authorized Value' => [$this->getAllSalesChannelAvailableId()],
+            'type' => 'Binary',
+            'example' => '98432def39fc4624b33213a56b8c944d'
+        ];
+        $exportParams['stream'] = [
+            'Authorized Value' => ['0', '1'],
+            'type' => 'Bool',
+            'example' => 'stream=1'
+        ];
+        $exportParams['out_of_stock'] = [
+            'Authorized Value' => ['0', '1'],
+            'type' => 'Bool',
+            'example' => 'out_of_stock=1'
+        ];
+        $exportParams['variation'] = [
+            'Authorized Value' => ['0', '1'],
+            'type' => 'Bool',
+            'example' => 'variation=1'
+        ];
+        $exportParams['inactive'] = [
+            'Authorized Value' => ['0', '1'],
+            'type' => 'Bool',
+            'example' => 'inactive=1'
+        ];
+        $exportParams['selection'] = [
+            'Authorized Value' => ['0', '1'],
+            'type' => 'Bool',
+            'example' => 'selection=1'
+        ];
+        $exportParams['log_output'] = [
+            'Authorized Value' => ['0', '1'],
+            'type' => 'Bool',
+            'example' => 'log_output=1'
+        ];
+        $exportParams['update_export_date'] = [
+            'Authorized Value' => ['0', '1'],
+            'type' => 'Bool',
+            'example' => 'update_export_date=1'
+        ];
+        $exportParams['currency'] = [
+            'Authorized Value' => [$this->getAllCurrenciesAvailable()],
+            'type' => 'string',
+            'example' => 'currency=EUR'
+        ];
+        $exportParams['language'] = [
+            'Authorized Value' => $this->getAllLanguages(),
+            'type' => 'string',
+            'example' => 'language=english'
+        ];
+        $exportParams['get_params'] = [
+            'Authorized Value' => ['0', '1'],
+            'type' => 'bool',
+            'example' => 'get_params=1'
+        ];
+        return json_encode($exportParams);
+    }
+
+    /**
+     * Get all sales channels
+     *
+     * @return array all sales channel ids
+     */
+    private function getAllSalesChannelAvailableId() : array
+    {
+        $result = $this->salesChannelRepository->search(
+            new Criteria(),
+            Context::createDefaultContext()
+        );
+        $salesChannels = (array) $result->getEntities()->getElements();
+        $ids = [];
+        foreach ($salesChannels as $salesChannel) {
+            $ids[] = $salesChannel->getId();
+        }
+        return $ids;
+    }
+
+    /**
+     * get all currencies available
+     *
+     * @return array all available currencies
+     */
+    private function getAllCurrenciesAvailable() : array
+    {
+        $result = $this->currencyRepository->search(
+            new Criteria(),
+            Context::createDefaultContext()
+        );
+        $currencies = (array) $result->getEntities()->getElements();
+        $iso = [];
+        foreach ($currencies as $currency) {
+            $iso[] = $currency->getIsoCode();
+        }
+        return $iso;
+    }
+
+    /**
+     * Get all Languages available
+     *
+     * @return array
+     */
+    private function getAllLanguages() : array
+    {
+        $result = $this->languageRepository->search(
+            new Criteria(),
+            Context::createDefaultContext()
+        );
+        $langs = (array) $result->getEntities()->getElements();
+        $languages = [];
+        foreach ($langs as $language) {
+            $languages[] = $language->getName();
+        }
+        return $languages;
+    }
 }

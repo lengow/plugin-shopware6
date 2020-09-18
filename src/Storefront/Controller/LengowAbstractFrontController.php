@@ -32,7 +32,7 @@ abstract class LengowAbstractFrontController extends StorefrontController
     protected $lengowLog;
 
     /**
-     * LengowAbstractFrontController constructor.
+     * LengowAbstractFrontController constructor
      *
      * @param LengowAccess $lengowAccess Lengow access security service
      * @param LengowConfiguration $lengowConfiguration Lengow configuration accessor service

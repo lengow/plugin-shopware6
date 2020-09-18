@@ -49,6 +49,8 @@
             <argument type="service" id="sales_channel.repository"/>
             <argument type="service" id="category.repository"/>
             <argument type="service" id="lengow_product.repository"/>
+            <argument type="service" id="currency.repository"/>
+            <argument type="service" id="language.repository"/>
         </service>
 
         <service id="Lengow\Connector\Service\LengowLog">

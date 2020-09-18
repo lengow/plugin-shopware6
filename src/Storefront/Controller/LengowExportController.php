@@ -2,9 +2,13 @@
 
 namespace Lengow\Connector\Storefront\Controller;
 
+use Shopware\Core\Framework\Context;
 use Shopware\Core\Framework\Routing\Annotation\RouteScope;
 use Shopware\Core\System\SalesChannel\SalesChannelContext;
 use Shopware\Storefront\Controller\StorefrontController;
+use Shopware\Core\Framework\DataAbstractionLayer\Search\Criteria;
+use Shopware\Core\Framework\DataAbstractionLayer\Search\Filter\EqualsFilter;
+use Shopware\Core\Framework\DataAbstractionLayer\EntityRepositoryInterface;
 use Symfony\Component\Routing\Annotation\Route;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\Response;
@@ -52,8 +56,13 @@ class LengowExportController extends LengowAbstractFrontController
      */
     public function export(Request $request, SalesChannelContext $context)
     {
-        //$this->checkAccess($request, $context, false);
+        $this->checkAccess($request, $context, false);
         $exportArgs = $this->createGetArgArray($request);
+
+        if ($exportArgs['get_params']) {
+            return new Response($this->lengowExport->getExportParams());
+        }
+
         $this->lengowExport->init(
             $exportArgs['sales_channel_id'],
             $exportArgs['selection'],
@@ -93,6 +102,7 @@ class LengowExportController extends LengowAbstractFrontController
             'update_export_date' => $request->query->get('update_export_date') === '1',
             'currency' => $request->query->get('currency'),
             'sales_channel_id' => $request->query->get('sales_channel_id'),
+            'get_params' => (bool) $request->query->get('get_params'),
         ];
     }
 
