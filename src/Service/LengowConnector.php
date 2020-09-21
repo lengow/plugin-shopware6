@@ -311,8 +311,8 @@ class LengowConnector
         $updatedAt = $this->lengowConfiguration->get('lengowLastAuthorizationTokenUpdate');
         if (!$force
             && $token !== null
-            && strlen($token) > 0
             && $updatedAt !== null
+            && $token !== ''
             && (time() - $updatedAt) < self::TOKEN_LIFETIME
         ) {
             $authorizationToken = $token;
@@ -440,7 +440,7 @@ class LengowConnector
             $this->connect(false, $logOutput);
             $data = $this->callAction($api, $args, $type, $format, $body, $logOutput);
         } catch (Exception $e) {
-            if (in_array($e->getCode(), $this->authorizationCodes)) {
+            if (in_array($e->getCode(), $this->authorizationCodes, true)) {
                 $this->lengowLog->write(
                     LengowLog::CODE_CONNECTOR,
                     $this->lengowLog->encodeMessage('log.connector.retry_get_token'),
@@ -450,7 +450,7 @@ class LengowConnector
                 $data = $this->callAction($api, $args, $type, $format, $body, $logOutput);
             } else {
                 throw new LengowException($e->getMessage(), $e->getCode());
-            };
+            }
         }
         return $data;
     }
@@ -478,13 +478,13 @@ class LengowConnector
     /**
      * Get authorization token from Middleware
      *
-     * @param boolean $logOutput see log or not
+     * @param bool $logOutput see log or not
      *
      * @throws LengowException
      *
      * @return string
      */
-    private function getAuthorizationToken($logOutput): string
+    private function getAuthorizationToken(bool $logOutput): string
     {
         // reset temporary token for the new authorization
         $this->token = null;
@@ -506,7 +506,7 @@ class LengowConnector
                 self::CODE_500
             );
         }
-        if (strlen($data['token']) === 0) {
+        if ($data['token'] === '') {
             throw new LengowException(
                 $this->lengowLog->encodeMessage('log.connector.token_is_empty'),
                 self::CODE_500
@@ -620,7 +620,7 @@ class LengowConnector
     {
         if ($result === false) {
             // recovery of Curl errors
-            if (in_array($curlErrorNumber, [CURLE_OPERATION_TIMEDOUT, CURLE_OPERATION_TIMEOUTED])) {
+            if (in_array($curlErrorNumber, [CURLE_OPERATION_TIMEDOUT, CURLE_OPERATION_TIMEOUTED], true)) {
                 throw new LengowException($this->lengowLog->encodeMessage('log.connector.timeout_api'), self::CODE_504);
             }
             throw new LengowException(
@@ -631,7 +631,7 @@ class LengowConnector
                 self::CODE_500
             );
         }
-        if (!in_array($httpCode, $this->successCodes)) {
+        if (!in_array($httpCode, $this->successCodes, true)) {
             $result = $this->format($result);
             // recovery of Lengow Api errors
             if (isset($result['error'])) {

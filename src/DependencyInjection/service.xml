@@ -6,6 +6,19 @@
 
     <services>
 
+        <service id="Lengow\Connector\Service\LengowAccess">
+            <argument type="service" id="Lengow\Connector\Service\LengowConfiguration"/>
+            <argument type="service" id="sales_channel.repository"/>
+        </service>
+
+        <service id="Lengow\Connector\Service\LengowAddress">
+            <argument type="service" id="Lengow\Connector\Service\LengowLog"/>
+            <argument type="service" id="Lengow\Connector\Util\StringCleaner"/>
+            <argument type="service" id="country.repository"/>
+            <argument type="service" id="country_state.repository"/>
+            <argument type="service" id="salutation.repository"/>
+        </service>
+
         <service id="Lengow\Connector\Service\LengowConfiguration">
             <argument type="service" id="lengow_settings.repository"/>
             <argument type="service" id="Shopware\Core\System\SystemConfig\SystemConfigService" />
@@ -14,14 +27,17 @@
             <argument type="service" id="Lengow\Connector\Util\EnvironmentInfoProvider"/>
         </service>
 
-        <service id="Lengow\Connector\Service\LengowAccess">
-            <argument type="service" id="Lengow\Connector\Service\LengowConfiguration"/>
-            <argument type="service" id="sales_channel.repository"/>
-        </service>
-
         <service id="Lengow\Connector\Service\LengowConnector">
             <argument type="service" id="Lengow\Connector\Service\LengowConfiguration"/>
             <argument type="service" id="Lengow\Connector\Service\LengowLog"/>
+        </service>
+
+        <service id="Lengow\Connector\Service\LengowCustomer">
+            <argument type="service" id="Lengow\Connector\Service\LengowAddress"/>
+            <argument type="service" id="Lengow\Connector\Service\LengowLog"/>
+            <argument type="service" id="customer.repository"/>
+            <argument type="service" id="Shopware\Core\System\NumberRange\ValueGenerator\NumberRangeValueGeneratorInterface"/>
+            <argument type="service" id="Lengow\Connector\Util\EnvironmentInfoProvider"/>
         </service>
 
         <service id="Lengow\Connector\Service\LengowImport">
@@ -40,6 +56,8 @@
             <argument type="service" id="Lengow\Connector\Service\LengowOrderError"/>
             <argument type="service" id="Lengow\Connector\Service\LengowOrder"/>
             <argument type="service" id="Lengow\Connector\Service\LengowProduct"/>
+            <argument type="service" id="Lengow\Connector\Service\LengowCustomer"/>
+            <argument type="service" id="Lengow\Connector\Service\LengowAddress"/>
             <argument type="service" id="currency.repository"/>
         </service>
 

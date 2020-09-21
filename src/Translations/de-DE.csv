@@ -70,3 +70,6 @@ lengow_log.exception.error_lengow_webservice|Lengow Webservice : %{error_code} -
 lengow_log.exception.no_product_to_cart|Es befinden sich kein Produkt im Warenkorb
 lengow_log.exception.product_is_a_parent|produkt %{product_number} (%{product_id})} ist ein Hauptartikel. Bitte Varianten angeben
 lengow_log.exception.product_not_be_found|produkt %{product_id} konnte nicht gefunden werden.
+lengow_log.exception.country_not_found|Kein Land für ISO-Code %{iso_code} gefunden. Bitte fügen Sie es Ihrer Shopware Konfiguration hinzu
+lengow_log.exception.salutation_not_found|Keine salutation in unserem System gefunden. Bitte fügen Sie es Ihrer Shopware Konfiguration hinzu
+lengow_log.exception.shopware_customer_not_saved|VORSICHT! Kunde konnte NICHT in der Shopware Datenbank gespeichert werden

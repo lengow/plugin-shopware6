@@ -205,7 +205,7 @@ class LengowImport
         $this->logOutput = $params['log_output'] ?? false;
         $this->salesChannelId = $params['sales_channel_id'] ?? null;
         // get params for synchronise one or all orders
-        if (isset($params['marketplace_sku']) && isset($params['marketplace_name']) && $this->salesChannelId) {
+        if (isset($params['marketplace_sku'], $params['marketplace_name']) && $this->salesChannelId) {
             $this->limit = 1;
             $this->importOneOrder = true;
             $this->marketplaceSku = $params['marketplace_sku'];
@@ -242,7 +242,7 @@ class LengowImport
         $syncOk = true;
         // clean log files
         $this->lengowLog->cleanLog();
-        if ($this->isInProcess() && !$this->debugMode && !$this->importOneOrder) {
+        if (!$this->debugMode && !$this->importOneOrder && $this->isInProcess()) {
             $globalError = $this->lengowLog->encodeMessage('lengow_log.error.rest_time_to_import', [
                 'rest_time' => $this->restTimeToImport()
             ]);
@@ -252,7 +252,7 @@ class LengowImport
             $this->lengowLog->write(LengowLog::CODE_IMPORT, $globalError, $this->logOutput);
         } else {
             if (!$this->importOneOrder) {
-                self::setInProcess();
+                $this->setInProcess();
             }
             // check Lengow catalogs for order synchronisation
             if (!$this->importOneOrder && $this->importType === self::TYPE_MANUAL) {
@@ -329,7 +329,8 @@ class LengowImport
                     }
                     if ($totalOrders <= 0 && $this->importOneOrder) {
                         throw new LengowException('lengow_log.error.order_not_found');
-                    } elseif ($totalOrders <= 0) {
+                    }
+                    if ($totalOrders <= 0) {
                         continue;
                     }
                     $result = $this->importOrders($orders, $salesChannel);
@@ -407,20 +408,20 @@ class LengowImport
         if ($globalError) {
             $error[0] = $globalError;
             if ($this->lengowOrderId !== null) {
-                // TODO Finish old order errors and create a new one
+                $this->lengowOrderError->finishOrderErrors($this->lengowOrderId);
+                $this->lengowOrderError->create($this->lengowOrderId, $globalError);
             }
         }
         if ($this->importOneOrder) {
             $result['error'] = $error;
             return $result;
-        } else {
-            return [
-                'order_new' => $orderNew,
-                'order_update' => $orderUpdate,
-                'order_error' => $orderError,
-                'error' => $error,
-            ];
         }
+        return [
+            'order_new' => $orderNew,
+            'order_update' => $orderUpdate,
+            'order_error' => $orderError,
+            'error' => $error,
+        ];
     }
 
     /**
@@ -435,9 +436,8 @@ class LengowImport
         if ($timestampCron && $timestampManual) {
             if ((int)$timestampCron > (int)$timestampManual) {
                 return ['type' => self::TYPE_CRON, 'timestamp' => (int)$timestampCron];
-            } else {
-                return ['type' => self::TYPE_MANUAL, 'timestamp' => (int)$timestampManual];
             }
+            return ['type' => self::TYPE_MANUAL, 'timestamp' => (int)$timestampManual];
         }
         if ($timestampCron && !$timestampManual) {
             return ['type' => self::TYPE_CRON, 'timestamp' => (int)$timestampCron];
@@ -457,10 +457,7 @@ class LengowImport
     {
         $timestamp = (int)$this->lengowConfiguration->get('lengowImportInProgress');
         // security check : if last import is more than 60 seconds old => authorize new import to be launched
-        if ($timestamp > 0 && ($timestamp + (60 * 1)) > time()) {
-            return true;
-        }
-        return false;
+        return ($timestamp > 0 && ($timestamp + (60 * 1)) > time());
     }
 
     /**
@@ -650,7 +647,7 @@ class LengowImport
             }
             $page++;
             $finish = ($results->next === null || $this->importOneOrder);
-        } while ($finish != true);
+        } while (!$finish);
         return $orders;
     }
 

@@ -11,6 +11,10 @@
             <argument type="service" id="language.repository"/>
             <argument type="service" id="sales_channel.repository"/>
             <argument type="service" id="sales_channel_domain.repository"/>
+            <argument type="service" id="payment_method.repository"/>
+        </service>
+
+        <service id="Lengow\Connector\Util\StringCleaner">
         </service>
 
     </services>

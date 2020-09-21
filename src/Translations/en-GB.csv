@@ -70,6 +70,9 @@ lengow_log.exception.marketplace_not_present|Lengow error: %{marketplace_name} d
 lengow_log.exception.no_product_to_cart|no product to be added to cart
 lengow_log.exception.product_is_a_parent|product %{product_number} (%{product_id}) is a parent. Product variation is needed
 lengow_log.exception.product_not_be_found|product %{product_id} could not be found
+lengow_log.exception.country_not_found|No country found for ISO code %{iso_code}. Please add it into your Shopware configuration
+lengow_log.exception.salutation_not_found|No salutation found in our system. Please add it into your Shopware configuration
+lengow_log.exception.shopware_customer_not_saved|WARNING! Customer could NOT be saved in Shopware user table
 log.export.unauthorised_ip|Unauthorized access for IP: %{ip}
 log.export.unauthorised_token|Unauthorised access for this token: %{token}
 log.export.empty_token|Unauthorised access: token parameter is empty
@@ -102,6 +105,8 @@ log.import.order_shipped_by_marketplace|order shipped by %{marketplace_name}
 log.import.product_state_canceled|product %{product_id} could not be added - status: %{state_product}
 log.import.product_advanced_search|product not found with field %{attribute_name} (%{attribute_value}). Using advanced search
 log.import.product_be_found|product %{product_number} (%{product_id}) found with field %{attribute_name} (%{attribute_value}) and attribute %{search_field}
+log.import.generate_unique_email|generate a unique email %{email}
+log.import.lengow_payment_not_found|WARNING! Unable to retrieve Lengow payment method
 log.connector.call_api|call %{call_type} %{curl_url}
 log.connector.error_api|API call failed - %{error_code} - %{error_message}
 log.connector.curl_disabled|Curl extension is not enabled on the server

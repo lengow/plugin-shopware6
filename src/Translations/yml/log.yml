@@ -35,6 +35,8 @@ en:
         product_state_canceled: "product %{product_id} could not be added - status: %{state_product}"
         product_advanced_search: "product not found with field %{attribute_name} (%{attribute_value}). Using advanced search"
         product_be_found: "product %{product_number} (%{product_id}) found with field %{attribute_name} (%{attribute_value}) and attribute %{search_field}"
+        generate_unique_email: "generate a unique email %{email}"
+        lengow_payment_not_found: "WARNING! Unable to retrieve Lengow payment method"
       connector:
         call_api: "call %{call_type} %{curl_url}"
         error_api: "API call failed - %{error_code} - %{error_message}"

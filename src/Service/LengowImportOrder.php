@@ -4,6 +4,7 @@ namespace Lengow\Connector\Service;
 
 use \DateTime;
 use \Exception;
+use Shopware\Core\Checkout\Customer\CustomerEntity;
 use Shopware\Core\Framework\Context;
 use Shopware\Core\Framework\DataAbstractionLayer\EntityRepositoryInterface;
 use Shopware\Core\Framework\DataAbstractionLayer\Search\Criteria;
@@ -71,6 +72,16 @@ class LengowImportOrder
      * @var LengowProduct Lengow product service
      */
     private $lengowProduct;
+
+    /**
+     * @var LengowCustomer Lengow customer service
+     */
+    private $lengowCustomer;
+
+    /**
+     * @var LengowAddress Lengow address service
+     */
+    private $lengowAddress;
 
     /**
      * @var EntityRepositoryInterface Shopware currency repository
@@ -210,6 +221,8 @@ class LengowImportOrder
      * @param LengowOrderError $lengowOrderError Lengow order error service
      * @param LengowOrder $lengowOrder Lengow order service
      * @param LengowProduct $lengowProduct Lengow product service
+     * @param LengowCustomer $lengowCustomer Lengow customer service
+     * @param LengowAddress $lengowAddress Lengow address service
      * @param EntityRepositoryInterface $currencyRepository Shopware currency repository
      */
     public function __construct(
@@ -219,6 +232,8 @@ class LengowImportOrder
         LengowOrderError $lengowOrderError,
         LengowOrder $lengowOrder,
         LengowProduct $lengowProduct,
+        LengowCustomer $lengowCustomer,
+        LengowAddress $lengowAddress,
         EntityRepositoryInterface $currencyRepository
     )
     {
@@ -228,6 +243,8 @@ class LengowImportOrder
         $this->lengowOrderError = $lengowOrderError;
         $this->lengowOrder = $lengowOrder;
         $this->lengowProduct = $lengowProduct;
+        $this->lengowCustomer = $lengowCustomer;
+        $this->lengowAddress = $lengowAddress;
         $this->currencyRepository = $currencyRepository;
     }
 
@@ -440,9 +457,15 @@ class LengowImportOrder
             }
             // get all Shopware products
             $products = $this->getProducts();
-            if (empty($products)) {
-                throw new LengowException($this->lengowLog->encodeMessage('lengow_log.exception.no_product_to_cart'));
-            }
+            // get lengow address to create all specific Shopware addresses for customer and order
+            $this->lengowAddress->init([
+                'billing_data' => $this->orderData->billing_address,
+                'shipping_data' => $this->packageData->delivery,
+                'relay_id' => $this->relayId,
+                'vat_number' => $this->getVatNumberFromOrderData(),
+            ]);
+            // get or create Shopware customerNot specified
+            $customer = $this->getCustomer();
         } catch (LengowException $e) {
             $errorMessage = $e->getMessage();
         } catch (Exception $e) {
@@ -540,7 +563,7 @@ class LengowImportOrder
                     $this->logOutput,
                     $this->marketplaceSku
                 );
-            };
+            }
             return false;
         }
         return true;
@@ -579,7 +602,7 @@ class LengowImportOrder
     {
         $orderDate = (string)($this->orderData->marketplace_order_date ?? $this->orderData->imported_at);
         $message = is_array($this->orderData->comments)
-            ? join(',', $this->orderData->comments)
+            ? implode(',', $this->orderData->comments)
             : (string)$this->orderData->comments;
         // create lengow order
         $this->lengowOrder->create([
@@ -605,7 +628,7 @@ class LengowImportOrder
     /**
      * Get order types data and update Lengow order record
      */
-    private function loadOrderTypesData()
+    private function loadOrderTypesData(): void
     {
         $orderTypes = [];
         if (!empty($this->orderData->order_types)) {
@@ -622,7 +645,7 @@ class LengowImportOrder
     /**
      * Load all order amount data (processing fee, shipping cost, order items and order amount)
      */
-    private function loadOrderAmountData()
+    private function loadOrderAmountData(): void
     {
         $this->processingFee = (float)$this->orderData->processing_fee;
         $this->shippingCost = (float)$this->orderData->shipping;
@@ -664,7 +687,7 @@ class LengowImportOrder
     /**
      * Load all tracking data (carrier name, carrier method, tracking number and relay id)
      */
-    private function loadTrackingData()
+    private function loadTrackingData(): void
     {
         $tracks = $this->packageData->delivery->trackings;
         if (!empty($tracks)) {
@@ -698,12 +721,7 @@ class LengowImportOrder
      */
     private function getVatNumberFromOrderData(): string
     {
-        if (isset($this->orderData->billing_address->vat_number)) {
-            return $this->orderData->billing_address->vat_number;
-        } elseif (isset($this->packageData->delivery->vat_number)) {
-            return $this->packageData->delivery->vat_number;
-        }
-        return '';
+        return (string)($this->orderData->billing_address->vat_number ?? $this->packageData->delivery->vat_number);
     }
 
     /**
@@ -781,6 +799,39 @@ class LengowImportOrder
                 ];
             }
         }
+        if (empty($products)) {
+            throw new LengowException($this->lengowLog->encodeMessage('lengow_log.exception.no_product_to_cart'));
+        }
         return $products;
+    }
+
+    /**
+     * Get or create Shopware customer
+     *
+     * @throws LengowException
+     *
+     * @return CustomerEntity
+     */
+    private function getCustomer(): CustomerEntity
+    {
+        $customerEmail = $this->marketplaceSku . '-' . $this->lengowMarketplace->getName() . '@lengow.com';
+        $this->lengowLog->write(
+            LengowLog::CODE_IMPORT,
+            $this->lengowLog->encodeMessage('log.import.generate_unique_email', [
+                'email' => $customerEmail
+            ]),
+            $this->logOutput,
+            $this->marketplaceSku
+        );
+        $customer = $this->lengowCustomer->getCustomerByEmail($this->salesChannel, $customerEmail);
+        if ($customer === null) {
+            $customer = $this->lengowCustomer->createCustomer($this->salesChannel, $customerEmail);
+        }
+        if ($customer === null) {
+            throw new LengowException(
+                $this->lengowLog->encodeMessage('lengow_log.exception.shopware_customer_not_saved')
+            );
+        }
+        return $customer;
     }
 }

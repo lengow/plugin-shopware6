@@ -22,5 +22,10 @@
             "de-DE": "Lengow Für Shopware",
             "en-GB": "Lengow For Shopware"
         }
+    },
+    "require": {
+        "php": ">=7.2.0",
+        "ext-curl": "*",
+        "ext-json": "*"
     }
 }

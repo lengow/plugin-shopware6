@@ -93,11 +93,9 @@ class LengowProduct
     {
         $productData = [];
         foreach ($this->productApiNodes as $node) {
-            if (isset($api->{$node})) {
-                $productData[$node] = $api->{$node};
-            }
+            $productData[$node] = $api->{$node};
         }
-        if (isset($productData['amount']) && isset($productData['quantity'])) {
+        if (isset($productData['amount'], $productData['quantity'])) {
             $productData['price_unit'] = (float)$productData['amount'] / (float)$productData['quantity'];
         } else {
             $productData['price_unit'] = 0;
@@ -179,8 +177,7 @@ class LengowProduct
         $context = Context::createDefaultContext();
         $criteria = new Criteria();
         if ($field === self::FIELD_ID) {
-            $attributeValue = str_replace('\_', '_', $attributeValue);
-            $attributeValue = str_replace('X', '_', $attributeValue);
+            $attributeValue = str_replace(['\_', 'X'], ['_', '_'], $attributeValue);
             $ids = explode('_', $attributeValue);
             if ($ids[0] !== null && strlen($ids[0]) === 32 && Uuid::isValid($ids[0]) && count($ids) < 3) {
                 if (isset($ids[1]) && strlen($ids[1]) === 32 && Uuid::isValid($ids[1])) {

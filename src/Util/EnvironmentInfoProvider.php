@@ -2,6 +2,8 @@
 
 namespace Lengow\Connector\Util;
 
+use Shopware\Core\Checkout\Payment\PaymentMethodCollection;
+use Shopware\Core\Checkout\Payment\PaymentMethodEntity;
 use Shopware\Core\Kernel;
 use Shopware\Core\Framework\Context;
 use Shopware\Core\Framework\DataAbstractionLayer\EntityCollection;
@@ -18,6 +20,11 @@ use Lengow\Connector\Connector;
  */
 class EnvironmentInfoProvider
 {
+    /**
+     * @var string plugin name
+     */
+    public const PLUGIN_NAME = 'Connector';
+
     /**
      * @var Kernel $kernel
      */
@@ -39,24 +46,32 @@ class EnvironmentInfoProvider
     private $salesChannelDomainRepository;
 
     /**
+     * @var EntityRepositoryInterface payment method repository
+     */
+    private $paymentMethodRepository;
+
+    /**
      * EnvironmentInfoProvider Construct
      *
      * @param Kernel $kernel Shopware kernel
      * @param EntityRepositoryInterface $languageRepository language repository
      * @param EntityRepositoryInterface $salesChannelRepository sales channel repository
      * @param EntityRepositoryInterface $salesChannelDomainRepository sales channel domain repository
+     * @param EntityRepositoryInterface $paymentMethodRepository payment method repository
      */
     public function __construct(
         Kernel $kernel,
         EntityRepositoryInterface $languageRepository,
         EntityRepositoryInterface $salesChannelRepository,
-        EntityRepositoryInterface $salesChannelDomainRepository
+        EntityRepositoryInterface $salesChannelDomainRepository,
+        EntityRepositoryInterface $paymentMethodRepository
     )
     {
         $this->kernel = $kernel;
         $this->languageRepository = $languageRepository;
-         $this->salesChannelRepository = $salesChannelRepository;
+        $this->salesChannelRepository = $salesChannelRepository;
         $this->salesChannelDomainRepository = $salesChannelDomainRepository;
+        $this->paymentMethodRepository = $paymentMethodRepository;
     }
 
     /**
@@ -169,5 +184,23 @@ class EnvironmentInfoProvider
         $criteria = new Criteria();
         $criteria->addFilter(new EqualsFilter('active', true));
         return $this->salesChannelRepository->search($criteria, $context)->getEntities();
+    }
+
+    /**
+     * Get Lengow payment method
+     *
+     * @return PaymentMethodEntity|null
+     */
+    public function getLengowPaymentMethod(): ?PaymentMethodEntity
+    {
+        $criteria = new Criteria();
+        $criteria->addFilter(new EqualsFilter('plugin.name', self::PLUGIN_NAME));
+        /** @var PaymentMethodCollection $paymentMethodCollection */
+        $paymentMethodCollection = $this->paymentMethodRepository->search($criteria, Context::createDefaultContext())
+            ->getEntities();
+        if ($paymentMethodCollection->count() !== 0) {
+            return $paymentMethodCollection->first();
+        }
+        return null;
     }
 }
