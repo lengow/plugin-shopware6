@@ -70,12 +70,11 @@ class OrderDefinition extends EntityDefinition
         return new FieldCollection(
             [
                 (new IdField('id', 'id'))->addFlags(new Required(), new PrimaryKey()),
-                (new FkField('order_id', 'orderId', ShopwareOrderDefinition::class)),
+                (new IdField('order_id', 'orderId')),
                 (new OneToOneAssociationField('order', 'order_id', 'id', ShopwareOrderDefinition::class))
                     ->addFlags(new setNullOnDelete()),
-                (new IntField ('order_sku', 'orderSku')),
-                (new FkField('sales_channel_id', 'salesChannelId', ShopwareSalesChannelDefinition::class))
-                    ->addFlags(new Required()),
+                (new StringField ('order_sku', 'orderSku')),
+                (new IdField('sales_channel_id', 'salesChannelId')),
                 (new OneToOneAssociationField('salesChannel', 'sales_channel_id', 'id', ShopwareSalesChannelDefinition::class))
                     ->addFlags(new setNullOnDelete()),
                 (new IntField('delivery_address_id', 'deliveryAddressId')),

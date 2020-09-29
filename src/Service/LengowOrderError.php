@@ -39,7 +39,7 @@ class LengowOrderError
     private $lengowLog;
 
     /**
-     * @var array $_fieldList field list for the table lengow_order_line
+     * @var array $fieldList field list for the table lengow_order_error
      * required => Required fields when creating registration
      * update   => Fields allowed when updating registration
      */

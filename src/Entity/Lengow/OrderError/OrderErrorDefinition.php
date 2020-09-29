@@ -66,8 +66,7 @@ class OrderErrorDefinition extends EntityDefinition
         return new FieldCollection(
             [
                 (new IdField('id', 'id'))->addFlags(new Required(), new PrimaryKey()),
-                (new FkField('lengow_order_id', 'lengowOrderId', LengowOrderDefinition::class))
-                    ->addFlags(new Required()),
+                (new IdField('lengow_order_id', 'lengowOrderId')),
                 (new OneToOneAssociationField('order', 'lengow_order_id', 'id', LengowOrderDefinition::class))
                     ->addFlags(new setNullOnDelete()),
                 (new StringField('message', 'message')),

@@ -69,10 +69,12 @@ lengow_log.exception.error_lengow_webservice|Lengow webservice: %{error_code} - 
 lengow_log.exception.marketplace_not_present|Lengow error: %{marketplace_name} does not feature in the marketplace list
 lengow_log.exception.no_product_to_cart|no product to be added to cart
 lengow_log.exception.product_is_a_parent|product %{product_number} (%{product_id}) is a parent. Product variation is needed
+lengow_log.exception.no_quantity_for_product|product %{product_number} (%{product_id}) could not be added to cart. Make sure it is available to order or that there is enough in stock
 lengow_log.exception.product_not_be_found|product %{product_id} could not be found
 lengow_log.exception.country_not_found|No country found for ISO code %{iso_code}. Please add it into your Shopware configuration
 lengow_log.exception.salutation_not_found|No salutation found in our system. Please add it into your Shopware configuration
 lengow_log.exception.shopware_customer_not_saved|WARNING! Customer could NOT be saved in Shopware user table
+lengow_log.exception.shopware_order_not_saved|WARNING! Order could NOT be saved in Shopware order table
 log.export.unauthorised_ip|Unauthorized access for IP: %{ip}
 log.export.unauthorised_token|Unauthorised access for this token: %{token}
 log.export.empty_token|Unauthorised access: token parameter is empty
@@ -99,14 +101,20 @@ log.import.external_id_exist|already imported in Shopware with the order ID %{or
 log.import.current_order_state_unavailable|current order's status [%{order_state_marketplace}] makes it unavailable to import for marketplace %{marketplace_name}
 log.import.lengow_order_saved|order saved in Lengow orders table
 log.import.lengow_order_not_saved|WARNING! Order could NOT be saved in Lengow orders table
+log.import.lengow_order_updated|order updated in Lengow orders table
+log.import.lengow_order_line_saved|save order lines product: %{order_line_saved}
 log.import.rewrite_processing_fee|rewrite amount without processing fee
 log.import.rewrite_shipping_cost|rewrite amount without shipping cost
 log.import.order_shipped_by_marketplace|order shipped by %{marketplace_name}
-log.import.product_state_canceled|product %{product_id} could not be added - status: %{state_product}
+log.import.product_state_canceled|product %{product_id} could not be added - status: %{product_state}
 log.import.product_advanced_search|product not found with field %{attribute_name} (%{attribute_value}). Using advanced search
 log.import.product_be_found|product %{product_number} (%{product_id}) found with field %{attribute_name} (%{attribute_value}) and attribute %{search_field}
 log.import.generate_unique_email|generate a unique email %{email}
 log.import.lengow_payment_not_found|WARNING! Unable to retrieve Lengow payment method
+log.import.stock_decreased|stock updated for product %{product_number} from %{initial_stock} to %{new_stock}
+log.import.quantity_back_shipped_by_marketplace|adding quantity back to stock (order shipped by marketplace)
+log.import.quantity_back_reimported_order|adding quantity back to stock (order is re-imported)
+log.import.order_successfully_imported|order successfully imported (ORDER ID %{order_number})
 log.connector.call_api|call %{call_type} %{curl_url}
 log.connector.error_api|API call failed - %{error_code} - %{error_message}
 log.connector.curl_disabled|Curl extension is not enabled on the server

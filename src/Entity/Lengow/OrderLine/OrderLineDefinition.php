@@ -62,10 +62,10 @@ class OrderLineDefinition extends EntityDefinition
         return new FieldCollection(
             [
                 (new IdField('id', 'id'))->addFlags(new Required(), new PrimaryKey()),
-                (new FkField('order_id', 'orderId', ShopwareOrderDefinition::class))->addFlags(new Required()),
+                (new IdField('order_id', 'orderId')),
                 (new OneToOneAssociationField('order', 'order_id', 'id', ShopwareOrderDefinition::class))
                     ->addFlags(new setNullOnDelete()),
-                (new FkField('product_id', 'productId', ShopwareProductDefinition::class))->addFlags(new Required()),
+                (new IdField('product_id', 'productId')),
                 (new OneToOneAssociationField('product', 'product_id', 'id', ShopwareProductDefinition::class))
                     ->addFlags(new SetNullOnDelete()),
                 (new StringField('order_line_id', 'orderLineId'))->addFlags(new Required()),

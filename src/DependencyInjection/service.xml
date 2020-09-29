@@ -55,10 +55,16 @@
             <argument type="service" id="Lengow\Connector\Factory\LengowMarketplaceFactory"/>
             <argument type="service" id="Lengow\Connector\Service\LengowOrderError"/>
             <argument type="service" id="Lengow\Connector\Service\LengowOrder"/>
+            <argument type="service" id="Lengow\Connector\Service\LengowOrderLine"/>
             <argument type="service" id="Lengow\Connector\Service\LengowProduct"/>
             <argument type="service" id="Lengow\Connector\Service\LengowCustomer"/>
             <argument type="service" id="Lengow\Connector\Service\LengowAddress"/>
             <argument type="service" id="currency.repository"/>
+            <argument type="service" id="Shopware\Core\System\SalesChannel\Context\SalesChannelContextFactory"/>
+            <argument type="service" id="Shopware\Core\Checkout\Cart\SalesChannel\CartService"/>
+            <argument type="service" id="Shopware\Core\Checkout\Cart\Order\OrderConverter"/>
+            <argument type="service" id="Shopware\Core\Checkout\Cart\Price\QuantityPriceCalculator"/>
+            <argument type="service" id="Doctrine\DBAL\Connection"/>
         </service>
 
         <service id="Lengow\Connector\Service\LengowExport">
@@ -78,12 +84,19 @@
         </service>
 
         <service id="Lengow\Connector\Service\LengowOrder">
+            <argument type="service" id="order.repository"/>
+            <argument type="service" id="state_machine_state.repository"/>
             <argument type="service" id="lengow_order.repository"/>
             <argument type="service" id="Lengow\Connector\Service\LengowLog"/>
         </service>
 
         <service id="Lengow\Connector\Service\LengowOrderError">
             <argument type="service" id="lengow_order_error.repository"/>
+            <argument type="service" id="Lengow\Connector\Service\LengowLog"/>
+        </service>
+
+        <service id="Lengow\Connector\Service\LengowOrderLine">
+            <argument type="service" id="lengow_order_line.repository"/>
             <argument type="service" id="Lengow\Connector\Service\LengowLog"/>
         </service>
 

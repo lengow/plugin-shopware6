@@ -125,8 +125,14 @@ class LengowCustomer
     public function createCustomer(SalesChannelEntity $salesChannel, string $customerEmail): ?CustomerEntity
     {
         $customerId = Uuid::randomHex();
-        $defaultAddressId = Uuid::randomHex();
-        $defaultAddress = $this->lengowAddress->getAddressData(LengowAddress::TYPE_BILLING);
+        $billingAddressId = Uuid::randomHex();
+        $billingAddressData = $this->lengowAddress->getAddressData(LengowAddress::TYPE_BILLING);
+        $billingAddressData['id'] = $billingAddressId;
+        $billingAddressData['customerId'] = $customerId;
+        $shippingAddressId = Uuid::randomHex();
+        $shippingAddressData = $this->lengowAddress->getAddressData(LengowAddress::TYPE_SHIPPING);
+        $shippingAddressData['id'] = $shippingAddressId;
+        $shippingAddressData['customerId'] = $customerId;
         // get Lengow payment method
         $lengowPaymentMethod = $this->environmentInfoProvider->getLengowPaymentMethod();
         if ($lengowPaymentMethod === null) {
@@ -141,34 +147,20 @@ class LengowCustomer
             'groupId' => $salesChannel->getCustomerGroupId(),
             'defaultPaymentMethodId' => $lengowPaymentMethod->getId(),
             'salesChannelId' => $salesChannel->getId(),
-            'defaultBillingAddressId' => $defaultAddressId,
-            'defaultShippingAddressId' => $defaultAddressId,
-            'salutationId' => $defaultAddress['salutation_id'],
+            'defaultBillingAddressId' => $billingAddressId,
+            'defaultShippingAddressId' => $shippingAddressId,
+            'salutationId' => $billingAddressData['salutationId'],
             'customerNumber' => $this->numberRangeValueGenerator->getValue(
                 'customer',
                 Context::createDefaultContext(),
                 null
             ),
-            'firstName' => $defaultAddress['first_name'],
-            'lastName' => $defaultAddress['last_name'],
+            'firstName' => $billingAddressData['firstName'],
+            'lastName' => $billingAddressData['lastName'],
             'email' => $customerEmail,
             'addresses' => [
-                [
-                    'id' => $defaultAddressId,
-                    'customerId' => $customerId,
-                    'countryId' => $defaultAddress['country_id'],
-                    'countryStateId' => $defaultAddress['country_state_id'],
-                    'salutationId' => $defaultAddress['salutation_id'],
-                    'vatId' => $defaultAddress['vat_id'],
-                    'company' => $defaultAddress['company'],
-                    'firstName' => $defaultAddress['first_name'],
-                    'lastName' => $defaultAddress['last_name'],
-                    'street' => $defaultAddress['street'],
-                    'additionalAddressLine1' => $defaultAddress['additional_address_line_1'],
-                    'additionalAddressLine2' => $defaultAddress['additional_address_line_2'],
-                    'zipcode' => $defaultAddress['zipcode'],
-                    'city' => $defaultAddress['city'],
-                ],
+                $billingAddressData,
+                $shippingAddressData,
             ],
         ];
         try {

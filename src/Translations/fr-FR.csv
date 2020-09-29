@@ -70,7 +70,9 @@ lengow_log.exception.no_connection_webservice|la connexion ne se fait pas avec L
 lengow_log.exception.error_lengow_webservice|l'API Lengow : %{error_code} - "%{error_message}" pour le sales channel %{sales_channel_name} (%{sales_channel_id})
 lengow_log.exception.no_product_to_cart|il n'y a pas de produit ajouté au panier
 lengow_log.exception.product_is_a_parent|le produit %{product_number} (%{product_id}) est un parent. Une variation du produit est nécessaire
+lengow_log.exception.no_quantity_for_product|le produit %{product_number} (%{product_id}) ne peut être ajouté au panier. Vérifiez qu'il est bien disponible à la commande ou qu'il y a assez de stock
 lengow_log.exception.product_not_be_found|le produit  %{product_id} ne peut être trouvé
 lengow_log.exception.country_not_found|Aucun pays trouvé pour l'iso code %{iso_code}. Merci de l'ajouter dans votre configuration Shopware
 lengow_log.exception.salutation_not_found|Aucune salutation trouvée dans votre système. Merci de l'ajouter dans votre configuration Shopware
 lengow_log.exception.shopware_customer_not_saved|ATTENTION ! Le client n'a pas pu être sauvegardé dans la table user de Shopware
+lengow_log.exception.shopware_order_not_saved|ATTENTION ! La commande n'a pas pu être sauvegardée dans la table order de Shopware

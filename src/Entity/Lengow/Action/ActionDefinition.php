@@ -64,7 +64,7 @@ class ActionDefinition extends EntityDefinition
     {
         return new FieldCollection([
             (new IdField('id', 'id'))->addFlags(new Required(), new PrimaryKey()),
-            (new FkField('order_id', 'orderId', ShopwareOrderDefinition::class))->addFlags(new Required()),
+            (new IdField('order_id', 'orderId')),
             (new OneToOneAssociationField('order', 'order_id', 'id', ShopwareOrderDefinition::class))
                 ->addFlags(new setNullOnDelete()),
             (new IntField('action_id', 'actionId'))->addFlags(new Required()),

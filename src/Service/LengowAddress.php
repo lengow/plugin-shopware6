@@ -517,21 +517,18 @@ class LengowAddress
         $addressFields = $this->getAddressFields($addressData, $addressType);
         return [
             'company' => $addressData['company'],
-            'salutation' => $salutation,
-            'salutation_id' => $salutation->getId(),
-            'first_name' => ucfirst(strtolower($names['first_name'])),
-            'last_name' => ucfirst(strtolower($names['last_name'])),
+            'salutationId' => $salutation->getId(),
+            'firstName' => ucfirst(strtolower($names['first_name'])),
+            'lastName' => ucfirst(strtolower($names['last_name'])),
             'street' => strtolower($addressFields['street']),
-            'additional_address_line_1' => strtolower($addressFields['additional_address_line_1']),
-            'additional_address_line_2' => strtolower($addressFields['additional_address_line_2']),
+            'additionalAddressLine1' => strtolower($addressFields['additional_address_line_1']),
+            'additionalAddressLine2' => strtolower($addressFields['additional_address_line_2']),
             'zipcode' => $addressData['zipcode'],
             'city' => ucfirst(strtolower(preg_replace('/[!<>?=+@{}_$%]/sim', '', $addressData['city']))),
-            'country' => $country,
-            'country_id' => $country->getId(),
-            'country_state' => $state,
-            'country_state_id' => $state ? $state->getId() : null,
-            'phone' => $this->getPhoneNumber($addressData),
-            'vat_id' => $this->vatNumber,
+            'countryId' => $country->getId(),
+            'countryStateId' => $state ? $state->getId() : null,
+            'phoneNumber' => $this->getPhoneNumber($addressData),
+            'vatId' => $this->vatNumber,
         ];
     }
 
@@ -566,14 +563,11 @@ class LengowAddress
     private function getSalutation(array $addressData): ?SalutationEntity
     {
         $salutation = $addressData['civility'];
-        if (empty($salutation)) {
+        if (empty($salutation) && !empty($addressData['full_name'])) {
             $split = explode(' ', $addressData['full_name']);
             if (!empty($split)) {
                 $salutation = $split[0];
             }
-        }
-        if (empty($salutation)) {
-            return null;
         }
         if (in_array($salutation, $this->currentMale, true)) {
             $salutationKey = self::SALUTATION_MR;

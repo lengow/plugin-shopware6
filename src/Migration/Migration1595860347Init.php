@@ -25,7 +25,7 @@ class Migration1595860347Init extends MigrationStep
             CREATE TABLE IF NOT EXISTS `lengow_order` (
                 `id`                   BINARY(16)    NOT NULL,
                 `order_id`             BINARY(16)    NULL DEFAULT NULL,
-                `order_sku`            BIGINT        NULL DEFAULT NULL,
+                `order_sku`            VARCHAR(64)   NULL DEFAULT NULL,
                 `sales_channel_id`     BINARY(16)    NOT NULL,
                 `delivery_address_id`  INTEGER(11)   UNSIGNED NOT NULL,
                 `delivery_country_iso` VARCHAR(3)    NULL DEFAULT NULL,
@@ -56,8 +56,6 @@ class Migration1595860347Init extends MigrationStep
                 `imported_at`          DATETIME(3)   NULL DEFAULT NULL,
                 `extra`                JSON          NULL DEFAULT NULL,
                 PRIMARY KEY (`id`),
-                FOREIGN KEY (order_id)         REFERENCES `order`(id),
-                FOREIGN KEY (sales_channel_id) REFERENCES sales_channel(id),
                 INDEX (
                     `order_id`,
                     `order_sku`,
@@ -83,8 +81,6 @@ class Migration1595860347Init extends MigrationStep
                 `order_line_id` VARCHAR(100) NOT NULL,
                 `created_at`    DATETIME(3)  NOT NULL,
                 `updated_at`    DATETIME(3)  NULL DEFAULT NULL,
-                FOREIGN KEY (`order_id`)   REFERENCES `order`(`id`),
-                FOREIGN KEY (`product_id`) REFERENCES product(`id`),
                 PRIMARY KEY (`id`),
                 INDEX (`order_id`)
             ) DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
@@ -105,7 +101,6 @@ class Migration1595860347Init extends MigrationStep
                 `mail`            TINYINT(1)  NOT NULL DEFAULT 0,
                 `created_at`      DATETIME(3) NOT NULL,
                 `updated_at`      DATETIME(3) NULL DEFAULT NULL,
-                FOREIGN KEY (`lengow_order_id`) REFERENCES lengow_order(`id`),
                 PRIMARY KEY (`id`),
                 INDEX (`lengow_order_id`)
             ) DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
@@ -128,7 +123,6 @@ class Migration1595860347Init extends MigrationStep
                 `state`          SMALLINT(5)  UNSIGNED NOT NULL,
                 `created_at`     DATETIME(3)  NOT NULL,
                 `updated_at`     DATETIME(3)  NULL DEFAULT NULL,
-                FOREIGN KEY (`order_id`) REFERENCES `order`(`id`),
                 PRIMARY KEY (`id`),
                 INDEX (`order_id`)
             ) DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;

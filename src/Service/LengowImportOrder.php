@@ -4,12 +4,33 @@ namespace Lengow\Connector\Service;
 
 use \DateTime;
 use \Exception;
+use Doctrine\DBAL\Connection;
+use Shopware\Core\Checkout\Cart\Cart;
+use Shopware\Core\Checkout\Cart\LineItem\LineItem;
+use Shopware\Core\Checkout\Cart\Order\OrderConversionContext;
+use Shopware\Core\Checkout\Cart\Order\OrderConverter;
+use Shopware\Core\Checkout\Cart\Price\QuantityPriceCalculator;
+use Shopware\Core\Checkout\Cart\Price\Struct\CartPrice;
+use Shopware\Core\Checkout\Cart\Price\Struct\QuantityPriceDefinition;
+use Shopware\Core\Checkout\Cart\SalesChannel\CartService;
 use Shopware\Core\Checkout\Customer\CustomerEntity;
+use Shopware\Core\Checkout\Order\Aggregate\OrderDelivery\OrderDeliveryStates;
+use Shopware\Core\Checkout\Order\Aggregate\OrderTransaction\OrderTransactionStates;
+use Shopware\Core\Checkout\Order\OrderEntity;
+use Shopware\Core\Checkout\Order\OrderStates;
+use Shopware\Core\Content\Product\ProductEntity;
+use Shopware\Core\Defaults;
 use Shopware\Core\Framework\Context;
+use Shopware\Core\Framework\DataAbstractionLayer\Doctrine\RetryableQuery;
 use Shopware\Core\Framework\DataAbstractionLayer\EntityRepositoryInterface;
 use Shopware\Core\Framework\DataAbstractionLayer\Search\Criteria;
 use Shopware\Core\Framework\DataAbstractionLayer\Search\Filter\EqualsFilter;
+use Shopware\Core\Framework\Uuid\Uuid;
 use Shopware\Core\System\Currency\CurrencyCollection;
+use Shopware\Core\System\Currency\CurrencyEntity;
+use Shopware\Core\System\SalesChannel\Context\SalesChannelContextFactory;
+use Shopware\Core\System\SalesChannel\Context\SalesChannelContextService;
+use Shopware\Core\System\SalesChannel\SalesChannelContext;
 use Shopware\Core\System\SalesChannel\SalesChannelEntity;
 use Lengow\Connector\Components\LengowMarketplace;
 use Lengow\Connector\Entity\Lengow\Order\OrderEntity as LengowOrderEntity;
@@ -69,6 +90,11 @@ class LengowImportOrder
     private $lengowOrder;
 
     /**
+     * @var LengowOrderLine Lengow order line service
+     */
+    private $lengowOrderLine;
+
+    /**
      * @var LengowProduct Lengow product service
      */
     private $lengowProduct;
@@ -92,6 +118,31 @@ class LengowImportOrder
      * @var SalesChannelEntity Shopware sales channel entity
      */
     private $salesChannel;
+
+    /**
+     * @var SalesChannelContextFactory Shopware sales channel context factory
+     */
+    private $salesChannelContextFactory;
+
+    /**
+     * @var CartService Shopware cart service
+     */
+    private $cartService;
+
+    /**
+     * @var OrderConverter Shopware order converter service
+     */
+    private $orderConverter;
+
+    /**
+     * @var QuantityPriceCalculator Shopware quantity price calculator service
+     */
+    private $calculator;
+
+    /**
+     * @var Connection Doctrine connection service
+     */
+    private $connection;
 
     /**
      * @var array valid states lengow to create a Lengow order
@@ -158,6 +209,11 @@ class LengowImportOrder
     private $orderStateLengow;
 
     /**
+     * @var CurrencyEntity Shopware currency instance
+     */
+    private $currency;
+
+    /**
      * @var float order processing fee
      */
     private $processingFee;
@@ -220,10 +276,16 @@ class LengowImportOrder
      * @param LengowMarketplaceFactory $lengowMarketplaceFactory Lengow marketplace factory
      * @param LengowOrderError $lengowOrderError Lengow order error service
      * @param LengowOrder $lengowOrder Lengow order service
+     * @param LengowOrderLine $lengowOrderLine Lengow order line service
      * @param LengowProduct $lengowProduct Lengow product service
      * @param LengowCustomer $lengowCustomer Lengow customer service
      * @param LengowAddress $lengowAddress Lengow address service
      * @param EntityRepositoryInterface $currencyRepository Shopware currency repository
+     * @param SalesChannelContextFactory $salesChannelContextFactory Shopware sales channel context factory
+     * @param CartService $cartService Shopware cart service
+     * @param OrderConverter $orderConverter Shopware order converter service
+     * @param QuantityPriceCalculator $calculator Shopware quantity price calculator service
+     * @param Connection $connection Doctrine connection service
      */
     public function __construct(
         LengowConfiguration $lengowConfiguration,
@@ -231,10 +293,16 @@ class LengowImportOrder
         LengowMarketplaceFactory $lengowMarketplaceFactory,
         LengowOrderError $lengowOrderError,
         LengowOrder $lengowOrder,
+        LengowOrderLine $lengowOrderLine,
         LengowProduct $lengowProduct,
         LengowCustomer $lengowCustomer,
         LengowAddress $lengowAddress,
-        EntityRepositoryInterface $currencyRepository
+        EntityRepositoryInterface $currencyRepository,
+        SalesChannelContextFactory $salesChannelContextFactory,
+        CartService $cartService,
+        OrderConverter $orderConverter,
+        QuantityPriceCalculator $calculator,
+        Connection $connection
     )
     {
         $this->lengowConfiguration = $lengowConfiguration;
@@ -242,10 +310,16 @@ class LengowImportOrder
         $this->lengowMarketplaceFactory = $lengowMarketplaceFactory;
         $this->lengowOrderError = $lengowOrderError;
         $this->lengowOrder = $lengowOrder;
+        $this->lengowOrderLine = $lengowOrderLine;
         $this->lengowProduct = $lengowProduct;
         $this->lengowCustomer = $lengowCustomer;
         $this->lengowAddress = $lengowAddress;
         $this->currencyRepository = $currencyRepository;
+        $this->salesChannelContextFactory = $salesChannelContextFactory;
+        $this->cartService = $cartService;
+        $this->orderConverter = $orderConverter;
+        $this->calculator = $calculator;
+        $this->connection = $connection;
     }
 
     /**
@@ -466,6 +540,49 @@ class LengowImportOrder
             ]);
             // get or create Shopware customerNot specified
             $customer = $this->getCustomer();
+            // create a Shopware order
+            $order = $this->createOrder($customer, $products);
+            // update Lengow order with new data
+            $orderProcessState = $this->lengowOrder->getOrderProcessState($this->orderStateLengow);
+            // update Lengow order with new data
+            $this->lengowOrder->update($lengowOrder->getId(), [
+                'orderId' => $order->getId(),
+                'orderSku' => $order->getOrderNumber(),
+                'orderProcessState' => $orderProcessState,
+                'orderLengowState' => $this->orderStateLengow,
+                'isInError' => false,
+                'isReimported' => false,
+            ]);
+            $this->lengowLog->write(
+                LengowLog::CODE_IMPORT,
+                $this->lengowLog->encodeMessage('log.import.lengow_order_updated'),
+                $this->logOutput,
+                $this->marketplaceSku
+            );
+            // save order line id in lengow_order_line table
+            $this->createLengowOrderLines($order, $products);
+            // don't reduce stock for re-import order and order shipped by marketplace
+            if ($this->isReimported
+                || ($this->shippedByMp && !(bool)$this->lengowConfiguration->get('lengow_import_stock_ship_mp'))
+            ) {
+                if ($this->isReimported) {
+                    $logMessage = $this->lengowLog->encodeMessage('log.import.quantity_back_reimported_order');
+                } else {
+                    $logMessage = $this->lengowLog->encodeMessage('log.import.quantity_back_shipped_by_marketplace');
+                }
+                $this->lengowLog->write(LengowLog::CODE_IMPORT, $logMessage, $this->logOutput, $this->marketplaceSku);
+            } else {
+                $orderIsCompleted = $order->getStateMachineState()->getTechnicalName() === OrderStates::STATE_COMPLETED;
+                $this->decrementProductStocks($products, $orderIsCompleted);
+            }
+            $this->lengowLog->write(
+                LengowLog::CODE_IMPORT,
+                $this->lengowLog->encodeMessage('log.import.order_successfully_imported', [
+                    'order_number' => $order->getOrderNumber(),
+                ]),
+                $this->logOutput,
+                $this->marketplaceSku
+            );
         } catch (LengowException $e) {
             $errorMessage = $e->getMessage();
         } catch (Exception $e) {
@@ -538,6 +655,8 @@ class LengowImportOrder
                 $errorMessages[] = $this->lengowLog->encodeMessage('lengow_log.error.currency_not_available', [
                     'currency_iso' => $this->orderData->currency->iso_a3,
                 ]);
+            } else {
+               $this->currency =  $currencyCollection->first();
             }
         }
         if ($this->orderData->total_order == -1) {
@@ -600,10 +719,6 @@ class LengowImportOrder
      */
     private function createLengowOrder(): ?LengowOrderEntity
     {
-        $orderDate = (string)($this->orderData->marketplace_order_date ?? $this->orderData->imported_at);
-        $message = is_array($this->orderData->comments)
-            ? implode(',', $this->orderData->comments)
-            : (string)$this->orderData->comments;
         // create lengow order
         $this->lengowOrder->create([
             'salesChannelId' => $this->salesChannel->getId(),
@@ -613,8 +728,8 @@ class LengowImportOrder
             'deliveryAddressId' => $this->deliveryAddressId,
             'orderLengowState' => $this->orderStateLengow,
             'orderTypes' => $this->orderTypes,
-            'orderDate' => new DateTime(date('Y-m-d H:i:s', strtotime($orderDate))),
-            'message' => $message,
+            'orderDate' => $this->getOrderDate(),
+            'message' => $this->getMessage(),
             'extra' => (array)$this->orderData,
         ]);
         // get lengow order
@@ -631,6 +746,7 @@ class LengowImportOrder
     private function loadOrderTypesData(): void
     {
         $orderTypes = [];
+        $this->shippedByMp = false;
         if (!empty($this->orderData->order_types)) {
             foreach ($this->orderData->order_types as $orderType) {
                 $orderTypes[$orderType->type] = $orderType->label;
@@ -715,6 +831,32 @@ class LengowImportOrder
     }
 
     /**
+     * Get order date in correct format for database
+     *
+     * @throws Exception
+     *
+     * @return string
+     */
+    private function getOrderDate(): string
+    {
+        $orderDate = (string)($this->orderData->marketplace_order_date ?? $this->orderData->imported_at);
+        $orderDate = new DateTime(date('Y-m-d H:i:s', strtotime($orderDate)));
+        return $orderDate->format(Defaults::STORAGE_DATE_TIME_FORMAT);
+    }
+
+    /**
+     * Get order messages
+     *
+     * @return string
+     */
+    private function getMessage(): string
+    {
+        return is_array($this->orderData->comments)
+            ? implode(',', $this->orderData->comments)
+            : (string)$this->orderData->comments;
+    }
+
+    /**
      * Get vat_number from lengow order data
      *
      * @return string
@@ -784,6 +926,15 @@ class LengowImportOrder
                     ])
                 );
             }
+            // product is not available for order because there is not enough stock
+            if ($product && !$product->getAvailable()) {
+                throw new LengowException(
+                    $this->lengowLog->encodeMessage('lengow_log.exception.no_quantity_for_product', [
+                        'product_number' => $product->getProductNumber(),
+                        'product_id' => $product->getId(),
+                    ])
+                );
+            }
             $productId = $product->getId();
             if (array_key_exists($productId, $products)) {
                 $products[$productId]['quantity'] += (int)$productData['quantity'];
@@ -833,5 +984,321 @@ class LengowImportOrder
             );
         }
         return $customer;
+    }
+
+    /**
+     * Create Shopware order
+     *
+     * @param CustomerEntity $customer Shopware customer instance
+     * @param array $products Shopware products
+     *
+     * @throws Exception|LengowException
+     *
+     * @return OrderEntity
+     */
+    private function createOrder(CustomerEntity $customer, array $products): OrderEntity
+    {
+        $token = Uuid::randomHex();
+        $shippingMethodId =  $this->lengowConfiguration->get(
+            'lengowImportDefaultShippingMethod',
+            $this->salesChannel->getId()
+        );
+        // create a specific context with all order data
+        $salesChannelContext = $this->salesChannelContextFactory->create($token, $this->salesChannel->getId(), [
+            SalesChannelContextService::CUSTOMER_ID => $customer->getId(),
+            SalesChannelContextService::CURRENCY_ID => $this->currency->getId(),
+            SalesChannelContextService::SHIPPING_METHOD_ID => $shippingMethodId,
+        ]);
+        // create a generic cart
+        $cart = $this->createCart($token, $products, $salesChannelContext);
+        // get and modify order data for Shopware order creation
+        $orderData = $this->getOrderData($cart, $products, $salesChannelContext);
+        // delete cart after order creation
+        $this->cartService->deleteCart($salesChannelContext);
+        // create Shopware order
+        $order = $this->lengowOrder->createOrder($orderData);
+        if (!$order) {
+            throw new LengowException(
+                $this->lengowLog->encodeMessage('lengow_log.exception.shopware_order_not_saved')
+            );
+        }
+        $order = $this->lengowOrder->getOrderById($orderData['id']);
+        return $order;
+    }
+
+    /**
+     * Create a generic cart
+     *
+     * @param string $token cart token
+     * @param array $products Shopware products
+     * @param SalesChannelContext $salesChannelContext Shopware sales channel context
+     *
+     * @throws LengowException
+     *
+     * @return Cart
+     */
+    private function createCart(string $token, array $products, SalesChannelContext $salesChannelContext): Cart
+    {
+        // create new empty cart
+        $cart = $this->cartService->createNew($token);
+        // add all products to cart
+        foreach ($products as $productId => $productData) {
+            $lineItem = new LineItem(
+                $productId,
+                LineItem::PRODUCT_LINE_ITEM_TYPE,
+                $productId,
+                $productData['quantity']
+            );
+            $this->cartService->add($cart, $lineItem, $salesChannelContext);
+        }
+        if ($cart->getLineItems()->count() === 0) {
+            throw new LengowException($this->lengowLog->encodeMessage('lengow_log.exception.no_product_to_cart'));
+        }
+        // recalculate the cart with new products and sales channel context
+        return $this->cartService->recalculate($cart, $salesChannelContext);
+    }
+
+    /**
+     * Get and modify order data for Shopware order creation
+     *
+     * @param Cart $cart Shopware cart instance
+     * @param array $products Shopware products
+     * @param SalesChannelContext $salesChannelContext Shopware sales channel context
+     *
+     * @throws Exception
+     *
+     * @return array
+     */
+    private function getOrderData(Cart $cart, array $products, SalesChannelContext $salesChannelContext): array
+    {
+        // convert cart to order
+        $orderData = $this->orderConverter->convertToOrder($cart, $salesChannelContext, new OrderConversionContext());
+        // change the price of the product with the price from the marketplace
+        $orderData = $this->changeProductPrice($orderData, $products, $salesChannelContext);
+        // change the shipping costs of the order by those of the marketplace
+        $orderData = $this->changeShippingCosts($orderData, $salesChannelContext);
+        // change order transaction state and order transaction amount
+        $orderData = $this->changeTransaction($orderData, $salesChannelContext);
+        // change order amount and order state
+        $orderData = $this->changeOrderAmountAndState($orderData);
+        // change order date and customer comment
+        $orderData['orderDateTime'] = $this->getOrderDate();
+        $orderData['customerComment'] = $this->getMessage();
+        return $orderData;
+    }
+
+    /**
+     * Change the price of the product with the price from the marketplace
+     *
+     * @param array $orderData Shopware order data
+     * @param array $products Shopware products
+     * @param SalesChannelContext $salesChannelContext Shopware sales channel context
+     *
+     * @return array
+     */
+    private function changeProductPrice(
+        array $orderData,
+        array $products,
+        SalesChannelContext $salesChannelContext
+    ): array
+    {
+        foreach ($orderData['lineItems'] as $key => $lineItem) {
+            $productData = $products[$lineItem['productId']];
+            $calculatedPrice = $lineItem['price'];
+            $definition = new QuantityPriceDefinition(
+                $productData['price_unit'],
+                $calculatedPrice->getTaxRules(),
+                $salesChannelContext->getCurrency()->getDecimalPrecision(),
+                $productData['quantity'],
+                true
+            );
+            $calculated = $this->calculator->calculate($definition, $salesChannelContext);
+            // set new price into line item
+            $lineItem['price'] = $calculated;
+            $lineItem['priceDefinition'] = $definition;;
+            $orderData['lineItems'][$key] = $lineItem;
+        }
+        return $orderData;
+    }
+
+    /**
+     * Change the shipping costs of the order by those of the marketplace
+     *
+     * @param array $orderData Shopware order data
+     * @param SalesChannelContext $salesChannelContext Shopware sales channel context
+     *
+     * @return array
+     */
+    private function changeShippingCosts(array $orderData, SalesChannelContext $salesChannelContext): array
+    {
+        $shippingCosts = $this->shippingCost + $this->processingFee;
+        $orderDeliveryState = $this->lengowOrder->getStateMachineStateByOrderState(
+            OrderDeliveryStates::STATE_MACHINE,
+            $this->orderStateLengow,
+            $this->shippedByMp
+        );
+        $calculatedPrice = $orderData['shippingCosts'];
+        $definition = new QuantityPriceDefinition(
+            $shippingCosts,
+            $calculatedPrice->getTaxRules(),
+            $salesChannelContext->getCurrency()->getDecimalPrecision(),
+            1,
+            true
+        );
+        $orderData['shippingCosts'] = $this->calculator->calculate($definition, $salesChannelContext);
+        $orderData['deliveries'][0]['shippingCosts'] = $orderData['shippingCosts'];
+        $orderData['deliveries'][0]['stateId'] = $orderDeliveryState->getId();
+        if (!empty($this->trackingNumber)) {
+            $orderData['deliveries'][0]['trackingCodes'] = [$this->trackingNumber];
+        }
+        return $orderData;
+    }
+
+    /**
+     * Change order transaction state and order transaction amount
+     *
+     * @param array $orderData Shopware order data
+     * @param SalesChannelContext $salesChannelContext Shopware sales channel context
+     *
+     * @return array
+     */
+    private function changeTransaction(array $orderData, SalesChannelContext $salesChannelContext): array
+    {
+        $cartPrice = $orderData['price'];
+        // get order amount calculated price
+        $definition = new QuantityPriceDefinition(
+            $this->orderAmount,
+            $cartPrice->getTaxRules(),
+            $salesChannelContext->getCurrency()->getDecimalPrecision(),
+            1,
+            true
+        );
+        $orderAmountCalculatedPrice = $this->calculator->calculate($definition, $salesChannelContext);
+        // modify payment state to paid and change payment amount
+        $orderTransactionState = $this->lengowOrder->getStateMachineStateByOrderState(
+            OrderTransactionStates::STATE_MACHINE,
+            $this->orderStateLengow,
+            $this->shippedByMp
+        );
+        $orderData['transactions'][0]['amount'] = $orderAmountCalculatedPrice;
+        $orderData['transactions'][0]['stateId'] = $orderTransactionState->getId();
+        return $orderData;
+    }
+
+    /**
+     * Change order amount and order state
+     *
+     * @param array $orderData Shopware order data
+     *
+     * @return array
+     */
+    private function changeOrderAmountAndState(array $orderData): array
+    {
+        $cartPrice = $orderData['price'];
+        $orderAmountCalculatedPrice = $orderData['transactions'][0]['amount'];
+        // modify order amount
+        $calculatedTax = $orderAmountCalculatedPrice->getCalculatedTaxes()->first();
+        $netPrice = $calculatedTax !== null ? $this->orderAmount - $calculatedTax->getTax() : $this->orderAmount;
+        $orderData['price'] = new CartPrice(
+            $netPrice,
+            $this->orderAmount,
+            $this->orderAmount,
+            $orderAmountCalculatedPrice->getCalculatedTaxes(),
+            $cartPrice->getTaxRules(),
+            $cartPrice->getTaxStatus()
+        );
+        // get current order state and change order state id
+        $orderState = $this->lengowOrder->getStateMachineStateByOrderState(
+            OrderStates::STATE_MACHINE,
+            $this->orderStateLengow,
+            $this->shippedByMp
+        );
+        $orderData['stateId'] = $orderState->getId();
+        return $orderData;
+    }
+
+    /**
+     * Decrements the stock of all products on the order
+     *
+     * @param array $products Shopware products
+     * @param bool $orderIsCompleted check if Shopware order is completed to decrement stock
+     */
+    private function decrementProductStocks(array $products, bool $orderIsCompleted = false): void
+    {
+        foreach ($products as $productData) {
+            /** @var ProductEntity $product */
+            $product = $productData['shopware_product'];
+            // decreases article detail stock
+            $initialStock = $product->getAvailableStock();
+            $stock = $orderIsCompleted ? $product->getStock() - $productData['quantity'] : $product->getStock();
+            $availableStock = $initialStock - $productData['quantity'];
+            try {
+                // use SQL query because update via the product repository don't work
+                // and Shopware has not any service allowing to decrement properly a product
+                $query = new RetryableQuery(
+                    $this->connection->prepare('
+                        UPDATE product 
+                        SET stock = :stock, available_stock = :available_stock, version_id = :version
+                        WHERE id = :id
+                    ')
+                );
+                $query->execute([
+                    'stock' => (int)$stock,
+                    'available_stock' => (int)$availableStock,
+                    'id' => Uuid::fromHexToBytes($product->getId()),
+                    'version' => Uuid::fromHexToBytes(Defaults::LIVE_VERSION),
+                ]);
+                $this->lengowLog->write(
+                    LengowLog::CODE_IMPORT,
+                    $this->lengowLog->encodeMessage('log.import.stock_decreased', [
+                        'product_number' => $product->getProductNumber(),
+                        'initial_stock' => $initialStock,
+                        'new_stock' => $availableStock,
+                    ]),
+                    $this->logOutput,
+                    $this->marketplaceSku
+                );
+            } catch (Exception $e) {
+                $errorMessage = '[Shopware error] "' . $e->getMessage() . '" ' . $e->getFile() . ' | ' . $e->getLine();
+                $this->lengowLog->write(
+                    LengowLog::CODE_ORM,
+                    $this->lengowLog->encodeMessage('log.orm.record_insert_failed', [
+                        'decoded_message' => str_replace(PHP_EOL, '', $errorMessage),
+                    ])
+                );
+            }
+        }
+    }
+
+    /**
+     * Create lines in lengow order line table
+     *
+     * @param OrderEntity $order Shopware order instance
+     * @param array $products Shopware products
+     */
+    private function createLengowOrderLines(OrderEntity $order, array $products): void
+    {
+        $orderLineSaved = '';
+        foreach ($products as $productId => $productData) {
+            // create Lengow order line entity
+            foreach ($productData['order_line_ids'] as $orderLineId) {
+                $result = $this->lengowOrderLine->create([
+                    'orderId' => $order->getId(),
+                    'orderLineId' => $orderLineId,
+                    'productId' => $productId,
+                ]);
+                if ($result) {
+                    $orderLineSaved .= empty($orderLineSaved) ? $orderLineId : ' / ' . $orderLineId;
+                }
+            }
+        }
+        $this->lengowLog->write(
+            LengowLog::CODE_IMPORT,
+            $this->lengowLog->encodeMessage('log.import.lengow_order_line_saved', [
+                'order_line_saved' => $orderLineSaved,
+            ]),
+            $this->logOutput,
+            $this->marketplaceSku
+        );
     }
 }

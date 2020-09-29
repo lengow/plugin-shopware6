@@ -608,7 +608,7 @@ class LengowConnector
     /**
      * Check return request and generate exception if needed
      *
-     * @param string $result Curl return call
+     * @param bool|string $result Curl return call
      * @param int $httpCode request http code
      * @param string $curlError Curl error
      * @param int $curlErrorNumber Curl error number
@@ -616,7 +616,7 @@ class LengowConnector
      * @throws LengowException
      *
      */
-    private function checkReturnRequest(string $result, int $httpCode, string $curlError, int $curlErrorNumber): void
+    private function checkReturnRequest($result, int $httpCode, string $curlError, int $curlErrorNumber): void
     {
         if ($result === false) {
             // recovery of Curl errors
