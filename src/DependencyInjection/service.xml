@@ -88,6 +88,8 @@
             <argument type="service" id="state_machine_state.repository"/>
             <argument type="service" id="lengow_order.repository"/>
             <argument type="service" id="Lengow\Connector\Service\LengowLog"/>
+            <argument type="service" id="Lengow\Connector\Service\LengowConfiguration"/>
+            <argument type="service" id="Lengow\Connector\Service\LengowConnector"/>
         </service>
 
         <service id="Lengow\Connector\Service\LengowOrderError">

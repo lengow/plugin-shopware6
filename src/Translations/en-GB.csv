@@ -115,6 +115,8 @@ log.import.stock_decreased|stock updated for product %{product_number} from %{in
 log.import.quantity_back_shipped_by_marketplace|adding quantity back to stock (order shipped by marketplace)
 log.import.quantity_back_reimported_order|adding quantity back to stock (order is re-imported)
 log.import.order_successfully_imported|order successfully imported (ORDER ID %{order_number})
+log.import.order_synchronized_with_lengow|order successfully synchronised with Lengow webservice (ORDER ID %{order_id})
+log.import.order_not_synchronized_with_lengow|WARNING! Order could NOT be synchronised with Lengow webservice (ORDER ID %{order_id})
 log.connector.call_api|call %{call_type} %{curl_url}
 log.connector.error_api|API call failed - %{error_code} - %{error_message}
 log.connector.curl_disabled|Curl extension is not enabled on the server

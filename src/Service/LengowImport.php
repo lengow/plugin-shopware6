@@ -3,6 +3,7 @@
 namespace Lengow\Connector\Service;
 
 use \Exception;
+use Shopware\Core\Checkout\Order\OrderEntity;
 use Shopware\Core\System\SalesChannel\SalesChannelEntity;
 use Lengow\Connector\Exception\LengowException;
 
@@ -105,42 +106,42 @@ class LengowImport
     /**
      * @var string|null marketplace order sku
      */
-    private $marketplaceSku = null;
+    private $marketplaceSku;
 
     /**
      * @var string|null marketplace name
      */
-    private $marketplaceName = null;
+    private $marketplaceName;
 
     /**
      * @var string|null Lengow order id
      */
-    private $lengowOrderId = null;
+    private $lengowOrderId;
 
     /**
      * @var int|null delivery address id
      */
-    private $deliveryAddressId = null;
+    private $deliveryAddressId;
 
     /**
      * @var int|null imports orders updated since (timestamp)
      */
-    private $updatedFrom = null;
+    private $updatedFrom;
 
     /**
      * @var int|null imports orders updated until (timestamp)
      */
-    private $updatedTo = null;
+    private $updatedTo;
 
     /**
      * @var int|null imports orders created since (timestamp)
      */
-    private $createdFrom = null;
+    private $createdFrom;
 
     /**
      * @var int|null imports orders created until (timestamp)
      */
-    private $createdTo = null;
+    private $createdTo;
 
     /**
      * @var array sales channel catalog ids for import
@@ -482,7 +483,7 @@ class LengowImport
     private function setLastImport(string $type): void
     {
         $time = (string)time();
-        if ($type === LengowImport::TYPE_CRON) {
+        if ($type === self::TYPE_CRON) {
             $this->lengowConfiguration->set('lengowLastImportCron', $time);
         } else {
             $this->lengowConfiguration->set('lengowLastImportManual', $time);
@@ -632,7 +633,7 @@ class LengowImport
                     ])
                 );
             }
-            $results = json_decode($results);
+            $results = json_decode($results, false);
             if ($results === null || !is_object($results)) {
                 throw new LengowException(
                     $this->lengowLog->encodeMessage('lengow_log.exception.no_connection_webservice', [
@@ -698,7 +699,7 @@ class LengowImport
                     continue;
                 }
                 $packageDeliveryAddressId = (int)$packageData->delivery->id;
-                $firstPackage = $nbPackage > 1 ? false : true;
+                $firstPackage = $nbPackage <= 1;
                 // check the package for re-import order
                 if ($this->importOneOrder
                     && $this->deliveryAddressId !== null
@@ -752,7 +753,21 @@ class LengowImport
                 }
                 // sync to lengow if no debug_mode
                 if (!$this->debugMode && isset($order['order_new']) && $order['order_new']) {
-                    // TODO Synchronise order id with Lengow
+                    /** @var OrderEntity $shopwareOrder */
+                    $shopwareOrder = $this->lengowOrder->getOrderById($order['order_id']);
+                    $synchro = $this->lengowOrder->synchronizeOrder($shopwareOrder, $this->logOutput);
+                    $messageKey = $synchro
+                        ? 'log.import.order_synchronized_with_lengow'
+                        : 'log.import.order_not_synchronized_with_lengow';
+                    $this->lengowLog->write(
+                        LengowLog::CODE_IMPORT,
+                        $this->lengowLog->encodeMessage($messageKey, [
+                            'order_id' => $shopwareOrder->getOrderNumber()
+                        ]),
+                        $this->logOutput,
+                        $marketplaceSku
+                    );
+                    unset($shopwareOrder);
                 }
                 // if re-import order -> return order information
                 if (isset($order) && $this->importOneOrder) {
@@ -799,7 +814,7 @@ class LengowImport
             // retrieval of orders created from ... until ...
             $createdFromTimestamp = strtotime($createdFrom);
             $createdToTimestamp = strtotime($createdTo) + 86399;
-            $intervalTime = (int)($createdToTimestamp - $createdFromTimestamp);
+            $intervalTime = $createdToTimestamp - $createdFromTimestamp;
             $this->createdFrom = $createdFromTimestamp;
             $this->createdTo = $intervalTime > self::MAX_INTERVAL_TIME
                 ? $createdFromTimestamp + self::MAX_INTERVAL_TIME

@@ -116,6 +116,16 @@ class LengowOrder
     private $lengowLog;
 
     /**
+     * @var LengowConfiguration Lengow configuration service
+     */
+    private $lengowConfiguration;
+
+    /**
+     * @var LengowConnector Lengow connector service
+     */
+    private $lengowConnector;
+
+    /**
      * @var array $fieldList field list for the table lengow_order
      * required => Required fields when creating registration
      * update   => Fields allowed when updating registration
@@ -195,18 +205,24 @@ class LengowOrder
      * @param EntityRepositoryInterface $stateMachineStateRepository Shopware state machine state repository
      * @param EntityRepositoryInterface $lengowOrderRepository Lengow order repository
      * @param LengowLog $lengowLog Lengow log service
+     * @param LengowConfiguration $lengowConfiguration Lengow configuration service
+     * @param LengowConnector $lengowConnector Lengow connector service
      */
     public function __construct(
         EntityRepositoryInterface $orderRepository,
         EntityRepositoryInterface $stateMachineStateRepository,
         EntityRepositoryInterface $lengowOrderRepository,
-        LengowLog $lengowLog
+        LengowLog $lengowLog,
+        LengowConfiguration $lengowConfiguration,
+        LengowConnector $lengowConnector
     )
     {
         $this->orderRepository = $orderRepository;
         $this->stateMachineStateRepository = $stateMachineStateRepository;
         $this->lengowOrderRepository = $lengowOrderRepository;
         $this->lengowLog = $lengowLog;
+        $this->lengowConfiguration = $lengowConfiguration;
+        $this->lengowConnector = $lengowConnector;
     }
 
     /**
@@ -332,6 +348,44 @@ class LengowOrder
     }
 
     /**
+     * Get lengow order from lengow order table by Shopware order id
+     *
+     * @param string $orderId Shopware order id
+     *
+     * @return LengowOrderEntity|null
+     */
+    public function getLengowOrderByOrderId(string $orderId): ?LengowOrderEntity
+    {
+        $context = Context::createDefaultContext();
+        $criteria = new Criteria();
+        $criteria->addFilter(new EqualsFilter('order.id', $orderId));
+        /** @var LengowOrderCollection $LengowOrderCollection */
+        $LengowOrderCollection = $this->lengowOrderRepository->search($criteria, $context)->getEntities();
+        return $LengowOrderCollection->count() !== 0 ? $LengowOrderCollection->first() : null;
+    }
+
+    /**
+     * Get lengow order from lengow order table by Shopware order number
+     *
+     * @param string $orderNumber Shopware order number
+     * @param int|null $deliveryAddressId Lengow delivery address id
+     *
+     * @return LengowOrderEntity|null
+     */
+    public function getLengowOrderByOrderNumber(string $orderNumber, int $deliveryAddressId = null): ?LengowOrderEntity
+    {
+        $context = Context::createDefaultContext();
+        $criteria = new Criteria();
+        $criteria->addFilter(new MultiFilter(MultiFilter::CONNECTION_AND, [
+            new EqualsFilter('order.orderNumber', $orderNumber),
+            new EqualsFilter('deliveryAddressId', $deliveryAddressId),
+        ]));
+        /** @var LengowOrderCollection $LengowOrderCollection */
+        $LengowOrderCollection = $this->lengowOrderRepository->search($criteria, $context)->getEntities();
+        return $LengowOrderCollection->count() !== 0 ? $LengowOrderCollection->first() : null;
+    }
+
+    /**
      * Get Shopware order from lengow order table
      *
      * @param string $marketplaceSku marketplace order sku
@@ -370,24 +424,33 @@ class LengowOrder
     }
 
     /**
-     * Get lengow order from lengow order table
+     * Get all Shopware order for lengow order
      *
-     * @param string $orderId Shopware order id
-     * @param int $deliveryAddressId Lengow delivery address id
+     * @param string $marketplaceSku marketplace order sku
+     * @param string $marketplaceName marketplace name
      *
-     * @return LengowOrderEntity|null
+     * @return array
      */
-    public function getLengowOrderByOrderId(string $orderId, int $deliveryAddressId): ?LengowOrderEntity
+    public function getAllOrdersByMarketplaceSku(string $marketplaceSku, string $marketplaceName): array
     {
-        $context = Context::createDefaultContext();
+        $orders = [];
         $criteria = new Criteria();
         $criteria->addFilter(new MultiFilter(MultiFilter::CONNECTION_AND, [
-            new EqualsFilter('order.id', $orderId),
-            new EqualsFilter('deliveryAddressId', $deliveryAddressId),
+            new EqualsFilter('marketplaceSku', $marketplaceSku),
+            new EqualsFilter('marketplaceName', $marketplaceName),
         ]));
         /** @var LengowOrderCollection $LengowOrderCollection */
-        $LengowOrderCollection = $this->lengowOrderRepository->search($criteria, $context)->getEntities();
-        return $LengowOrderCollection->count() !== 0 ? $LengowOrderCollection->first() : null;
+        $LengowOrderCollection = $this->lengowOrderRepository->search($criteria, Context::createDefaultContext())
+            ->getEntities();
+        if ($LengowOrderCollection->count() !== 0) {
+            /** @var LengowOrderEntity $lengowOrder */
+            foreach ($LengowOrderCollection as $lengowOrder) {
+                if ($lengowOrder->getOrder() !== null) {
+                    $orders[] = $lengowOrder->getOrder();
+                }
+            }
+        }
+        return $orders;
     }
 
     /**
@@ -513,5 +576,63 @@ class LengowOrder
             return false;
         }
         return true;
+    }
+
+    /**
+     * Synchronize order with Lengow API
+     *
+     * @param OrderEntity $order Shopware order instance
+     * @param bool $logOutput see log or not
+     *
+     * @return bool
+     */
+    public function synchronizeOrder(OrderEntity $order, bool $logOutput = false): bool
+    {
+        $lengowOrder = $this->getLengowOrderByOrderId($order->getId());
+        if ($lengowOrder === null || !$this->lengowConnector->isValidAuth($logOutput)) {
+            return false;
+        }
+        /** @var OrderEntity[] $orders */
+        $orders = $this->getAllOrdersByMarketplaceSku(
+            $lengowOrder->getMarketplaceSku(),
+            $lengowOrder->getMarketplaceName()
+        );
+        if (empty($orders)) {
+            return false;
+        }
+        $merchantOrderIds = [];
+        foreach ($orders as $shopwareOrder) {
+            $merchantOrderIds[] = $shopwareOrder->getOrderNumber();
+        }
+        try {
+            $result = $this->lengowConnector->patch(
+                LengowConnector::API_ORDER_MOI,
+                [
+                    'account_id' => (int)$this->lengowConfiguration->get('lengowAccountId'),
+                    'marketplace_order_id' => $lengowOrder->getMarketplaceSku(),
+                    'marketplace' => $lengowOrder->getMarketplaceName(),
+                    'merchant_order_id' => $merchantOrderIds,
+                ],
+                LengowConnector::FORMAT_JSON,
+                '',
+                $logOutput
+            );
+        } catch (Exception $e) {
+            $message = $this->lengowLog->decodeMessage($e->getMessage());
+            $this->lengowLog->write(
+                LengowLog::CODE_CONNECTOR,
+                $this->lengowLog->encodeMessage('log.connector.error_api', [
+                    'error_code' => $e->getCode(),
+                    'error_message' => $message,
+                ]),
+                $logOutput,
+                $lengowOrder->getMarketplaceSku()
+            );
+            return false;
+        }
+        return !($result === null
+            || (isset($result['detail']) && $result['detail'] === 'Pas trouvé.')
+            || isset($result['error'])
+        );
     }
 }

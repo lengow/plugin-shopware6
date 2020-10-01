@@ -623,7 +623,7 @@ class LengowImportOrder
             return false;
         }
         foreach ($externalIds as $externalId) {
-            if ($this->lengowOrder->getLengowOrderByOrderId($externalId, $this->deliveryAddressId)) {
+            if ($this->lengowOrder->getLengowOrderByOrderNumber($externalId, $this->deliveryAddressId)) {
                 return $externalId;
             }
         }
@@ -999,7 +999,7 @@ class LengowImportOrder
     private function createOrder(CustomerEntity $customer, array $products): OrderEntity
     {
         $token = Uuid::randomHex();
-        $shippingMethodId =  $this->lengowConfiguration->get(
+        $shippingMethodId = $this->lengowConfiguration->get(
             'lengowImportDefaultShippingMethod',
             $this->salesChannel->getId()
         );
