@@ -3,10 +3,13 @@
 namespace Lengow\Connector\Service;
 
 use \Exception;
+use Shopware\Core\Checkout\Order\Aggregate\OrderDelivery\OrderDeliveryDefinition;
+use Shopware\Core\Checkout\Order\Aggregate\OrderDelivery\OrderDeliveryEntity;
 use Shopware\Core\Checkout\Order\Aggregate\OrderDelivery\OrderDeliveryStates;
 use Shopware\Core\Checkout\Order\Aggregate\OrderTransaction\OrderTransactionStates;
 use Shopware\Core\Checkout\Order\OrderCollection;
 use Shopware\Core\Checkout\Order\OrderEntity;
+use Shopware\Core\Checkout\Order\OrderDefinition;
 use Shopware\Core\Checkout\Order\OrderStates;
 use Shopware\Core\Framework\Context;
 use Shopware\Core\Framework\DataAbstractionLayer\EntityRepositoryInterface;
@@ -18,6 +21,10 @@ use Shopware\Core\System\StateMachine\Aggregation\StateMachineState\StateMachine
 use Shopware\Core\System\StateMachine\Aggregation\StateMachineState\StateMachineStateEntity;
 use Lengow\Connector\Entity\Lengow\Order\OrderEntity as LengowOrderEntity;
 use Lengow\Connector\Entity\Lengow\Order\OrderCollection as LengowOrderCollection;
+use Shopware\Core\System\StateMachine\Aggregation\StateMachineTransition\StateMachineTransitionActions;
+use Shopware\Core\System\StateMachine\Aggregation\StateMachineTransition\StateMachineTransitionEntity;
+use Shopware\Core\System\StateMachine\StateMachineRegistry;
+use Shopware\Core\System\StateMachine\Transition;
 
 /**
  * Class LengowOrder
@@ -96,14 +103,24 @@ class LengowOrder
     public const TYPE_DELIVERED_BY_MARKETPLACE = 'is_delivered_by_marketplace';
 
     /**
-     * @var EntityRepositoryInterface $orderRepository Shopware order repository
+     * @var EntityRepositoryInterface Shopware order repository
      */
     private $orderRepository;
 
     /**
-     * @var EntityRepositoryInterface $stateMachineStateRepository Shopware state machine state repository
+     * @var EntityRepositoryInterface Shopware order delivery repository
+     */
+    private $orderDeliveryRepository;
+
+    /**
+     * @var EntityRepositoryInterface Shopware state machine state repository
      */
     private $stateMachineStateRepository;
+
+    /**
+     * @var StateMachineRegistry Shopware state machine registry
+     */
+    protected $stateMachineRegistry;
 
     /**
      * @var EntityRepositoryInterface $lengowOrderRepository Lengow order repository
@@ -111,7 +128,7 @@ class LengowOrder
     private $lengowOrderRepository;
 
     /**
-     * @var LengowLog $lengowLog Lengow log service
+     * @var LengowLog Lengow log service
      */
     private $lengowLog;
 
@@ -124,6 +141,11 @@ class LengowOrder
      * @var LengowConnector Lengow connector service
      */
     private $lengowConnector;
+
+    /**
+     * @var LengowOrderError Lengow order error service
+     */
+    private $lengowOrderError;
 
     /**
      * @var array $fieldList field list for the table lengow_order
@@ -202,27 +224,36 @@ class LengowOrder
      * LengowOrder constructor
      *
      * @param EntityRepositoryInterface $orderRepository Shopware order repository
+     * @param EntityRepositoryInterface $orderDeliveryRepository Shopware order delivery repository
      * @param EntityRepositoryInterface $stateMachineStateRepository Shopware state machine state repository
+     * @param StateMachineRegistry $stateMachineRegistry Shopware state machine registry service
      * @param EntityRepositoryInterface $lengowOrderRepository Lengow order repository
      * @param LengowLog $lengowLog Lengow log service
      * @param LengowConfiguration $lengowConfiguration Lengow configuration service
      * @param LengowConnector $lengowConnector Lengow connector service
+     * @param LengowOrderError $lengowOrderError Lengow order error service
      */
     public function __construct(
         EntityRepositoryInterface $orderRepository,
+        EntityRepositoryInterface $orderDeliveryRepository,
         EntityRepositoryInterface $stateMachineStateRepository,
+        StateMachineRegistry $stateMachineRegistry,
         EntityRepositoryInterface $lengowOrderRepository,
         LengowLog $lengowLog,
         LengowConfiguration $lengowConfiguration,
-        LengowConnector $lengowConnector
+        LengowConnector $lengowConnector,
+        LengowOrderError $lengowOrderError
     )
     {
         $this->orderRepository = $orderRepository;
+        $this->orderDeliveryRepository = $orderDeliveryRepository;
         $this->stateMachineStateRepository = $stateMachineStateRepository;
+        $this->stateMachineRegistry = $stateMachineRegistry;
         $this->lengowOrderRepository = $lengowOrderRepository;
         $this->lengowLog = $lengowLog;
         $this->lengowConfiguration = $lengowConfiguration;
         $this->lengowConnector = $lengowConnector;
+        $this->lengowOrderError = $lengowOrderError;
     }
 
     /**
@@ -411,6 +442,10 @@ class LengowOrder
             new EqualsFilter('orderProcessState', self::PROCESS_STATE_IMPORT),
             new EqualsFilter('orderProcessState', self::PROCESS_STATE_FINISH),
         ]));
+        $criteria->addAssociation('order.deliveries')
+            ->addAssociation('order.lineItems')
+            ->addAssociation('order.currency')
+            ->addAssociation('order.addresses');
         /** @var LengowOrderCollection $LengowOrderCollection */
         $LengowOrderCollection = $this->lengowOrderRepository->search($criteria, $context)->getEntities();
         if ($LengowOrderCollection->count() !== 0) {
@@ -565,6 +600,189 @@ class LengowOrder
     {
         try {
             $this->orderRepository->create([$orderData], Context::createDefaultContext());
+        } catch (Exception $e) {
+            $errorMessage = '[Shopware error] "' . $e->getMessage() . '" ' . $e->getFile() . ' | ' . $e->getLine();
+            $this->lengowLog->write(
+                LengowLog::CODE_ORM,
+                $this->lengowLog->encodeMessage('log.orm.record_insert_failed', [
+                    'decoded_message' => str_replace(PHP_EOL, '', $errorMessage),
+                ])
+            );
+            return false;
+        }
+        return true;
+    }
+
+    /**
+     * Update order state to marketplace state
+     *
+     * @param OrderEntity $order Shopware order instance
+     * @param LengowOrderEntity $lengowOrder Lengow order instance
+     * @param string $orderStateLengow lengow order status
+     * @param object $packageData package data
+     *
+     * @return string|null
+     */
+    public function updateOrderState(
+        OrderEntity $order,
+        LengowOrderEntity $lengowOrder,
+        string $orderStateLengow,
+        object $packageData
+    ): ?string
+    {
+        // finish actions if lengow order is shipped, closed, cancel or refunded
+        $orderProcessState = $this->getOrderProcessState($orderStateLengow);
+        $tracks = $packageData->delivery->trackings;
+        $trackingCode = !empty($tracks) && !empty($tracks[0]->number) ? (string)$tracks[0]->number : false;
+        if ($orderProcessState === self::PROCESS_STATE_FINISH) {
+
+            // TODO finish all actions
+
+            $this->lengowOrderError->finishOrderErrors($lengowOrder->getId(), LengowOrderError::TYPE_ERROR_SEND);
+        }
+        // update Lengow order if necessary
+        $data = [];
+        if ($lengowOrder->getOrderLengowState() !== $orderStateLengow) {
+            $data['order_lengow_state'] = $orderStateLengow;
+            if ($trackingCode) {
+                $data['carrier_tracking'] = $trackingCode;
+            }
+        }
+        if ($orderProcessState === self::PROCESS_STATE_FINISH) {
+            if ($lengowOrder->getOrderProcessState() !== $orderProcessState) {
+                $data['order_process_state'] = $orderProcessState;
+            }
+            if ($lengowOrder->isInError()) {
+                $data['is_in_error'] = false;
+            }
+        }
+        if (!empty($data)) {
+            $this->update($lengowOrder->getId(), $data);
+        }
+        // get all state machine state to compare state
+        $orderState = $order->getStateMachineState();
+        $technicalName = OrderStates::STATE_MACHINE;
+        $currentOrderState = $this->getStateMachineStateByOrderState($technicalName, $orderStateLengow);
+        $stateWaitingShipment = $this->getStateMachineStateByOrderState($technicalName, self::STATE_WAITING_SHIPMENT);
+        $stateShipped = $this->getStateMachineStateByOrderState($technicalName, self::STATE_SHIPPED);
+        $stateCanceled = $this->getStateMachineStateByOrderState($technicalName, self::STATE_CANCELED);
+        // update Shopware order's status only if in accepted, waiting_shipment, shipped, closed or cancel
+        if ($orderState && $currentOrderState && $orderState->getId() !== $currentOrderState->getId()) {
+            if (($stateWaitingShipment && $stateShipped)
+                && $orderState->getId() === $stateWaitingShipment->getId()
+                && $currentOrderState->getId() === $stateShipped->getId()
+            ) {
+                if ($trackingCode) {
+                    $this->addTrackingCode($order, $trackingCode);
+                }
+                $this->changeOrderStates($order, StateMachineTransitionActions::ACTION_SHIP);
+                return OrderStates::STATE_COMPLETED;
+            }
+            if (($stateWaitingShipment && $stateShipped && $stateCanceled)
+                && $currentOrderState->getId() === $stateCanceled->getId()
+                && ($orderState->getId() === $stateWaitingShipment->getId()
+                    || $orderState->getId() === $stateShipped->getId()
+                )
+            ) {
+                $this->changeOrderStates($order, StateMachineTransitionActions::ACTION_CANCEL);
+                return OrderStates::STATE_CANCELLED;
+            }
+        }
+        return null;
+    }
+
+    /**
+     * Cancel or ship a Shopware order
+     *
+     * @param OrderEntity $order Shopware order instance
+     * @param string $actionName action name for transition
+     */
+    public function changeOrderStates(OrderEntity $order, string $actionName): void
+    {
+        // change order delivery state machine
+        if ($order->getDeliveries() !== null && $order->getDeliveries()->count() > 0) {
+            $delivery = $order->getDeliveries()->first();
+            if ($delivery !== null) {
+                $this->addTransition(OrderDeliveryDefinition::ENTITY_NAME, $delivery->getId(), $actionName);
+            }
+        }
+        // change order state machine
+        $actionName = $actionName === StateMachineTransitionActions::ACTION_SHIP
+            ? StateMachineTransitionActions::ACTION_COMPLETE
+            : $actionName;
+        $this->addTransition(OrderDefinition::ENTITY_NAME, $order->getId(), $actionName);
+    }
+
+    /**
+     * Add new transition for a specific entity
+     *
+     * @param string $entityName Shopware entity name
+     * @param string $entityId Shopware entity id
+     * @param string $actionName Shopware transition action name
+     */
+    public function addTransition(string $entityName, string $entityId, string $actionName): void
+    {
+        $orderAvailableActions = $this->getAvailableTransitions($entityName, $entityId);
+        if (in_array($actionName, $orderAvailableActions, true)) {
+            $this->stateMachineRegistry->transition(
+                new Transition($entityName, $entityId, $actionName, 'stateId'),
+                Context::createDefaultContext()
+            );
+        }
+    }
+
+    /**
+     * Get all available action for a state machine (order, delivery or transaction)
+     *
+     * @param string $entityName Shopware entity name
+     * @param string $entityId Shopware entity id
+     *
+     * @return array
+     */
+    public function getAvailableTransitions(string $entityName, string $entityId): array
+    {
+        $availableActions = [];
+        /** @var StateMachineTransitionEntity[] $availableTransitions */
+        $availableTransitions = $this->stateMachineRegistry->getAvailableTransitions(
+            $entityName,
+            $entityId,
+            'stateId',
+            Context::createDefaultContext()
+        );
+        foreach ($availableTransitions as $transition) {
+            $availableActions[] = $transition->getActionName();
+        }
+        return $availableActions;
+    }
+
+    /**
+     * Add a tracking code to the Shopware order
+     *
+     * @param OrderEntity $order Shopware order instance
+     * @param string $trackingCode tracking code
+     *
+     * @return bool
+     */
+    public function addTrackingCode(OrderEntity $order, string $trackingCode): bool
+    {
+        if ($order->getDeliveries() === null) {
+            return false;
+        }
+        /** @var orderDeliveryEntity $delivery */
+        $delivery = $order->getDeliveries()->first();
+        if ($delivery === null) {
+            return false;
+        }
+        $trackingCodes = $delivery->getTrackingCodes();
+        if (in_array($trackingCode, $trackingCodes, true)) {
+            return true;
+        }
+        $data = [
+            'id' => $delivery->getId(),
+            'trackingCodes' => array_merge([$trackingCode], $trackingCodes),
+        ];
+        try {
+            $this->orderDeliveryRepository->update([$data], Context::createDefaultContext());
         } catch (Exception $e) {
             $errorMessage = '[Shopware error] "' . $e->getMessage() . '" ' . $e->getFile() . ' | ' . $e->getLine();
             $this->lengowLog->write(

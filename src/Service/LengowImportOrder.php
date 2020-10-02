@@ -382,8 +382,13 @@ class LengowImportOrder
         );
         // if order is already exist
         if ($order) {
-            // TODO check and update order
-            return false;
+            $orderUpdated = $this->checkAndUpdateOrder($order);
+            if ($orderUpdated && isset($orderUpdated['update'])) {
+                return $this->returnResult(self::RESULT_UPDATE, $orderUpdated['lengow_order_id'], $order->getId());
+            }
+            if (!$this->isReimported) {
+                return false;
+            }
         }
         if (!$this->importOneOrder) {
             // skip import if the order is anonymized
@@ -611,6 +616,64 @@ class LengowImportOrder
     }
 
     /**
+     * Check the order and updates data if necessary
+     *
+     * @param OrderEntity $order Shopware order instance
+     *
+     * @throws Exception
+     *
+     * @return array|null
+     */
+    private function checkAndUpdateOrder(OrderEntity $order): ?array
+    {
+        $this->lengowLog->write(
+            LengowLog::CODE_IMPORT,
+            $this->lengowLog->encodeMessage('log.import.order_already_imported', [
+                'order_id' => $order->getOrderNumber(),
+            ]),
+            $this->logOutput,
+            $this->marketplaceSku
+        );
+        // get a record in the lengow order table
+        /** @var LengowOrderEntity $lengowOrder */
+        $lengowOrder = $this->lengowOrder->getLengowOrderByOrderId($order->getId());
+        $result = ['lengow_order_id' => $lengowOrder->getId()];
+        // Lengow -> Cancel and reimport order
+        if ($lengowOrder->isReimported()) {
+            $this->lengowLog->write(
+                LengowLog::CODE_IMPORT,
+                $this->lengowLog->encodeMessage('log.import.order_ready_to_reimport', [
+                    'order_id' => $order->getOrderNumber(),
+                ]),
+                $this->logOutput,
+                $this->marketplaceSku
+            );
+            $this->isReimported = true;
+            return null;
+        }
+        // try to update Shopware order, lengow order and finish actions if necessary
+        $orderUpdated = $this->lengowOrder->updateOrderState(
+            $order,
+            $lengowOrder,
+            $this->orderStateLengow,
+            $this->packageData
+        );
+        if ($orderUpdated) {
+            $result['update'] = true;
+            $this->lengowLog->write(
+                LengowLog::CODE_IMPORT,
+                $this->lengowLog->encodeMessage('log.import.order_state_updated', [
+                    'state_name' => $orderUpdated,
+                ]),
+                $this->logOutput,
+                $this->marketplaceSku
+            );
+        }
+        unset($order, $lengowOrder);
+        return $result;
+    }
+
+    /**
      * Checks if an external id already exists
      *
      * @param array|null $externalIds external ids return by API
@@ -656,7 +719,7 @@ class LengowImportOrder
                     'currency_iso' => $this->orderData->currency->iso_a3,
                 ]);
             } else {
-               $this->currency =  $currencyCollection->first();
+               $this->currency = $currencyCollection->first();
             }
         }
         if ($this->orderData->total_order == -1) {

@@ -94,6 +94,9 @@ log.import.error_no_package|import order failed - Lengow error: no package in th
 log.import.error_wrong_package_number|import order failed - wrong package number
 log.import.error_no_delivery_address|import order failed - Lengow error: no delivery address in the order
 log.import.error_already_created|%{decoded_message} (created on the %{date_message})
+log.import.order_already_imported|order already imported (ORDER ID %{order_id})
+log.import.order_ready_to_reimport|order ready to be re-imported (ORDER ID %{order_id})
+log.import.order_state_updated|order's status has been updated to %{state_name}
 log.import.order_import_failed|import order failed - %{decoded_message}
 log.import.anonymized_order|order is anonymized and has not been imported
 log.import.old_order|Order is older than 3 months and has not been imported

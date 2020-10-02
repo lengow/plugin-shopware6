@@ -85,11 +85,14 @@
 
         <service id="Lengow\Connector\Service\LengowOrder">
             <argument type="service" id="order.repository"/>
+            <argument type="service" id="order_delivery.repository"/>
             <argument type="service" id="state_machine_state.repository"/>
+            <argument type="service" id="Shopware\Core\System\StateMachine\StateMachineRegistry"/>
             <argument type="service" id="lengow_order.repository"/>
             <argument type="service" id="Lengow\Connector\Service\LengowLog"/>
             <argument type="service" id="Lengow\Connector\Service\LengowConfiguration"/>
             <argument type="service" id="Lengow\Connector\Service\LengowConnector"/>
+            <argument type="service" id="Lengow\Connector\Service\LengowOrderError"/>
         </service>
 
         <service id="Lengow\Connector\Service\LengowOrderError">
