@@ -73,7 +73,7 @@ abstract class LengowAbstractFrontController extends StorefrontController
         }
 
         if (!$this->lengowAccessService->checkWebserviceAccess($token, $salesChannelId)) {
-            if ((bool)$this->lengowConfiguration->get('lengowIpEnabled')) {
+            if ((bool)$this->lengowConfiguration->get(LengowConfiguration::LENGOW_IP_ENABLED)) {
                 $errorMessage = $this->lengowLog->decodeMessage(
                     'log.export.unauthorised_ip',
                     LengowTranslation::DEFAULT_ISO_CODE,

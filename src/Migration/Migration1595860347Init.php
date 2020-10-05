@@ -141,9 +141,9 @@ class Migration1595860347Init extends MigrationStep
                 `value`            VARCHAR(100) NULL DEFAULT NULL,
                 `created_at`       DATETIME(3)  NOT NULL,
                 `updated_at`       DATETIME(3)  NULL DEFAULT NULL,
-                FOREIGN KEY (`sales_channel_id`) REFERENCES sales_channel(`id`),
+                FOREIGN KEY (`sales_channel_id`) REFERENCES sales_channel(`id`) ON DELETE CASCADE,
                 PRIMARY KEY (`id`),
-                INDEX (`sales_channel_id`, `name`)
+                INDEX (`sales_channel_id`)
             ) DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
         ');
 

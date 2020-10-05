@@ -203,4 +203,22 @@ class EnvironmentInfoProvider
         }
         return null;
     }
+
+    /**
+     * Get default shipping method for given salesChannel
+     *
+     * @param string $salesChannelId shopware sales channel id
+     * @param EntityRepositoryInterface $shippingMethodRepository shopware shipping method repository
+     * @return string
+     */
+    public static function getShippingMethodDefaultValue(string $salesChannelId, EntityRepositoryInterface $shippingMethodRepository): string {
+        $shippingMethodCriteria = new Criteria();
+        $shippingMethodCriteria->getAssociation('salesChannel')->addFilter(new EqualsFilter('salesChannel.id', $salesChannelId));
+        $result = $shippingMethodRepository
+            ->search($shippingMethodCriteria, Context::createDefaultContext());
+        if ($result->count() !== 0) {
+            return $result->first()->getId();
+        }
+        return '';
+    }
 }

@@ -10,6 +10,8 @@ use Shopware\Core\Framework\DataAbstractionLayer\Search\Criteria;
 use Shopware\Core\Framework\Context;
 use Shopware\Core\Framework\DataAbstractionLayer\Search\Filter\EqualsFilter;
 use Shopware\Core\Framework\DataAbstractionLayer\Search\Filter\MultiFilter;
+use Shopware\Core\Framework\DataAbstractionLayer\Event\EntityWrittenEvent;
+use Shopware\Core\Framework\DataAbstractionLayer\Event\EntityDeletedEvent;
 use Shopware\Core\System\SalesChannel\SalesChannelCollection;
 use Shopware\Core\System\SalesChannel\SalesChannelEntity;
 use Shopware\Core\Framework\Uuid\Uuid;
@@ -23,175 +25,287 @@ class LengowConfiguration
 {
     public const LENGOW_SETTING_PATH = 'Connector.config.';
 
+    /* Settings database key */
+    public const LENGOW_GLOBAL_TOKEN = 'lengowGlobalToken';
+    public const LENGOW_CHANNEL_TOKEN = 'lengowChannelToken';
+    public const LENGOW_ACCOUNT_ID = 'lengowAccountId';
+    public const LENGOW_ACCESS_TOKEN = 'lengowAccessToken';
+    public const LENGOW_SECRET_TOKEN = 'lengowSecretToken';
+    public const LENGOW_AUTH_TOKEN = 'lengowAuthorizationToken';
+    public const LENGOW_LAST_AUTH_TOKEN_UPDATE = 'lengowLastAuthorizationTokenUpdate';
+    public const LENGOW_SALES_CHANNEL_ENABLED = 'lengowStoreEnabled';
+    public const LENGOW_CATALOG_ID = 'lengowCatalogId';
+    public const LENGOW_IP_ENABLED = 'lengowIpEnabled';
+    public const LENGOW_AUTHORIZED_IP = 'lengowAuthorizedIp';
+    public const LENGOW_TRACKING_ENABLED = 'lengowTrackingEnabled';
+    public const LENGOW_TRACKING_ID = 'lengowTrackingId';
+    public const LENGOW_ACCOUNT_STATUS = 'lengowAccountStatus';
+    public const LENGOW_ACCOUNT_STATUS_UPDATE = 'lengowAccountStatusUpdate';
+    public const LENGOW_OPTION_CMS_UPDATE = 'lengowOptionCmsUpdate';
+    public const LENGOW_CATALOG_UPDATE = 'lengowCatalogUpdate';
+    public const LENGOW_EXPORT_FORMAT = 'lengowExportFormat';
+    public const LENGOW_MARKETPLACE_UPDATE = 'lengowMarketplaceUpdate';
+    public const LENGOW_LAST_SETTING_UPDATE = 'lengowLastSettingUpdate';
+    public const LENGOW_PLUGIN_DATA = 'lengowPluginData';
+    public const LENGOW_PLUGIN_DATA_UPDATE = 'lengowPluginDataUpdate';
+    public const LENGOW_REPORT_MAIL_ENABLED = 'lengowReportMailEnabled';
+    public const LENGOW_REPORT_MAIL_ADDRESS = 'lengowReportMailAddress';
+    public const LENGOW_DEBUG_ENABLED = 'lengowDebugEnabled';
+    public const LENGOW_CURRENCY_CONVERSION_ENABLED = 'lengowCurrencyConversion';
+    public const LENGOW_B2B_ENABLED = 'lengowImportB2b';
+    public const LENGOW_LAST_IMPORT_CRON = 'lengowLastImportCron';
+    public const LENGOW_LAST_IMPORT_MANUAL = 'lengowLastImportManual';
+    public const LENGOW_LAST_ACTION_SYNC = 'lengowLastActionSync';
+    public const LENGOW_TIMEZONE = 'lengowTimezone';
+    public const LENGOW_EXPORT_SELECTION_ENABLED = 'lengowSelectionEnabled';
+    public const LENGOW_EXPORT_DISABLED_PRODUCT = 'lengowExportDisabledProduct';
+    public const LENGOW_EXPORT_DEFAULT_SHIPPING_METHOD = 'lengowExportDefaultShippingMethod';
+    public const LENGOW_EXPORT_OUT_OF_STOCK_ENABLED = 'lengowExportOutOfStock';
+    public const LENGOW_EXPORT_VARIATION_ENABLED = 'lengowExportVariation';
+    public const LENGOW_LAST_EXPORT = 'lengowLastExport';
+    public const LENGOW_IMPORT_DEFAULT_SHIPPING_METHOD = 'lengowImportDefaultShippingMethod';
+    public const LENGOW_IMPORT_DAYS = 'lengowImportDays';
+    public const LENGOW_IMPORT_SHIPPED_BY_MKTP = 'lengowImportShipMpEnabled';
+    public const LENGOW_IMPORT_MKTP_DECR_STOCK = 'lengowImportStockShipMp';
+    public const LENGOW_IMPORT_IN_PROGRESS = 'lengowImportInProgress';
+
     /**
      * @var array $lengowSettings specific Lengow settings in lengow_settings table
      */
     public static $lengowSettings = [
-        'lengowGlobalToken' => [
+        self::LENGOW_GLOBAL_TOKEN => [
             'lengow_settings' => true,
             'global' => true,
+            'default_value' => '',
         ],
-        'lengowChannelToken' => [
+        self::LENGOW_CHANNEL_TOKEN => [
             'channel' => true,
             'lengow_settings' => true,
+            'default_value' => '',
         ],
-        'lengowAccountId' => [
+        self::LENGOW_ACCOUNT_ID => [
             'global' => true,
+            'lengow_settings' => true,
+            'default_value' => '',
         ],
-        'lengowAccessToken' => [
+        self::LENGOW_ACCESS_TOKEN => [
             'global' => true,
             'secret' => true,
+            'lengow_settings' => true,
+            'default_value' => '',
         ],
-        'lengowSecretToken' => [
+        self::LENGOW_SECRET_TOKEN => [
             'global' => true,
             'secret' => true,
+            'lengow_settings' => true,
+            'default_value' => '',
         ],
-        'lengowAuthorizationToken' => [
+        self::LENGOW_AUTH_TOKEN => [
             'lengow_settings' => true,
             'global' => true,
             'export' => false,
+            'default_value' => '',
         ],
-        'lengowLastAuthorizationTokenUpdate' => [
+        self::LENGOW_LAST_AUTH_TOKEN_UPDATE => [
             'lengow_settings' => true,
             'global' => true,
             'export' => false,
+            'default_value' => '',
         ],
-        'lengowChannelActive' => [
+        self::LENGOW_SALES_CHANNEL_ENABLED => [
+            'lengow_settings' => true,
             'channel' => true,
             'type' => 'boolean',
+            'default_value' => '0',
         ],
-        'lengowCatalogId' => [
+        self::LENGOW_CATALOG_ID => [
+            'lengow_settings' => true,
             'channel' => true,
             'update' => true,
             'type' => 'array',
+            'default_value' => '',
         ],
-        'lengowIpEnabled' => [
+        self::LENGOW_IP_ENABLED => [
+            'lengow_settings' => true,
             'global' => true,
             'type' => 'boolean',
+            'default_value' => '0',
         ],
-        'lengowAuthorizedIp' => [
+        self::LENGOW_AUTHORIZED_IP => [
+            'lengow_settings' => true,
             'global' => true,
             'type' => 'array',
+            'default_value' => '',
         ],
-        'lengowTrackingEnable' => [
+        self::LENGOW_TRACKING_ENABLED => [
+            'lengow_settings' => true,
             'global' => true,
             'type' => 'boolean',
+            'default_value' => '0',
         ],
-        'lengowTrackingId' => [
+        self::LENGOW_TRACKING_ID => [
+            'lengow_settings' => true,
             'global' => true,
+            'default_value' => 'id',
         ],
-        'lengowAccountStatus' => [
+        self::LENGOW_ACCOUNT_STATUS => [
             'lengow_settings' => true,
             'global' => true,
             'export' => false,
+            'default_value' => '',
         ],
-        'lengowAccountStatusUpdate' => [
+        self::LENGOW_ACCOUNT_STATUS_UPDATE => [
             'lengow_settings' => true,
             'global' => true,
+            'default_value' => '',
         ],
-        'lengowOptionCmsUpdate' => [
+        self::LENGOW_OPTION_CMS_UPDATE => [
             'lengow_settings' => true,
             'global' => true,
+            'default_value' => '',
         ],
-        'lengowCatalogUpdate' => [
+        self::LENGOW_CATALOG_UPDATE => [
             'lengow_settings' => true,
             'global' => true,
+            'default_value' => '',
         ],
-        'lengowMarketplaceUpdate' => [
+        self::LENGOW_EXPORT_FORMAT => [
             'lengow_settings' => true,
             'global' => true,
+            'default_value' => 'csv',
         ],
-        'lengowLastSettingUpdate' => [
+        self::LENGOW_EXPORT_VARIATION_ENABLED => [
             'lengow_settings' => true,
             'global' => true,
+            'type' => 'boolean',
+            'default_value' => '0',
         ],
-        'lengowPluginData' => [
+        self::LENGOW_MARKETPLACE_UPDATE => [
+            'lengow_settings' => true,
+            'global' => true,
+            'default_value' => '',
+        ],
+        self::LENGOW_LAST_SETTING_UPDATE => [
+            'lengow_settings' => true,
+            'global' => true,
+            'default_value' => '',
+        ],
+        self::LENGOW_PLUGIN_DATA => [
             'lengow_settings' => true,
             'global' => true,
             'export' => false,
+            'default_value' => '',
         ],
-        'lengowPluginDataUpdate' => [
+        self::LENGOW_PLUGIN_DATA_UPDATE => [
             'lengow_settings' => true,
             'global' => true,
             'export' => false,
+            'default_value' => '',
         ],
-        'lengowExportSelectionEnabled' => [
-            'channel' => true,
-            'type' => 'boolean',
-        ],
-        'lengowExportDisabledProduct' => [
-            'channel' => true,
-            'type' => 'boolean',
-        ],
-        'lengowDefaultDispatcher' => [
-            'channel' => true,
-        ],
-        'lengowLastExport' => [
+        self::LENGOW_EXPORT_SELECTION_ENABLED => [
             'lengow_settings' => true,
             'channel' => true,
+            'type' => 'boolean',
+            'default_value' => '0',
         ],
-        'lengowImportDays' => [
+        self::LENGOW_EXPORT_DISABLED_PRODUCT => [
+            'lengow_settings' => true,
+            'channel' => true,
+            'type' => 'boolean',
+            'default_value' => '0',
+        ],
+        self::LENGOW_EXPORT_DEFAULT_SHIPPING_METHOD => [
+            'lengow_settings' => true,
+            'channel' => true,
+            'default_value' => '',
+        ],
+        self::LENGOW_LAST_EXPORT => [
+            'lengow_settings' => true,
+            'channel' => true,
+            'default_value' => '',
+        ],
+        self::LENGOW_IMPORT_DAYS => [
+            'lengow_settings' => true,
             'global' => true,
             'update' => true,
+            'default_value' => '3',
         ],
-        'lengowImportDefaultDispatcher' => [
+        self::LENGOW_IMPORT_DEFAULT_SHIPPING_METHOD => [
+            'lengow_settings' => true,
             'channel' => true,
+            'default_value' => '',
         ],
-        'lengowImportReportMailEnabled' => [
+        self::LENGOW_REPORT_MAIL_ENABLED => [
+            'lengow_settings' => true,
             'global' => true,
             'type' => 'boolean',
+            'default_value' => '1',
         ],
-        'lengowImportReportMailAddress' => [
+        self::LENGOW_REPORT_MAIL_ADDRESS => [
+            'lengow_settings' => true,
             'global' => true,
             'type' => 'array',
+            'default_value' => '',
         ],
-        'lengowImportShipMpEnabled' => [
+        self::LENGOW_IMPORT_SHIPPED_BY_MKTP => [
+            'lengow_settings' => true,
             'global' => true,
             'type' => 'boolean',
+            'default_value' => '0',
         ],
-        'lengowImportStockMpEnabled' => [
+        self::LENGOW_IMPORT_MKTP_DECR_STOCK => [
+            'lengow_settings' => true,
             'global' => true,
             'type' => 'boolean',
+            'default_value' => '0',
         ],
-        'lengowImportDebugEnabled' => [
+        self::LENGOW_DEBUG_ENABLED => [
+            'lengow_settings' => true,
             'global' => true,
             'type' => 'boolean',
+            'default_value' => '0',
         ],
-        'lengowCurrencyConversion' => [
+        self::LENGOW_EXPORT_OUT_OF_STOCK_ENABLED => [
+            'lengow_settings' => true,
             'global' => true,
             'type' => 'boolean',
+            'default_value' => '0',
         ],
-        'lengowImportB2b' => [
+        self::LENGOW_CURRENCY_CONVERSION_ENABLED => [
+            'global' => true,
+            'type' => 'boolean',
+            'default_value' => '1',
+        ],
+        self::LENGOW_B2B_ENABLED => [
+            'lengow_settings' => true,
             'global' => true,
             'type'   => 'boolean',
+            'default_value' => '0',
         ],
-        'lengowImportInProgress' => [
+        self::LENGOW_IMPORT_IN_PROGRESS => [
             'lengow_settings' => true,
             'global' => true,
+            'default_value' => '',
         ],
-        'lengowLastImportCron' => [
+        self::LENGOW_LAST_IMPORT_CRON => [
             'lengow_settings' => true,
             'global' => true,
+            'default_value' => '',
         ],
-        'lengowLastImportManual' => [
+        self::LENGOW_LAST_IMPORT_MANUAL => [
             'lengow_settings' => true,
             'global' => true,
+            'default_value' => '',
         ],
-        'lengowIdWaitingShipment' => [
-            'global' => true,
-        ],
-        'lengowIdShipped' => [
-            'global' => true,
-        ],
-        'lengowIdCanceled' => [
-            'global' => true,
-        ],
-        'lengowIdShippedByMp' => [
-            'global' => true,
-        ],
-        'lengowLastActionSync' => [
+        self::LENGOW_LAST_ACTION_SYNC => [
             'lengow_settings' => true,
             'global' => true,
+            'default_value' => '',
+        ],
+        self::LENGOW_TIMEZONE => [
+            'lengow_settings' => true,
+            'global' => true,
+            'default_value' => 'GMT',
         ],
     ];
 
@@ -478,6 +592,17 @@ class LengowConfiguration
             Context::createDefaultContext()
         );
         $value = (array) $result->getEntities()->getElements();
+        $entities = $result->getEntities();
+        if (isset(self::$lengowSettings[$key]['type']) && (count($entities) > 0)) {
+            switch(self::$lengowSettings[$key]['type']) {
+                case 'boolean':
+                    return (bool) $entities->first()->value;
+                case 'array':
+                    return explode(';', trim(str_replace(["\r\n", ',', ' '], ';', $entities->first()->value), ';'));
+                default:
+                    return $entities->first()->value;
+            }
+        }
         if ($value) {
             return $value[array_key_first($value)]->getValue();
         }
@@ -552,5 +677,82 @@ class LengowConfiguration
             $ids = $this->systemConfigRepository->searchIds($criteria, Context::createDefaultContext())->getIds();
         }
         return array_shift($ids);
+    }
+
+    /**
+     * create default config linked to salesChannel in database
+     * Since this method is static, you have to pass the repository as arguments
+     *
+     * @param EntityRepositoryInterface $salesChannelRepository shopware sales channel repository
+     * @param EntityRepositoryInterface $shippingMethodRepository shopware shipping method repository
+     * @param EntityRepositoryInterface $settingsRepository lengow settings repository
+     */
+    public static function createDefaultSalesChannelConfig(
+        EntityRepositoryInterface $salesChannelRepository,
+        EntityRepositoryInterface $shippingMethodRepository,
+        EntityRepositoryInterface $settingsRepository
+    ): void
+    {
+        $salesChannels = $salesChannelRepository->search(new Criteria(), Context::createDefaultContext());
+        $config = [];
+        foreach(self::$lengowSettings as $key => $lengowSetting) {
+            if (isset($lengowSetting['channel'])) {
+                foreach ($salesChannels as $salesChannel) {
+                    // special case
+                    if ($key === 'lengowImportDefaultShippingMethod'
+                        || $key === 'lengowExportDefaultShippingMethod') {
+                        $config[] = [
+                            'salesChannelId' => $salesChannel->getId(),
+                            'name' => $key,
+                            'value' => EnvironmentInfoProvider::getShippingMethodDefaultValue(
+                                $salesChannel->getId(),
+                                $shippingMethodRepository,
+                            )
+                        ];
+                        continue;
+                    }
+                    $config[] = [
+                        'salesChannelId' => $salesChannel->getId(),
+                        'name' => $key,
+                        'value' => $lengowSetting['default_value'],
+                    ];
+                }
+            } else {
+                $config[] = [
+                    'salesChannelId' => null,
+                    'name' => $key,
+                    'value' => $lengowSetting['default_value'],
+                ];
+            }
+        }
+        $settingsRepository->create($config, Context::createDefaultContext());
+    }
+
+    /**
+     * This method delete the lengow_settings configuration related to the sales channel deleted
+     *
+     * @param EntityDeletedEvent $event Shopware entity deleted event
+     */
+    public function deleteSalesChannelConfig(EntityDeletedEvent $event) : void
+    {
+        $entityWriteResults = $event->getWriteResults();
+        foreach ($entityWriteResults as $entityWriteResult) {
+            $lengowSettingsCriteria = new Criteria();
+            $lengowSettingsCriteria->addFilter(
+                new EqualsFilter('salesChannelId', $entityWriteResult->getPrimaryKey())
+            );
+            $salesChannelConfig = $this->settingsRepository->search(
+                $lengowSettingsCriteria,
+                Context::createDefaultContext()
+            );
+            foreach ($salesChannelConfig->getEntities() as $lengowSettingEntity) {
+                $this->settingsRepository->delete(
+                    [
+                        ['id' => $lengowSettingEntity->id],
+                    ],
+                    Context::createDefaultContext()
+                );
+            }
+        }
     }
 }

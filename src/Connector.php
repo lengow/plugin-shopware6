@@ -11,10 +11,13 @@ use Shopware\Core\Framework\Plugin;
 use Shopware\Core\Framework\Plugin\Context\InstallContext;
 use Shopware\Core\Framework\Plugin\Context\UninstallContext;
 use Shopware\Core\Framework\Plugin\Util\PluginIdProvider;
+use Shopware\Core\Framework\Plugin\Context\ActivateContext;
 use Symfony\Component\Config\FileLocator;
 use Symfony\Component\DependencyInjection\ContainerBuilder;
 use Symfony\Component\DependencyInjection\Loader\XmlFileLoader;
 use Lengow\Connector\Service\LengowPayment;
+use Lengow\Connector\Entity\Settings;
+use Lengow\Connector\Service\LengowConfiguration;
 
 /**
  * Class Connector
@@ -44,7 +47,21 @@ class Connector extends Plugin
      */
     public function install(InstallContext $context): void
     {
+        parent::Install($context);
         $this->addPaymentMethod($context->getContext());
+    }
+
+    /**
+     * @param ActivateContext $activateContext
+     */
+    public function activate(ActivateContext $activateContext): void
+    {
+        LengowConfiguration::createDefaultSalesChannelConfig(
+            $this->container->get('sales_channel.repository'),
+            $this->container->get('shipping_method.repository'),
+            $this->container->get('lengow_settings.repository')
+        );
+        parent::activate($activateContext);
     }
 
     /**
@@ -53,6 +70,7 @@ class Connector extends Plugin
     public function uninstall(UninstallContext $context): void
     {
         $this->setPaymentMethodIsActive(false, $context->getContext());
+        // todo drop table lengow_settings
     }
 
     /**

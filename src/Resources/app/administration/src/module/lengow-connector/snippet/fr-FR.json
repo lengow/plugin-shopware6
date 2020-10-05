@@ -39,6 +39,138 @@
             "columns": {
                 "activeInLengow": "Actif dans lengow"
             }
+        },
+        "settings": {
+            "NavBar": {
+                "title": "Paramètres",
+                "generalTab": "General",
+                "exportTab": "Export",
+                "importTab": "Import"
+            },
+            "title": {
+                "credentials": "Credentials",
+                "salesChannel": "Sales Channels",
+                "security": "Securité & tracker",
+                "timezone": "Timezone",
+                "exclusions": "Exclusions",
+                "shipping": "Methode de transport par defaut",
+                "marketplaces": "Marketplaces",
+                "others": "Autres"
+            },
+            "lengow_main_settings": {
+                "label": "Paramètres principaux",
+                "description": "Vous trouverez ci-dessous vos identifiants de connexion à Lengow.\nLes ID Lengow, Access Token et Secret Token sont automatiquement complétés lors de votre première connexion : veuillez à ne pas les modifier.",
+                "account": {
+                    "label": "ID du compte",
+                    "description": "Votre ID de compte Lengow. Veuillez ne pas le modifier."
+                },
+                "access": {
+                    "label": "Access Token",
+                    "description": "Votre Access Token. Veuillez ne pas le modifier."
+                },
+                "secret": {
+                    "label": "Secret Token",
+                    "description": "Votre Secret Token. Veuillez ne pas le modifier."
+                },
+                "enable": {
+                    "label": "Activer la boutique",
+                    "description": "Activer la boutique pour la connecter à la plateforme Lengow"
+                },
+                "catalog": {
+                    "label": "Catalogues ID",
+                    "description": "Vos ID catalogues pour importer les commandes.\nSéparez-les par des ' ; '"
+                },
+                "ip_enable": {
+                    "label": "Activer l'autorisation par IP",
+                    "description": "Activez cette option si vous voulez sécuriser votre export par ip. Par défaut, votre export est sécurisé par une clé unique."
+                },
+                "ip": {
+                    "label": "IP autorisée(s)",
+                    "description": "IP autorisée(s) à accéder à votre flux d'export.\nSéparez-les par ' ; '"
+                },
+                "tracking_enable": {
+                    "label": "Activer le tracker Lengow",
+                    "description": "Ce tracker vous permet de récupérer les statistiques de commandes de votre site directement sur la plateforme Lengow."
+                },
+                "tracking_id": {
+                    "label": "Tracker ID produit",
+                    "description": "Le nom de l'identifiant unique indiqué dans Lengow"
+                },
+                "timezone": {
+                    "label": "Timezone",
+                    "description": "Choix de la Timezone. Attention, ce paramètre est utilisé lors de l'import de vos commandes depuis l'API Lengow"
+                }
+            },
+            "lengow_export_settings": {
+                "label": "Paramètres d'export",
+                "description": "Définissez les paramètres pour créer votre flux.",
+                "disabled_products": {
+                    "label": "Exporter les produits inactifs",
+                    "description": "Activez cette option si vous souhaitez exporter les produits inactifs"
+                },
+                "lengow_selection": {
+                    "label": "Exporter uniquement la sélection de produits",
+                    "description": "Activez cette option si vous ne voulez pas exporter tous vos produits disponibles. Sélectionnez ensuite les produits un par un."
+                },
+                "dispatcher": {
+                    "label": "Transporteur par défaut",
+                    "description": "Sélectionnez un transporteur par défaut pour calculer les frais de livraison"
+                }
+            },
+            "lengow_import_settings": {
+                "label": "Paramètres d'import",
+                "description": "Toutes vos commandes sont centralisées sur votre plateforme Lengow : choisissez ici si vous voulez synchroniser et importer vos commandes dans votre backoffice Shopware. Vos stocks seront ainsi mis à jour dans votre backoffice Shopware.",
+                "ship_mp_enabled": {
+                    "label": "Importer les commandes expédiées par les marketplaces"
+                },
+                "decrease_stock": {
+                    "label": "Diminuer mon stock avec les commandes expédiées par les marketplaces",
+                    "description": "Activez cette option pour prendre en compte les commandes des marketplaces sur les stocks de votre backoffice Shopware."
+                },
+                "dispatcher": {
+                    "label": "Transporteur par défaut",
+                    "description": "Sélectionnez le transporteur par défaut à appliquer à vos commandes."
+                },
+                "import_days": {
+                    "label": "Synchroniser toutes les commandes mises à jour depuis",
+                    "description": "Choisissez le nombre de jours (Max 10 jours)"
+                },
+                "debug_mode": {
+                    "label": "Activer le Debug Mode",
+                    "description": "Utilisez le Debug Mode pour tester et simuler des commandes fictives. Pour rappel, vous devez activer ce paramètre UNIQUEMENT sur votre serveur de préproduction"
+                },
+                "report_mail_enabled": {
+                    "label": "Je veux être notifié en cas de problème lors de l'importation de mes commandes"
+                },
+                "report_mail_address": {
+                    "label": "Email à utiliser pour l'envoi des emails de rapport",
+                    "description": "Email séparé par ;"
+                },
+                "currency_conversion_title": {
+                    "label": "Convertir la devise de vos commandes",
+                    "description": "Toutes les commandes importées dans Shopware seront automatiquement converties dans la devise choisie dans Lengow"
+                },
+                "import_btob": {
+                    "label": "Activer l'import des commandes B2B sans taxes",
+                    "description": "Activer cette option pour importer les commandes B2B sans taxes"
+                }
+            },
+            "lengow_order_status_settings": {
+                "label": "Statut des commandes",
+                "description": "Attribuez des statuts Lengow à vos commandes pour les retrouver facilement parmi l'ensemble de vos commandes.",
+                "id_waiting_shipment": {
+                    "label": "Commandes en préparation"
+                },
+                "id_shipped": {
+                    "label": "Commandes expédiées"
+                },
+                "id_canceled": {
+                    "label": "Commandes annulées"
+                },
+                "id_shipped_by_mp": {
+                    "label": "Commandes expédiées par les marketplaces"
+                }
+            }
         }
     }
 }

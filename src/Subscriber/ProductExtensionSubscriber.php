@@ -20,7 +20,7 @@ class ProductExtensionSubscriber implements EventSubscriberInterface
 {
 
     /**
-     * @var EntityRepositoryInterface $systemConfigRepository shopware settings repository
+     * @var EntityRepositoryInterface $lengowProductRepository shopware product repository
      */
     private $lengowProductRepository;
 

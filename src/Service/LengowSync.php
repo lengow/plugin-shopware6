@@ -131,7 +131,7 @@ class LengowSync
         $filePath = $this->environmentInfoProvider->getPluginPath()
             . $sep . self::CONFIG_FOLDER_NAME . $sep . self::MARKETPLACE_FILE;
         if (!$force) {
-            $updatedAt = $this->lengowConfiguration->get('lengowMarketplaceUpdate');
+            $updatedAt = $this->lengowConfiguration->get(LengowConfiguration::LENGOW_MARKETPLACE_UPDATE);
             if ($updatedAt !== null
                 && (time() - (int)$updatedAt) < $this->cacheTimes[self::SYNC_MARKETPLACE]
                 && file_exists($filePath)
@@ -161,7 +161,7 @@ class LengowSync
                 );
                 $marketplaceFile->write(json_encode($result));
                 $marketplaceFile->close();
-                $this->lengowConfiguration->set('lengowMarketplaceUpdate', (string)time());
+                $this->lengowConfiguration->set(LengowConfiguration::LENGOW_MARKETPLACE_UPDATE, (string)time());
             } catch (LengowException $e) {
                 $decodedMessage = $this->lengowLog->decodeMessage($e->getMessage());
                 $this->lengowLog->write(

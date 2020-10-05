@@ -114,6 +114,10 @@ Component.register('lengow-export-list', {
             return this.repositoryFactory.create('system_config');
         },
 
+        lengowSettingsRepository() {
+            return this.repositoryFactory.create('lengow_settings');
+        },
+
         currenciesColumns() {
             return this.currencies
                 .sort((a, b) => (b.isSystemDefault ? 1 : -1))
@@ -244,27 +248,27 @@ Component.register('lengow-export-list', {
         },
 
         setupSelectionActivated() {
-            const systemConfigCriteria = new Criteria();
-            systemConfigCriteria.addFilter(Criteria.equals('configurationKey', 'Connector.config.lengowExportSelectionEnabled'));
-            systemConfigCriteria.addFilter(Criteria.equals('salesChannelId', this.currentSalesChannelId));
-            this.systemConfigRepository
-                .search(systemConfigCriteria, Shopware.Context.api)
+            const lengowSettingsCriteria = new Criteria();
+            lengowSettingsCriteria.addFilter(Criteria.equals('salesChannelId', this.currentSalesChannelId));
+            lengowSettingsCriteria.addFilter(Criteria.equals('name', 'lengowSelectionEnabled'));
+            this.lengowSettingsRepository
+                .search(lengowSettingsCriteria, Shopware.Context.api)
                 .then(result => {
                     if (result.total > 0) {
-                        this.productSelection = result.first().configurationValue.active;
+                        this.productSelection = result.first().value === '1';
                     }
                 });
         },
 
         setupCountInactiveProduct() {
-            const systemConfigCriteria = new Criteria();
-            systemConfigCriteria.addFilter(Criteria.equals('configurationKey', 'Connector.config.lengowExportDisabledProduct'));
-            systemConfigCriteria.addFilter(Criteria.equals('salesChannelId', this.currentSalesChannelId));
-            this.systemConfigRepository
-                .search(systemConfigCriteria, Shopware.Context.api)
+            const lengowSettingsCriteria = new Criteria();
+            lengowSettingsCriteria.addFilter(Criteria.equals('salesChannelId', this.currentSalesChannelId));
+            lengowSettingsCriteria.addFilter(Criteria.equals('name', 'lengowExportDisabledProduct'));
+            this.lengowSettingsRepository
+                .search(lengowSettingsCriteria, Shopware.Context.api)
                 .then(result => {
                     if (result.total > 0) {
-                        this.countInactive = Boolean(result.first().configurationValue);
+                        this.countInactive = result.first().value === '1';
                     }
                 });
         },
@@ -307,7 +311,8 @@ Component.register('lengow-export-list', {
             this.lengowProductRepository.search(lengowProductCriteria, Shopware.Context.api).then((result) => {
                 if (!this.countInactive) {
                     this.countLoading = false;
-                    return this.exportedCount = result.total;
+                    this.exportedCount = result.total;
+                    return ;
                 }
                 const ids = [];
                 result.forEach(lengowProduct => {
@@ -370,9 +375,6 @@ Component.register('lengow-export-list', {
             const categoryCriteria = new Criteria();
             categoryCriteria.addFilter(Criteria.contains('category.path', treeMasterCategoryId));
             categoryCriteria.addAssociation('products');
-            if (!this.countInactive) {
-                categoryCriteria.addFilter(Criteria.equals('products.active', true));
-            }
             this.categoryRepository
                 .search(categoryCriteria, Shopware.Context.api)
                 .then(categoryCollection => {
@@ -445,25 +447,23 @@ Component.register('lengow-export-list', {
         },
 
         onActivateSelection($active) {
-            const systemConfigCriteria = new Criteria();
-            systemConfigCriteria.addFilter(Criteria.equals('salesChannelId', this.currentSalesChannelId));
-            systemConfigCriteria.addFilter(Criteria.equals('configurationKey', 'Connector.config.lengowExportSelectionEnabled'));
-            this.systemConfigRepository
-                .search(systemConfigCriteria, Shopware.Context.api)
+            const lengowSettingsCriteria = new Criteria();
+            lengowSettingsCriteria.addFilter(Criteria.equals('salesChannelId', this.currentSalesChannelId));
+            lengowSettingsCriteria.addFilter(Criteria.equals('name', 'lengowSelectionEnabled'));
+            this.lengowSettingsRepository
+                .search(lengowSettingsCriteria, Shopware.Context.api)
                 .then(result => {
-                    const systemConfig = this.systemConfigRepository.create(Shopware.Context.api);
-                    systemConfig.salesChannelId = this.currentSalesChannelId;
-                    systemConfig.configurationKey = 'Connector.config.lengowExportSelectionEnabled';
-                    systemConfig.configurationValue = {'active' : $active};
                     if (result.total !== 0) {
-                        systemConfig.id = result.first().id;
-                        return this.systemConfigRepository.sync([systemConfig], Shopware.Context.api);
+                        const lengowSettings = this.lengowSettingsRepository.create(Shopware.Context.api);
+                        lengowSettings.id = result.first().id;
+                        lengowSettings.salesChannelsId = this.currentSalesChannelId;
+                        lengowSettings.name = 'lengowSelectionEnabled';
+                        lengowSettings.value = $active === true ? '1' : '0';
+                        this.lengowSettingsRepository.sync([lengowSettings], Shopware.Context.api).then(() => {
+                            this.onSalesChannelChanged(this.currentSalesChannelId);
+                        });
                     }
-                    return this.systemConfigRepository.save(systemConfig, Shopware.Context.api);
-                }).then(() => {
-                    this.setupSelectionActivated();
-                })
-            this.onSalesChannelChanged(this.currentSalesChannelId);
+                });
         },
 
         onPublishOnLengow() {

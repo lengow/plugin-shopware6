@@ -525,7 +525,7 @@ class LengowImportOrder
                     $this->logOutput,
                     $this->marketplaceSku
                 );
-                if (!(bool)$this->lengowConfiguration->get('lengowImportShipMpEnabled')) {
+                if (!(bool)$this->lengowConfiguration->get(LengowConfiguration::LENGOW_IMPORT_SHIPPED_BY_MKTP)) {
                     // update Lengow order with new data
                     $this->lengowOrder->update($lengowOrder->getId(), [
                         'orderProcessState' => LengowOrder::PROCESS_STATE_FINISH,
@@ -568,7 +568,7 @@ class LengowImportOrder
             $this->createLengowOrderLines($order, $products);
             // don't reduce stock for re-import order and order shipped by marketplace
             if ($this->isReimported
-                || ($this->shippedByMp && !(bool)$this->lengowConfiguration->get('lengow_import_stock_ship_mp'))
+                || ($this->shippedByMp && !(bool)$this->lengowConfiguration->get(LengowConfiguration::LENGOW_IMPORT_MKTP_DECR_STOCK))
             ) {
                 if ($this->isReimported) {
                     $logMessage = $this->lengowLog->encodeMessage('log.import.quantity_back_reimported_order');
@@ -1063,7 +1063,7 @@ class LengowImportOrder
     {
         $token = Uuid::randomHex();
         $shippingMethodId = $this->lengowConfiguration->get(
-            'lengowImportDefaultShippingMethod',
+            LengowConfiguration::LENGOW_IMPORT_DEFAULT_SHIPPING_METHOD,
             $this->salesChannel->getId()
         );
         // create a specific context with all order data
@@ -1300,7 +1300,7 @@ class LengowImportOrder
                 // and Shopware has not any service allowing to decrement properly a product
                 $query = new RetryableQuery(
                     $this->connection->prepare('
-                        UPDATE product 
+                        UPDATE product
                         SET stock = :stock, available_stock = :available_stock, version_id = :version
                         WHERE id = :id
                     ')

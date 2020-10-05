@@ -112,10 +112,22 @@ class LengowExport
     ): void
     {
         $this->exportConfiguration = [
-            'selection' => $selection ?: $this->lengowConfiguration->get('lengowExportSelectionEnabled', $salesChannelId),
-            'out_of_stock' => $outOfStock ?: $this->lengowConfiguration->get('lengowExportOutOfStock', $salesChannelId),
-            'variation' => $variation ?: $this->lengowConfiguration->get('lengowExportVariation', $salesChannelId),
-            'inactive' => $inactive ?: $this->lengowConfiguration->get('lengowExportDisabledProduct', $salesChannelId),
+            'selection' => $selection ?: $this->lengowConfiguration->get(
+                LengowConfiguration::LENGOW_EXPORT_SELECTION_ENABLED,
+                $salesChannelId
+            ),
+            'out_of_stock' => $outOfStock ?: $this->lengowConfiguration->get(
+                LengowConfiguration::LENGOW_EXPORT_OUT_OF_STOCK_ENABLED,
+                $salesChannelId)
+            ,
+            'variation' => $variation ?: $this->lengowConfiguration->get(
+                LengowConfiguration::LENGOW_EXPORT_VARIATION_ENABLED,
+                $salesChannelId
+            ),
+            'inactive' => $inactive ?: $this->lengowConfiguration->get(
+                LengowConfiguration::LENGOW_EXPORT_DISABLED_PRODUCT,
+                $salesChannelId
+            ),
             'product_ids' => $productIds ?: '',
         ];
     }

@@ -307,8 +307,8 @@ class LengowConnector
      */
     public function connect(bool $force = false, bool $logOutput = false): void
     {
-        $token = $this->lengowConfiguration->get('lengowAuthorizationToken');
-        $updatedAt = $this->lengowConfiguration->get('lengowLastAuthorizationTokenUpdate');
+        $token = $this->lengowConfiguration->get(LengowConfiguration::LENGOW_AUTH_TOKEN);
+        $updatedAt = $this->lengowConfiguration->get(LengowConfiguration::LENGOW_LAST_AUTH_TOKEN_UPDATE);
         if (!$force
             && $token !== null
             && $updatedAt !== null
@@ -318,8 +318,8 @@ class LengowConnector
             $authorizationToken = $token;
         } else {
             $authorizationToken = $this->getAuthorizationToken($logOutput);
-            $this->lengowConfiguration->set('lengowAuthorizationToken', $authorizationToken);
-            $this->lengowConfiguration->set('lengowLastAuthorizationTokenUpdate', (string)time());
+            $this->lengowConfiguration->set(LengowConfiguration::LENGOW_AUTH_TOKEN, $authorizationToken);
+            $this->lengowConfiguration->set(LengowConfiguration::LENGOW_LAST_AUTH_TOKEN_UPDATE, (string)time());
         }
         $this->token = $authorizationToken;
     }

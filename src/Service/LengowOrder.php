@@ -826,7 +826,7 @@ class LengowOrder
             $result = $this->lengowConnector->patch(
                 LengowConnector::API_ORDER_MOI,
                 [
-                    'account_id' => (int)$this->lengowConfiguration->get('lengowAccountId'),
+                    'account_id' => (int)$this->lengowConfiguration->get(LengowConfiguration::LENGOW_ACCOUNT_ID),
                     'marketplace_order_id' => $lengowOrder->getMarketplaceSku(),
                     'marketplace' => $lengowOrder->getMarketplaceName(),
                     'merchant_order_id' => $merchantOrderIds,
