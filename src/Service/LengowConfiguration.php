@@ -305,7 +305,7 @@ class LengowConfiguration
         self::LENGOW_TIMEZONE => [
             'lengow_settings' => true,
             'global' => true,
-            'default_value' => 'GMT',
+            'default_value' => 'Etc/Greenwich',
         ],
     ];
 
@@ -366,14 +366,15 @@ class LengowConfiguration
      */
     public function get(string $key, ?string $salesChannelId = null)
     {
-        // not a lengow configuration
-        if (!array_key_exists($key, self::$lengowSettings)) {
+        // get a Lengow configuration
+        if (array_key_exists($key, self::$lengowSettings)) {
+            $setting = self::$lengowSettings[$key];
+            if ($setting['lengow_settings'] ?? false) {
+                return $this->getInLengowConfig($key, $salesChannelId);
+            }
             return null;
         }
-        $setting = self::$lengowSettings[$key];
-        if ($setting['lengow_settings'] ?? false) {
-            return $this->getInLengowConfig($key, $salesChannelId);
-        }
+        // get a Shopware configuration
         return $this->getInShopwareConfig($key, $salesChannelId);
     }
 
@@ -386,14 +387,15 @@ class LengowConfiguration
      */
     public function set(string $key, string $value, ?string $salesChannelId = null)
     {
-        // not a lengow configuration
-        if (!array_key_exists($key, self::$lengowSettings)) {
+        // set a Lengow configuration
+        if (array_key_exists($key, self::$lengowSettings)) {
+            $setting = self::$lengowSettings[$key];
+            if ($setting['lengow_settings'] ?? false) {
+                return $this->setInLengowConfig($key, $value, $salesChannelId);
+            }
             return null;
         }
-        $setting = self::$lengowSettings[$key];
-        if ($setting['lengow_settings'] ?? false) {
-            return $this->setInLengowConfig($key, $value, $salesChannelId);
-        }
+        // set a Shopware configuration
         return $this->setInShopwareConfig($key, $value, $salesChannelId);
     }
 
@@ -407,11 +409,11 @@ class LengowConfiguration
     public function getToken(string $salesChannelId = null): string
     {
         if ($salesChannelId) {
-            $token = $this->get('lengowChannelToken', $salesChannelId);
+            $token = $this->get(self::LENGOW_CHANNEL_TOKEN, $salesChannelId);
         } else {
-            $token = $this->get('lengowGlobalToken');
+            $token = $this->get(self::LENGOW_GLOBAL_TOKEN);
         }
-        if ($token && strlen($token) > 0) {
+        if ($token && $token !== '') {
             return $token;
         }
         return $this->generateToken($salesChannelId);
@@ -428,9 +430,9 @@ class LengowConfiguration
     {
         $token = bin2hex(openssl_random_pseudo_bytes(16));
         if ($salesChannelId) {
-            $this->set('lengowChannelToken', $token, $salesChannelId);
+            $this->set(self::LENGOW_CHANNEL_TOKEN, $token, $salesChannelId);
         } else {
-            $this->set('lengowGlobalToken', $token);
+            $this->set(self::LENGOW_GLOBAL_TOKEN, $token);
         }
         return $token;
     }
@@ -442,9 +444,9 @@ class LengowConfiguration
      */
     public function getAccessIds(): array
     {
-        $accountId = (int)$this->get('lengowAccountId');
-        $accessToken = $this->get('lengowAccessToken');
-        $secretToken = $this->get('lengowSecretToken');
+        $accountId = (int)$this->get(self::LENGOW_ACCOUNT_ID);
+        $accessToken = $this->get(self::LENGOW_ACCESS_TOKEN);
+        $secretToken = $this->get(self::LENGOW_SECRET_TOKEN);
         if ($accountId !== 0 && !empty($accessToken) && !empty($secretToken)) {
             return [$accountId, $accessToken, $secretToken];
         }
@@ -461,7 +463,7 @@ class LengowConfiguration
     public function getCatalogIds(string $salesChannelId): array
     {
         $catalogIds = [];
-        $salesChannelCatalogIds = $this->get('lengowCatalogId', $salesChannelId);
+        $salesChannelCatalogIds = $this->get(self::LENGOW_CATALOG_ID, $salesChannelId);
         if (!empty($salesChannelCatalogIds)) {
             foreach ($salesChannelCatalogIds as $catalogId) {
                 $catalogId = trim(str_replace(["\r\n", ',', '-', '|', ' ', '/'], ';', $catalogId), ';');
@@ -474,13 +476,33 @@ class LengowConfiguration
     }
 
     /**
+     * Get all report mails
+     *
+     * @return array
+     */
+    public function getReportEmailAddress(): array
+    {
+        $reportEmailAddress = [];
+        $emails = $this->get(self::LENGOW_REPORT_MAIL_ADDRESS);
+        foreach ($emails as $email) {
+            if ($email !== '' && (bool)preg_match('/^\S+\@\S+\.\S+$/', $email)) {
+                $reportEmailAddress[] = $email;
+            }
+        }
+        if (empty($reportEmailAddress)) {
+            $reportEmailAddress[] = $this->get('core.basicInformation.email');
+        }
+        return $reportEmailAddress;
+    }
+
+    /**
      * Recovers if a store is active or not
      *
      * @return bool
      */
     public function debugModeIsActive(): bool
     {
-        return (bool)$this->get('lengowImportDebugEnabled');
+        return $this->get(self::LENGOW_DEBUG_ENABLED);
     }
 
     /**
@@ -496,8 +518,7 @@ class LengowConfiguration
         foreach ($salesChannelCollection as $salesChannel) {
             /** @var SalesChannelEntity $salesChannel */
             // get Lengow config for this sales channel
-            $enabledInLengow = (bool)$this->get('lengowChannelActive', $salesChannel->getId());
-            if ($enabledInLengow) {
+            if ($this->get(self::LENGOW_SALES_CHANNEL_ENABLED, $salesChannel->getId())) {
                 $result[] = $salesChannel;
             }
         }
@@ -553,7 +574,7 @@ class LengowConfiguration
             }
             // save last update date for a specific settings (change synchronisation interval time)
             if (isset($setting['update']) && $setting['update']) {
-                $this->set('lengowLastSettingUpdate', (string)time());
+                $this->set(self::LENGOW_LAST_SETTING_UPDATE, (string)time());
             }
         }
     }
@@ -566,7 +587,7 @@ class LengowConfiguration
      */
     private function getInShopwareConfig(string $key, ?string $salesChannelId = null)
     {
-        return $this->systemConfigService->get(self::LENGOW_SETTING_PATH . $key, $salesChannelId);
+        return $this->systemConfigService->get($key, $salesChannelId);
     }
 
     /**
@@ -578,35 +599,26 @@ class LengowConfiguration
     private function getInLengowConfig(string $key, ?string $salesChannelId = null)
     {
         $criteria = new Criteria();
-        $criteria->addFilter(
-            new MultiFilter(
-                MultiFilter::CONNECTION_AND,
-                [
-                    new EqualsFilter('salesChannelId', $salesChannelId),
-                    new EqualsFilter('name', $key),
-                ]
-            )
-        );
-        $result = $this->settingsRepository->search(
-            $criteria,
-            Context::createDefaultContext()
-        );
-        $value = (array) $result->getEntities()->getElements();
-        $entities = $result->getEntities();
-        if (isset(self::$lengowSettings[$key]['type']) && (count($entities) > 0)) {
-            switch(self::$lengowSettings[$key]['type']) {
+        $criteria->addFilter(new MultiFilter(MultiFilter::CONNECTION_AND, [
+            new EqualsFilter('salesChannelId', $salesChannelId),
+            new EqualsFilter('name', $key),
+        ]));
+        $result = $this->settingsRepository->search($criteria, Context::createDefaultContext())
+            ->getEntities()
+            ->getElements();
+        if (empty($result)) {
+            return null;
+        }
+        $value = $result[array_key_first($result)]->getValue();
+        if (isset(self::$lengowSettings[$key]['type'])) {
+            switch (self::$lengowSettings[$key]['type']) {
                 case 'boolean':
-                    return (bool) $entities->first()->value;
+                    return (bool)$value;
                 case 'array':
-                    return explode(';', trim(str_replace(["\r\n", ',', ' '], ';', $entities->first()->value), ';'));
-                default:
-                    return $entities->first()->value;
+                    return explode(';', trim(str_replace(["\r\n", ',', ' '], ';', $value), ';'));
             }
         }
-        if ($value) {
-            return $value[array_key_first($value)]->getValue();
-        }
-        return null;
+        return $value;
     }
 
     /**
@@ -650,7 +662,7 @@ class LengowConfiguration
      */
     private function setInShopwareConfig(string $key, string $value, ?string $salesChannelId = null): void
     {
-        $this->systemConfigService->set(self::LENGOW_SETTING_PATH . $key, $value, $salesChannelId);
+        $this->systemConfigService->set($key, $value, $salesChannelId);
     }
 
     /**

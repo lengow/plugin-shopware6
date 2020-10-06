@@ -294,7 +294,7 @@ class LengowConnector
             $this->lengowLog->write(LengowLog::CODE_CONNECTOR, $error, $logOutput);
             return false;
         }
-        return json_decode($results);
+        return json_decode($results, false);
     }
 
     /**

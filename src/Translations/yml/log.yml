@@ -59,6 +59,9 @@ en:
         token_is_empty: "the returned authorization token is empty"
         api_not_available: "Lengow APIs are not available"
         retry_get_token: "API call failed - authorization token expired - attempt to recover a new token"
+      mail_report:
+        send_mail_to: "report email sent to %{email}"
+        unable_send_mail_to: "unable to send report email to %{email}"
       orm:
         field_is_required: "Error while creating record in database: %{field} is required"
         record_insert_failed: "Error while inserting record in database: %{decoded_message}"

@@ -146,9 +146,13 @@ class LengowOrderError
      * @param int $deliveryAddressId Lengow delivery address id
      * @param int $type order error type (import or send)
      *
-     * @return EntityCollection|false
+     * @return EntityCollection|null
      */
-    public function orderIsInError(string $marketplaceSku, int $deliveryAddressId, int $type = self::TYPE_ERROR_IMPORT)
+    public function orderIsInError(
+        string $marketplaceSku,
+        int $deliveryAddressId,
+        int $type = self::TYPE_ERROR_IMPORT
+    ): ?EntityCollection
     {
         $context = Context::createDefaultContext();
         $criteria = new Criteria();
@@ -163,7 +167,7 @@ class LengowOrderError
         if ($LengowOrderErrorCollection->count() !== 0) {
             return $LengowOrderErrorCollection;
         }
-        return false;
+        return null;
     }
 
     /**
@@ -192,5 +196,27 @@ class LengowOrderError
             }
         }
         return $result;
+    }
+
+    /**
+     * Get order error not sent by email
+     *
+     * @return EntityCollection|null
+     */
+    public function getOrderErrorNotSent(): ?EntityCollection
+    {
+        $context = Context::createDefaultContext();
+        $criteria = new Criteria();
+        $criteria->addFilter(new MultiFilter(MultiFilter::CONNECTION_AND, [
+            new EqualsFilter('isFinished', false),
+            new EqualsFilter('mail', false),
+        ]));
+        $criteria->addAssociation('order');
+        /** @var LengowOrderErrorCollection $LengowOrderErrorCollection */
+        $LengowOrderErrorCollection = $this->lengowOrderErrorRepository->search($criteria, $context)->getEntities();
+        if ($LengowOrderErrorCollection->count() !== 0) {
+            return $LengowOrderErrorCollection;
+        }
+        return null;
     }
 }

@@ -525,7 +525,7 @@ class LengowImportOrder
                     $this->logOutput,
                     $this->marketplaceSku
                 );
-                if (!(bool)$this->lengowConfiguration->get(LengowConfiguration::LENGOW_IMPORT_SHIPPED_BY_MKTP)) {
+                if (!$this->lengowConfiguration->get(LengowConfiguration::LENGOW_IMPORT_SHIPPED_BY_MKTP)) {
                     // update Lengow order with new data
                     $this->lengowOrder->update($lengowOrder->getId(), [
                         'orderProcessState' => LengowOrder::PROCESS_STATE_FINISH,
@@ -568,7 +568,9 @@ class LengowImportOrder
             $this->createLengowOrderLines($order, $products);
             // don't reduce stock for re-import order and order shipped by marketplace
             if ($this->isReimported
-                || ($this->shippedByMp && !(bool)$this->lengowConfiguration->get(LengowConfiguration::LENGOW_IMPORT_MKTP_DECR_STOCK))
+                || ($this->shippedByMp
+                    && !$this->lengowConfiguration->get(LengowConfiguration::LENGOW_IMPORT_MKTP_DECR_STOCK)
+                )
             ) {
                 if ($this->isReimported) {
                     $logMessage = $this->lengowLog->encodeMessage('log.import.quantity_back_reimported_order');

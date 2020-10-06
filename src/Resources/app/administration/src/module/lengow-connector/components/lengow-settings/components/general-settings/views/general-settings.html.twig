@@ -70,17 +70,27 @@
                     :switchHelpText="$tc('lengow-connector.settings.lengow_main_settings.ip_enable.description')"
                     :helpText="$tc('lengow-connector.settings.lengow_main_settings.ip.description')">
                 </lgw-conditionnal-string-field>
-                <lgw-conditionnal-string-field
-                    :switchLabel="$tc('lengow-connector.settings.lengow_main_settings.tracking_enable.label')"
-                    :fieldLabel="$tc('lengow-connector.settings.lengow_main_settings.tracking_id.label')"
-                    :locked="lengowTrackingEnabled"
-                    :fieldContent="lengowTrackingId"
-                    switchSettingsKey="lengowTrackingEnabled"
-                    fieldSettingsKey="lengowTrackingId"
-                    :switchHelpText="$tc('lengow-connector.settings.lengow_main_settings.tracking_enable.description')"
-                    :helpText="$tc('lengow-connector.settings.lengow_main_settings.tracking_id.description')"
-                    :onSaveSettings="onSaveSettings">
-                </lgw-conditionnal-string-field>
+                <sw-help-text class="lgw-help-text"
+                              :text="$tc('lengow-connector.settings.lengow_main_settings.tracking_enable.description')"
+                              :width="200"
+                              tooltipPosition="right"/>
+                <sw-switch-field class="text-center"
+                                 :label="$tc('lengow-connector.settings.lengow_main_settings.tracking_enable.label')"
+                                 v-model="lengowTrackingEnabled"
+                                 @change="onSaveSettings($event, 'lengowTrackingEnabled')">
+                </sw-switch-field>
+                <sw-help-text class="lgw-help-text"
+                              :text="$tc('lengow-connector.settings.lengow_main_settings.tracking_id.description')"
+                              :width="200"
+                              v-show="lengowTrackingEnabled"
+                              tooltipPosition="right"/>
+                <sw-select-field :label="$tc('lengow-connector.settings.lengow_main_settings.tracking_id.label')"
+                                 v-model="lengowTrackingId"
+                                 v-show="lengowTrackingEnabled"
+                                 @change="onSaveSettings($event, 'lengowTrackingId')">
+                    <option value="id">Id</option>
+                    <option value="productNumber">Product Number</option>
+                </sw-select-field>
             </div>
             <div class="lgw-settings-block-title">
                 <h3>|  {{ $tc('lengow-connector.settings.title.timezone') }}</h3>

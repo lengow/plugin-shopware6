@@ -3,7 +3,11 @@
 namespace Lengow\Connector\Service;
 
 use \Exception;
+use \Swift_Message;
+use \Swift_Mailer;
+use Lengow\Connector\Entity\Lengow\OrderError\OrderErrorEntity;
 use Shopware\Core\Checkout\Order\OrderEntity;
+use Shopware\Core\Framework\DataAbstractionLayer\EntityCollection;
 use Shopware\Core\System\SalesChannel\SalesChannelEntity;
 use Lengow\Connector\Exception\LengowException;
 
@@ -67,6 +71,11 @@ class LengowImport
      * @var LengowOrderError Lengow order error service
      */
     private $lengowOrderError;
+
+    /**
+     * @var Swift_Mailer Swift mailer service
+     */
+    private $swiftMailer;
 
     /**
      * @var int account ID
@@ -162,6 +171,7 @@ class LengowImport
      * @param LengowImportOrder $lengowImportOrder Lengow import order service
      * @param LengowOrder $lengowOrder Lengow order service
      * @param LengowOrderError $lengowOrderError Lengow order error service
+     * @param Swift_Mailer $swiftMailer Swift Mailer service
      */
     public function __construct(
         LengowConnector $lengowConnector,
@@ -169,7 +179,8 @@ class LengowImport
         LengowLog $lengowLog,
         LengowImportOrder $lengowImportOrder,
         LengowOrder $lengowOrder,
-        LengowOrderError $lengowOrderError
+        LengowOrderError $lengowOrderError,
+        Swift_Mailer $swiftMailer
     )
     {
         $this->lengowConnector = $lengowConnector;
@@ -178,6 +189,7 @@ class LengowImport
         $this->lengowImportOrder = $lengowImportOrder;
         $this->lengowOrder = $lengowOrder;
         $this->lengowOrderError = $lengowOrderError;
+        $this->swiftMailer = $swiftMailer;
     }
 
     /**
@@ -405,6 +417,13 @@ class LengowImport
                 ]),
                 $this->logOutput
             );
+            // sending email in error for orders
+            if (!$this->debugMode
+                && !$this->importOneOrder
+                && $this->lengowConfiguration->get(LengowConfiguration::LENGOW_REPORT_MAIL_ENABLED)
+            ) {
+                $this->sendMailAlert($this->logOutput);
+            }
         }
         if ($globalError) {
             $error[0] = $globalError;
@@ -583,7 +602,9 @@ class LengowImport
         }
         do {
             try {
-                $currencyConversion = !(bool)$this->lengowConfiguration->get(LengowConfiguration::LENGOW_CURRENCY_CONVERSION_ENABLED);
+                $currencyConversion = !$this->lengowConfiguration->get(
+                    LengowConfiguration::LENGOW_CURRENCY_CONVERSION_ENABLED
+                );
                 if ($this->importOneOrder) {
                     $results = $this->lengowConnector->get(
                         LengowConnector::API_ORDER,
@@ -844,5 +865,102 @@ class LengowImport
         }
         $this->updatedFrom = time() - $intervalTime;
         $this->updatedTo = time();
+    }
+
+    /**
+     * Check order error table and send mail for order not imported correctly
+     *
+     * @param bool $logOutput see log or not
+     *
+     * @return bool
+     */
+    private function sendMailAlert(bool $logOutput = false): bool
+    {
+        $success = true;
+        $orderErrorCollection = $this->lengowOrderError->getOrderErrorNotSent();
+        if ($orderErrorCollection === null) {
+            return $success;
+        }
+        $subject = $this->lengowLog->decodeMessage('lengow_log.mail_report.subject_report_mail');
+        $mailBody = $this->getMailAlertBody($orderErrorCollection);
+        $emails = $this->lengowConfiguration->getReportEmailAddress();
+        foreach ($emails as $email) {
+            if ($email === '') {
+                continue;
+            }
+            if ($this->sendMail($email, $subject, $mailBody)) {
+                $this->lengowLog->write(
+                    LengowLog::CODE_MAIL_REPORT,
+                    $this->lengowLog->encodeMessage('log.mail_report.send_mail_to', [
+                        'email' => $email,
+                    ]),
+                    $logOutput
+                );
+            } else {
+                $this->lengowLog->write(
+                    LengowLog::CODE_MAIL_REPORT,
+                    $this->lengowLog->encodeMessage('log.mail_report.unable_send_mail_to', [
+                        'email' => $email,
+                    ]),
+                    $logOutput
+                );
+                $success = false;
+            }
+        }
+        return $success;
+    }
+
+    /**
+     * Get mail alert body and put mail attribute at true in order lengow record
+     *
+     * @param EntityCollection $orderErrorCollection order errors ready to be send
+     *
+     * @return string
+     */
+    private function getMailAlertBody(EntityCollection $orderErrorCollection): string
+    {
+        $mailBody = '';
+        if ($orderErrorCollection->count() === 0) {
+            return $mailBody;
+        }
+        $support = $this->lengowLog->decodeMessage('lengow_log.mail_report.no_error_in_report_mail');
+        $mailBody = '<h2>'
+            . $this->lengowLog->decodeMessage('lengow_log.mail_report.subject_report_mail')
+            . '</h2><p><ul>';
+        /** @var OrderErrorEntity $orderError */
+        foreach ($orderErrorCollection as $orderError) {
+            $order = $this->lengowLog->decodeMessage('lengow_log.mail_report.order', null, [
+                'marketplace_sku' => $orderError->getOrder()->getMarketplaceSku(),
+            ]);
+            $message = $orderError->getMessage() !== ''
+                ? $this->lengowLog->decodeMessage($orderError->getMessage())
+                : $support;
+            $mailBody .= '<li>' . $order . ' - ' . $message . '</li>';
+            $this->lengowOrderError->update($orderError->getId(), [
+                'mail' => true,
+            ]);
+        }
+        $mailBody .= '</ul></p>';
+        return $mailBody;
+    }
+
+    /**
+     * Send mail without template
+     *
+     * @param string $email send mail at
+     * @param string $subject subject email
+     * @param string $body body email
+     *
+     * @return bool
+     */
+    private function sendMail(string $email, string $subject, string $body): bool
+    {
+        // Create a message
+        $message = (new Swift_Message($subject))
+            ->setFrom([$this->lengowConfiguration->get('core.basicInformation.email') => 'Lengow'])
+            ->setTo([$email])
+            ->setBody($body);
+        // Send the message
+        return $this->swiftMailer->send($message) === 1;
     }
 }

@@ -160,3 +160,7 @@ de:
         salutation_not_found: "Keine salutation in unserem System gefunden. Bitte fügen Sie es Ihrer Shopware Konfiguration hinzu"
         shopware_customer_not_saved: "VORSICHT! Kunde konnte NICHT in der Shopware Datenbank gespeichert werden"
         shopware_order_not_saved: "VORSICHT! Bestellung konnte NICHT in der Shopware Datenbank gespeichert werden"
+      mail_report:
+        subject_report_mail: "Lengow Importfehler"
+        order: "Bestellungen %{marketplace_sku}"
+        no_error_in_report_mail: "Keine Fehlermeldung, kontaktieren Sie den Support auf https://supportlengow.zendesk.com/agent/"

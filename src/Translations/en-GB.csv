@@ -23,6 +23,9 @@ lengow_log.exception.country_not_found|No country found for ISO code %{iso_code}
 lengow_log.exception.salutation_not_found|No salutation found in our system. Please add it into your Shopware configuration
 lengow_log.exception.shopware_customer_not_saved|WARNING! Customer could NOT be saved in Shopware user table
 lengow_log.exception.shopware_order_not_saved|WARNING! Order could NOT be saved in Shopware order table
+lengow_log.mail_report.subject_report_mail|Lengow imports errors
+lengow_log.mail_report.order|Order %{marketplace_sku}
+lengow_log.mail_report.no_error_in_report_mail|no error message, contact support via https://supportlengow.zendesk.com/agent/
 log.export.unauthorised_ip|Unauthorized access for IP: %{ip}
 log.export.unauthorised_token|Unauthorised access for this token: %{token}
 log.export.empty_token|Unauthorised access: token parameter is empty
@@ -78,6 +81,8 @@ log.connector.token_not_return|no authorization token returned
 log.connector.token_is_empty|the returned authorization token is empty
 log.connector.api_not_available|Lengow APIs are not available
 log.connector.retry_get_token|API call failed - authorization token expired - attempt to recover a new token
+log.mail_report.send_mail_to|report email sent to %{email}
+log.mail_report.unable_send_mail_to|unable to send report email to %{email}
 log.orm.field_is_required|Error while creating record in database: %{field} is required
 log.orm.record_insert_failed|Error while inserting record in database: %{decoded_message}
 log.setting.setting_change|%{key} - old value %{old_value} replaced with %{value}

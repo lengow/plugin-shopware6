@@ -87,7 +87,7 @@ class LengowAccess
             $criteria,
             Context::createDefaultContext()
         );
-        $salesChannel = (array) $result->getEntities()->getElements();
+        $salesChannel = $result->getEntities()->getElements();
         if ($salesChannel) {
             return true;
         }
@@ -104,7 +104,7 @@ class LengowAccess
     {
         if ($this->checkIp($_SERVER['REMOTE_ADDR'])
             || ($token
-                && !(bool)$this->lengowConfiguration->get(LengowConfiguration::LENGOW_IP_ENABLED)
+                && !$this->lengowConfiguration->get(LengowConfiguration::LENGOW_IP_ENABLED)
                 && $this->checkToken($token, $salesChannelId))
         ) {
             return true;

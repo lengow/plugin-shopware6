@@ -47,6 +47,7 @@
             <argument type="service" id="Lengow\Connector\Service\LengowImportOrder"/>
             <argument type="service" id="Lengow\Connector\Service\LengowOrder"/>
             <argument type="service" id="Lengow\Connector\Service\LengowOrderError"/>
+            <argument type="service" id="swiftmailer.mailer.default"/>
         </service>
 
         <service id="Lengow\Connector\Service\LengowImportOrder">
