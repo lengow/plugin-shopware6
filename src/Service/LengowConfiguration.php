@@ -718,7 +718,7 @@ class LengowConfiguration
                             'name' => $key,
                             'value' => EnvironmentInfoProvider::getShippingMethodDefaultValue(
                                 $salesChannel->getId(),
-                                $shippingMethodRepository,
+                                $shippingMethodRepository
                             )
                         ];
                         continue;
