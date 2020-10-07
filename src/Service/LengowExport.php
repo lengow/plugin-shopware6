@@ -53,6 +53,76 @@ class LengowExport
     private $languageRepository;
 
     /**
+     * @var EntityRepositoryInterface  shopware custom field repository
+     */
+    private $customFieldRepository;
+
+    /**
+     * @var EntityRepositoryInterface shopware custom field set repository
+     */
+    private $customFieldSetRepository;
+
+    /**
+     * @var EntityRepositoryInterface shopware property group translation repository
+     */
+    private $propertyGroupTranslationRepository;
+
+    /**
+     * @var LengowFeed lengow feed service
+     */
+    private $lengowFeed;
+
+    /**
+     * @var array default fields
+     */
+    public static $defaultFields = [
+        'id' => 'id',
+        'sku' => 'sku',
+        'sku_supplier' => 'sku_supplier',
+        'ean' => 'ean',
+        'name' => 'name',
+        'quantity' => 'quantity',
+        'category' => 'category',
+        'status' => 'status',
+        'url' => 'url',
+        'price_excl_tax' => 'price_excl_tax',
+        'price_incl_tax' => 'price_incl_tax',
+        'price_before_discount_excl_tax' => 'price_before_discount_excl_tax',
+        'price_before_discount_incl_tax' => 'price_before_discount_incl_tax',
+        'discount_percent' => 'discount_percent',
+        'discount_start_date' => 'discount_start_date',
+        'discount_end_date' => 'discount_end_date',
+        'currency' => 'currency',
+        'shipping_cost' => 'shipping_cost',
+        'shipping_delay' => 'shipping_delay',
+        'weight' => 'weight',
+        'width' => 'width',
+        'height' => 'height',
+        'length' => 'length',
+        'minimal_quantity' => 'minimal_quantity',
+        'image_url_1' => 'image_url_1',
+        'image_url_2' => 'image_url_2',
+        'image_url_3' => 'image_url_3',
+        'image_url_4' => 'image_url_4',
+        'image_url_5' => 'image_url_5',
+        'image_url_6' => 'image_url_6',
+        'image_url_7' => 'image_url_7',
+        'image_url_8' => 'image_url_8',
+        'image_url_9' => 'image_url_9',
+        'image_url_10' => 'image_url_10',
+        'type' => 'type',
+        'parent_id' => 'parent_id',
+        'variation' => 'variation',
+        'language' => 'language',
+        'description_short' => 'description_short',
+        'description' => 'description',
+        'description_html' => 'description_html',
+        'meta_title' => 'meta_title',
+        'meta_keyword' => 'meta_keyword',
+        'supplier' => 'supplier',
+    ];
+
+    /**
      * all export configuration parameters :
      * @var array [
      *  bool 'selection'
@@ -73,6 +143,10 @@ class LengowExport
      * @param EntityRepositoryInterface $lengowProductRepository lengow product repository
      * @param EntityRepositoryInterface $currencyRepository lengow product repository
      * @param EntityRepositoryInterface $languageRepository lengow product repository
+     * @param EntityRepositoryInterface $customFieldRepository lengow product repository
+     * @param EntityRepositoryInterface $customFieldSetRepository lengow product repository
+     * @param EntityRepositoryInterface $propertyGroupTranslationRepository
+     * @param LengowFeed $lengowFeed lengow feed service
      */
     public function __construct(
         LengowConfiguration $lengowConfiguration,
@@ -81,7 +155,11 @@ class LengowExport
         EntityRepositoryInterface $categoryRepository,
         EntityRepositoryInterface $lengowProductRepository,
         EntityRepositoryInterface $currencyRepository,
-        EntityRepositoryInterface $languageRepository
+        EntityRepositoryInterface $languageRepository,
+        EntityRepositoryInterface $customFieldRepository,
+        EntityRepositoryInterface $customFieldSetRepository,
+        EntityRepositoryInterface $propertyGroupTranslationRepository,
+        LengowFeed $lengowFeed
     ) {
         $this->lengowConfiguration = $lengowConfiguration;
         $this->productRepository = $productRepository;
@@ -90,6 +168,11 @@ class LengowExport
         $this->lengowProductRepository = $lengowProductRepository;
         $this->currencyRepository = $currencyRepository;
         $this->languageRepository = $languageRepository;
+        /** export exec repository */
+        $this->customFieldRepository = $customFieldRepository;
+        $this->customFieldSetRepository = $customFieldSetRepository;
+        $this->propertyGroupTranslationRepository = $propertyGroupTranslationRepository;
+        $this->lengowFeed = $lengowFeed;
     }
 
     /**
@@ -108,6 +191,7 @@ class LengowExport
         bool $outOfStock,
         bool $variation,
         bool $inactive,
+        string $format,
         string $productIds
     ): void
     {
@@ -128,8 +212,23 @@ class LengowExport
                 LengowConfiguration::LENGOW_EXPORT_DISABLED_PRODUCT,
                 $salesChannelId
             ),
+            'format' => $this->validateFormat($format),
             'product_ids' => $productIds ?: '',
+            'sales_channel_id' => $salesChannelId,
         ];
+    }
+
+    /**
+     * Validate requested format
+     *
+     * @param string $format requested format
+     * @return string
+     */
+    private function validateFormat($format) {
+        if ($format && in_array($format, LengowFeed::$availableFormats, true)) {
+            return $format;
+        }
+        return LengowFeed::FORMAT_CSV;
     }
 
     /**
@@ -406,4 +505,97 @@ class LengowExport
         }
         return $languages;
     }
+
+    /**
+     * execute export
+     *
+     * @return bool
+     * @throws \Lengow\Connector\Exception\LengowException
+     */
+    public function exec() : bool
+    {
+        // todo Log start export
+        // todo Log which sales channel is exported
+        try {
+            $fields = $this->getHeaderFields();
+            $this->lengowFeed->init(
+                $this->exportConfiguration['sales_channel_id'],
+                false,
+                $this->exportConfiguration['format']
+            );
+            $this->lengowFeed->write(LengowFeed::HEADER, $fields);
+            $this->lengowFeed->end();
+        } catch (Exception $e) {
+            // todo log exception
+        }
+        return false;
+    }
+
+    /**
+     * Get all field's headers
+     *
+     * @return array
+     */
+    private function getHeaderFields() : array
+    {
+        $fields = [];
+        foreach (self::$defaultFields as $key => $value) {
+            $fields[] = $key;
+        }
+        $fields = array_merge(
+            $fields,
+            $this->getAllCustomHeaderField(),
+            $this->getAllPropertiesHeaderField()
+        );
+        return $fields;
+    }
+
+    /**
+     * Get all ACTIVE custom fields
+     * Format is 'CustomFieldSetName'_'CustomFieldName'
+     *
+     * @return array
+     */
+    private function getAllCustomHeaderField() : array
+    {
+        $fields = [];
+        $customFieldSetCriteria = new Criteria();
+        $customFieldSetCriteria->addFilter(new EqualsFilter('active', 1));
+        $customFieldSetCriteria->addAssociation('customFieldSet');
+        $searchResult = $this->customFieldRepository->search($customFieldSetCriteria, Context::createDefaultContext());
+        if ($searchResult->count() > 0) {
+            foreach ($searchResult as $customField) {
+                $fields[] = $customField->getCustomFieldSet()->getName() . '_' . $customField->getName();
+            }
+        }
+        return $fields;
+    }
+
+    /**
+     * Get all properties fields
+     * Format is 'prop'_'fieldName'
+     *
+     * @return array
+     */
+    private function getAllPropertiesHeaderField() : array
+    {
+        $fields = [];
+        $salesChannelCriteria = new Criteria();
+        $salesChannelCriteria->addFilter(new EqualsFilter('id', $this->exportConfiguration['sales_channel_id']));
+        $salesChannel = $this->salesChannelRepository->search($salesChannelCriteria, Context::createDefaultContext());
+        if ($salesChannel->count() > 0) {
+            $languageId = $salesChannel->first()->getLanguageId();
+            $propertyGroupTranslationCriteria = new Criteria();
+            $propertyGroupTranslationCriteria->addFilter(new EqualsFilter('languageId', $languageId));
+            $searchResult = $this->propertyGroupTranslationRepository
+                ->search($propertyGroupTranslationCriteria, Context::createDefaultContext());
+            if ($searchResult->count() > 0) {
+                foreach ($searchResult as $propertiesField) {
+                    $fields[] = 'prop_' . $propertiesField->getName();
+                }
+            }
+        }
+        return $fields;
+    }
+
 }

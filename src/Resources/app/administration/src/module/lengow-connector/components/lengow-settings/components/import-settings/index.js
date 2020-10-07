@@ -112,7 +112,7 @@ Component.register('lengow-import-settings', {
             const shippingMethodCriteria = new Criteria();
             shippingMethodCriteria.addFilter(Criteria.equals('id', defaultShippingMethodId));
             return this.shippingMethodRepository.search(shippingMethodCriteria, Shopware.Context.api).then(result => {
-                return result.total !== 0 ? result.first().name : 'Not found';
+                return result.total !== 0 ? result.first().id : 'Not found';
             });
         },
     },

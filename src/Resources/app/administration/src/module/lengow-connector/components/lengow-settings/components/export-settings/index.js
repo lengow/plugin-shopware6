@@ -36,9 +36,9 @@ Component.register('lengow-export-settings', {
         salesChannelCriteria.addAssociation('domains');
         this.salesChannelRepository.search(salesChannelCriteria, Shopware.Context.api).then(result => {
             result.forEach(salesChannel => {
-                this.getShippingMethod(salesChannel);
-                this.getConfigExportDefaultShippingMethod(salesChannel.id).then(defaultShippingMethod => {
-                    this.salesChannels = [ ...this.salesChannels, {
+                this.getShippingMethod(salesChannel).then(() => {
+                    this.getConfigExportDefaultShippingMethod(salesChannel.id).then(defaultShippingMethod => {
+                        this.salesChannels = [ ...this.salesChannels, {
                             salesChannelId: salesChannel.id,
                             name: salesChannel.name,
                             value: salesChannel.id,
@@ -46,9 +46,10 @@ Component.register('lengow-export-settings', {
                             exportDisabled: this.getConfigExportDisabledProduct(salesChannel.id),
                             exportSelection: this.getConfigExportSelection(salesChannel.id)
                         }
-                    ];
-                    this.render = true;
-                })
+                        ];
+                        this.render = true;
+                    })
+                });
             });
         });
     },
@@ -81,7 +82,7 @@ Component.register('lengow-export-settings', {
             const shippingMethodCriteria = new Criteria();
             shippingMethodCriteria.addFilter(Criteria.equals('id', defaultShippingMethodId));
             return this.shippingMethodRepository.search(shippingMethodCriteria, Shopware.Context.api).then(result => {
-                return result.total !== 0 ? result.first().name : 'Not found';
+                return result.total !== 0 ? result.first().id : 'Not found';
             });
         },
 
@@ -101,7 +102,7 @@ Component.register('lengow-export-settings', {
             const shippingMethodCriteria = new Criteria();
             shippingMethodCriteria.getAssociation('salesChannels');
             shippingMethodCriteria.addFilter(Criteria.equals('salesChannels.id', salesChannel.id));
-            this.shippingMethodRepository.search(shippingMethodCriteria, Shopware.Context.api).then(result => {
+            return this.shippingMethodRepository.search(shippingMethodCriteria, Shopware.Context.api).then(result => {
                 result.forEach(shippingMethod => {
                     this.shippingMethods = [...this.shippingMethods,
                         {

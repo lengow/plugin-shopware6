@@ -69,15 +69,17 @@ class LengowExportController extends LengowAbstractFrontController
             $exportArgs['out_of_stock'],
             $exportArgs['variation'],
             $exportArgs['inactive'],
+            $exportArgs['format'] ?: '',
             $exportArgs['product_ids'] ?: ''
         );
 
         if ($exportArgs['mode']) {
             return new Response($this->modeSize($exportArgs['mode'], $exportArgs['sales_channel_id'] ));
         }
-
-        // TODO handle export here
-        die(var_dump($exportArgs));
+        if (!$this->lengowExport->exec()) {
+            // todo log
+        }
+        return new Response('ok');
     }
 
     /**
