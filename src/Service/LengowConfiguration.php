@@ -2,6 +2,8 @@
 
 namespace Lengow\Connector\Service;
 
+use DateTime;
+use DateTimeZone;
 use Exception;
 use Shopware\Core\System\SystemConfig\SystemConfigService;
 use Shopware\Core\Framework\DataAbstractionLayer\EntityRepositoryInterface;
@@ -10,7 +12,6 @@ use Shopware\Core\Framework\DataAbstractionLayer\Search\Criteria;
 use Shopware\Core\Framework\Context;
 use Shopware\Core\Framework\DataAbstractionLayer\Search\Filter\EqualsFilter;
 use Shopware\Core\Framework\DataAbstractionLayer\Search\Filter\MultiFilter;
-use Shopware\Core\Framework\DataAbstractionLayer\Event\EntityWrittenEvent;
 use Shopware\Core\Framework\DataAbstractionLayer\Event\EntityDeletedEvent;
 use Shopware\Core\System\SalesChannel\SalesChannelCollection;
 use Shopware\Core\System\SalesChannel\SalesChannelEntity;
@@ -70,7 +71,22 @@ class LengowConfiguration
     public const LENGOW_IMPORT_IN_PROGRESS = 'lengowImportInProgress';
 
     /**
-     * @var array $lengowSettings specific Lengow settings in lengow_settings table
+     * @var string Lengow default timezone
+     */
+    public const DEFAULT_TIMEZONE = 'Etc/Greenwich';
+
+    /**
+     * @var string log date time format
+     */
+    public const DEFAULT_DATE_TIME_FORMAT = 'Y-m-d H:i:s';
+
+    /**
+     * @var string api date time format
+     */
+    public const API_DATE_TIME_FORMAT = 'c';
+
+    /**
+     * @var array specific Lengow settings in lengow_settings table
      */
     public static $lengowSettings = [
         self::LENGOW_GLOBAL_TOKEN => [
@@ -305,7 +321,7 @@ class LengowConfiguration
         self::LENGOW_TIMEZONE => [
             'lengow_settings' => true,
             'global' => true,
-            'default_value' => 'Etc/Greenwich',
+            'default_value' => self::DEFAULT_TIMEZONE,
         ],
     ];
 
@@ -325,14 +341,14 @@ class LengowConfiguration
     private $systemConfigRepository;
 
     /**
-     * @var LengowLog $lengowLog Lengow log service
-     */
-    private $lengowLog;
-
-    /**
      * @var EnvironmentInfoProvider Environment info provider utility
      */
     private $environmentInfoProvider;
+
+    /**
+     * @var string Lengow timezone for date creation
+     */
+    private $lengowTimezone;
 
     /**
      * LengowConfiguration constructor
@@ -340,21 +356,18 @@ class LengowConfiguration
      * @param EntityRepositoryInterface $settingsRepository Lengow settings access
      * @param SystemConfigService $systemConfigService Shopware settings access
      * @param EntityRepositoryInterface $systemConfigRepository shopware settings repository
-     * @param LengowLog $lengowLog Lengow log service
      * @param EnvironmentInfoProvider $environmentInfoProvider Environment info provider utility
      */
     public function __construct(
         EntityRepositoryInterface $settingsRepository,
         SystemConfigService $systemConfigService,
         EntityRepositoryInterface $systemConfigRepository,
-        LengowLog $lengowLog,
         EnvironmentInfoProvider $environmentInfoProvider
     )
     {
         $this->settingsRepository = $settingsRepository;
         $this->systemConfigService = $systemConfigService;
         $this->systemConfigRepository = $systemConfigRepository;
-        $this->lengowLog = $lengowLog;
         $this->environmentInfoProvider = $environmentInfoProvider;
     }
 
@@ -438,6 +451,25 @@ class LengowConfiguration
     }
 
     /**
+     * Get a sales channel with a given token
+     *
+     * @param string $token sales channel token
+     *
+     * @return SalesChannelEntity|null
+     */
+    public function getSalesChannelByToken(string $token): ?SalesChannelEntity
+    {
+        /** @var SalesChannelCollection $salesChannelCollection */
+        $salesChannelCollection = $this->environmentInfoProvider->getActiveSalesChannels();
+        foreach ($salesChannelCollection as $salesChannel) {
+            if ($this->get(self::LENGOW_CHANNEL_TOKEN, $salesChannel->getId()) === $token) {
+                return $salesChannel;
+            }
+        }
+        return null;
+    }
+
+    /**
      * Get valid account id / access token / secret token
      *
      * @return array
@@ -451,6 +483,17 @@ class LengowConfiguration
             return [$accountId, $accessToken, $secretToken];
         }
         return [null, null, null];
+    }
+
+    /**
+     * Check if new merchant
+     *
+     * @return bool
+     */
+    public function isNewMerchant(): bool
+    {
+        list($accountId, $accessToken, $secretToken) = $this->getAccessIds();
+        return !($accountId !== null && $accessToken !== null && $secretToken !== null);
     }
 
     /**
@@ -473,6 +516,56 @@ class LengowConfiguration
             }
         }
         return $catalogIds;
+    }
+
+    /**
+     * Set catalog ids for a specific sales channel
+     *
+     * @param array $catalogIds Lengow catalog ids
+     * @param string $salesChannelId Shopware sales channel id
+     *
+     * @return bool
+     */
+    public function setCatalogIds(array $catalogIds, string $salesChannelId): bool
+    {
+        $valueChange = false;
+        $salesChannelCatalogIds = $this->getCatalogIds($salesChannelId);
+        foreach ($catalogIds as $catalogId) {
+            if ($catalogId > 0 && is_numeric($catalogId) && !in_array($catalogId, $salesChannelCatalogIds, true)) {
+                $salesChannelCatalogIds[] = (int)$catalogId;
+                $valueChange = true;
+            }
+        }
+        $this->set(self::LENGOW_CATALOG_ID, implode(';', $salesChannelCatalogIds), $salesChannelId);
+        return $valueChange;
+    }
+
+    /**
+     * Recovers if a sales channel is active or not
+     *
+     * @param string $salesChannelId Shopware sales channel id
+     *
+     * @return bool
+     */
+    public function salesChannelIsActive(string $salesChannelId): bool
+    {
+        return $this->get(self::LENGOW_SALES_CHANNEL_ENABLED, $salesChannelId);
+    }
+
+    /**
+     * Set active sales channel or not
+     *
+     * @param string $salesChannelId Shopware sales channel id
+     *
+     * @return bool
+     */
+    public function setActiveSalesChannel(string $salesChannelId): bool
+    {
+        $shopIsActive = $this->salesChannelIsActive($salesChannelId);
+        $catalogIds = $this->getCatalogIds($salesChannelId);
+        $salesChannelHasCatalog = !empty($catalogIds) ? '1' : '0';
+        $this->set(self::LENGOW_SALES_CHANNEL_ENABLED, $salesChannelHasCatalog, $salesChannelId);
+        return $shopIsActive !== $salesChannelHasCatalog;
     }
 
     /**
@@ -506,6 +599,51 @@ class LengowConfiguration
     }
 
     /**
+     * Get Lengow timezone for datetime
+     *
+     * @return string
+     */
+    public function getLengowTimezone(): string
+    {
+        if ($this->lengowTimezone === null) {
+            $timezone = $this->get(self::LENGOW_TIMEZONE);
+            $this->lengowTimezone = $timezone ?? self::DEFAULT_TIMEZONE;
+        }
+        return  $this->lengowTimezone;
+    }
+
+    /**
+     * Get date with correct timezone
+     *
+     * @param int|null $timestamp gmt timestamp
+     * @param string $format date format
+     *
+     * @return string
+     */
+    public function date(int $timestamp = null, string $format = self::DEFAULT_DATE_TIME_FORMAT): string
+    {
+        $timestamp = $timestamp ?? time();
+        $timezone = $this->getLengowTimezone();
+        $dateTime = new DateTime();
+        return $dateTime->setTimestamp($timestamp)->setTimezone(new DateTimeZone($timezone))->format($format);
+    }
+
+    /**
+     * Get GMT date
+     *
+     * @param int|null $timestamp gmt timestamp
+     * @param string $format date format
+     *
+     * @return string
+     */
+    public function gmtDate(int $timestamp = null, string $format = self::DEFAULT_DATE_TIME_FORMAT): string
+    {
+        $timestamp = $timestamp ?? time();
+        $dateTime = new DateTime();
+        return $dateTime->setTimestamp($timestamp)->format($format);
+    }
+
+    /**
      * Get list of Shopware sales channel that have been activated in Lengow
      *
      * @return array
@@ -523,60 +661,6 @@ class LengowConfiguration
             }
         }
         return $result;
-    }
-
-    /**
-     * Check value and create a log if necessary
-     *
-     * @param string $key name of Lengow setting
-     * @param mixed $value setting value
-     * @param string|null $salesChannelId Shopware sales channel id
-     */
-    public function checkAndLog(string $key, $value, string $salesChannelId = null): void
-    {
-        if (!array_key_exists($key, self::$lengowSettings)) {
-            return;
-        }
-        $setting = self::$lengowSettings[$key];
-        $oldValue = $this->get($key, $salesChannelId);
-        if (isset($setting['type']) && $setting['type'] === 'boolean') {
-            $value = (int)$value;
-            $oldValue = (int)$oldValue;
-        } elseif (isset($setting['type']) && $setting['type'] === 'array') {
-            $value = implode(',', $value);
-            $oldValue = implode(',', $oldValue);
-        }
-        if ($oldValue !== $value) {
-            if (isset($setting['secret']) && $setting['secret']) {
-                $value = preg_replace("/[a-zA-Z0-9]/", '*', $value);
-                $oldValue = preg_replace("/[a-zA-Z0-9]/", '*', $oldValue);
-            }
-            if ($salesChannelId === null && isset($setting['global']) && $setting['global']) {
-                $this->lengowLog->write(
-                    LengowLog::CODE_SETTING,
-                    $this->lengowLog->encodeMessage('log.setting.setting_change', [
-                        'key' => $key,
-                        'old_value' => $oldValue,
-                        'value' => $value,
-                    ])
-                );
-            }
-            if ($salesChannelId && isset($setting['channel']) && $setting['channel']) {
-                $this->lengowLog->write(
-                    LengowLog::CODE_SETTING,
-                    $this->lengowLog->encodeMessage('log.setting.setting_change_for_sales_channel', [
-                        'key' => $key,
-                        'old_value' => $oldValue,
-                        'value' => $value,
-                        'sales_channel_id' => $salesChannelId,
-                    ])
-                );
-            }
-            // save last update date for a specific settings (change synchronisation interval time)
-            if (isset($setting['update']) && $setting['update']) {
-                $this->set(self::LENGOW_LAST_SETTING_UPDATE, (string)time());
-            }
-        }
     }
 
     /**
@@ -640,16 +724,9 @@ class LengowConfiguration
             'sales_channel_id' => $salesChannelId,
             'name' => $key,
             'value' => $value,
-            'updated_at' => new \DateTime()
         ];
-
         try {
-            return $this->settingsRepository->upsert(
-                [
-                    $data,
-                ],
-                Context::createDefaultContext()
-            );
+            return $this->settingsRepository->upsert([$data], Context::createDefaultContext());
         } catch (Exception $e) {
             return null;
         }

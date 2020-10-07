@@ -23,7 +23,6 @@
             <argument type="service" id="lengow_settings.repository"/>
             <argument type="service" id="Shopware\Core\System\SystemConfig\SystemConfigService" />
             <argument type="service" id="system_config.repository"/>
-            <argument type="service" id="Lengow\Connector\Service\LengowLog"/>
             <argument type="service" id="Lengow\Connector\Util\EnvironmentInfoProvider"/>
         </service>
 
@@ -47,6 +46,7 @@
             <argument type="service" id="Lengow\Connector\Service\LengowImportOrder"/>
             <argument type="service" id="Lengow\Connector\Service\LengowOrder"/>
             <argument type="service" id="Lengow\Connector\Service\LengowOrderError"/>
+            <argument type="service" id="Lengow\Connector\Service\LengowSync"/>
             <argument type="service" id="swiftmailer.mailer.default"/>
         </service>
 
@@ -89,6 +89,7 @@
 
         <service id="Lengow\Connector\Service\LengowLog">
             <argument type="service" id="Lengow\Connector\Service\LengowTranslation"/>
+            <argument type="service" id="Lengow\Connector\Service\LengowConfiguration"/>
             <argument type="service" id="Lengow\Connector\Util\EnvironmentInfoProvider"/>
             <argument type="service" id="Lengow\Connector\Factory\LengowFileFactory"/>
         </service>

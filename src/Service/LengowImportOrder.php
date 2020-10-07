@@ -363,11 +363,14 @@ class LengowImportOrder
                 $orderError->getMessage(),
                 LengowTranslation::DEFAULT_ISO_CODE
             );
+            $dateMessage = $orderError->getCreatedAt()
+                ? $this->lengowConfiguration->date($orderError->getCreatedAt()->getTimestamp())
+                : $this->lengowConfiguration->date();
             $this->lengowLog->write(
                 LengowLog::CODE_IMPORT,
                 $this->lengowLog->encodeMessage('log.import.error_already_created', [
                     'decoded_message' => $decodedMessage,
-                    'date_message' => $orderError->getCreatedAt()->format('Y-m-d H:i:s'),
+                    'date_message' => $dateMessage,
                 ]),
                 $this->logOutput,
                 $this->marketplaceSku
@@ -436,7 +439,7 @@ class LengowImportOrder
             $this->deliveryAddressId
         );
         // if order is new, accepted, canceled or refunded -> skip
-        if (!in_array($this->orderStateLengow, $this->lengowStates)) {
+        if (!in_array($this->orderStateLengow, $this->lengowStates, true)) {
             $orderProcessState = $this->lengowOrder->getOrderProcessState($this->orderStateLengow);
             // check and complete an order not imported if it is canceled or refunded
             if ($lengowOrder && $orderProcessState === LengowOrder::PROCESS_STATE_FINISH) {
@@ -579,7 +582,8 @@ class LengowImportOrder
                 }
                 $this->lengowLog->write(LengowLog::CODE_IMPORT, $logMessage, $this->logOutput, $this->marketplaceSku);
             } else {
-                $orderIsCompleted = $order->getStateMachineState()->getTechnicalName() === OrderStates::STATE_COMPLETED;
+                $orderIsCompleted = $order->getStateMachineState()
+                    && $order->getStateMachineState()->getTechnicalName() === OrderStates::STATE_COMPLETED;
                 $this->decrementProductStocks($products, $orderIsCompleted);
             }
             $this->lengowLog->write(
@@ -671,7 +675,7 @@ class LengowImportOrder
                 $this->marketplaceSku
             );
         }
-        unset($order, $lengowOrder);
+        unset($lengowOrder);
         return $result;
     }
 
@@ -724,7 +728,7 @@ class LengowImportOrder
                $this->currency = $currencyCollection->first();
             }
         }
-        if ($this->orderData->total_order == -1) {
+        if ($this->orderData->total_order === -1) {
             $errorMessages[] = $this->lengowLog->encodeMessage('lengow_log.error.no_change_rate');
         }
         if ($this->orderData->billing_address === null) {
@@ -905,8 +909,7 @@ class LengowImportOrder
     private function getOrderDate(): string
     {
         $orderDate = (string)($this->orderData->marketplace_order_date ?? $this->orderData->imported_at);
-        $orderDate = new DateTime(date('Y-m-d H:i:s', strtotime($orderDate)));
-        return $orderDate->format(Defaults::STORAGE_DATE_TIME_FORMAT);
+        return $this->lengowConfiguration->gmtDate(strtotime($orderDate), Defaults::STORAGE_DATE_TIME_FORMAT);
     }
 
     /**
@@ -1180,7 +1183,7 @@ class LengowImportOrder
             $calculated = $this->calculator->calculate($definition, $salesChannelContext);
             // set new price into line item
             $lineItem['price'] = $calculated;
-            $lineItem['priceDefinition'] = $definition;;
+            $lineItem['priceDefinition'] = $definition;
             $orderData['lineItems'][$key] = $lineItem;
         }
         return $orderData;
@@ -1212,7 +1215,9 @@ class LengowImportOrder
         );
         $orderData['shippingCosts'] = $this->calculator->calculate($definition, $salesChannelContext);
         $orderData['deliveries'][0]['shippingCosts'] = $orderData['shippingCosts'];
-        $orderData['deliveries'][0]['stateId'] = $orderDeliveryState->getId();
+        if ($orderDeliveryState) {
+            $orderData['deliveries'][0]['stateId'] = $orderDeliveryState->getId();
+        }
         if (!empty($this->trackingNumber)) {
             $orderData['deliveries'][0]['trackingCodes'] = [$this->trackingNumber];
         }
@@ -1246,7 +1251,9 @@ class LengowImportOrder
             $this->shippedByMp
         );
         $orderData['transactions'][0]['amount'] = $orderAmountCalculatedPrice;
-        $orderData['transactions'][0]['stateId'] = $orderTransactionState->getId();
+        if ($orderTransactionState) {
+            $orderData['transactions'][0]['stateId'] = $orderTransactionState->getId();
+        }
         return $orderData;
     }
 
@@ -1278,7 +1285,9 @@ class LengowImportOrder
             $this->orderStateLengow,
             $this->shippedByMp
         );
-        $orderData['stateId'] = $orderState->getId();
+        if ($orderState) {
+            $orderData['stateId'] = $orderState->getId();
+        }
         return $orderData;
     }
 
