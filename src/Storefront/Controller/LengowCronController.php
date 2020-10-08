@@ -100,7 +100,9 @@ class LengowCronController extends LengowAbstractFrontController
     {
         return [
             'sync' => $request->query->get('sync'),
-            'debug_mode' => $request->query->get('debug_mode') === '1',
+            'debug_mode' => $request->query->get('debug_mode') !== null
+                ? $request->query->get('debug_mode') === '1'
+                : null,
             'log_output' => $request->query->get('log_output') === '1',
             'days' => (int)$request->query->get('days'),
             'created_from' => $request->query->get('created_from'),
