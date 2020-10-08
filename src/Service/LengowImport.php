@@ -2,9 +2,9 @@
 
 namespace Lengow\Connector\Service;
 
-use \Exception;
-use \Swift_Message;
-use \Swift_Mailer;
+use Exception;
+use Swift_Message;
+use Swift_Mailer;
 use Lengow\Connector\Entity\Lengow\OrderError\OrderErrorEntity;
 use Shopware\Core\Checkout\Order\OrderEntity;
 use Shopware\Core\Framework\DataAbstractionLayer\EntityCollection;
@@ -71,6 +71,11 @@ class LengowImport
      * @var LengowOrderError Lengow order error service
      */
     private $lengowOrderError;
+
+    /**
+     * @var LengowSync Lengow sync service
+     */
+    private $lengowSync;
 
     /**
      * @var Swift_Mailer Swift mailer service
@@ -171,6 +176,7 @@ class LengowImport
      * @param LengowImportOrder $lengowImportOrder Lengow import order service
      * @param LengowOrder $lengowOrder Lengow order service
      * @param LengowOrderError $lengowOrderError Lengow order error service
+     * @param LengowSync $lengowSync Lengow sync service
      * @param Swift_Mailer $swiftMailer Swift Mailer service
      */
     public function __construct(
@@ -180,6 +186,7 @@ class LengowImport
         LengowImportOrder $lengowImportOrder,
         LengowOrder $lengowOrder,
         LengowOrderError $lengowOrderError,
+        LengowSync $lengowSync,
         Swift_Mailer $swiftMailer
     )
     {
@@ -189,6 +196,7 @@ class LengowImport
         $this->lengowImportOrder = $lengowImportOrder;
         $this->lengowOrder = $lengowOrder;
         $this->lengowOrderError = $lengowOrderError;
+        $this->lengowSync = $lengowSync;
         $this->swiftMailer = $swiftMailer;
     }
 
@@ -269,7 +277,7 @@ class LengowImport
             }
             // check Lengow catalogs for order synchronisation
             if (!$this->importOneOrder && $this->importType === self::TYPE_MANUAL) {
-                // TODO get new catalog ids with cms API
+                $this->lengowSync->syncCatalog();
             }
             // start order synchronisation
             $this->lengowLog->write(
@@ -570,7 +578,7 @@ class LengowImport
      *
      * @param SalesChannelEntity $salesChannel Shopware sales channel instance
      *
-     * @throws LengowException
+     * @throws Exception|LengowException
      *
      * @return array
      */
@@ -588,13 +596,17 @@ class LengowImport
                 $this->logOutput
             );
         } else {
-            $dateFrom = $this->createdFrom ?? $this->updatedFrom;
-            $dateTo = $this->createdTo ?? $this->updatedTo;
+            $dateFrom = $this->createdFrom
+                ? $this->lengowConfiguration->gmtDate($this->createdFrom)
+                : $this->lengowConfiguration->date($this->updatedFrom);
+            $dateTo = $this->createdTo
+                ? $this->lengowConfiguration->gmtDate($this->createdTo)
+                : $this->lengowConfiguration->date($this->updatedTo);
             $this->lengowLog->write(
                 LengowLog::CODE_IMPORT,
                 $this->lengowLog->encodeMessage('log.import.connector_get_all_order', [
-                    'date_from' => date('Y-m-d H:i:s', $dateFrom),
-                    'date_to' => date('Y-m-d H:i:s', $dateTo),
+                    'date_from' => $dateFrom,
+                    'date_to' => $dateTo,
                     'catalog_id' => implode(', ', $this->salesChannelCatalogIds),
                 ]),
                 $this->logOutput
@@ -621,13 +633,25 @@ class LengowImport
                 } else {
                     if ($this->createdFrom && $this->createdTo) {
                         $timeParams = [
-                            'marketplace_order_date_from' => date('c', $this->createdFrom),
-                            'marketplace_order_date_to' => date('c', $this->createdTo),
+                            'marketplace_order_date_from' => $this->lengowConfiguration->gmtDate(
+                                $this->createdFrom,
+                                LengowConfiguration::API_DATE_TIME_FORMAT
+                            ),
+                            'marketplace_order_date_to' => $this->lengowConfiguration->gmtDate(
+                                $this->createdTo,
+                                LengowConfiguration::API_DATE_TIME_FORMAT
+                            ),
                         ];
                     } else {
                         $timeParams = [
-                            'updated_from' => date('c', $this->updatedFrom),
-                            'updated_to' => date('c', $this->updatedTo),
+                            'updated_from' => $this->lengowConfiguration->date(
+                                $this->updatedFrom,
+                                LengowConfiguration::API_DATE_TIME_FORMAT
+                            ),
+                            'updated_to' => $this->lengowConfiguration->date(
+                                $this->updatedTo,
+                                LengowConfiguration::API_DATE_TIME_FORMAT
+                            ),
                         ];
                     }
                     $results = $this->lengowConnector->get(

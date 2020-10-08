@@ -2,6 +2,7 @@
 
 namespace Lengow\Connector\Subscriber;
 
+use Lengow\Connector\Service\LengowLog;
 use Shopware\Core\Framework\DataAbstractionLayer\Event\EntityWrittenEvent;
 use Shopware\Core\Framework\DataAbstractionLayer\Event\EntityWrittenContainerEvent;
 use Shopware\Core\System\SystemConfig\SystemConfigDefinition;
@@ -20,12 +21,19 @@ class LengowSettingUpdateSubscriber implements EventSubscriberInterface
     private $lengowConfiguration;
 
     /**
+     * @var LengowLog Lengow log service
+     */
+    private $lengowLog;
+
+    /**
      * LengowSettingUpdateSubscriber constructor
      * @param LengowConfiguration $lengowConfiguration
+     * @param LengowLog $lengowLog
      */
-    public function __construct(LengowConfiguration $lengowConfiguration)
+    public function __construct(LengowConfiguration $lengowConfiguration, LengowLog $lengowLog)
     {
         $this->lengowConfiguration = $lengowConfiguration;
+        $this->lengowLog = $lengowLog;
     }
 
     /**
@@ -57,9 +65,64 @@ class LengowSettingUpdateSubscriber implements EventSubscriberInterface
                 $salesChannelId = $payLoads[0]['salesChannelId'];
                 if (stristr($key, LengowConfiguration::LENGOW_SETTING_PATH)) {
                     $key = str_replace(LengowConfiguration::LENGOW_SETTING_PATH, '', $key);
-                    $this->lengowConfiguration->checkAndLog($key, $value, $salesChannelId);
+                    $this->checkAndLog($key, $value, $salesChannelId);
                 }
             }
+        }
+    }
+
+    /**
+     * Check value and create a log if necessary
+     *
+     * @param string $key name of Lengow setting
+     * @param mixed $value setting value
+     * @param string|null $salesChannelId Shopware sales channel id
+     */
+    private function checkAndLog(string $key, $value, string $salesChannelId = null): void
+    {
+        if (!array_key_exists($key, LengowConfiguration::$lengowSettings)) {
+            return;
+        }
+        $setting = LengowConfiguration::$lengowSettings[$key];
+        $oldValue = $this->lengowConfiguration->get($key, $salesChannelId);
+        if (isset($setting['type']) && $setting['type'] === 'boolean') {
+            $value = (int)$value;
+            $oldValue = (int)$oldValue;
+        } elseif (isset($setting['type']) && $setting['type'] === 'array') {
+            $value = implode(',', $value);
+            $oldValue = implode(',', $oldValue);
+        }
+        if ($oldValue === $value) {
+            return;
+        }
+        if (isset($setting['secret'])) {
+            $value = preg_replace("/[a-zA-Z0-9]/", '*', $value);
+            $oldValue = preg_replace("/[a-zA-Z0-9]/", '*', $oldValue);
+        }
+        if ($salesChannelId === null && isset($setting['global'])) {
+            $this->lengowLog->write(
+                LengowLog::CODE_SETTING,
+                $this->lengowLog->encodeMessage('log.setting.setting_change', [
+                    'key' => $key,
+                    'old_value' => $oldValue,
+                    'value' => $value,
+                ])
+            );
+        }
+        if ($salesChannelId && isset($setting['channel'])) {
+            $this->lengowLog->write(
+                LengowLog::CODE_SETTING,
+                $this->lengowLog->encodeMessage('log.setting.setting_change_for_sales_channel', [
+                    'key' => $key,
+                    'old_value' => $oldValue,
+                    'value' => $value,
+                    'sales_channel_id' => $salesChannelId,
+                ])
+            );
+        }
+        // save last update date for a specific settings (change synchronisation interval time)
+        if (isset($setting['update'])) {
+            $this->lengowConfiguration->set(LengowConfiguration::LENGOW_LAST_SETTING_UPDATE, (string)time());
         }
     }
 }

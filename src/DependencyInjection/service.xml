@@ -23,7 +23,6 @@
             <argument type="service" id="lengow_settings.repository"/>
             <argument type="service" id="Shopware\Core\System\SystemConfig\SystemConfigService" />
             <argument type="service" id="system_config.repository"/>
-            <argument type="service" id="Lengow\Connector\Service\LengowLog"/>
             <argument type="service" id="Lengow\Connector\Util\EnvironmentInfoProvider"/>
         </service>
 
@@ -47,6 +46,7 @@
             <argument type="service" id="Lengow\Connector\Service\LengowImportOrder"/>
             <argument type="service" id="Lengow\Connector\Service\LengowOrder"/>
             <argument type="service" id="Lengow\Connector\Service\LengowOrderError"/>
+            <argument type="service" id="Lengow\Connector\Service\LengowSync"/>
             <argument type="service" id="swiftmailer.mailer.default"/>
         </service>
 
@@ -76,10 +76,20 @@
             <argument type="service" id="lengow_product.repository"/>
             <argument type="service" id="currency.repository"/>
             <argument type="service" id="language.repository"/>
+            <argument type="service" id="custom_field.repository"/>
+            <argument type="service" id="custom_field_set.repository"/>
+            <argument type="service" id="property_group_translation.repository"/>
+            <argument type="service" id="Lengow\Connector\Service\LengowFeed"/>
+        </service>
+
+        <service id="Lengow\Connector\Service\LengowFeed">
+            <argument type="service" id="Lengow\Connector\Factory\LengowFileFactory"/>
+            <argument type="service" id="Lengow\Connector\Util\EnvironmentInfoProvider"/>
         </service>
 
         <service id="Lengow\Connector\Service\LengowLog">
             <argument type="service" id="Lengow\Connector\Service\LengowTranslation"/>
+            <argument type="service" id="Lengow\Connector\Service\LengowConfiguration"/>
             <argument type="service" id="Lengow\Connector\Util\EnvironmentInfoProvider"/>
             <argument type="service" id="Lengow\Connector\Factory\LengowFileFactory"/>
         </service>

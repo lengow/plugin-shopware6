@@ -125,7 +125,7 @@ class StringCleaner
      *
      * @return string
      */
-    public function replaceAccentedChars(string $str): string
+    public static function replaceAccentedChars(string $str): string
     {
         /* One source among others:
             http://www.tachyonsoft.com/uc0000.htm

@@ -118,6 +118,56 @@ class LengowSync
     }
 
     /**
+     * Sync Lengow catalogs for order synchronisation
+     *
+     * @param bool $force force cache Update
+     * @param bool $logOutput see log or not
+     *
+     * @return bool
+     */
+    public function syncCatalog(bool $force = false, bool $logOutput = false): bool
+    {
+        $settingUpdated = false;
+        if ($this->lengowConfiguration->isNewMerchant()) {
+            return false;
+        }
+        if (!$force) {
+            $updatedAt = $this->lengowConfiguration->get(LengowConfiguration::LENGOW_CATALOG_UPDATE);
+            if ($updatedAt !== null && (time() - (int) $updatedAt) < $this->cacheTimes[self::SYNC_CATALOG]) {
+                return false;
+            }
+        }
+        $result = $this->lengowConnector->queryApi(LengowConnector::GET, LengowConnector::API_CMS, [], '', $logOutput);
+        if (isset($result->cms)) {
+            $cmsToken = $this->lengowConfiguration->getToken();
+            foreach ($result->cms as $cms) {
+                if ($cms->token !== $cmsToken) {
+                    continue;
+                }
+                foreach ($cms->shops as $cmsShop) {
+                    $salesChannel = $this->lengowConfiguration->getSalesChannelByToken($cmsShop->token);
+                    if ($salesChannel === null) {
+                        continue;
+                    }
+                    $salesChannelId = $salesChannel->getId();
+                    $idsChange = $this->lengowConfiguration->setCatalogIds($cmsShop->catalog_ids, $salesChannelId);
+                    $salesChannelChange = $this->lengowConfiguration->setActiveSalesChannel($salesChannelId);
+                    if (!$settingUpdated && ($idsChange || $salesChannelChange)) {
+                        $settingUpdated = true;
+                    }
+                }
+                break;
+            }
+        }
+        // save last update date for a specific settings (change synchronisation interval time)
+        if ($settingUpdated) {
+            $this->lengowConfiguration->set(LengowConfiguration::LENGOW_LAST_SETTING_UPDATE, (string) time());
+        }
+        $this->lengowConfiguration->set(LengowConfiguration::LENGOW_CATALOG_UPDATE, (string) time());
+        return true;
+    }
+
+    /**
      * Get marketplace data
      *
      * @param bool $force force cache update
@@ -139,7 +189,7 @@ class LengowSync
                 // recovering data with the marketplaces.json file
                 $marketplacesData = file_get_contents($filePath);
                 if ($marketplacesData) {
-                    return json_decode($marketplacesData);
+                    return json_decode($marketplacesData, false);
                 }
             }
         }
@@ -167,7 +217,7 @@ class LengowSync
                 $this->lengowLog->write(
                     LengowLog::CODE_IMPORT,
                     $this->lengowLog->encodeMessage('log.import.marketplace_update_failed', [
-                        'decoded_message' => $decodedMessage
+                        'decoded_message' => $decodedMessage,
                     ]),
                     $logOutput
                 );
@@ -178,7 +228,7 @@ class LengowSync
         if (file_exists($filePath)) {
             $marketplacesData = file_get_contents($filePath);
             if ($marketplacesData) {
-                return json_decode($marketplacesData);
+                return json_decode($marketplacesData, false);
             }
         }
         return false;

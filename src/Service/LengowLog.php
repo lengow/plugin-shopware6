@@ -68,6 +68,11 @@ class LengowLog
     private $lengowTranslation;
 
     /**
+     * @var LengowConfiguration Lengow configuration service
+     */
+    private $lengowConfiguration;
+
+    /**
      * @var EnvironmentInfoProvider Environment info provider utility
      */
     private $environmentInfoProvider;
@@ -86,16 +91,19 @@ class LengowLog
      * LengowLog Construct
      *
      * @param LengowTranslation $lengowTranslation Lengow translation service
+     * @param LengowConfiguration $lengowConfiguration Lengow configuration service
      * @param EnvironmentInfoProvider $environmentInfoProvider Environment info provider utility
      * @param LengowFileFactory $lengowFileFactory Lengow file factory
      */
     public function __construct(
         LengowTranslation $lengowTranslation,
+        LengowConfiguration $lengowConfiguration,
         EnvironmentInfoProvider $environmentInfoProvider,
         LengowFileFactory $lengowFileFactory
     )
     {
         $this->lengowTranslation = $lengowTranslation;
+        $this->lengowConfiguration = $lengowConfiguration;
         $this->environmentInfoProvider = $environmentInfoProvider;
         $this->lengowFileFactory = $lengowFileFactory;
         // init new LengowFile for logging
@@ -162,7 +170,7 @@ class LengowLog
     public function write(string $category, string $message = '', bool $display = false, $marketplaceSku = null): void
     {
         $decodedMessage = $this->decodeMessage($message, LengowTranslation::DEFAULT_ISO_CODE);
-        $log = date('Y-m-d H:i:s');
+        $log = $this->lengowConfiguration->date();
         $log .= ' - ' . (empty($category) ? '' : '[' . $category . '] ');
         $log .= '' . (empty($marketplaceSku) ? '' : 'order ' . $marketplaceSku . ': ');
         $log .= $decodedMessage . "\r\n";

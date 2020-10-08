@@ -8,6 +8,7 @@
 
         <service id="Lengow\Connector\Subscriber\LengowSettingUpdateSubscriber">
             <argument type="service" id="Lengow\Connector\Service\LengowConfiguration"/>
+            <argument type="service" id="Lengow\Connector\Service\LengowLog"/>
             <tag name="kernel.event_subscriber"/>
         </service>
 
