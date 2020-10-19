@@ -1,2 +1,171 @@
-{% block lengow_order_list %}
+{% block lgw_order_list %}
+    <sw-page class="sw-order-list" style="background: #F1F1F1">
+        {% block lgw_order_list_search_bar %}
+            <template #search-bar>
+                <sw-search-bar initialSearchType="lengow_order"
+                               :placeholder="$tc('lengow-connector.order.filter.search_placeholder')"
+                               @search="onSearch">
+                </sw-search-bar>
+            </template>
+        {% endblock %}
+
+        {% block lgw_order_list_smart_bar_header %}
+            <template #smart-bar-header>
+                {% block lgw_order_list_smart_bar_header_title %}
+                    <h2>
+                        {% block lgw_order_list_smart_bar_header_title_text %}
+                            {{ $tc('lengow-connector.order.title') }}
+                        {% endblock %}
+
+                        {% block lgw_order_list_smart_bar_header_amount %}
+                            <span v-if="!isLoading" class="sw-page__smart-bar-amount">
+                                ({{ total }})
+                            </span>
+                        {% endblock %}
+                    </h2>
+                {% endblock %}
+            </template>
+        {% endblock %}
+
+        {% block lgw_order_list_content %}
+            <template #content>
+                <div>
+                    {% block lgw_order_list_grid %}
+                        <sw-entity-listing ref="swLengowOrderGrid"
+                                           :items="lengowOrders"
+                                           :columns="lengowOrderColumns"
+                                           :repository="lengowOrderRepository"
+                                           :showSelection="true"
+                                           :showActions="false">
+                            {% block lgw_order_list_grid_columns %}
+                                {% block lgw_order_list_grid_columns_order_is_in_error %}
+                                    <template #column-isInError="{ item }">
+                                        <lgw-action-button>
+                                        </lgw-action-button>
+                                    </template>
+                                {% endblock %}
+                                {% block lgw_order_list_grid_columns_order_lengow_state %}
+                                    <template #column-orderLengowState="{ item }">
+                                        <lgw-order-state-label :orderLengowState="item.orderLengowState">
+                                        </lgw-order-state-label>
+                                    </template>
+                                {% endblock %}
+                                {% block lgw_order_list_grid_columns_order_types %}
+                                    <template #column-orderTypes="{ item }">
+                                        <div v-if="Object.keys(item.orderTypes).length">
+                                            <lgw-order-type-icon v-for="orderType in getOrderTypes(item.orderTypes)"
+                                                                 :type="orderType.type"
+                                                                 :label="orderType.label">
+                                            </lgw-order-type-icon>
+                                        </div>
+                                        <div v-else></div>
+                                    </template>
+                                {% endblock %}
+                                {% block lgw_order_list_grid_columns_order_state %}
+                                    <template #column-order.stateMachineState.name="{ item }">
+                                        <sw-label v-if="item.order" :variant="getVariantFromOrderState(item.order)" appearance="pill">
+                                            {{ item.order.stateMachineState.translated.name }}
+                                        </sw-label>
+                                    </template>
+                                {% endblock %}
+                                {% block lgw_order_list_grid_columns_order_number %}
+                                    <template #column-order.orderNumber="{ item }">
+                                        <template v-if="item.order">
+                                            <router-link :to="{ name: 'sw.order.detail', params: { id: item.order.id } }">
+                                                {{ item.order.orderNumber }}
+                                            </router-link>
+                                        </template>
+                                    </template>
+                                {% endblock %}
+                                {% block lgw_order_list_grid_columns_order_date %}
+                                    <template #column-orderDate="{ item }">
+                                        {{ item.orderDate | date({hour: '2-digit', minute: '2-digit'}) }}
+                                    </template>
+                                {% endblock %}
+                                {% block lgw_order_list_grid_columns_delivery_country_iso %}
+                                    <template #column-deliveryCountryIso="{ item }">
+                                        <lgw-country-icon :codeIsoA2="item.deliveryCountryIso">
+                                        </lgw-country-icon>
+                                    </template>
+                                {% endblock %}
+                                {% block lgw_order_list_grid_columns_total_paid %}
+                                    <template #column-totalPaid="{ item }">
+                                        <span :title="getOrderItemTooltip(item)">
+                                            {{ item.totalPaid | currency(item.currency) }}
+                                        </span>
+                                    </template>
+                                {% endblock %}
+                            {% endblock %}
+                        </sw-entity-listing>
+                    {% endblock %}
+
+                    {% block lgw_order_list_empty_state %}
+                        <sw-empty-state
+                                v-if="!isLoading && !total"
+                                :title="$tc('lengow-connector.order.no_order_title')"
+                                :subline="$tc('lengow-connector.order.no_order_description')">>
+                        </sw-empty-state>
+                    {% endblock %}
+
+                    {% block lgw_order_list_grid_loader %}
+                        <sw-loader v-if="isLoading"></sw-loader>
+                    {% endblock %}
+                </div>
+            </template>
+
+            {% block lgw_order_list_sidebar %}
+                <template #sidebar>
+                    <sw-sidebar class="sw-order-list__sidebar">
+                        {% block lgw_order_list_sidebar_refresh %}
+                            <sw-sidebar-item
+                                    icon="default-arrow-360-left"
+                                    :title="$tc('sw-order.list.titleSidebarItemRefresh')"
+                                    @click="onRefresh">
+                            </sw-sidebar-item>
+                        {% endblock %}
+
+                        {% block lgw_order_list_sidebar_filter %}
+                            <sw-sidebar-item icon="default-action-filter"
+                                             :title="$tc('sw-order.list.titleSidebarItemFilter')">
+
+                                {% block lgw_order_list_sidebar_filter_items %}
+
+                                    {% block lgw_order_list_sidebar_filter_order_state %}
+                                        <sw-multi-select
+                                                :label="$tc('lengow-connector.order.filter.order_state')"
+                                                :options="availableOrderLengowStates"
+                                                :isLoading="filterLoading"
+                                                :value="orderLengowStateFilter"
+                                                @change="onChangeOrderLengowStateFilter">
+                                        </sw-multi-select>
+                                    {% endblock %}
+
+                                    {% block lgw_order_list_sidebar_filter_order_type %}
+                                        <sw-single-select
+                                                :label="$tc('lengow-connector.order.filter.order_type')"
+                                                :options="availableOrderTypes"
+                                                :isLoading="filterLoading"
+                                                :value="orderTypeFilter"
+                                                @change="onChangeOrderTypeFilter">
+                                        </sw-single-select>
+                                    {% endblock %}
+
+                                    {% block lgw_order_list_sidebar_filter_marketplace %}
+                                        <sw-multi-select
+                                                :label="$tc('lengow-connector.order.filter.marketplace')"
+                                                :options="availableMarketplaces"
+                                                :isLoading="filterLoading"
+                                                :value="marketplaceFilter"
+                                                @change="onChangeMarketplaceFilter">
+                                        </sw-multi-select>
+                                    {% endblock %}
+
+                                {% endblock %}
+                            </sw-sidebar-item>
+                        {% endblock %}
+                    </sw-sidebar>
+                </template>
+            {% endblock %}
+        {% endblock %}
+    </sw-page>
 {% endblock %}
