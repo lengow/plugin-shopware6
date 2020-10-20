@@ -47,7 +47,7 @@ fr:
           express: "Livraison Express"
           delivered_by_marketplace: "Expédié par la marketplace"
           business: "Business"
-        columns:
+        column:
           actions: "Actions"
           lengow_status: "Status"
           order_types: "Types"

@@ -48,7 +48,7 @@ de:
           express: "Expresszustellung"
           delivered_by_marketplace: "Wird vom Marktplatz"
           business: "Business"
-        columns:
+        column:
           actions: "Aktionen"
           lengow_status: "Status"
           order_types: "Typen"

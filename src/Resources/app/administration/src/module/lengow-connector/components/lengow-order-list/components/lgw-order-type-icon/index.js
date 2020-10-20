@@ -13,12 +13,10 @@ Component.register('lgw-order-type-icon', {
         type: {
             type: String,
             required: true,
-            default: '',
         },
         label: {
             type: String,
             required: true,
-            default: '',
         },
     },
 

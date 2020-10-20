@@ -1,4 +1,5 @@
 import template from './views/lgw-country-icon.html.twig';
+import './views/lgw-country-icon.scss';
 
 const {
     Component,
@@ -23,7 +24,7 @@ Component.register('lgw-country-icon', {
 
     data() {
         return {
-            isLoading: false,
+            isLoading: true,
             countryName: '',
             countryIso: '',
         };
@@ -41,7 +42,6 @@ Component.register('lgw-country-icon', {
 
     methods: {
         createdComponent() {
-            this.isLoading = true;
             const criteria = new Criteria();
             criteria.addFilter(Criteria.equals('iso', this.codeIsoA2));
             this.countryRepository.search(criteria, Shopware.Context.api).then((response) => {

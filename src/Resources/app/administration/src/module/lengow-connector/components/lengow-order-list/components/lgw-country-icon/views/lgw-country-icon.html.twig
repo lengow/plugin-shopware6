@@ -1,6 +1,6 @@
 {% block lgw_country_icon %}
     <template>
-        <div style="position: relative">
+        <div v-if="countryIso !== ''" class="lgw-country-icon">
             <img v-show="!isLoading"
                  @load="loaded"
                  :src="'connector/flag/'+countryIso+'.png' | asset"

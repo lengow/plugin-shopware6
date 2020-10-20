@@ -87,10 +87,10 @@ Component.register('lengow-order-list', {
                     Criteria.contains('customerName', this.searchFilter),
                 ]));
             }
-            criteria.addSorting(Criteria.sort(this.sortBy, this.sortDirection));
-            criteria.addAssociation('salesChannel');
-            criteria.addAssociation('order');
-            criteria.addAssociation('order.stateMachineState');
+            criteria.addSorting(Criteria.sort(this.sortBy, this.sortDirection))
+                .addAssociation('salesChannel')
+                .addAssociation('order')
+                .addAssociation('order.stateMachineState');
 
             return criteria;
         },
@@ -117,17 +117,15 @@ Component.register('lengow-order-list', {
     },
 
     methods: {
-
         getList() {
             this.isLoading = true;
 
             return this.lengowOrderRepository.search(this.lengowOrderCriteria, Shopware.Context.api).then((response) => {
                 this.total = response.total;
                 this.lengowOrders = response;
-                this.isLoading = false;
 
                 return response;
-            }).catch(() => {
+            }).finally(() => {
                 this.isLoading = false;
             });
         },
@@ -216,7 +214,7 @@ Component.register('lengow-order-list', {
         },
 
         getOrderItemTooltip(order) {
-            return order.orderItem.toString()+' '+this.$tc('lengow-connector.order.nb_product');
+            return `${order.orderItem.toString()} ${this.$tc('lengow-connector.order.nb_product')}`;
         },
 
         loadFilterValues() {
@@ -233,8 +231,7 @@ Component.register('lengow-order-list', {
                     availableMarketplaces.push({label: item.marketplaceLabel, value: item.marketplaceName});
                 });
                 this.availableMarketplaces = availableMarketplaces;
-                this.filterLoading = false;
-            }).catch(() => {
+            }).finally(() => {
                 this.filterLoading = false;
             });
         },
