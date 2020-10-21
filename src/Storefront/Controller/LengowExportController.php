@@ -24,7 +24,6 @@ use Lengow\Connector\Service\LengowExport;
  */
 class LengowExportController extends LengowAbstractFrontController
 {
-
     /**
      * @var LengowExport lengow export service
      */
@@ -56,30 +55,30 @@ class LengowExportController extends LengowAbstractFrontController
      */
     public function export(Request $request, SalesChannelContext $context)
     {
-        $this->checkAccess($request, $context, false);
+        $salesChannelName = $this->checkAccess($request, $context, false);
         $exportArgs = $this->createGetArgArray($request);
-
         if ($exportArgs['get_params']) {
             return new Response($this->lengowExport->getExportParams());
         }
-
-        $this->lengowExport->init(
-            $exportArgs['sales_channel_id'],
-            $exportArgs['selection'],
-            $exportArgs['out_of_stock'],
-            $exportArgs['variation'],
-            $exportArgs['inactive'],
-            $exportArgs['format'] ?: '',
-            $exportArgs['product_ids'] ?: ''
-        );
-
         if ($exportArgs['mode']) {
             return new Response($this->modeSize($exportArgs['mode'], $exportArgs['sales_channel_id'] ));
         }
-        if (!$this->lengowExport->exec()) {
-            // todo log
+        if (!$this->lengowExport->exec($salesChannelName, $exportArgs)) {
+            $this->lengowLog->write(
+                LengowLog::CODE_EXPORT,
+                $this->lengowLog->encodeMessage('log.export.export_failed'),
+                $exportArgs['log_output']
+            );
+        } else {
+            $this->lengowLog->write(
+                LengowLog::CODE_EXPORT,
+                $this->lengowLog->encodeMessage('log.export.end', [
+                    'sales_channel_name' => $salesChannelName,
+                ]),
+                $exportArgs['log_output']
+            );
         }
-        return new Response('ok');
+        return new Response();
     }
 
     /**
@@ -90,21 +89,41 @@ class LengowExportController extends LengowAbstractFrontController
     protected function createGetArgArray(Request $request): array
     {
         return [
-            'format' => $request->query->get('format'),
+            'sales_channel_id' => $request->query->get('sales_channel_id'),
+            'format' => $request->query->get('format') ?? '',
             'mode' => $request->query->get('mode'),
             'stream' => $request->query->get('stream') === '1',
             'product_ids' => $request->query->get('product_ids'),
-            'limit' => (int)$request->query->get('limit'),
-            'offset' => (int)$request->query->get('offset'),
-            'out_of_stock' => (bool) $request->query->get('out_of_stock') === '1',
-            'variation' => (bool) $request->query->get('variation') === '1',
-            'inactive' => (bool) $request->query->get('inactive') === '1',
-            'selection' => (bool) $request->query->get('selection'),
+            'limit' => (int) $request->query->get('limit'),
+            'offset' => (int) $request->query->get('offset'),
+            'out_of_stock' => (null !== $request->query->get('out_of_stock'))
+                ? ($request->query->get('out_of_stock') === '1')
+                : $this->lengowConfiguration->get(
+                    LengowConfiguration::LENGOW_EXPORT_OUT_OF_STOCK_ENABLED,
+                    $request->query->get('sales_channel_id')
+                ) ?? false,
+            'variation' => (null !== $request->query->get('variation'))
+                ? ($request->query->get('variation') === '1')
+                : $this->lengowConfiguration->get(
+                    LengowConfiguration::LENGOW_EXPORT_VARIATION_ENABLED,
+                    $request->query->get('sales_channel_id')
+                ) ?? true,
+            'inactive' => (null !== $request->query->get('inactive'))
+                ? ($request->query->get('inactive') === '1')
+                : $this->lengowConfiguration->get(
+                    LengowConfiguration::LENGOW_EXPORT_DISABLED_PRODUCT,
+                    $request->query->get('sales_channel_id')
+                ) ?? false,
+            'selection' => (null !== $request->query->get('selection'))
+                ? ($request->query->get('selection') === '1')
+                : $this->lengowConfiguration->get(
+                    LengowConfiguration::LENGOW_EXPORT_SELECTION_ENABLED,
+                    $request->query->get('sales_channel_id')
+                ) ?? false,
             'log_output' => $request->query->get('log_output') === '1',
             'update_export_date' => $request->query->get('update_export_date') === '1',
             'currency' => $request->query->get('currency'),
-            'sales_channel_id' => $request->query->get('sales_channel_id'),
-            'get_params' => (bool) $request->query->get('get_params'),
+            'get_params' => $request->query->get('get_params') === '1',
         ];
     }
 

@@ -53,16 +53,17 @@ abstract class LengowAbstractFrontController extends StorefrontController
      * @param Request $request Http request
      * @param SalesChannelContext $context Shopware context
      * @param bool $import is call for import or export
+     * @return string|null
      */
-    public function checkAccess(Request $request, SalesChannelContext $context, $import = true): void
+    public function checkAccess(Request $request, SalesChannelContext $context, $import = true): ?string
     {
         $token = $request->query->get('token');
         $salesChannelId = $request->query->get('sales_channel_id');
         if ($import || !$salesChannelId || strlen($salesChannelId) <= 1) {
             $salesChannelId = null;
         }
-
-        if (!$import && !$this->lengowAccessService->checkSalesChannel($salesChannelId)) {
+        $salesChannelName = $this->lengowAccessService->checkSalesChannel($salesChannelId);
+        if (!$import && !$salesChannelName) {
             header('HTTP/1.1 400 Bad Request');
             die(
                 $this->lengowLog->decodeMessage(
@@ -94,6 +95,7 @@ abstract class LengowAbstractFrontController extends StorefrontController
             header('HTTP/1.1 403 Forbidden');
             die($errorMessage);
         }
+        return $salesChannelName;
     }
 
     /**

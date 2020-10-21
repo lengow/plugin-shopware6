@@ -74,12 +74,12 @@ class LengowAccess
     /**
      * @param string|null $salesChannelId sales channel id
      *
-     * @return bool
+     * @return string|null sales channel name
      */
-    public function checkSalesChannel(string $salesChannelId = null): bool
+    public function checkSalesChannel(string $salesChannelId = null): ?string
     {
         if ($salesChannelId === null) {
-            return false;
+            return null;
         }
         $criteria = new Criteria();
         $criteria->addFilter(new EqualsFilter('id', $salesChannelId));
@@ -87,11 +87,11 @@ class LengowAccess
             $criteria,
             Context::createDefaultContext()
         );
-        $salesChannel = $result->getEntities()->getElements();
-        if ($salesChannel) {
-            return true;
+        $salesChannels = $result->getEntities();
+        if ($salesChannels->count() > 0) {
+            return $salesChannels->first()->getName();
         }
-        return false;
+        return null;
     }
 
     /**

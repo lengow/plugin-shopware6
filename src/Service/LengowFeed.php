@@ -80,6 +80,11 @@ class LengowFeed
     private $format;
 
     /**
+     * @var string export folder
+     */
+    public $exportFolder;
+
+    /**
      * @var string salesChannel Id to export
      */
     private $salesChannelId;
@@ -198,13 +203,39 @@ class LengowFeed
      * Finalize export generation
      *
      * @return bool
-     *
-     * @throws LengowException
      */
     public function end() : bool
     {
         $this->write(self::FOOTER);
+        if (!$this->stream) {
+            $oldFileName = 'flux.' . $this->format;
+            $oldFile = $this->lengowFileFactory->create($this->exportFolder, $oldFileName);
+            if ($oldFile->exists()) {
+                $oldFilePath = $oldFile->getPath();
+                $oldFile->delete();
+            }
+            if (isset($oldFilePath)) {
+                $rename = $this->lengowFile->rename($oldFilePath);
+                $this->lengowFile->setFileName($oldFileName);
+            } else {
+                $sep = DIRECTORY_SEPARATOR;
+                $rename = $this->lengowFile->rename($this->lengowFile->getFolderPath() . $sep . $oldFileName);
+                $this->lengowFile->setFileName($oldFileName);
+            }
+            return $rename;
+        }
         return true;
+    }
+
+    /**
+     * Get export generated file path
+     *
+     * @return string
+     */
+    public function getExportFilePath() : string
+    {
+        $sep = DIRECTORY_SEPARATOR;
+        return $this->lengowFile->getFolderPath() . $sep . 'flux.' . $this->format;
     }
 
     /**
@@ -274,12 +305,47 @@ class LengowFeed
     /**
      * GetBody
      *
+     * @param array $data data to export as body
+     * @param bool $isFirst is first product
      * @return string
      */
-    protected function getBody() : string
+    protected function getBody(array $data, bool $isFirst) : string
     {
-        // todo get export content here
-        return '';
+        switch ($this->format) {
+            case self::FORMAT_CSV:
+            default:
+                $content = '';
+                foreach ($data as $value) {
+                    $content .= self::PROTECTION . $value . self::PROTECTION . self::CSV_SEPARATOR;
+                }
+                return rtrim($content, self::CSV_SEPARATOR) . self::EOL;
+            case self::FORMAT_XML:
+                $content = '<product>';
+                foreach ($data as $field => $value) {
+                    $field = self::formatFields($field, self::FORMAT_XML);
+                    $content .= '<' . $field . '><![CDATA[' . $value . ']]></' . $field . '>' . self::EOL;
+                }
+                $content .= '</product>' . self::EOL;
+                return $content;
+            case self::FORMAT_JSON:
+                $content = $isFirst ? '' : ',';
+                $jsonArray = array();
+                foreach ($data as $field => $value) {
+                    $field = self::formatFields($field, self::FORMAT_JSON);
+                    $jsonArray[$field] = $value;
+                }
+                $content .= json_encode($jsonArray);
+                return $content;
+            case self::FORMAT_YAML:
+                $content = '  ' . self::PROTECTION . 'product' . self::PROTECTION . ':' . self::EOL;
+                $fieldMaxSize = $this->getFieldMaxSize($data);
+                foreach ($data as $field => $value) {
+                    $field = self::formatFields($field, self::FORMAT_YAML);
+                    $content .= '    ' . self::PROTECTION . $field . self::PROTECTION . ':';
+                    $content .= $this->indentYaml($field, $fieldMaxSize) . (string)$value . self::EOL;
+                }
+                return $content;
+        }
     }
 
     /**
@@ -329,6 +395,42 @@ class LengowFeed
                     )
                 );
         }
+    }
+
+    /**
+     * For YAML, add spaces to have corresponding indentation
+     *
+     * @param string $name the field name
+     * @param int $maxSize space limit
+     * @return string
+     */
+    protected function indentYaml(string $name, int $maxSize) : string
+    {
+        $strlen = strlen($name);
+        $spaces = '';
+        for ($i = $strlen; $i <= $maxSize; $i++) {
+            $spaces .= ' ';
+        }
+        return $spaces;
+    }
+
+    /**
+     * Get the maximum length of the fields
+     * Used for indentYaml function
+     *
+     * @param array $fields list of fields to export
+     * @return int
+     */
+    protected function getFieldMaxSize(array $fields) : int
+    {
+        $maxSize = 0;
+        foreach ($fields as $key => $field) {
+            $field = self::formatFields($key, self::FORMAT_YAML);
+            if (strlen($field) > $maxSize) {
+                $maxSize = strlen($field);
+            }
+        }
+        return $maxSize;
     }
 
 }

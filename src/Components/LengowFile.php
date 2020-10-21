@@ -175,7 +175,7 @@ class LengowFile
      *
      * @return bool
      */
-    private function exists(): bool
+    public function exists(): bool
     {
         return file_exists($this->getPath());
     }
@@ -191,5 +191,15 @@ class LengowFile
     private function getFileResource(string $path, string $mode)
     {
         return fopen($path, $mode);
+    }
+
+    /**
+     * FileName setter
+     *
+     * @param string $fileName
+     */
+    public function setFileName(string $fileName) : void
+    {
+        $this->fileName = $fileName;
     }
 }

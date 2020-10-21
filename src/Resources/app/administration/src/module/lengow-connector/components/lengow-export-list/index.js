@@ -62,6 +62,8 @@ Component.register('lengow-export-list', {
             salesChannelName: '',
             salesChannelDomain: '',
             tempListActivated: [],
+            downloadLink: '',
+            exportToken: '',
         };
     },
 
@@ -70,7 +72,6 @@ Component.register('lengow-export-list', {
             .search(new Criteria(), Shopware.Context.api)
             .then(salesChannelCollection => {
                 this.onSalesChannelChanged(salesChannelCollection.first().id).then(() => {
-                    this.setupSelectionActivated();
                     this.$refs.lgwSalesChannelSwitch.salesChannelId = salesChannelCollection.first().id;
                 });
             });
@@ -260,6 +261,26 @@ Component.register('lengow-export-list', {
                 });
         },
 
+        setExportLink(salesChannelId) {
+            const lengowSettingsCriteria = new Criteria();
+            lengowSettingsCriteria.addFilter(Criteria.equals('salesChannelId', salesChannelId));
+            lengowSettingsCriteria.addFilter(Criteria.equals('name', 'lengowChannelToken'));
+            this.lengowSettingsRepository
+                .search(lengowSettingsCriteria, Shopware.Context.api)
+                .then(result => {
+                    if (result.total > 0) {
+                        this.exportToken = result.first().value
+                        this.downloadLink =
+                            window.location.origin
+                            + '/lengow/export?token='
+                            + this.exportToken
+                            + '&sales_channel_id='
+                            + salesChannelId
+                            + '&stream=1&update_export_date=0&format=csv'
+                    }
+                });
+        },
+
         setupCountInactiveProduct() {
             const lengowSettingsCriteria = new Criteria();
             lengowSettingsCriteria.addFilter(Criteria.equals('salesChannelId', this.currentSalesChannelId));
@@ -341,6 +362,8 @@ Component.register('lengow-export-list', {
             this.isLoading = true;
             this.countLoading = true;
             this.currentSalesChannelId = salesChannelId;
+            this.setupSelectionActivated();
+            this.setExportLink(salesChannelId);
             const salesChannelCriteria = new Criteria();
             salesChannelCriteria.setIds([salesChannelId]);
             salesChannelCriteria.addAssociation('domains');

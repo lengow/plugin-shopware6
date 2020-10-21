@@ -13,7 +13,11 @@
                     <div class="sw-card__content" v-if="salesChannelSelected">
                         <div class="lengow-box text-center">
                             <div>
-                                <span style="float: right;"><sw-icon name="default-action-cloud-download" color="#3498db"></sw-icon></span>
+                                <a :href="downloadLink">
+                                    <span style="float: right;">
+                                        <sw-icon name="default-action-cloud-download" color="#3498db"></sw-icon>
+                                    </span>
+                                </a>
                             </div>
                             <div v-if="!countLoading" class="lgw-tooltip">
                                 <span class="stats-big-value">{{ salesChannelName }}</span>
