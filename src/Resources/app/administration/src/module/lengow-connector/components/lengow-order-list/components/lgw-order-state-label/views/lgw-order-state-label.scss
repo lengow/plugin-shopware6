@@ -1,0 +1,44 @@
+.lgw-order-state-label {
+  font-size: 13px;
+  background: #ebebeb;
+  color: #828282;
+  height: 23px;
+  line-height: 23px;
+  margin: 15px 0;
+  padding: 0 20px;
+  border-radius: 12px;
+  display: inline-block;
+  vertical-align: middle;
+  white-space: nowrap;
+}
+
+.lgw-order-state-label.mod-refunded {
+  color: white;
+  background: #e55a4d;
+}
+
+.lgw-order-state-label.mod-canceled {
+  background: transparent;
+  border: 1px solid #e6594d;
+  color: #e6594d;
+  line-height: 21px;
+}
+
+.lgw-order-state-label.mod-shipped,
+.lgw-order-state-label.mod-closed {
+  color: white;
+  background: #7bc27a;
+}
+
+.lgw-order-state-label.mod-accepted,
+.lgw-order-state-label.mod-waiting-shipment {
+  color: white;
+  background: #00b0f0;
+}
+
+.lgw-order-state-label.mod-default {
+  border: 1px solid #7ac279;
+  color: #7ac279;
+  background: transparent;
+  line-height: 21px;
+}

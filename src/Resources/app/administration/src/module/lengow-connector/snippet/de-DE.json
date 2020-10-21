@@ -41,6 +41,46 @@
                 "activeInLengow": "Aktiv in Lengow"
             }
         },
+        "order": {
+            "title": "Bestellungen",
+            "nb_product": "produkt(en)",
+            "no_order_title": "Das Beste kommt erst noch!",
+            "no_order_description": "Ihre Produkte sind gut sichtbar, Sie werden sicherlich bald Ihre ersten Bestellungen erhalten",
+            "state": {
+                "accepted": "Akzeptiert",
+                "waiting_shipment": "Warten auf Versand",
+                "shipped": "Versandt",
+                "refunded": "Erstattet",
+                "closed": "Abgeschlossen",
+                "canceled": "Abgebrochen"
+            },
+            "type": {
+                "express": "Expresszustellung",
+                "delivered_by_marketplace": "Wird vom Marktplatz",
+                "business": "Business"
+            },
+            "column": {
+                "actions": "Aktionen",
+                "lengow_status": "Status",
+                "order_types": "Typen",
+                "marketplace_sku": "Bestellungs ID",
+                "marketplace": "Marktplatz",
+                "sales_channel_name": "Verkaufskanäle",
+                "shopware_status": "Shopware-Status",
+                "shopware_sku": "Shopware-Referenz",
+                "customer_name": "Kundenname",
+                "order_date": "Datum",
+                "country": "Land",
+                "total_paid": "Menge"
+            },
+            "filter": {
+                "search_placeholder": "Suche nach Bestellnummer oder Kundenname...",
+                "default_order_type": "Alle",
+                "order_state": "Bestellstatus",
+                "order_type": "Auftragsart",
+                "marketplace": "Marktplatz"
+            }
+        },
         "Settings": {
             "NavBar": {
                 "title": "Settings",

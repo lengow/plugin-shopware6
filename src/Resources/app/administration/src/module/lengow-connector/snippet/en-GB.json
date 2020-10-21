@@ -41,6 +41,46 @@
                 "activeInLengow": "Active in Lengow"
             }
         },
+        "order": {
+            "title": "Orders",
+            "nb_product": "product(s)",
+            "no_order_title": "The best is yet to come!",
+            "no_order_description": "Your products have great visibility and your sales are about to prosper!",
+            "state": {
+                "accepted": "Accepted",
+                "waiting_shipment": "Awaiting shipment",
+                "shipped": "Shipped",
+                "refunded": "Refunded",
+                "closed": "Closed",
+                "canceled": "Canceled"
+            },
+            "type": {
+                "express": "Express delivery",
+                "delivered_by_marketplace": "Shipped by Marketplace",
+                "business": "Business"
+            },
+            "column": {
+                "actions": "Actions",
+                "lengow_status": "Status",
+                "order_types": "Types",
+                "marketplace_sku": "Order ID",
+                "marketplace": "Marketplace",
+                "sales_channel_name": "Sales Channel",
+                "shopware_status": "Shopware status",
+                "shopware_sku": "Shopware reference",
+                "customer_name": "Customer Name",
+                "order_date": "Date",
+                "country": "Country",
+                "total_paid": "Amount"
+            },
+            "filter": {
+                "search_placeholder": "Search by order id or customer name...",
+                "default_order_type": "All",
+                "order_state": "Order state",
+                "order_type": "Order type",
+                "marketplace": "Marketplace"
+            }
+        },
         "settings": {
             "NavBar": {
                 "title": "Settings",

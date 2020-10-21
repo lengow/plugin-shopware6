@@ -1,136 +1,171 @@
 de:
   administration:
     lengow-connector:
-      "dashboard":
-        "banner":
-          "title": "Hallo und herzlich willkommen!"
-          "button": "Zu Lengow wechseln"
-        "products":
-          "title": "Produkte"
-          "desc": "Alle verfügbaren Produkte im Überblick, um Ihren Katalog vorzubereiten"
-        "orders":
-          "title": "Bestellungen"
-          "desc": "Verwalten Sie Ihre Bestellungen direkt in Ihrem Shopware-Dashboard"
-        "settings":
-          "title": "Einstellungen"
-          "desc": "Konfigurieren Sie Ihre Shopware-Plugins"
-        "help":
-          "title": "Benötigen Sie Hilfe?"
-          "contact": "Kontaktieren Sie Lengow"
-          "helpCenterLink": "Schauen Sie im Help Center"
-          "helpCenterTarget": "https://supportlengow.zendesk.com/hc/de-de/articles/360012203311"
-          "helpCenter": "um detaillierte Informationen zu der korrekten Einrichtung des Shopware-Plugins zu finden"
-      "products":
-          "activateSelectionLabel": "Produktauswahl aktivieren"
-          "datas":
-              "nbProductExportLabel": "Gesamtprodukt exportiert :"
-              "nbProductExportableLabel": "Gesamtprodukt exportierbar :"
-              "downloadLinkLabel": "Download-Link :"
-          "filters":
-              "activeFilterLabel": "Aktiv / Inaktiv"
-              "stockFilterLabel": "Mit Lager / Ohne Lager"
-              "searchFilterLabel": "Suche nach ID / Name / Referenz"
-          "columns":
-              "activeInLengow": "Aktiv in Lengow"
-      "Settings":
-          "NavBar":
-              "title": "Settings" # todo trad germannnnn
-              "generalTab": "General"
-              "exportTab": "Export"
-              "importTab": "Import"
-          title:
-              credentials: "Credentials"
-              salesChannel: "Sales Channels"
-              security: "Security & tracker"
-              timezone: "Timezone"
-              exclusions: "Exclusions"
-              shipping: "Default shipping method"
-              marketplaces: "Marketplaces"
-              others: "Others"
-          lengow_main_settings:
-              label: "Haupteinstellungen"
-              description: "Im Folgenden finden Sie Ihre Lengow Zugangsdaten.\nKonto ID, Zugangstoken, Geheimtoken werden bei der ersten Anmeldung automatisch aufgefüllt: bitte keine Änderungen eingeben!"
-              account:
-                  label: "Account ID"
-                  description: "Ihr Lengow Account ID. Bitte nicht ändern."
-              access:
-                  label: "Zugangstoken"
-                  description: "Ihr Lengow-Zugangstoken. Bitte nicht ändern."
-              secret:
-                  label: "Geheimtoken"
-                  description: "Ihr Geheimtoken. Bitte nicht ändern."
-              enable:
-                  label: "Shop aktivieren"
-                  description: "Verbindung zwischen Lengow und Shop aktivieren"
-              catalog:
-                  label: "Katalog-ID"
-                  description: "Ihre Katalog-ID für den Import von Bestellungen.\nGetrennt durch ' ; '"
-              ip_enable:
-                  label: "Aktivieren Sie die Autorisierung über IP"
-                  description: "Aktivieren Sie diese Option, wenn Sie Ihren Export über IP sichern wollen. Standartmäßig ist ihr Export über einen Sicherheitsschlüssel gespeichert."
-              ip:
-                  label: "Autorisierte IP-Adressen"
-                  description: "Zugang zum Export Feed für die folgende IP-Adressen freigeben.\nGetrennt durch ;"
-              tracking_enable:
-                  label: "Aktivieren Sie den Lengow-Tracker"
-                  description: "Mit diesem Tracker können Sie die auf Ihrer Website generierten Bestellstatistiken direkt in Lengow abrufen."
-              tracking_id:
-                  label: "Tracker Product ID"
-                  description: "Der Name der eindeutigen Kennung, die in Lengow angegeben ist"
-              timezone:
-                  label: "Timezone"
-                  description: "Wählen Sie Ihre entsprechende Zeitzone aus. Wählen Sie diese mit Bedacht aus, da diese Zeitzone beim Importieren von Bestellungen aus der Lengow-API verwendet wird"
-          lengow_export_settings:
-              label: "Exporteinstellungen"
-              description: "Definieren Sie Einstellungen, um Ihres Feed zu erstellen."
-              disabled_products:
-                  label: "Inaktive Produkte exportieren"
-                  description: "Verwenden Sie diese Option, um inaktive Produkte zu exportieren"
-              lengow_selection:
-                  label: "Nur bestimmte Produkte exportieren"
-                  description: "Aktivieren Sie diese Option, wenn Sie nicht alle verfügbare Produkte exportieren möchten. Danach Ihre Produkte einzeln auswählen."
-              dispatcher:
-                  label: "Default-Carrier"
-                  description: "Wählen Sie den Standard-Zulieferer um die Versandkosten zu berechen"
-          lengow_import_settings:
-              label: "Importeinstellungen"
-              description: "Alle Bestellungen werden in der Lengow Plattform zentralisiert: Wählen Sie aus, ob Sie Ihre Bestellungen im Shopware Backoffice synchronisieren und importieren wollen. Das wird auch die Produktbestand in Ihrem Backoffice verringern"
-              ship_mp_enabled:
-                  label: "Durch einen Marktplatz versandte Bestellungen importieren"
-              decrease_stock:
-                  label: "Lagerbestand verringern für Bestellungen, die durch einen Marktplatz versandt werden"
-                  description: "Verwenden Sie diese Option, damit Bestellungen auf Marktplätzen in Ihrem Shopware-Backoffice einbezogen werden"
-              dispatcher:
-                  label: "Standard-Zulieferer"
-                  description: "Wählen Sie den Standard-Zulieferer aus, den Sie für Ihre Bestellungen verwenden wollen"
-              import_days:
-                  label: "Synchronisieren Sie alle Bestellungen, die seit aktualisiert wurden"
-                  description: "Anzahl der Tage auswählen (Max. 10 Tage)"
-              debug_mode:
-                  label: "Debug Mode aktivieren"
-                  description: "Dieser Modus zur Prüfung und Auftragsimulation verwenden. Diese Einstellung NUR auf Ihrem Pre-Production Server aktivieren"
-              report_mail_enabled:
-                  label: "Bei Problemen während des Importes der Bestellungen möchte ich benachrichtigt werden"
-              report_mail_address:
-                  label: "Emailaddresse für den Email-Report"
-                  description: "Email getrennt durch ;"
-              currency_conversion_title:
-                  label: "Konvertieren Sie die Währung Ihrer Bestellung"
-                  description: "Alle in Shopware importierten Bestellungen werden automatisch in die Währung umgerechnet, die Sie in Lengow ausgewählt haben."
-              import_btob:
-                  label: "Import von B2B-Bestellungen ohne Steuern ermöglichen"
-                  description: "Aktivieren Sie diese Option, um B2B-Bestellungen ohne Steuer zu importieren"
-          lengow_order_status_settings:
-              label: "Lieferstatus"
-              description: "Passen Sie den Lengow Lieferstatus an um Ihre Lieferungen einfach abzufragen"
-              id_waiting_shipment:
-                  label: "Lieferung in Vorbereitung"
-              id_shipped:
-                  label: "Versandte Bestellungen"
-              id_canceled:
-                  label: "Stornierte Bestellungen"
-              id_shipped_by_mp:
-                  label: "Bestellung von Marktplatz versandt"
+      dashboard:
+        banner:
+          title: "Hallo und herzlich willkommen!"
+          button: "Zu Lengow wechseln"
+        products:
+          title: "Produkte"
+          desc: "Alle verfügbaren Produkte im Überblick, um Ihren Katalog vorzubereiten"
+        orders:
+          title: "Bestellungen"
+          desc: "Verwalten Sie Ihre Bestellungen direkt in Ihrem Shopware-Dashboard"
+        settings:
+          title: "Einstellungen"
+          desc: "Konfigurieren Sie Ihre Shopware-Plugins"
+        help:
+          title: "Benötigen Sie Hilfe?"
+          contact: "Kontaktieren Sie Lengow"
+          helpCenterLink: "Schauen Sie im Help Center"
+          helpCenterTarget: "https://supportlengow.zendesk.com/hc/de-de/articles/360012203311"
+          helpCenter: "um detaillierte Informationen zu der korrekten Einrichtung des Shopware-Plugins zu finden"
+      products:
+        activateSelectionLabel: "Produktauswahl aktivieren"
+        datas:
+          nbProductExportLabel: "Gesamtprodukt exportiert :"
+          nbProductExportableLabel: "Gesamtprodukt exportierbar :"
+          downloadLinkLabel: "Download-Link :"
+        filters:
+          activeFilterLabel: "Aktiv / Inaktiv"
+          stockFilterLabel: "Mit Lager / Ohne Lager"
+          searchFilterLabel: "Suche nach ID / Name / Referenz"
+        columns:
+          activeInLengow: "Aktiv in Lengow"
+      order:
+        title: "Bestellungen"
+        nb_product: "produkt(en)"
+        no_order_title: "Das Beste kommt erst noch!"
+        no_order_description: "Ihre Produkte sind gut sichtbar, Sie werden sicherlich bald Ihre ersten Bestellungen erhalten"
+        state:
+          accepted: "Akzeptiert"
+          waiting_shipment: "Warten auf Versand"
+          shipped: "Versandt"
+          refunded: "Erstattet"
+          closed: "Abgeschlossen"
+          canceled: "Abgebrochen"
+        type:
+          express: "Expresszustellung"
+          delivered_by_marketplace: "Wird vom Marktplatz"
+          business: "Business"
+        column:
+          actions: "Aktionen"
+          lengow_status: "Status"
+          order_types: "Typen"
+          marketplace_sku: "Bestellungs ID"
+          marketplace: "Marktplatz"
+          sales_channel_name: "Verkaufskanäle"
+          shopware_status: "Shopware-Status"
+          shopware_sku: "Shopware-Referenz"
+          customer_name: "Kundenname"
+          order_date: "Datum"
+          country: "Land"
+          total_paid: "Menge"
+        filter:
+          search_placeholder: "Suche nach Bestellnummer oder Kundenname..."
+          default_order_type: "Alle"
+          order_state: "Bestellstatus"
+          order_type: "Auftragsart"
+          marketplace: "Marktplatz"
+      Settings:
+        NavBar:
+          title: "Settings" # todo trad german
+          generalTab: "General"
+          exportTab: "Export"
+          importTab: "Import"
+        title:
+          credentials: "Credentials"
+          salesChannel: "Sales Channels"
+          security: "Security & tracker"
+          timezone: "Timezone"
+          exclusions: "Exclusions"
+          shipping: "Default shipping method"
+          marketplaces: "Marketplaces"
+          others: "Others"
+        lengow_main_settings:
+          label: "Haupteinstellungen"
+          description: "Im Folgenden finden Sie Ihre Lengow Zugangsdaten.\nKonto ID, Zugangstoken, Geheimtoken werden bei der ersten Anmeldung automatisch aufgefüllt: bitte keine Änderungen eingeben!"
+          account:
+            label: "Account ID"
+            description: "Ihr Lengow Account ID. Bitte nicht ändern."
+          access:
+            label: "Zugangstoken"
+            description: "Ihr Lengow-Zugangstoken. Bitte nicht ändern."
+          secret:
+            label: "Geheimtoken"
+            description: "Ihr Geheimtoken. Bitte nicht ändern."
+          enable:
+            label: "Shop aktivieren"
+            description: "Verbindung zwischen Lengow und Shop aktivieren"
+          catalog:
+            label: "Katalog-ID"
+            description: "Ihre Katalog-ID für den Import von Bestellungen.\nGetrennt durch ' ; '"
+          ip_enable:
+            label: "Aktivieren Sie die Autorisierung über IP"
+            description: "Aktivieren Sie diese Option, wenn Sie Ihren Export über IP sichern wollen. Standartmäßig ist ihr Export über einen Sicherheitsschlüssel gespeichert."
+          ip:
+            label: "Autorisierte IP-Adressen"
+            description: "Zugang zum Export Feed für die folgende IP-Adressen freigeben.\nGetrennt durch ;"
+          tracking_enable:
+            label: "Aktivieren Sie den Lengow-Tracker"
+            description: "Mit diesem Tracker können Sie die auf Ihrer Website generierten Bestellstatistiken direkt in Lengow abrufen."
+          tracking_id:
+            label: "Tracker Product ID"
+            description: "Der Name der eindeutigen Kennung, die in Lengow angegeben ist"
+          timezone:
+            label: "Timezone"
+            description: "Wählen Sie Ihre entsprechende Zeitzone aus. Wählen Sie diese mit Bedacht aus, da diese Zeitzone beim Importieren von Bestellungen aus der Lengow-API verwendet wird"
+        lengow_export_settings:
+          label: "Exporteinstellungen"
+          description: "Definieren Sie Einstellungen, um Ihres Feed zu erstellen."
+          disabled_products:
+            label: "Inaktive Produkte exportieren"
+            description: "Verwenden Sie diese Option, um inaktive Produkte zu exportieren"
+          lengow_selection:
+            label: "Nur bestimmte Produkte exportieren"
+            description: "Aktivieren Sie diese Option, wenn Sie nicht alle verfügbare Produkte exportieren möchten. Danach Ihre Produkte einzeln auswählen."
+          dispatcher:
+            label: "Default-Carrier"
+            description: "Wählen Sie den Standard-Zulieferer um die Versandkosten zu berechen"
+        lengow_import_settings:
+          label: "Importeinstellungen"
+          description: "Alle Bestellungen werden in der Lengow Plattform zentralisiert: Wählen Sie aus, ob Sie Ihre Bestellungen im Shopware Backoffice synchronisieren und importieren wollen. Das wird auch die Produktbestand in Ihrem Backoffice verringern"
+          ship_mp_enabled:
+            label: "Durch einen Marktplatz versandte Bestellungen importieren"
+          decrease_stock:
+            label: "Lagerbestand verringern für Bestellungen, die durch einen Marktplatz versandt werden"
+            description: "Verwenden Sie diese Option, damit Bestellungen auf Marktplätzen in Ihrem Shopware-Backoffice einbezogen werden"
+          dispatcher:
+            label: "Standard-Zulieferer"
+            description: "Wählen Sie den Standard-Zulieferer aus, den Sie für Ihre Bestellungen verwenden wollen"
+          import_days:
+            label: "Synchronisieren Sie alle Bestellungen, die seit aktualisiert wurden"
+            description: "Anzahl der Tage auswählen (Max. 10 Tage)"
+          debug_mode:
+            label: "Debug Mode aktivieren"
+            description: "Dieser Modus zur Prüfung und Auftragsimulation verwenden. Diese Einstellung NUR auf Ihrem Pre-Production Server aktivieren"
+          report_mail_enabled:
+            label: "Bei Problemen während des Importes der Bestellungen möchte ich benachrichtigt werden"
+          report_mail_address:
+            label: "Emailaddresse für den Email-Report"
+            description: "Email getrennt durch ;"
+          currency_conversion_title:
+            label: "Konvertieren Sie die Währung Ihrer Bestellung"
+            description: "Alle in Shopware importierten Bestellungen werden automatisch in die Währung umgerechnet, die Sie in Lengow ausgewählt haben."
+          import_btob:
+            label: "Import von B2B-Bestellungen ohne Steuern ermöglichen"
+            description: "Aktivieren Sie diese Option, um B2B-Bestellungen ohne Steuer zu importieren"
+        lengow_order_status_settings:
+          label: "Lieferstatus"
+          description: "Passen Sie den Lengow Lieferstatus an um Ihre Lieferungen einfach abzufragen"
+          id_waiting_shipment:
+            label: "Lieferung in Vorbereitung"
+          id_shipped:
+            label: "Versandte Bestellungen"
+          id_canceled:
+            label: "Stornierte Bestellungen"
+          id_shipped_by_mp:
+            label: "Bestellung von Marktplatz versandt"
   backend:
     lengow_log:
       error:

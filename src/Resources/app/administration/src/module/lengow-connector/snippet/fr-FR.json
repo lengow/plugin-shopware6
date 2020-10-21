@@ -40,6 +40,46 @@
                 "activeInLengow": "Actif dans lengow"
             }
         },
+        "order": {
+            "title": "Commandes",
+            "nb_product": "produit(s)",
+            "no_order_title": "Le meilleur est encore à venir !",
+            "no_order_description": "Vos produits sont bien visibles, vos ventes sont sur le point de décoller",
+            "state": {
+                "accepted": "Accepté",
+                "waiting_shipment": "En attente d'expédition",
+                "shipped": "Expédié",
+                "refunded": "Remboursé",
+                "closed": "Fermé",
+                "canceled": "Annulé"
+            },
+            "type": {
+                "express": "Livraison Express",
+                "delivered_by_marketplace": "Expédié par la marketplace",
+                "business": "Business"
+            },
+            "column": {
+                "actions": "Actions",
+                "lengow_status": "Status",
+                "order_types": "Types",
+                "marketplace_sku": "N° de commande",
+                "marketplace": "Marketplace",
+                "sales_channel_name": "Sales Channel",
+                "shopware_status": "Statut Shopware",
+                "shopware_sku": "Référence Shopware",
+                "customer_name": "Nom du client",
+                "order_date": "Date",
+                "country": "Pays",
+                "total_paid": "Montant"
+            },
+            "filter": {
+                "search_placeholder": "Recherche par numéro de commande ou nom du client...",
+                "default_order_type": "Tous",
+                "order_state": "Status de commande",
+                "order_type": "Type de commande",
+                "marketplace": "Marketplace"
+            }
+        },
         "settings": {
             "NavBar": {
                 "title": "Paramètres",
