@@ -23,6 +23,47 @@
                             </span>
                         {% endblock %}
                     </h2>
+                    <div id="lgw-sync-data">
+                        <div v-if="!settingsLoading && !orderWithErrorLoading && !orderWaitingToBeSentLoading">
+                            <p>
+                                {{ orderWithError }} {{ $tc('lengow-connector.order.order_with_error') }},
+                                {{ orderWaitingToBeSent }} {{ $tc('lengow-connector.order.order_waiting_to_be_sent') }}
+                            </p>
+                            <p v-if="Object.keys(lastSynchronisation).length !== 0">
+                                {{ $tc('lengow-connector.order.last_synchronisation') }}
+                                {{ lastSynchronisation.date | date({hour: '2-digit', minute: '2-digit'}) }}
+                            </p>
+                            <p v-else>
+                                {{ $tc('lengow-connector.order.no_synchronisation_yet') }}
+                            </p>
+                            <p v-if="reportMailEnabled">
+                                {{ $tc('lengow-connector.order.report_sent_to') }}
+                                <span v-if="reportMailAddress" >{{ reportMailAddress }}</span>
+                                <span v-else>{{ defaultEmail }}</span>
+                            </p>
+                            <p v-else>
+                                {{ $tc('lengow-connector.order.no_report_sent') }}
+                                <routerLink :to="{ name: 'lengow.connector.settings' }">
+                                    {{ $tc('lengow-connector.order.change_this') }}
+                                </routerLink>
+                            </p>
+                        </div>
+                        <sw-loader v-else size="20px"></sw-loader>
+                    </div>
+                {% endblock %}
+            </template>
+        {% endblock %}
+
+        {% block lgw_order_list_smart_bar_actions %}
+            <template #smart-bar-actions>
+                {% block lgw_order_list_smart_bar_actions_slot %}
+
+                    {% block lgw_order_list_smart_bar_actions_synchronise %}
+                        <sw-button variant="primary" @click="synchroniseOrders">
+                            {{ $tc('lengow-connector.order.synchronise_orders') }}
+                        </sw-button>
+                    {% endblock %}
+
                 {% endblock %}
             </template>
         {% endblock %}
@@ -110,6 +151,20 @@
                     {% block lgw_order_list_grid_loader %}
                         <sw-loader v-if="isLoading"></sw-loader>
                     {% endblock %}
+
+                    {% block lgw_order_list_modal %}
+                        <sw-modal v-if="showSyncResultModal"
+                                  @modal-close="onCloseSynResultModal"
+                                  :title="$tc('lengow-connector.order.modal_sync_result_title')"
+                                  variant="default">
+                            <ul>
+                                <li v-for="message in syncResultMessages">
+                                    {{ message }}
+                                </li>
+                            </ul>
+                        </sw-modal>
+                    {% endblock %}
+
                 </div>
             </template>
 

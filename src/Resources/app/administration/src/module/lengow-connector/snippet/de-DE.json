@@ -43,9 +43,18 @@
         },
         "order": {
             "title": "Bestellungen",
+            "order_with_error": "mit Fehlern",
+            "order_waiting_to_be_sent": "die zum Versand bereit sind",
+            "last_synchronisation": "Letzte Synchronisierung:",
+            "no_synchronisation": "Derzeit keine Synchronisierung",
+            "report_sent_to": "Alle Reports werden per Email gesendet",
+            "no_report_sent": "Reports werden per Email nicht gesendet.",
+            "change_this": "Ändern Sie dies?",
+            "synchronise_orders": "Bestellungen synchronisieren",
             "nb_product": "produkt(en)",
             "no_order_title": "Das Beste kommt erst noch!",
             "no_order_description": "Ihre Produkte sind gut sichtbar, Sie werden sicherlich bald Ihre ersten Bestellungen erhalten",
+            "modal_sync_result_title": "Befehlssynchronisierung abgeschlossen",
             "state": {
                 "accepted": "Akzeptiert",
                 "waiting_shipment": "Warten auf Versand",

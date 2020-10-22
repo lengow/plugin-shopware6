@@ -1,9 +1,10 @@
 import template from './views/lengow-order-list.html.twig';
-import {ORDER_LENGOW_STATES, ORDER_TYPES} from "../../../const";
+import {ORDER_LENGOW_STATES, ORDER_TYPES, ORDER_SYNCHRONISATION} from "../../../const";
 import lgwActionButton from './components/lgw-action-button';
 import lgwCountryIcon from './components/lgw-country-icon';
 import lgwOrderStateLabel from './components/lgw-order-state-label';
 import lgwOrderTypeIcon from './components/lgw-order-type-icon';
+import './views/lengow-order-list.scss';
 
 const {
     Component,
@@ -17,7 +18,8 @@ Component.register('lengow-order-list', {
     inject: [
         'repositoryFactory',
         'stateStyleDataProviderService',
-        'acl'
+        'acl',
+        'LengowConnectorOrderService',
     ],
 
     mixins: [
@@ -32,6 +34,7 @@ Component.register('lengow-order-list', {
             isLoading: false,
             filterLoading: false,
             showDeleteModal: false,
+            showSyncResultModal: false,
             searchFilter: '',
             orderLengowStateFilter: [],
             orderTypeFilter: '',
@@ -39,11 +42,22 @@ Component.register('lengow-order-list', {
             availableOrderLengowStates: [],
             availableOrderTypes: [],
             availableMarketplaces: [],
+            syncResultMessages: [],
+            orderWithError: 0,
+            orderWaitingToBeSent: 0,
+            reportMailEnabled: false,
+            reportMailAddress: '',
+            defaultMail: '',
+            lastSynchronisation: {},
+            settingsLoading: false,
+            orderWithErrorLoading: false,
+            orderWaitingToBeSentLoading: false,
         };
     },
 
     created() {
         this.loadFilterValues();
+        this.loadSyncData();
     },
 
     metaInfo() {
@@ -56,6 +70,14 @@ Component.register('lengow-order-list', {
 
         lengowOrderRepository() {
             return this.repositoryFactory.create('lengow_order');
+        },
+
+        lengowSettingsRepository() {
+            return this.repositoryFactory.create('lengow_settings');
+        },
+
+        systemConfigRepository() {
+            return this.repositoryFactory.create('system_config');
         },
 
         lengowOrderColumns() {
@@ -262,6 +284,118 @@ Component.register('lengow-order-list', {
             this.orderTypeFilter = '';
             this.marketplaceFilter = [];
             this.getList();
+        },
+
+        onCloseSynResultModal() {
+            this.showSyncResultModal = false;
+        },
+
+        loadSyncData() {
+            this.loadDefaultEmail();
+            this.loadSettings();
+            this.loadOrderWithError();
+            this.loadOrderWaitingToBeSent();
+        },
+
+        loadSettings() {
+            this.settingsLoading = true;
+            const criteria = new Criteria();
+            criteria.addFilter(Criteria.equalsAny('name', [
+                'lengowLastImportCron',
+                'lengowLastImportManual',
+                'lengowReportMailEnabled',
+                'lengowReportMailAddress',
+            ]));
+            this.lengowSettingsRepository.search(criteria, Shopware.Context.api).then(response => {
+                const settings = [];
+                if (response.total > 0) {
+                    response.forEach(setting => {
+                        settings[setting.name] = setting.value;
+                    });
+                }
+                if (settings['lengowLastImportCron'] !== undefined && settings['lengowLastImportManual'] !== undefined) {
+                    this.lastSynchronisation = this.getLastSynchronisationDate(
+                        settings['lengowLastImportCron'],
+                        settings['lengowLastImportManual']
+                    );
+                }
+                if (settings['lengowReportMailEnabled'] !== undefined) {
+                    this.reportMailEnabled = settings['lengowReportMailEnabled'] === '1';
+                }
+                if (settings['lengowReportMailAddress'] !== undefined) {
+                    this.reportMailAddress = this.cleanReportMailAddresses(settings['lengowReportMailAddress']);
+                }
+            }).finally(() => {
+                this.settingsLoading = false;
+            });
+        },
+
+        getLastSynchronisationDate(timestampCron, timestampManual) {
+            if (timestampCron && timestampManual) {
+                if (parseInt(timestampCron) > parseInt(timestampManual)) {
+                    return {'type': ORDER_SYNCHRONISATION.cron, 'date': new Date(parseInt(timestampCron) * 1000)};
+                }
+                return {'type': ORDER_SYNCHRONISATION.manual, 'date': new Date(parseInt(timestampManual) * 1000)};
+            }
+            if (timestampCron && !timestampManual) {
+                return {'type': ORDER_SYNCHRONISATION.cron, 'date': new Date(parseInt(timestampCron) * 1000)};
+            }
+            if (timestampManual && !timestampCron) {
+                return {'type': ORDER_SYNCHRONISATION.manual, 'date': new Date(parseInt(timestampManual) * 1000)};
+            }
+            return {};
+        },
+
+        loadDefaultEmail() {
+            const criteria = new Criteria();
+            criteria.addFilter(Criteria.contains('configurationKey', 'core.basicInformation.email'));
+            this.systemConfigRepository.search(criteria, Shopware.Context.api).then(response => {
+                if (response.total > 0) {
+                    this.defaultEmail = response.first().configurationValue;
+                }
+            })
+        },
+
+        cleanReportMailAddresses(reportMailAddress) {
+            return reportMailAddress.trim()
+                .replaceAll("\r\n", ',')
+                .replaceAll(';', ',')
+                .replaceAll(' ', ',')
+                .replaceAll(',', ', ');
+        },
+
+        loadOrderWithError() {
+            this.orderWithErrorLoading = true;
+            const criteria = new Criteria();
+            criteria.addFilter(Criteria.contains('isInError', '1'));
+            this.lengowOrderRepository.search(criteria, Shopware.Context.api).then(response => {
+                this.orderWithError = parseInt(response.total);
+            }).finally(() => {
+                this.orderWithErrorLoading = false;
+            });
+        },
+
+        loadOrderWaitingToBeSent() {
+            this.orderWaitingToBeSentLoading = true;
+            const criteria = new Criteria();
+            criteria.addFilter(Criteria.contains('orderProcessState', '1'));
+            this.lengowOrderRepository.search(criteria, Shopware.Context.api).then(response => {
+                this.orderWaitingToBeSent = parseInt(response.total);
+            }).finally(() => {
+                this.orderWaitingToBeSentLoading = false;
+            });
+        },
+
+        synchroniseOrders() {
+            this.isLoading = true;
+            this.LengowConnectorOrderService.synchroniseOrders().then(response => {
+                this.syncResultMessages = response;
+                this.showSyncResultModal = true;
+                this.onRefresh();
+                this.loadSyncData();
+            }).finally(() => {
+                this.isLoading = false;
+            });
         },
     },
 });

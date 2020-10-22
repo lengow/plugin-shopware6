@@ -1,3 +1,4 @@
+lengow_log.error.no_notification|Keine neue Benachrichtigung zur Bestellung
 lengow_log.error.nb_order_imported|%{nb_order} Bestellung(en) importiert
 lengow_log.error.nb_order_updated|%{nb_order} Bestellung(en) aktualisiert
 lengow_log.error.nb_order_with_error|%{nb_order} Bestellung(en) mit Fehlern

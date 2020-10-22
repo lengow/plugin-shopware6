@@ -43,9 +43,18 @@
         },
         "order": {
             "title": "Orders",
+            "order_with_error": "with errors",
+            "order_waiting_to_be_sent": "waiting to be sent",
+            "last_synchronisation": "Last synchronisation:",
+            "no_synchronisation": "No synchronisation for now",
+            "report_sent_to": "All reports will be sent to",
+            "no_report_sent": "No order issue reports will be sent by mail.",
+            "change_this": "Change this?",
+            "synchronise_orders": "Synchronise Orders",
             "nb_product": "product(s)",
             "no_order_title": "The best is yet to come!",
             "no_order_description": "Your products have great visibility and your sales are about to prosper!",
+            "modal_sync_result_title": "Orders synchronisation finished",
             "state": {
                 "accepted": "Accepted",
                 "waiting_shipment": "Awaiting shipment",

@@ -1,6 +1,6 @@
 .idea
 **/.DS_Store
-src/Resources/public
+src/Resources/public/administration
 src/Logs/*.txt
 .eslintrc.json
 node_modules

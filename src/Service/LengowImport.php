@@ -217,7 +217,7 @@ class LengowImport
      * bool   log_output          display log messages
      * bool   debug_mode          debug mode
      */
-    public function init(array $params): void
+    public function init(array $params = []): void
     {
         // get generic params for synchronisation
         $this->accountId = (int)$this->lengowConfiguration->get(LengowConfiguration::LENGOW_ACCOUNT_ID);
@@ -383,7 +383,7 @@ class LengowImport
                         ]),
                         $this->logOutput
                     );
-                    $error[$salesChannel->getId()] = $errorMessage;
+                    $error[$salesChannel->getName()] = $errorMessage;
                     unset($errorMessage);
                     continue;
                 }

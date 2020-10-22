@@ -24,3 +24,8 @@ export const ORDER_TYPES = {
     business: 'is_business',
     delivered_by_marketplace: 'is_delivered_by_marketplace',
 }
+
+export const ORDER_SYNCHRONISATION = {
+    manual: 'manual',
+    cron: 'cron',
+}

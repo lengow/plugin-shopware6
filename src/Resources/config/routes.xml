@@ -5,4 +5,6 @@
         https://symfony.com/schema/routing/routing-1.0.xsd">
     <!-- All annotation routes from storefront controller -->
     <import resource="../../Storefront/Controller/*Controller.php" type="annotation"/>
+    <!-- All annotation routes from administration controller -->
+    <import resource="../../Controller/*Controller.php" type="annotation" />
 </routes>
