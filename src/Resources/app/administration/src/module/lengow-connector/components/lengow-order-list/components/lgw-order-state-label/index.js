@@ -1,10 +1,8 @@
 import template from './views/lgw-order-state-label.html.twig';
-import {ORDER_LENGOW_STATES} from "../../../../../const";
+import { ORDER_LENGOW_STATES } from '../../../../../const';
 import './views/lgw-order-state-label.scss';
 
-const {
-    Component,
-} = Shopware;
+const { Component } = Shopware;
 
 Component.register('lgw-order-state-label', {
     template,
@@ -67,5 +65,5 @@ Component.register('lgw-order-state-label', {
             this.orderStateTranslation = this.$tc(translationKey);
             this.isLoading = false;
         },
-    }
+    },
 });

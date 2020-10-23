@@ -9,7 +9,7 @@ import './views/lengow-order-list.scss';
 const {
     Component,
     Mixin,
-    Data: {Criteria},
+    Data: { Criteria },
 } = Shopware;
 
 Component.register('lengow-order-list', {
@@ -22,9 +22,7 @@ Component.register('lengow-order-list', {
         'LengowConnectorOrderService',
     ],
 
-    mixins: [
-        Mixin.getByName('listing')
-    ],
+    mixins: [Mixin.getByName('listing')],
 
     data() {
         return {
@@ -67,7 +65,6 @@ Component.register('lengow-order-list', {
     },
 
     computed: {
-
         lengowOrderRepository() {
             return this.repositoryFactory.create('lengow_order');
         },
@@ -88,14 +85,18 @@ Component.register('lengow-order-list', {
             const criteria = new Criteria(this.page, this.limit);
             criteria.setTerm(this.term);
             if (this.orderLengowStateFilter.length > 0) {
-                criteria.addFilter(Criteria.equalsAny('orderLengowState', this.orderLengowStateFilter));
+                criteria.addFilter(
+                    Criteria.equalsAny('orderLengowState', this.orderLengowStateFilter),
+                );
             }
             if (this.orderTypeFilter) {
                 if (this.orderTypeFilter === ORDER_TYPES.express) {
-                    criteria.addFilter(Criteria.multi('OR', [
-                        Criteria.contains('orderTypes', ORDER_TYPES.express),
-                        Criteria.contains('orderTypes', ORDER_TYPES.prime),
-                    ]));
+                    criteria.addFilter(
+                        Criteria.multi('OR', [
+                            Criteria.contains('orderTypes', ORDER_TYPES.express),
+                            Criteria.contains('orderTypes', ORDER_TYPES.prime),
+                        ]),
+                    );
                 } else {
                     criteria.addFilter(Criteria.contains('orderTypes', this.orderTypeFilter));
                 }
@@ -104,12 +105,15 @@ Component.register('lengow-order-list', {
                 criteria.addFilter(Criteria.equalsAny('marketplaceName', this.marketplaceFilter));
             }
             if (this.searchFilter) {
-                criteria.addFilter(Criteria.multi('OR', [
-                    Criteria.contains('marketplaceSku', this.searchFilter),
-                    Criteria.contains('customerName', this.searchFilter),
-                ]));
+                criteria.addFilter(
+                    Criteria.multi('OR', [
+                        Criteria.contains('marketplaceSku', this.searchFilter),
+                        Criteria.contains('customerName', this.searchFilter),
+                    ]),
+                );
             }
-            criteria.addSorting(Criteria.sort(this.sortBy, this.sortDirection))
+            criteria
+                .addSorting(Criteria.sort(this.sortBy, this.sortDirection))
                 .addAssociation('salesChannel')
                 .addAssociation('order')
                 .addAssociation('order.stateMachineState');
@@ -119,21 +123,51 @@ Component.register('lengow-order-list', {
 
         getAvailableOrderLengowStates() {
             return [
-                {label: this.$tc('lengow-connector.order.state.accepted'), value: ORDER_LENGOW_STATES.accepted},
-                {label: this.$tc('lengow-connector.order.state.waiting_shipment'), value: ORDER_LENGOW_STATES.waiting_shipment},
-                {label: this.$tc('lengow-connector.order.state.shipped'), value: ORDER_LENGOW_STATES.shipped},
-                {label: this.$tc('lengow-connector.order.state.refunded'), value: ORDER_LENGOW_STATES.refunded},
-                {label: this.$tc('lengow-connector.order.state.closed'), value: ORDER_LENGOW_STATES.closed},
-                {label: this.$tc('lengow-connector.order.state.canceled'), value: ORDER_LENGOW_STATES.canceled},
+                {
+                    label: this.$tc('lengow-connector.order.state.accepted'),
+                    value: ORDER_LENGOW_STATES.accepted,
+                },
+                {
+                    label: this.$tc('lengow-connector.order.state.waiting_shipment'),
+                    value: ORDER_LENGOW_STATES.waiting_shipment,
+                },
+                {
+                    label: this.$tc('lengow-connector.order.state.shipped'),
+                    value: ORDER_LENGOW_STATES.shipped,
+                },
+                {
+                    label: this.$tc('lengow-connector.order.state.refunded'),
+                    value: ORDER_LENGOW_STATES.refunded,
+                },
+                {
+                    label: this.$tc('lengow-connector.order.state.closed'),
+                    value: ORDER_LENGOW_STATES.closed,
+                },
+                {
+                    label: this.$tc('lengow-connector.order.state.canceled'),
+                    value: ORDER_LENGOW_STATES.canceled,
+                },
             ];
         },
 
         getAvailableOrderTypes() {
             return [
-                {label: this.$tc('lengow-connector.order.filter.default_order_type'), value: ''},
-                {label: this.$tc('lengow-connector.order.type.express'), value: ORDER_TYPES.express},
-                {label: this.$tc('lengow-connector.order.type.delivered_by_marketplace'), value: ORDER_TYPES.delivered_by_marketplace},
-                {label: this.$tc('lengow-connector.order.type.business'), value: ORDER_TYPES.business},
+                {
+                    label: this.$tc('lengow-connector.order.filter.default_order_type'),
+                    value: '',
+                },
+                {
+                    label: this.$tc('lengow-connector.order.type.express'),
+                    value: ORDER_TYPES.express,
+                },
+                {
+                    label: this.$tc('lengow-connector.order.type.delivered_by_marketplace'),
+                    value: ORDER_TYPES.delivered_by_marketplace
+                },
+                {
+                    label: this.$tc('lengow-connector.order.type.business'),
+                    value: ORDER_TYPES.business,
+                },
             ];
         },
     },
@@ -142,14 +176,16 @@ Component.register('lengow-order-list', {
         getList() {
             this.isLoading = true;
 
-            return this.lengowOrderRepository.search(this.lengowOrderCriteria, Shopware.Context.api).then((response) => {
-                this.total = response.total;
-                this.lengowOrders = response;
-
-                return response;
-            }).finally(() => {
-                this.isLoading = false;
-            });
+            return this.lengowOrderRepository
+                .search(this.lengowOrderCriteria, Shopware.Context.api)
+                .then(response => {
+                    this.total = response.total;
+                    this.lengowOrders = response;
+                    return response;
+                })
+                .finally(() => {
+                    this.isLoading = false;
+                });
         },
 
         getLengowOrderColumns() {
@@ -223,14 +259,15 @@ Component.register('lengow-order-list', {
 
         getVariantFromOrderState(order) {
             return this.stateStyleDataProviderService.getStyle(
-                'order.state', order.stateMachineState.technicalName
+                'order.state',
+                order.stateMachineState.technicalName,
             ).variant;
         },
 
         getOrderTypes(types) {
             const orderTypes = [];
             Object.keys(types).forEach(key => {
-                orderTypes.push({type: key, label: types[key]});
+                orderTypes.push({ type: key, label: types[key] });
             });
             return orderTypes;
         },
@@ -246,16 +283,31 @@ Component.register('lengow-order-list', {
             this.availableOrderTypes = this.getAvailableOrderTypes;
 
             const criteria = new Criteria();
-            criteria.addGrouping('marketplaceName');
-            return this.lengowOrderRepository.search(criteria, Shopware.Context.api).then((response) => {
-                const availableMarketplaces = [];
-                response.forEach(item => {
-                    availableMarketplaces.push({label: item.marketplaceLabel, value: item.marketplaceName});
+            return this.lengowOrderRepository.search(criteria, Shopware.Context.api)
+                .then(response => {
+                    const allMarketplaceNames = [];
+                    const availableMarketplaces = [];
+                    response.forEach(item => {
+                        allMarketplaceNames[item.marketplaceName] = item.marketplaceLabel;
+                    });
+                    Object.entries(allMarketplaceNames.sort()).forEach(
+                        ([marketplaceName, marketplaceLabel]) => {
+                            availableMarketplaces.push({
+                                label: marketplaceLabel,
+                                value: marketplaceName,
+                            });
+                        },
+                    );
+                    availableMarketplaces.sort(function(a, b) {
+                        const textA = a.value.toUpperCase();
+                        const textB = b.value.toUpperCase();
+                        return textA < textB ? -1 : textA > textB ? 1 : 0;
+                    });
+                    this.availableMarketplaces = availableMarketplaces;
+                })
+                .finally(() => {
+                    this.filterLoading = false;
                 });
-                this.availableMarketplaces = availableMarketplaces;
-            }).finally(() => {
-                this.filterLoading = false;
-            });
         },
 
         onSearch(value) {
@@ -300,65 +352,88 @@ Component.register('lengow-order-list', {
         loadSettings() {
             this.settingsLoading = true;
             const criteria = new Criteria();
-            criteria.addFilter(Criteria.equalsAny('name', [
-                'lengowLastImportCron',
-                'lengowLastImportManual',
-                'lengowReportMailEnabled',
-                'lengowReportMailAddress',
-            ]));
-            this.lengowSettingsRepository.search(criteria, Shopware.Context.api).then(response => {
-                const settings = [];
-                if (response.total > 0) {
-                    response.forEach(setting => {
-                        settings[setting.name] = setting.value;
-                    });
-                }
-                if (settings['lengowLastImportCron'] !== undefined && settings['lengowLastImportManual'] !== undefined) {
-                    this.lastSynchronisation = this.getLastSynchronisationDate(
-                        settings['lengowLastImportCron'],
-                        settings['lengowLastImportManual']
-                    );
-                }
-                if (settings['lengowReportMailEnabled'] !== undefined) {
-                    this.reportMailEnabled = settings['lengowReportMailEnabled'] === '1';
-                }
-                if (settings['lengowReportMailAddress'] !== undefined) {
-                    this.reportMailAddress = this.cleanReportMailAddresses(settings['lengowReportMailAddress']);
-                }
-            }).finally(() => {
-                this.settingsLoading = false;
-            });
+            criteria.addFilter(
+                Criteria.equalsAny('name', [
+                    'lengowLastImportCron',
+                    'lengowLastImportManual',
+                    'lengowReportMailEnabled',
+                    'lengowReportMailAddress',
+                ]),
+            );
+            this.lengowSettingsRepository
+                .search(criteria, Shopware.Context.api)
+                .then(response => {
+                    const settings = [];
+                    if (response.total > 0) {
+                        response.forEach(setting => {
+                            settings[setting.name] = setting.value;
+                        });
+                    }
+                    if (
+                        settings['lengowLastImportCron'] !== undefined &&
+                        settings['lengowLastImportManual'] !== undefined
+                    ) {
+                        this.lastSynchronisation = this.getLastSynchronisationDate(
+                            settings['lengowLastImportCron'],
+                            settings['lengowLastImportManual'],
+                        );
+                    }
+                    if (settings['lengowReportMailEnabled'] !== undefined) {
+                        this.reportMailEnabled = settings['lengowReportMailEnabled'] === '1';
+                    }
+                    if (settings['lengowReportMailAddress'] !== undefined && settings['lengowReportMailAddress']) {
+                        this.reportMailAddress = this.cleanReportMailAddresses(settings['lengowReportMailAddress']);
+                    }
+                })
+                .finally(() => {
+                    this.settingsLoading = false;
+                });
         },
 
         getLastSynchronisationDate(timestampCron, timestampManual) {
             if (timestampCron && timestampManual) {
                 if (parseInt(timestampCron) > parseInt(timestampManual)) {
-                    return {'type': ORDER_SYNCHRONISATION.cron, 'date': new Date(parseInt(timestampCron) * 1000)};
+                    return {
+                        type: ORDER_SYNCHRONISATION.cron,
+                        date: new Date(parseInt(timestampCron) * 1000),
+                    };
                 }
-                return {'type': ORDER_SYNCHRONISATION.manual, 'date': new Date(parseInt(timestampManual) * 1000)};
+                return {
+                    type: ORDER_SYNCHRONISATION.manual,
+                    date: new Date(parseInt(timestampManual) * 1000),
+                };
             }
             if (timestampCron && !timestampManual) {
-                return {'type': ORDER_SYNCHRONISATION.cron, 'date': new Date(parseInt(timestampCron) * 1000)};
+                return {
+                    type: ORDER_SYNCHRONISATION.cron,
+                    date: new Date(parseInt(timestampCron) * 1000),
+                };
             }
             if (timestampManual && !timestampCron) {
-                return {'type': ORDER_SYNCHRONISATION.manual, 'date': new Date(parseInt(timestampManual) * 1000)};
+                return {
+                    type: ORDER_SYNCHRONISATION.manual,
+                    date: new Date(parseInt(timestampManual) * 1000),
+                };
             }
             return {};
         },
 
         loadDefaultEmail() {
             const criteria = new Criteria();
-            criteria.addFilter(Criteria.contains('configurationKey', 'core.basicInformation.email'));
+            criteria.addFilter(
+                Criteria.contains('configurationKey', 'core.basicInformation.email'),
+            );
             this.systemConfigRepository.search(criteria, Shopware.Context.api).then(response => {
                 if (response.total > 0) {
                     this.defaultEmail = response.first().configurationValue;
                 }
-            })
+            });
         },
 
         cleanReportMailAddresses(reportMailAddress) {
-            return reportMailAddress.trim()
-                .replaceAll("\r\n", ',')
+            return reportMailAddress
+                .trim()
+                .replaceAll('\r\n', ',')
                 .replaceAll(';', ',')
                 .replaceAll(' ', ',')
                 .replaceAll(',', ', ');
@@ -368,34 +443,42 @@ Component.register('lengow-order-list', {
             this.orderWithErrorLoading = true;
             const criteria = new Criteria();
             criteria.addFilter(Criteria.contains('isInError', '1'));
-            this.lengowOrderRepository.search(criteria, Shopware.Context.api).then(response => {
-                this.orderWithError = parseInt(response.total);
-            }).finally(() => {
-                this.orderWithErrorLoading = false;
-            });
+            this.lengowOrderRepository
+                .search(criteria, Shopware.Context.api)
+                .then(response => {
+                    this.orderWithError = parseInt(response.total);
+                })
+                .finally(() => {
+                    this.orderWithErrorLoading = false;
+                });
         },
 
         loadOrderWaitingToBeSent() {
             this.orderWaitingToBeSentLoading = true;
             const criteria = new Criteria();
             criteria.addFilter(Criteria.contains('orderProcessState', '1'));
-            this.lengowOrderRepository.search(criteria, Shopware.Context.api).then(response => {
-                this.orderWaitingToBeSent = parseInt(response.total);
-            }).finally(() => {
-                this.orderWaitingToBeSentLoading = false;
-            });
+            this.lengowOrderRepository
+                .search(criteria, Shopware.Context.api)
+                .then(response => {
+                    this.orderWaitingToBeSent = parseInt(response.total);
+                })
+                .finally(() => {
+                    this.orderWaitingToBeSentLoading = false;
+                });
         },
 
         synchroniseOrders() {
             this.isLoading = true;
-            this.LengowConnectorOrderService.synchroniseOrders().then(response => {
-                this.syncResultMessages = response;
-                this.showSyncResultModal = true;
-                this.onRefresh();
-                this.loadSyncData();
-            }).finally(() => {
-                this.isLoading = false;
-            });
+            this.LengowConnectorOrderService.synchroniseOrders()
+                .then(response => {
+                    this.syncResultMessages = response;
+                    this.showSyncResultModal = true;
+                    this.onRefresh();
+                    this.loadSyncData();
+                })
+                .finally(() => {
+                    this.isLoading = false;
+                });
         },
     },
 });

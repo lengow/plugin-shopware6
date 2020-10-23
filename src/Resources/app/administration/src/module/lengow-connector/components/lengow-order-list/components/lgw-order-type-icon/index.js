@@ -1,10 +1,8 @@
 import template from './views/lgw-order-type-icon.html.twig';
-import {ORDER_TYPES} from "../../../../../const";
+import { ORDER_TYPES } from '../../../../../const';
 import './views/lgw-order-type-icon.scss';
 
-const {
-    Component,
-} = Shopware;
+const { Component } = Shopware;
 
 Component.register('lgw-order-type-icon', {
     template,
@@ -36,7 +34,8 @@ Component.register('lgw-order-type-icon', {
     methods: {
         createdComponent() {
             this.isLoading = true;
-            let iconColorClass, iconModClass;
+            let iconColorClass;
+            let iconModClass;
             if (this.type === ORDER_TYPES.express || this.type === ORDER_TYPES.prime) {
                 iconColorClass = 'mod-orange';
                 iconModClass = 'mod-chrono';
@@ -54,5 +53,5 @@ Component.register('lgw-order-type-icon', {
             this.iconLabel = this.label;
             this.isLoading = false;
         },
-    }
+    },
 });

@@ -34,7 +34,7 @@
                                 {{ lastSynchronisation.date | date({hour: '2-digit', minute: '2-digit'}) }}
                             </p>
                             <p v-else>
-                                {{ $tc('lengow-connector.order.no_synchronisation_yet') }}
+                                {{ $tc('lengow-connector.order.no_synchronisation') }}
                             </p>
                             <p v-if="reportMailEnabled">
                                 {{ $tc('lengow-connector.order.report_sent_to') }}
@@ -144,7 +144,7 @@
                         <sw-empty-state
                                 v-if="!isLoading && !total"
                                 :title="$tc('lengow-connector.order.no_order_title')"
-                                :subline="$tc('lengow-connector.order.no_order_description')">>
+                                :subline="$tc('lengow-connector.order.no_order_description')">
                         </sw-empty-state>
                     {% endblock %}
 

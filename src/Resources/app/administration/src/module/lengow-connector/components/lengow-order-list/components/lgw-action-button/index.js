@@ -1,23 +1,13 @@
 import template from './views/lgw-action-button.html.twig';
 
-const {
-    Component,
-    Mixin,
-    Data: { Criteria },
-} = Shopware;
+const { Component } = Shopware;
 
 Component.register('lgw-action-button', {
     template,
 
-    props: {
+    props: {},
 
-    },
+    computed: {},
 
-    computed: {
-
-    },
-
-    methods: {
-
-    }
+    methods: {},
 });
