@@ -50,6 +50,18 @@
                                     </a>
                                     {{ $tc('lengow-connector.dashboard.help.helpCenter') }}
                                 </p>
+                                <div>
+                                    <routerLink :to="{ name: 'lengow.connector.legal' }" tag='span'>
+                                        <br/> <!-- todo mettre dans le footer -->
+                                        <h4>Mention légal</h4>
+                                    </routerLink>
+                                </div>
+                                <div>
+                                    <routerLink :to="{ name: 'lengow.connector.contact' }" tag='span'>
+                                        <!-- todo mettre dans le footer -->
+                                        <h4>Contact</h4>
+                                    </routerLink>
+                                </div>
                             </div>
                         </div>
                     </div>

@@ -25,6 +25,27 @@
                 "helpCenter": "pour plus d'informations sur la configuration de votre plugin Shopware"
             }
         },
+        "contact": {
+            "title": "Demandez de l'aide à notre équipe Support !",
+            "contain_text_support": "Des questions, un feedback sur Lengow... transmettez vos demandes au",
+            "title_lengow_support": "support Lengow.",
+            "link_lengow_support": "https:\/\/supportlengow.zendesk.com\/hc\/fr\/requests\/new",
+            "need_some_help": "Besoin d'aide ?",
+            "contain_text_support_hour": "Nous ferons notre maximum pour revenir vers vous au plus vite (Notre équipe Support est disponible du lundi au vendredi, de 9h à 18h).",
+            "find_answer": "Vous pouvez aussi consulter",
+            "link_magento_guide": "notre guide dédié à Shopware 6",
+            "knowledge_link_url": "https:\/\/support.lengow.com\/"
+        },
+        "legals": {
+            "simplified_company": "Société par actions simplifiés",
+            "social_capital": "Capital social :",
+            "cnil_declaration": "Déclaration CNIL :",
+            "company_registration_number": "RCS de Nantes :",
+            "vat_identification_number": "Numéro de TVA intracommunautaire :",
+            "address": "Adresse",
+            "contact": "Contact",
+            "hosting": "Hébergement"
+        },
         "products": {
             "activateSelectionLabel": "Activer la selection produit",
             "datas": {
