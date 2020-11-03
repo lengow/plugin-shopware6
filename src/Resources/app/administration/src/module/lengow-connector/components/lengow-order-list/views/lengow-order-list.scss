@@ -4,3 +4,8 @@
   font-size: 14px;
   padding-top: 5px;
 }
+
+#lgw-order-grid .sw-data-grid__cell,
+#lgw-order-grid .sw-data-grid__cell-content {
+  overflow: visible;
+}

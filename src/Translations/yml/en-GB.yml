@@ -76,6 +76,12 @@ en:
           order_state: "Order state"
           order_type: "Order type"
           marketplace: "Marketplace"
+        action_button:
+          not_imported: "not imported"
+          not_sent: "not sent"
+          action: "Action sent to the marketplace did not work"
+          import: "Order hasn't been imported into Shopware"
+          no_error_message: "Unidentified error, please contact Lengow's support team for more information"
       settings:
         NavBar:
           title: "Settings"

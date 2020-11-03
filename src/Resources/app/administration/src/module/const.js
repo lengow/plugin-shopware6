@@ -7,7 +7,7 @@ export const envMixin = {
             LENGOW_URL,
         }
     }
-}
+};
 
 export const ORDER_LENGOW_STATES = {
     accepted: 'accepted',
@@ -16,16 +16,26 @@ export const ORDER_LENGOW_STATES = {
     refunded: 'refunded',
     closed: 'closed',
     canceled: 'canceled',
-}
+};
 
 export const ORDER_TYPES = {
     prime: 'is_prime',
     express: 'is_express',
     business: 'is_business',
     delivered_by_marketplace: 'is_delivered_by_marketplace',
-}
+};
 
 export const ORDER_SYNCHRONISATION = {
     manual: 'manual',
     cron: 'cron',
-}
+};
+
+export const ERROR_TYPE = {
+    import: 1,
+    send: 2,
+};
+
+export const ACTION_BUTTON = {
+    reimport: 'reimport',
+    resend: 'resend',
+};

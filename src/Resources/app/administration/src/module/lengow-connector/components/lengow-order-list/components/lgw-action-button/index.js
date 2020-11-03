@@ -1,13 +1,100 @@
 import template from './views/lgw-action-button.html.twig';
+import { ERROR_TYPE, ACTION_BUTTON } from '../../../../../const';
+import './views/lgw-action-button.scss';
 
-const { Component } = Shopware;
+const {
+    Component,
+    Data: { Criteria },
+} = Shopware;
 
 Component.register('lgw-action-button', {
     template,
 
-    props: {},
+    inject: ['LengowConnectorOrderService'],
+
+    props: {
+        lengowOrderId: {
+            type: String,
+            required: true,
+        },
+        orderProcessState: {
+            type: Number,
+            required: true,
+        },
+        onRefresh: {
+            type: Object,
+            required: true,
+        },
+    },
+
+    data() {
+        return {
+            errors: [],
+            buttonContent: '',
+            buttonAction: '',
+            tooltipTitle: '',
+            isLoading: false,
+        };
+    },
+
+    created() {
+        this.createdComponent();
+    },
 
     computed: {},
 
-    methods: {},
+    methods: {
+        createdComponent() {
+            this.isLoading = true;
+            if (this.orderProcessState === 0) {
+                this.buttonAction = ACTION_BUTTON.reimport;
+                this.buttonContent = this.$tc('lengow-connector.order.action_button.not_imported');
+                this.tooltipTitle = this.$tc('lengow-connector.order.action_button.import');
+            } else {
+                this.buttonAction = ACTION_BUTTON.resend;
+                this.buttonContent = this.$tc('lengow-connector.order.action_button.not_sent');
+                this.tooltipTitle = this.$tc('lengow-connector.order.action_button.action');
+            }
+            this.getLengowOrderErrors()
+                .then(response => {
+                    this.errors = response;
+                })
+                .finally(() => {
+                    this.isLoading = false;
+                });
+        },
+
+        getLengowOrderErrors() {
+            return this.LengowConnectorOrderService.getOrderErrorMessages({
+                lengowOrderId: this.lengowOrderId,
+                orderErrorType: this.orderProcessState === 0 ? ERROR_TYPE.import : ERROR_TYPE.send,
+            });
+        },
+
+        clickButton(action) {
+            if (action === ACTION_BUTTON.reimport) {
+                this.reImportOrder();
+            } else {
+                this.reSendAction();
+            }
+        },
+
+        reImportOrder() {
+            this.isLoading = true;
+            this.LengowConnectorOrderService.reImportOrder({
+                lengowOrderId: this.lengowOrderId,
+            }).then(response => {
+                if (response.order_new !== undefined && response.order_new === true) {
+                    this.onRefresh();
+                } else {
+                    this.getLengowOrderErrors().then(result => {
+                        this.errors = result;
+                        this.isLoading = false;
+                    });
+                }
+            });
+        },
+
+        reSendAction() {},
+    },
 });

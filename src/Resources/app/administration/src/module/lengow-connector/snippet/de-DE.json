@@ -88,6 +88,13 @@
                 "order_state": "Bestellstatus",
                 "order_type": "Auftragsart",
                 "marketplace": "Marktplatz"
+            },
+            "action_button": {
+                "not_imported": "nicht importiert",
+                "not_sent": "nicht gesendet",
+                "action": "An Marktplatz gesendete Aktivität funktioniert nicht",
+                "import": "Bestellung konnte in Shopware nicht importiert werden",
+                "no_error_message": "Ein nicht identifizierbarer Fehler ist aufgetreten. Bitte kontaktieren Sie unseren Support!"
             }
         },
         "Settings": {

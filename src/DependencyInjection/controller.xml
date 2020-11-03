@@ -9,6 +9,8 @@
         <service id="Lengow\Connector\Controller\LengowOrderController">
             <argument type="service" id="Lengow\Connector\Service\LengowImport"/>
             <argument type="service" id="Lengow\Connector\Service\LengowLog"/>
+            <argument type="service" id="Lengow\Connector\Service\LengowOrder"/>
+            <argument type="service" id="Lengow\Connector\Service\LengowOrderError"/>
             <tag name="controller.service_arguments"/>
         </service>
 

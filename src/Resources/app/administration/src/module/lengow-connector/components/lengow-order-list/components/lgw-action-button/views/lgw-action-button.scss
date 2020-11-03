@@ -1,0 +1,47 @@
+.lgw-action-button {
+  position: relative;
+}
+
+.lgw-action-tooltip {
+  position: relative;
+  text-decoration: none;
+}
+
+.lgw-action-tooltip span {
+  display: none
+}
+
+.lgw-action-tooltip :hover span {
+  display: block;
+  position: absolute;
+  background-color: #000;
+  color: #FFF;
+  border-radius: 4px;
+  padding: 3px 8px;
+  text-align: center;
+  font-size: 11px;
+  font-style: normal;
+  font-weight: normal;
+  line-height: 1.42857143;
+  opacity: .9;
+  width: 180px;
+  white-space: normal;
+  z-index: 100;
+  left: -50%;
+  bottom: 150%;
+}
+
+.lgw-action-tooltip :hover span:after {
+  content: '';
+  position: absolute;
+  left: 50%;
+  top: 100%;
+  margin-left: -5px;
+  width: 0;
+  height: 0;
+  border-top: 5px solid #000000;
+  border-right: 5px solid transparent;
+  border-left: 5px solid transparent;
+  opacity: .9;
+  z-index: 100;
+}

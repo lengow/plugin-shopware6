@@ -16,6 +16,7 @@ use Shopware\Core\Framework\DataAbstractionLayer\EntityRepositoryInterface;
 use Shopware\Core\Framework\DataAbstractionLayer\Search\Criteria;
 use Shopware\Core\Framework\DataAbstractionLayer\Search\Filter\EqualsFilter;
 use Shopware\Core\Framework\DataAbstractionLayer\Search\Filter\MultiFilter;
+use Shopware\Core\Framework\DataAbstractionLayer\Search\Grouping\FieldGrouping;
 use Shopware\Core\Framework\Uuid\Uuid;
 use Shopware\Core\System\StateMachine\Aggregation\StateMachineState\StateMachineStateCollection;
 use Shopware\Core\System\StateMachine\Aggregation\StateMachineState\StateMachineStateEntity;
@@ -339,11 +340,11 @@ class LengowOrder
     {
         $context = Context::createDefaultContext();
         $criteria = new Criteria();
-        $criteria->addFilter(new EqualsFilter('id', $lengowOrderId));
-        /** @var LengowOrderCollection $LengowOrderCollection */
-        $LengowOrderCollection = $this->lengowOrderRepository->search($criteria, $context)->getEntities();
-        if ($LengowOrderCollection->count() !== 0) {
-            return $LengowOrderCollection->first();
+        $criteria->setIds([$lengowOrderId]);
+        /** @var LengowOrderCollection $lengowOrderCollection */
+        $lengowOrderCollection = $this->lengowOrderRepository->search($criteria, $context)->getEntities();
+        if ($lengowOrderCollection->count() !== 0) {
+            return $lengowOrderCollection->first();
         }
         return null;
     }
@@ -370,10 +371,10 @@ class LengowOrder
             new EqualsFilter('marketplaceName', $marketplaceName),
             new EqualsFilter('deliveryAddressId', $deliveryAddressId),
         ]));
-        /** @var LengowOrderCollection $LengowOrderCollection */
-        $LengowOrderCollection = $this->lengowOrderRepository->search($criteria, $context)->getEntities();
-        if ($LengowOrderCollection->count() !== 0) {
-            return $LengowOrderCollection->first();
+        /** @var LengowOrderCollection $lengowOrderCollection */
+        $lengowOrderCollection = $this->lengowOrderRepository->search($criteria, $context)->getEntities();
+        if ($lengowOrderCollection->count() !== 0) {
+            return $lengowOrderCollection->first();
         }
         return null;
     }
@@ -390,9 +391,9 @@ class LengowOrder
         $context = Context::createDefaultContext();
         $criteria = new Criteria();
         $criteria->addFilter(new EqualsFilter('order.id', $orderId));
-        /** @var LengowOrderCollection $LengowOrderCollection */
-        $LengowOrderCollection = $this->lengowOrderRepository->search($criteria, $context)->getEntities();
-        return $LengowOrderCollection->count() !== 0 ? $LengowOrderCollection->first() : null;
+        /** @var LengowOrderCollection $lengowOrderCollection */
+        $lengowOrderCollection = $this->lengowOrderRepository->search($criteria, $context)->getEntities();
+        return $lengowOrderCollection->count() !== 0 ? $lengowOrderCollection->first() : null;
     }
 
     /**
@@ -411,9 +412,9 @@ class LengowOrder
             new EqualsFilter('order.orderNumber', $orderNumber),
             new EqualsFilter('deliveryAddressId', $deliveryAddressId),
         ]));
-        /** @var LengowOrderCollection $LengowOrderCollection */
-        $LengowOrderCollection = $this->lengowOrderRepository->search($criteria, $context)->getEntities();
-        return $LengowOrderCollection->count() !== 0 ? $LengowOrderCollection->first() : null;
+        /** @var LengowOrderCollection $lengowOrderCollection */
+        $lengowOrderCollection = $this->lengowOrderRepository->search($criteria, $context)->getEntities();
+        return $lengowOrderCollection->count() !== 0 ? $lengowOrderCollection->first() : null;
     }
 
     /**
@@ -446,11 +447,11 @@ class LengowOrder
             ->addAssociation('order.lineItems')
             ->addAssociation('order.currency')
             ->addAssociation('order.addresses');
-        /** @var LengowOrderCollection $LengowOrderCollection */
-        $LengowOrderCollection = $this->lengowOrderRepository->search($criteria, $context)->getEntities();
-        if ($LengowOrderCollection->count() !== 0) {
+        /** @var LengowOrderCollection $lengowOrderCollection */
+        $lengowOrderCollection = $this->lengowOrderRepository->search($criteria, $context)->getEntities();
+        if ($lengowOrderCollection->count() !== 0) {
             /** @var LengowOrderEntity $lengowOrder */
-            $lengowOrder = $LengowOrderCollection->first();
+            $lengowOrder = $lengowOrderCollection->first();
             if ($lengowOrder->getOrder() !== null) {
                 return $lengowOrder->getOrder();
             }
@@ -474,18 +475,40 @@ class LengowOrder
             new EqualsFilter('marketplaceSku', $marketplaceSku),
             new EqualsFilter('marketplaceName', $marketplaceName),
         ]));
-        /** @var LengowOrderCollection $LengowOrderCollection */
-        $LengowOrderCollection = $this->lengowOrderRepository->search($criteria, Context::createDefaultContext())
+        /** @var LengowOrderCollection $lengowOrderCollection */
+        $lengowOrderCollection = $this->lengowOrderRepository->search($criteria, Context::createDefaultContext())
             ->getEntities();
-        if ($LengowOrderCollection->count() !== 0) {
+        if ($lengowOrderCollection->count() !== 0) {
             /** @var LengowOrderEntity $lengowOrder */
-            foreach ($LengowOrderCollection as $lengowOrder) {
+            foreach ($lengowOrderCollection as $lengowOrder) {
                 if ($lengowOrder->getOrder() !== null) {
                     $orders[] = $lengowOrder->getOrder();
                 }
             }
         }
         return $orders;
+    }
+
+    /**
+     * Get all available marketplace list (name and label)
+     *
+     * @return array
+     */
+    public function getMarketplaceList(): array
+    {
+        $marketplaceList = [];
+        $context = Context::createDefaultContext();
+        $criteria = new Criteria();
+        $criteria->addGroupField(new FieldGrouping('marketplaceName'));
+        /** @var LengowOrderCollection $lengowOrderCollection */
+        $lengowOrderCollection = $this->lengowOrderRepository->search($criteria, $context)->getEntities();
+        if ($lengowOrderCollection->count() !== 0) {
+            foreach ($lengowOrderCollection as $lengowOrder) {
+                /** @var LengowOrderEntity $lengowOrder */
+                $marketplaceList[$lengowOrder->getMarketplaceName()] = $lengowOrder->getMarketplaceLabel();
+            }
+        }
+        return $marketplaceList;
     }
 
     /**

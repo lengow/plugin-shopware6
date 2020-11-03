@@ -87,6 +87,13 @@
                 "order_state": "Status de commande",
                 "order_type": "Type de commande",
                 "marketplace": "Marketplace"
+            },
+            "action_button": {
+                "not_imported": "non importée",
+                "not_sent": "non envoyée",
+                "action": "L'action envoyée à la marketplace ne fonctionne pas",
+                "import": "Votre commande n'a pas été importée dans Shopware",
+                "no_error_message": "Erreur non identifiée, merci de contacter le support Lengow pour plus d'informations"
             }
         },
         "settings": {

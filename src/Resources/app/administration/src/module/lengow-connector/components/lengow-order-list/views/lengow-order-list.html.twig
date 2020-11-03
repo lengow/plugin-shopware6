@@ -59,7 +59,9 @@
                 {% block lgw_order_list_smart_bar_actions_slot %}
 
                     {% block lgw_order_list_smart_bar_actions_synchronise %}
-                        <sw-button variant="primary" @click="synchroniseOrders">
+                        <sw-button variant="primary"
+                                   @click="synchroniseOrders"
+                                   :isLoading="isLoading">
                             {{ $tc('lengow-connector.order.synchronise_orders') }}
                         </sw-button>
                     {% endblock %}
@@ -70,7 +72,7 @@
 
         {% block lgw_order_list_content %}
             <template #content>
-                <div>
+                <div id="lgw-order-grid">
                     {% block lgw_order_list_grid %}
                         <sw-entity-listing ref="swLengowOrderGrid"
                                            :items="lengowOrders"
@@ -81,8 +83,12 @@
                             {% block lgw_order_list_grid_columns %}
                                 {% block lgw_order_list_grid_columns_order_is_in_error %}
                                     <template #column-isInError="{ item }">
-                                        <lgw-action-button>
+                                        <lgw-action-button v-if="item.isInError && item.orderProcessState !== 2"
+                                                           :lengowOrderId="item.id"
+                                                           :orderProcessState="item.orderProcessState"
+                                                           :onRefresh="onRefresh">
                                         </lgw-action-button>
+                                        <div v-else></div>
                                     </template>
                                 {% endblock %}
                                 {% block lgw_order_list_grid_columns_order_lengow_state %}

@@ -171,6 +171,34 @@ class LengowOrderError
     }
 
     /**
+     * Get all order errors
+     *
+     * @param string $lengowOrderId Lengow order id
+     * @param int|null $type order error type (import or send)
+     * @param bool|null $finished order error finished
+     *
+     * @return EntityCollection|null
+     */
+    public function getOrderErrors(string $lengowOrderId, int $type = null, bool $finished = null): ?EntityCollection
+    {
+        $context = Context::createDefaultContext();
+        $criteria = new Criteria();
+        $criteria->addFilter(new EqualsFilter('order.id', $lengowOrderId));
+        if ($type) {
+            $criteria->addFilter(new EqualsFilter('type', $type));
+        }
+        if ($finished !== null) {
+            $criteria->addFilter(new EqualsFilter('isFinished', $finished));
+        }
+        /** @var LengowOrderErrorCollection $LengowOrderErrorCollection */
+        $LengowOrderErrorCollection = $this->lengowOrderErrorRepository->search($criteria, $context)->getEntities();
+        if ($LengowOrderErrorCollection->count() !== 0) {
+            return $LengowOrderErrorCollection;
+        }
+        return null;
+    }
+
+    /**
      * Finish all order error for one lengow order
      *
      * @param string $lengowOrderId Lengow order id

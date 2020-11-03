@@ -1,5 +1,21 @@
 {% block lgw_action_button %}
     <template>
-        <div></div>
+        <div class="lgw-action-button">
+            <sw-button v-show="!isLoading"
+                       @click="clickButton(buttonAction)"
+                       size="x-small"
+                       class="lgw-action-tooltip">
+                {{ buttonContent }}
+                <span>
+                    {{ tooltipTitle }}
+                    <ul>
+                        <li v-for="error in errors">
+                            {{ error }}
+                        </li>
+                    </ul>
+                </span>
+            </sw-button>
+            <sw-loader v-show="isLoading" size="14px"></sw-loader>
+        </div>
     </template>
 {% endblock %}

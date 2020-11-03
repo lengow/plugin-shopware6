@@ -193,6 +193,7 @@ Component.register('lengow-order-list', {
                 {
                     property: 'isInError',
                     label: 'lengow-connector.order.column.actions',
+                    align: 'center',
                     allowResize: true,
                 },
                 {
@@ -281,29 +282,9 @@ Component.register('lengow-order-list', {
 
             this.availableOrderLengowStates = this.getAvailableOrderLengowStates;
             this.availableOrderTypes = this.getAvailableOrderTypes;
-
-            const criteria = new Criteria();
-            return this.lengowOrderRepository.search(criteria, Shopware.Context.api)
+            this.LengowConnectorOrderService.getAvailableMarketplaces()
                 .then(response => {
-                    const allMarketplaceNames = [];
-                    const availableMarketplaces = [];
-                    response.forEach(item => {
-                        allMarketplaceNames[item.marketplaceName] = item.marketplaceLabel;
-                    });
-                    Object.entries(allMarketplaceNames.sort()).forEach(
-                        ([marketplaceName, marketplaceLabel]) => {
-                            availableMarketplaces.push({
-                                label: marketplaceLabel,
-                                value: marketplaceName,
-                            });
-                        },
-                    );
-                    availableMarketplaces.sort(function(a, b) {
-                        const textA = a.value.toUpperCase();
-                        const textB = b.value.toUpperCase();
-                        return textA < textB ? -1 : textA > textB ? 1 : 0;
-                    });
-                    this.availableMarketplaces = availableMarketplaces;
+                    this.availableMarketplaces = response;
                 })
                 .finally(() => {
                     this.filterLoading = false;
@@ -336,6 +317,7 @@ Component.register('lengow-order-list', {
             this.orderTypeFilter = '';
             this.marketplaceFilter = [];
             this.getList();
+            this.loadSyncData();
         },
 
         onCloseSynResultModal() {
@@ -474,7 +456,6 @@ Component.register('lengow-order-list', {
                     this.syncResultMessages = response;
                     this.showSyncResultModal = true;
                     this.onRefresh();
-                    this.loadSyncData();
                 })
                 .finally(() => {
                     this.isLoading = false;

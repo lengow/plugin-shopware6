@@ -211,7 +211,7 @@ class LengowImport
      * string created_to          import of orders until
      * int    delivery_address_id Lengow delivery address id to import
      * int    order_lengow_id     Lengow order id in Magento
-     * int    store_id            store id for current import
+     * int    sales_channel_id    sales channel id for current import
      * int    days                import period
      * int    limit               number of orders to import
      * bool   log_output          display log messages
@@ -353,6 +353,9 @@ class LengowImport
                     }
                     if ($totalOrders <= 0) {
                         continue;
+                    }
+                    if ($this->lengowOrderId !== null) {
+                        $this->lengowOrderError->finishOrderErrors($this->lengowOrderId);
                     }
                     $result = $this->importOrders($orders, $salesChannel);
                     if (!$this->importOneOrder) {
