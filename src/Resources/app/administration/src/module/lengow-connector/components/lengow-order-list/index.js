@@ -1,5 +1,5 @@
 import template from './views/lengow-order-list.html.twig';
-import {ORDER_LENGOW_STATES, ORDER_TYPES, ORDER_SYNCHRONISATION} from "../../../const";
+import {ORDER_LENGOW_STATES, ORDER_TYPES, ORDER_SYNCHRONISATION, ERROR_TYPE} from "../../../const";
 import lgwActionButton from './components/lgw-action-button';
 import lgwCountryIcon from './components/lgw-country-icon';
 import lgwOrderStateLabel from './components/lgw-order-state-label';
@@ -50,6 +50,7 @@ Component.register('lengow-order-list', {
             settingsLoading: false,
             orderWithErrorLoading: false,
             orderWaitingToBeSentLoading: false,
+            selection: [],
         };
     },
 
@@ -324,6 +325,10 @@ Component.register('lengow-order-list', {
             this.showSyncResultModal = false;
         },
 
+        updateSelection(selected) {
+            this.selection = Object.values(selected);
+        },
+
         loadSyncData() {
             this.loadDefaultEmail();
             this.loadSettings();
@@ -452,6 +457,26 @@ Component.register('lengow-order-list', {
         synchroniseOrders() {
             this.isLoading = true;
             this.LengowConnectorOrderService.synchroniseOrders()
+                .then(response => {
+                    this.syncResultMessages = response;
+                    this.showSyncResultModal = true;
+                    this.onRefresh();
+                })
+                .finally(() => {
+                    this.isLoading = false;
+                });
+        },
+
+        massReImportOrders() {
+            this.isLoading = true;
+
+            let lengowOrderIds = [];
+            this.selection.forEach(orderSelected => {
+                if (orderSelected.isInError && orderSelected.orderProcessState === 0) {
+                    lengowOrderIds = [...lengowOrderIds, orderSelected.id];
+                }
+            });
+            this.LengowConnectorOrderService.massReImportOrders({ lengowOrderIds })
                 .then(response => {
                     this.syncResultMessages = response;
                     this.showSyncResultModal = true;

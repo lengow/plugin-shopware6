@@ -94,20 +94,39 @@ class LengowOrderController extends AbstractController
         $result = false;
         $lengowOrderId = $request->get('lengowOrderId');
         if ($lengowOrderId) {
-            $lengowOrder = $this->lengowOrder->getLengowOrderById($lengowOrderId);
-            if ($lengowOrder) {
-                $this->lengowImport->init([
-                    'type' => LengowImport::TYPE_MANUAL,
-                    'lengow_order_id' => $lengowOrderId,
-                    'marketplace_sku' => $lengowOrder->getMarketplaceSku(),
-                    'marketplace_name' => $lengowOrder->getMarketplaceName(),
-                    'delivery_address_id' => $lengowOrder->getDeliveryAddressId(),
-                    'sales_channel_id' => $lengowOrder->getSalesChannel()->getId(),
-                ]);
-                $result = $this->lengowImport->exec();
+            $result = $this->loadAndImportOrder($lengowOrderId);
+        }
+        return new JsonResponse([
+            'success' => $result,
+        ]);
+    }
+
+    /**
+     * Re-import a list of orders
+     *
+     * @Route("/api/v{version}/_action/lengow/order/mass-reimport-orders",
+     *     defaults={"auth_enabled"=true},
+     *     name="api.action.lengow.order.mass-reimport-orders",
+     *     methods={"POST"})
+     *
+     * @param Request $request
+     * @return JsonResponse
+     */
+    public function massReImportOrders(Request $request): JsonResponse
+    {
+        $orderNew = 0;
+        $orderError = 0;
+        $lengowOrderIds = $request->get('lengowOrderIds');
+        if (!empty($lengowOrderIds)) {
+            foreach ($lengowOrderIds as $lengowOrderId) {
+                $this->loadAndImportOrder($lengowOrderId) ? $orderNew++ : $orderError++;
             }
         }
-        return new JsonResponse($result);
+        $message = $this->loadMessage([
+            'order_new' => $orderNew,
+            'order_error' => $orderError,
+        ]);
+        return new JsonResponse($message);
     }
 
     /**
@@ -158,6 +177,34 @@ class LengowOrderController extends AbstractController
             }
         }
         return new JsonResponse($orderErrorMessages);
+    }
+
+    /**
+     * Load lengow order entity an try a re-import
+     *
+     * @param string $lengowOrderId Lengow order id
+     *
+     * @return bool
+     */
+    private function loadAndImportOrder(string $lengowOrderId): bool
+    {
+        $success = false;
+        $lengowOrder = $this->lengowOrder->getLengowOrderById($lengowOrderId);
+        if ($lengowOrder) {
+            $this->lengowImport->init([
+                'type' => LengowImport::TYPE_MANUAL,
+                'lengow_order_id' => $lengowOrderId,
+                'marketplace_sku' => $lengowOrder->getMarketplaceSku(),
+                'marketplace_name' => $lengowOrder->getMarketplaceName(),
+                'delivery_address_id' => $lengowOrder->getDeliveryAddressId(),
+                'sales_channel_id' => $lengowOrder->getSalesChannel()->getId(),
+            ]);
+            $result = $this->lengowImport->exec();
+            if (isset($result['order_new']) && $result['order_new']) {
+                $success = true;
+            }
+        }
+        return $success;
     }
 
     /**

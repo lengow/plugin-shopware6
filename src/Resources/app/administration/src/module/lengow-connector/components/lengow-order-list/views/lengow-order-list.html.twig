@@ -79,7 +79,18 @@
                                            :columns="lengowOrderColumns"
                                            :repository="lengowOrderRepository"
                                            :showSelection="true"
-                                           :showActions="false">
+                                           :showActions="false"
+                                           :allowDelete="false"
+                                           @selection-change="updateSelection">
+                            <template slot="bulk">
+                                {% block sw_data_grid_bulk_selected_actions_content %}
+                                    <span class="sw-data-grid__bulk-selected bulk-link">
+                                        <a class="link link-default" @click="massReImportOrders">
+                                            {{ $tc('lengow-connector.order.mass_action_reimport') }}
+                                        </a>
+                                    </span>
+                                {% endblock %}
+                            </template>
                             {% block lgw_order_list_grid_columns %}
                                 {% block lgw_order_list_grid_columns_order_is_in_error %}
                                     <template #column-isInError="{ item }">

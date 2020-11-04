@@ -84,7 +84,7 @@ Component.register('lgw-action-button', {
             this.LengowConnectorOrderService.reImportOrder({
                 lengowOrderId: this.lengowOrderId,
             }).then(response => {
-                if (response.order_new !== undefined && response.order_new === true) {
+                if (response.success) {
                     this.onRefresh();
                 } else {
                     this.getLengowOrderErrors().then(result => {

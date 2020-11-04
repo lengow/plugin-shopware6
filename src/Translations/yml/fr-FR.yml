@@ -60,6 +60,7 @@ fr:
         no_report_sent: "Les rapports ne seront pas envoyés par email."
         change_this: "Vous voulez modifier cela ?"
         synchronise_orders: "Synchroniser les commandes"
+        mass_action_reimport: "Réimporter les commandes sélectionnées"
         nb_product: "produit(s)"
         no_order_title: "Le meilleur est encore à venir !"
         no_order_description: "Vos produits sont bien visibles, vos ventes sont sur le point de décoller"

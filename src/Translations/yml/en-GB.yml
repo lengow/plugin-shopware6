@@ -61,6 +61,7 @@ en:
         no_report_sent: "No order issue reports will be sent by mail."
         change_this: "Change this?"
         synchronise_orders: "Synchronise Orders"
+        mass_action_reimport: "Re-import selected orders"
         nb_product: "product(s)"
         no_order_title: "The best is yet to come!"
         no_order_description: "Your products have great visibility and your sales are about to prosper!"

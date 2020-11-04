@@ -36,6 +36,22 @@ class LengowConnectorOrderService extends ApiService {
             });
     }
 
+    massReImportOrders(data) {
+        const headers = this.getBasicHeaders();
+
+        return this.httpClient
+            .post(
+                `_action/${this.getApiBasePath()}/order/mass-reimport-orders`,
+                JSON.stringify(data),
+                {
+                    headers: headers
+                }
+            )
+            .then((response) => {
+                return ApiService.handleResponse(response);
+            });
+    }
+
     getAvailableMarketplaces() {
         const headers = this.getBasicHeaders();
 
