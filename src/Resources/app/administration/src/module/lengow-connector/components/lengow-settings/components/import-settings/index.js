@@ -26,7 +26,7 @@ Component.register('lengow-import-settings', {
     data() {
         return {
             lengowImportShipMpEnabled: false,
-            lengowImportStockshipMp: false,
+            lengowImportStockShipMp: false,
             lengowImportDays: 3,
             lengowReportMailEnabled: null,
             lengowReportMailAddress: [],
@@ -68,7 +68,7 @@ Component.register('lengow-import-settings', {
             });
         });
         this.lengowImportShipMpEnabled = this.config.lengowImportShipMpEnabled.value === '1';
-        this.lengowImportStockshipMp = this.config.lengowImportStockShipMp.value === '1';
+        this.lengowImportStockShipMp = this.config.lengowImportStockShipMp.value === '1';
         this.lengowImportDays = this.config.lengowImportDays.value;
         this.lengowReportMailEnabled = this.config.lengowReportMailEnabled.value === '1';
         this.lengowReportMailAddress = this.config.lengowReportMailAddress.value;
