@@ -1,6 +1,8 @@
 export const LENGOW_URL = 'https://my.lengow.io';
 //export const LENGOW_URL = 'https://my.lengow.net';
 
+export const MODULE_VERSION = '1.0.0';
+
 export const envMixin = {
     data() {
         return {

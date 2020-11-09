@@ -1,0 +1,21 @@
+.lgw-footer {
+    min-height: 80px;
+}
+
+.lgw-router-link {
+    cursor: pointer;
+}
+
+.lgw-label-preprod {
+    color: white;
+    background: #0e1425;
+    height: 20px;
+    line-height: 20px;
+    font-size: 10px;
+    font-weight: bold;
+    padding: 0 5px;
+    border-radius: 5px;
+    display: inline-block;
+    vertical-align: middle;
+    white-space: nowrap;
+}

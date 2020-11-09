@@ -22,7 +22,11 @@
                 "contact": "Get in touch with Lengow.",
                 "helpCenterLink": "Visit our Help Center",
                 "helpCenterTarget": "https:\/\/supportlengow.zendesk.com\/hc\/en-us\/articles\/360012203311",
-                "helpCenter": "for detailed information on how to configure your Shopware plugin properly"
+                "helpCenter": "for detailed information on how to configure your Shopware plugin properly",
+                "footer": {
+                    "link": "https:\/\/www.lengow.com\/",
+                    "plugin_name": "Lengow Shopware 6 Plugin"
+                }
             }
         },
         "contact": {
@@ -37,6 +41,7 @@
             "knowledge_link_url": "https:\/\/support.lengow.com\/"
         },
         "legals": {
+            "title": "Legal notices",
             "simplified_company": "Simplified limited liability company",
             "social_capital": "Social capital:",
             "cnil_declaration": "CNIL declaration:",

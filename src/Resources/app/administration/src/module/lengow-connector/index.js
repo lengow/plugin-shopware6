@@ -4,6 +4,7 @@ import './components/lengow-order-list';
 import './components/lengow-settings';
 import './components/lengow-legal-notices';
 import './components/lengow-contact';
+import './components/lengow-footer';
 
 Shopware.Module.register('lengow-connector', {
     color: '#ff3d58',

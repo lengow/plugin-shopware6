@@ -20,6 +20,9 @@ de:
           helpCenterLink: "Schauen Sie im Help Center"
           helpCenterTarget: "https://supportlengow.zendesk.com/hc/de-de/articles/360012203311"
           helpCenter: "um detaillierte Informationen zu der korrekten Einrichtung des Shopware-Plugins zu finden"
+          footer:
+            link: 'https://www.lengow.com/de'
+            plugin_name: 'Lengow Shopware 6 Plugin'
       contact:
         title: "Lassen Sie sich etwas von Ihrem Support-Team unterstützen"
         contain_text_support: "Kontaktieren Sie uns bei Fragen und teilen Sie uns Ihr Feedback mit über den"
@@ -31,6 +34,7 @@ de:
         link_magento_guide: "Shopware 6 Begleithandbuch finden"
         knowledge_link_url: "https://support.lengow.com/"
       legals:
+        title: "Rechtshinweise"
         simplified_company: "Gesellschaft mit einfacher Haftungsbeschränkung"
         social_capital: "Soziales Kapital:"
         cnil_declaration: "CNIL Erklärung:"

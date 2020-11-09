@@ -19,7 +19,10 @@ fr:
           contact: "Prenez contact avec les équipes lengow"
           helpCenterLink: "Visitez notre help center"
           helpCenterTarget: "https://supportlengow.zendesk.com/hc/fr-fr/articles/360012203311"
-          helpCenter: "pour plus d'informations sur la configuration de votre plugin Shopware"
+          helpCenter:
+      footer:
+        link: 'https://www.lengow.com/fr'
+        plugin_name: 'Lengow Shopware 6 Module'
       contact:
         title: "Demandez de l'aide à notre équipe Support !"
         contain_text_support: "Des questions, un feedback sur Lengow... transmettez vos demandes au"
@@ -31,6 +34,7 @@ fr:
         link_magento_guide: "notre guide dédié à Shopware 6"
         knowledge_link_url: "https://support.lengow.com/"
       legals:
+        title: "Mentions Légales"
         simplified_company: "Société par actions simplifiés"
         social_capital: "Capital social :"
         cnil_declaration: "Déclaration CNIL :"

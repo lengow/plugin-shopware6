@@ -1,9 +1,11 @@
 {% block lengow_dashboard %}
-            <template>
-                <div style="background: #F1F1F1">
+    <template>
+        <sw-page class="lgw-page" :showSearchBar="false">
+            <template #content>
+                <div class="lgw-page">
                     <div class="lgw-container">
                         <div class="lgw-row">
-                            <div class="lgw-box lgw-home-header text-center" style="margin-top: 70px;">
+                            <div class="lgw-box lgw-home-header text-center lgw-home-header-margin">
                                 <img :src="'connector/lengow-white-big.png' | asset" alt="lengow" class="img-responsive">
                                 <h1 style="color: white">{{ $tc('lengow-connector.dashboard.banner.title') }}</h1>
                                 <sw-button :disabled="false" :square="false" :block="false" :isLoading="false" style="margin-top: 15px" class="lgw-btn" target="_blank" :link="lengow_url">
@@ -50,21 +52,13 @@
                                     </a>
                                     {{ $tc('lengow-connector.dashboard.help.helpCenter') }}
                                 </p>
-                                <div>
-                                    <routerLink :to="{ name: 'lengow.connector.legal' }" tag='span'>
-                                        <br/> <!-- todo mettre dans le footer -->
-                                        <h4>Mention légal</h4>
-                                    </routerLink>
-                                </div>
-                                <div>
-                                    <routerLink :to="{ name: 'lengow.connector.contact' }" tag='span'>
-                                        <!-- todo mettre dans le footer -->
-                                        <h4>Contact</h4>
-                                    </routerLink>
-                                </div>
                             </div>
                         </div>
+                        <lengow-footer>
+                        </lengow-footer>
                     </div>
                 </div>
             </template>
+        </sw-page>
+    </template>
 {% endblock %}

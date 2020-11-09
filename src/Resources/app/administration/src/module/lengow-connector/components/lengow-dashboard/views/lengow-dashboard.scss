@@ -2,6 +2,7 @@
   width: 60%;
   margin: 0 auto;
   background: #F1F1F1;
+  overflow-x: hidden;
 }
 
 .lgw-page {
@@ -38,6 +39,13 @@
   padding: 0 15px;
   float: left;
   box-sizing: border-box;
+}
+
+.lgw-col-3 {
+    width: 25%;
+    padding: 0 15px;
+    float: left;
+    box-sizing: border-box;
 }
 
 .lgw-left-block {
@@ -79,6 +87,9 @@
     background: #313148;
 }
 
+.lgw-home-header-margin {
+    margin-top: 20px;
+}
 
 .lgw-box-link .lgw-box {
   top: 0;
@@ -128,4 +139,5 @@ li a {
   height: auto;
   margin: 0 auto;
 }
+
 
