@@ -11,6 +11,13 @@
             <argument type="service" id="sales_channel.repository"/>
         </service>
 
+        <service id="Lengow\Connector\Service\LengowAction">
+            <argument type="service" id="lengow_action.repository"/>
+            <argument type="service" id="Lengow\Connector\Service\LengowLog"/>
+            <argument type="service" id="Lengow\Connector\Service\LengowConnector"/>
+            <argument type="service" id="Lengow\Connector\Service\LengowConfiguration"/>
+        </service>
+
         <service id="Lengow\Connector\Service\LengowAddress">
             <argument type="service" id="Lengow\Connector\Service\LengowLog"/>
             <argument type="service" id="Lengow\Connector\Util\StringCleaner"/>
@@ -107,6 +114,9 @@
             <argument type="service" id="Lengow\Connector\Service\LengowConfiguration"/>
             <argument type="service" id="Lengow\Connector\Service\LengowConnector"/>
             <argument type="service" id="Lengow\Connector\Service\LengowOrderError"/>
+            <argument type="service" id="Lengow\Connector\Service\LengowOrderLine"/>
+            <argument type="service" id="Lengow\Connector\Factory\LengowMarketplaceFactory"/>
+            <argument type="service" id="Lengow\Connector\Service\LengowAction"/>
         </service>
 
         <service id="Lengow\Connector\Service\LengowOrderError">

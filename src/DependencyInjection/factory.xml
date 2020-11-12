@@ -13,6 +13,8 @@
         <service id="Lengow\Connector\Factory\LengowMarketplaceFactory">
             <argument type="service" id="Lengow\Connector\Service\LengowSync"/>
             <argument type="service" id="Lengow\Connector\Service\LengowLog"/>
+            <argument type="service" id="Lengow\Connector\Service\LengowAction"/>
+            <argument type="service" id="Lengow\Connector\Service\LengowConfiguration"/>
         </service>
 
     </services>

@@ -23,5 +23,11 @@
             <tag name="kernel.event_subscriber"/>
         </service>
 
+        <service id="Lengow\Connector\Subscriber\SendActionSubscriber">
+            <argument type="service" id="Lengow\Connector\Service\LengowAction"/>
+            <argument type="service" id="Lengow\Connector\Service\LengowOrder"/>
+            <tag name="kernel.event_subscriber"/>
+        </service>
+
     </services>
 </container>

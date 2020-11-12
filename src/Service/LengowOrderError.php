@@ -41,7 +41,7 @@ class LengowOrderError
     /**
      * @var array $fieldList field list for the table lengow_order_error
      * required => Required fields when creating registration
-     * update   => Fields allowed when updating registration
+     * updated  => Fields allowed when updating registration
      */
     private $fieldList = [
         'lengowOrderId' => ['required' => true, 'updated' => false],

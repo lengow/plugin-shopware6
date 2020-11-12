@@ -67,6 +67,13 @@ en:
         order_successfully_imported: "order successfully imported (ORDER ID %{order_number})"
         order_synchronized_with_lengow: "order successfully synchronised with Lengow webservice (ORDER ID %{order_id})"
         order_not_synchronized_with_lengow: "WARNING! Order could NOT be synchronised with Lengow webservice (ORDER ID %{order_id})"
+      order_action:
+        try_to_send_action: "try to send %{action} action (ORDER ID %{order_number})"
+        action_send: "action %{action} was successfully sent (ORDER ID %{order_number})"
+        action_not_send: "WARNING ! action %{action} could not be sent (ORDER ID %{order_number})"
+        call_tracking: "call tracking with parameters: %{parameters}"
+        action_saved: "call tracking saved in lengow_actions table"
+        call_action_failed: "order action failed - %{decoded_message}"
       connector:
         call_api: "call %{call_type} %{curl_url}"
         error_api: "API call failed - %{error_code} - %{error_message}"

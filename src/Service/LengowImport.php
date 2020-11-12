@@ -83,6 +83,11 @@ class LengowImport
     private $swiftMailer;
 
     /**
+     * @var string order id being imported
+     */
+    public static $currentOrder;
+
+    /**
      * @var int account ID
      */
     private $accountId;
@@ -320,7 +325,7 @@ class LengowImport
                             ]
                         );
                         $this->lengowLog->write(LengowLog::CODE_IMPORT, $errorCatalogIds, $this->logOutput);
-                        $error[$salesChannel->getId()] = $errorCatalogIds;
+                        $error[$salesChannel->getName()] = $errorCatalogIds;
                         continue;
                     }
                     // get orders from Lengow API
@@ -723,6 +728,8 @@ class LengowImport
             if ($this->debugMode) {
                 $marketplaceSku .= '--' . time();
             }
+            // set current order to cancel events from SendActionSubscriber
+            self::$currentOrder = $marketplaceSku;
             // if order contains no package
             if (empty($orderData->packages)) {
                 $this->lengowLog->write(
@@ -831,6 +838,7 @@ class LengowImport
                     }
                 }
                 // clean process
+                self::$currentOrder = null;
                 unset($importOrder, $order);
                 // if limit is set
                 if ($this->limit > 0 && $orderNew === $this->limit) {

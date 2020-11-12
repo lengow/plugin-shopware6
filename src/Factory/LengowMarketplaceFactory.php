@@ -4,6 +4,8 @@ namespace Lengow\Connector\Factory;
 
 use Lengow\Connector\Components\LengowMarketplace;
 use Lengow\Connector\Exception\LengowException;
+use Lengow\Connector\Service\LengowAction;
+use Lengow\Connector\Service\LengowConfiguration;
 use Lengow\Connector\Service\LengowLog;
 use Lengow\Connector\Service\LengowSync;
 
@@ -24,6 +26,16 @@ class LengowMarketplaceFactory
     private $lengowLog;
 
     /**
+     * @var LengowAction Lengow action service
+     */
+    private $lengowAction;
+
+    /**
+     * @var LengowConfiguration Lengow configuration service
+     */
+    private $lengowConfiguration;
+
+    /**
      * @var array|false all marketplaces allowed for an account ID
      */
     private $marketplaces = false;
@@ -38,11 +50,20 @@ class LengowMarketplaceFactory
      *
      * @param LengowSync $lengowSync Lengow sync service
      * @param LengowLog $lengowLog Lengow log service
+     * @param LengowAction $lengowAction Lengow action service
+     * @param LengowConfiguration $lengowConfiguration Lengow configuration service
      */
-    public function __construct(LengowSync $lengowSync, LengowLog $lengowLog)
+    public function __construct(
+        LengowSync $lengowSync,
+        LengowLog $lengowLog,
+        LengowAction $lengowAction,
+        LengowConfiguration $lengowConfiguration
+    )
     {
         $this->lengowSync = $lengowSync;
         $this->lengowLog = $lengowLog;
+        $this->lengowAction = $lengowAction;
+        $this->lengowConfiguration = $lengowConfiguration;
     }
 
     /**
@@ -66,7 +87,10 @@ class LengowMarketplaceFactory
         if (!isset($this->registers[$marketplaceName])) {
             $this->registers[$marketplaceName] = new LengowMarketplace(
                 $marketplaceName,
-                $this->marketplaces->{$marketplaceName}
+                $this->marketplaces->{$marketplaceName},
+                $this->lengowAction,
+                $this->lengowLog,
+                $this->lengowConfiguration
             );
         }
         return $this->registers[$marketplaceName];

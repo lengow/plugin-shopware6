@@ -3,6 +3,7 @@
 namespace Lengow\Connector\Service;
 
 use \Exception;
+use Shopware\Core\Checkout\Order\Aggregate\OrderDelivery\OrderDeliveryCollection;
 use Shopware\Core\Checkout\Order\Aggregate\OrderDelivery\OrderDeliveryDefinition;
 use Shopware\Core\Checkout\Order\Aggregate\OrderDelivery\OrderDeliveryEntity;
 use Shopware\Core\Checkout\Order\Aggregate\OrderDelivery\OrderDeliveryStates;
@@ -20,12 +21,14 @@ use Shopware\Core\Framework\DataAbstractionLayer\Search\Grouping\FieldGrouping;
 use Shopware\Core\Framework\Uuid\Uuid;
 use Shopware\Core\System\StateMachine\Aggregation\StateMachineState\StateMachineStateCollection;
 use Shopware\Core\System\StateMachine\Aggregation\StateMachineState\StateMachineStateEntity;
-use Lengow\Connector\Entity\Lengow\Order\OrderEntity as LengowOrderEntity;
-use Lengow\Connector\Entity\Lengow\Order\OrderCollection as LengowOrderCollection;
 use Shopware\Core\System\StateMachine\Aggregation\StateMachineTransition\StateMachineTransitionActions;
 use Shopware\Core\System\StateMachine\Aggregation\StateMachineTransition\StateMachineTransitionEntity;
 use Shopware\Core\System\StateMachine\StateMachineRegistry;
 use Shopware\Core\System\StateMachine\Transition;
+use Lengow\Connector\Factory\LengowMarketplaceFactory;
+use Lengow\Connector\Entity\Lengow\Order\OrderEntity as LengowOrderEntity;
+use Lengow\Connector\Entity\Lengow\Order\OrderCollection as LengowOrderCollection;
+use Lengow\Connector\Exception\LengowException;
 
 /**
  * Class LengowOrder
@@ -149,9 +152,24 @@ class LengowOrder
     private $lengowOrderError;
 
     /**
+     * @var LengowOrderLine Lengow order line service
+     */
+    private $lengowOrderLine;
+
+    /**
+     * @var LengowMarketplaceFactory Lengow marketplace factory
+     */
+    private $lengowMarketplaceFactory;
+
+    /**
+     * @var LengowAction Lengow action service
+     */
+    private $lengowAction;
+
+    /**
      * @var array $fieldList field list for the table lengow_order
      * required => Required fields when creating registration
-     * update   => Fields allowed when updating registration
+     * updated  => Fields allowed when updating registration
      */
     private $fieldList = [
         'orderId' => ['required' => false, 'updated' => true],
@@ -233,6 +251,9 @@ class LengowOrder
      * @param LengowConfiguration $lengowConfiguration Lengow configuration service
      * @param LengowConnector $lengowConnector Lengow connector service
      * @param LengowOrderError $lengowOrderError Lengow order error service
+     * @param LengowOrderLine $lengowOrderLine Lengow order line service
+     * @param LengowMarketplaceFactory $lengowMarketplaceFactory Lengow marketplace factory
+     * @param LengowAction $lengowAction Lengow action service
      */
     public function __construct(
         EntityRepositoryInterface $orderRepository,
@@ -243,7 +264,10 @@ class LengowOrder
         LengowLog $lengowLog,
         LengowConfiguration $lengowConfiguration,
         LengowConnector $lengowConnector,
-        LengowOrderError $lengowOrderError
+        LengowOrderError $lengowOrderError,
+        LengowOrderLine $lengowOrderLine,
+        LengowMarketplaceFactory $lengowMarketplaceFactory,
+        LengowAction $lengowAction
     )
     {
         $this->orderRepository = $orderRepository;
@@ -255,6 +279,9 @@ class LengowOrder
         $this->lengowConfiguration = $lengowConfiguration;
         $this->lengowConnector = $lengowConnector;
         $this->lengowOrderError = $lengowOrderError;
+        $this->lengowOrderLine = $lengowOrderLine;
+        $this->lengowMarketplaceFactory = $lengowMarketplaceFactory;
+        $this->lengowAction = $lengowAction;
     }
 
     /**
@@ -391,6 +418,12 @@ class LengowOrder
         $context = Context::createDefaultContext();
         $criteria = new Criteria();
         $criteria->addFilter(new EqualsFilter('order.id', $orderId));
+        $criteria->addAssociation('order.deliveries.shippingMethod')
+            ->addAssociation('order.deliveries.shippingOrderAddress.country')
+            ->addAssociation('order.transactions.paymentMethod')
+            ->addAssociation('order.lineItems')
+            ->addAssociation('order.currency')
+            ->addAssociation('order.addresses.country');
         /** @var LengowOrderCollection $lengowOrderCollection */
         $lengowOrderCollection = $this->lengowOrderRepository->search($criteria, $context)->getEntities();
         return $lengowOrderCollection->count() !== 0 ? $lengowOrderCollection->first() : null;
@@ -637,6 +670,25 @@ class LengowOrder
     }
 
     /**
+     * Get Shopware order delivery by id
+     *
+     * @param string $orderDeliveryId Shopware order delivery id
+     *
+     * @return OrderDeliveryEntity|null
+     */
+    public function getOrderDeliveryById(string $orderDeliveryId): ?OrderDeliveryEntity
+    {
+        $criteria = new Criteria();
+        $criteria->setIds([$orderDeliveryId]);
+        $criteria->addAssociation('shippingMethod');
+        /** @var OrderDeliveryCollection $orderDeliveryCollection */
+        $orderDeliveryCollection = $this->orderDeliveryRepository
+            ->search($criteria, Context::createDefaultContext())
+            ->getEntities();
+        return $orderDeliveryCollection->count() !== 0 ? $orderDeliveryCollection->first() : null;
+    }
+
+    /**
      * Update order state to marketplace state
      *
      * @param OrderEntity $order Shopware order instance
@@ -658,25 +710,23 @@ class LengowOrder
         $tracks = $packageData->delivery->trackings;
         $trackingCode = !empty($tracks) && !empty($tracks[0]->number) ? (string)$tracks[0]->number : false;
         if ($orderProcessState === self::PROCESS_STATE_FINISH) {
-
-            // TODO finish all actions
-
+            $this->lengowAction->finishActions($order->getId());
             $this->lengowOrderError->finishOrderErrors($lengowOrder->getId(), LengowOrderError::TYPE_ERROR_SEND);
         }
         // update Lengow order if necessary
         $data = [];
         if ($lengowOrder->getOrderLengowState() !== $orderStateLengow) {
-            $data['order_lengow_state'] = $orderStateLengow;
+            $data['orderLengowState'] = $orderStateLengow;
             if ($trackingCode) {
-                $data['carrier_tracking'] = $trackingCode;
+                $data['carrierTracking'] = $trackingCode;
             }
         }
         if ($orderProcessState === self::PROCESS_STATE_FINISH) {
             if ($lengowOrder->getOrderProcessState() !== $orderProcessState) {
-                $data['order_process_state'] = $orderProcessState;
+                $data['orderProcessState'] = $orderProcessState;
             }
             if ($lengowOrder->isInError()) {
-                $data['is_in_error'] = false;
+                $data['isInError'] = false;
             }
         }
         if (!empty($data)) {
@@ -875,5 +925,123 @@ class LengowOrder
             || (isset($result['detail']) && $result['detail'] === 'Pas trouvé.')
             || isset($result['error'])
         );
+    }
+
+    /**
+     * Send Order action
+     *
+     * @param string $action Lengow Actions (ship or cancel)
+     * @param OrderEntity $order Shopware order instance
+     * @param OrderDeliveryEntity|null $orderDelivery Shopware order delivery instance
+     *
+     * @return bool
+     */
+    public function callAction(string $action, OrderEntity $order, OrderDeliveryEntity $orderDelivery = null): bool
+    {
+        $success = true;
+        $lengowOrder = $this->getLengowOrderByOrderId($order->getId());
+        if ($lengowOrder === null) {
+            return false;
+        }
+        $this->lengowLog->write(
+            LengowLog::CODE_ACTION,
+            $this->lengowLog->encodeMessage('log.order_action.try_to_send_action', [
+                'action' => $action,
+                'order_number' => $order->getOrderNumber(),
+            ]),
+            false,
+            $lengowOrder->getMarketplaceSku()
+        );
+        try {
+            // finish all order errors before API call
+            $this->lengowOrderError->finishOrderErrors($lengowOrder->getId(), LengowOrderError::TYPE_ERROR_SEND);
+            if ($lengowOrder->isInError()) {
+                $this->update($lengowOrder->getId(), [
+                    'isInError' => false,
+                ]);
+            }
+            $marketplace = $this->lengowMarketplaceFactory->create($lengowOrder->getMarketplaceName());
+            if ($marketplace->containOrderLine($action)) {
+                $orderLineIds = $this->lengowOrderLine->getOrderLineIdsByOrderId($order->getId());
+                // get order line ids by API for security
+                if (empty($orderLineIds)) {
+                    $orderLineCollection = $this->getOrderLineIdsByApi($lengowOrder);
+                }
+                if (empty($orderLineIds)) {
+                    throw new LengowException(
+                        $this->lengowLog->encodeMessage('lengow_log.exception.order_line_required')
+                    );
+                }
+                foreach ($orderLineIds as $orderLineId) {
+                    $marketplace->callAction($action, $lengowOrder, $order, $orderDelivery, $orderLineId);
+                }
+            } else {
+                $marketplace->callAction($action, $lengowOrder, $order, $orderDelivery);
+            }
+        } catch (LengowException $e) {
+            $errorMessage = $e->getMessage();
+        } catch (Exception $e) {
+            $errorMessage = 'Shopware error: "' . $e->getMessage() . '" ' . $e->getFile() . ' line ' . $e->getLine();
+        }
+        if (isset($errorMessage)) {
+            if ($lengowOrder->getOrderProcessState() !== self::PROCESS_STATE_FINISH) {
+                $this->update($lengowOrder->getId(), [
+                    'isInError' => true,
+                ]);
+                $this->lengowOrderError->create(
+                    $lengowOrder->getId(),
+                    $errorMessage,
+                    LengowOrderError::TYPE_ERROR_SEND
+                );
+            }
+            $this->lengowLog->write(
+                LengowLog::CODE_ACTION,
+                $this->lengowLog->encodeMessage('log.order_action.call_action_failed', [
+                    'decoded_message' => $this->lengowLog->decodeMessage($errorMessage),
+                ]),
+                false,
+                $lengowOrder->getMarketplaceSku()
+            );
+            $success = false;
+        }
+        $key = $success ? 'log.order_action.action_send': 'log.order_action.action_not_send';
+        $message = $this->lengowLog->encodeMessage($key, [
+            'action' => $action,
+            'order_number' => $order->getOrderNumber(),
+        ]);
+        $this->lengowLog->write(LengowLog::CODE_ACTION, $message, false, $lengowOrder->getMarketplaceSku());
+        return $success;
+    }
+
+    /**
+     * Get order line by API
+     *
+     * @param LengowOrderEntity $lengowOrder Lengow order instance
+     *
+     * @return array
+     */
+    public function getOrderLineIdsByApi(LengowOrderEntity $lengowOrder): array
+    {
+        $orderLinesByPackage = [];
+        $results =  $this->lengowConnector->queryApi(
+            LengowConnector::GET,
+            LengowConnector::API_ORDER,
+            [
+                'marketplace_order_id' => $lengowOrder->getMarketplaceSku(),
+                'marketplace' => $lengowOrder->getMarketplaceName(),
+            ]
+        );
+        if (isset($results->count) && (int)$results->count === 0) {
+            return [];
+        }
+        $orderData = $results->results[0];
+        foreach ($orderData->packages as $package) {
+            $packageLines = [];
+            foreach ($package->cart as $product) {
+                $packageLines[] = (string)$product->marketplace_order_line_id;
+            }
+            $orderLinesByPackage[(int)$package->delivery->id] = $packageLines;
+        }
+        return $orderLinesByPackage[$lengowOrder->getDeliveryAddressId()] ?? [];
     }
 }

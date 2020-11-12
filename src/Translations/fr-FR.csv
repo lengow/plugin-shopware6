@@ -14,6 +14,14 @@ lengow_log.error.no_billing_address|Erreur Lengow : pas d'adresse de facturation
 lengow_log.error.no_country_for_billing_address|Erreur Lengow : l'adresse de facturation ne contient pas de pays
 lengow_log.error.no_country_for_delivery_address|Erreur Lengow : l'adresse de livraison ne contient pas de pays
 lengow_log.exception.marketplace_not_present|Erreur Lengow : la marketplace %{marketplace_name} n’apparaît pas dans la liste des marketplaces
+lengow_log.exception.order_line_required|numéro de la ligne de commande requis, non trouvé dans la commande
+lengow_log.exception.action_not_valid|l'action %{action} n'est pas valide
+lengow_log.exception.marketplace_action_not_present|l'action %{action} n'est pas présente pour cette marketplace
+lengow_log.exception.marketplace_sku_require|la référence commande marketplace est requise
+lengow_log.exception.marketplace_name_require|le nom de la marketplace est requis
+lengow_log.exception.arg_is_required|envoi d'action impossible : %{arg_name} est requis
+lengow_log.exception.action_not_created|création d'action impossible : %{error_message}
+lengow_log.exception.action_not_created_api|création d'action impossible car l'API Lengow n'est pas disponible. Réessayez de nouveau
 lengow_log.exception.no_connection_webservice|la connexion ne se fait pas avec Lengow pour le sales channel %{sales_channel_name} (%{sales_channel_id})
 lengow_log.exception.error_lengow_webservice|l'API Lengow : %{error_code} - "%{error_message}" pour le sales channel %{sales_channel_name} (%{sales_channel_id})
 lengow_log.exception.no_product_to_cart|il n'y a pas de produit ajouté au panier
