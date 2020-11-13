@@ -77,10 +77,12 @@
             "change_this": "Vous voulez modifier cela ?",
             "synchronise_orders": "Synchroniser les commandes",
             "mass_action_reimport": "Réimporter les commandes sélectionnées",
+            "mass_action_resend": "Renvoyer les commandes sélectionnées",
             "nb_product": "produit(s)",
             "no_order_title": "Le meilleur est encore à venir !",
             "no_order_description": "Vos produits sont bien visibles, vos ventes sont sur le point de décoller",
-            "modal_sync_result_title": "Synchronisation des commandes terminée",
+            "sync_modal_title_order": "Synchronisation des commandes terminée",
+            "sync_modal_title_action": "Synchronisation des actions terminée",
             "state": {
                 "accepted": "Accepté",
                 "waiting_shipment": "En attente d'expédition",
@@ -121,6 +123,11 @@
                 "action": "L'action envoyée à la marketplace ne fonctionne pas",
                 "import": "Votre commande n'a pas été importée dans Shopware",
                 "no_error_message": "Erreur non identifiée, merci de contacter le support Lengow pour plus d'informations"
+            },
+            "action_label": {
+                "action_ship_sent": "action ship envoyée",
+                "action_cancel_sent": "action cancel envoyée",
+                "action_waiting_return": "Action envoyée, en attente d'une réponse"
             }
         },
         "settings": {

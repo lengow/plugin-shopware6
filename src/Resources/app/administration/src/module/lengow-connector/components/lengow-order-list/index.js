@@ -1,6 +1,7 @@
 import template from './views/lengow-order-list.html.twig';
-import {ORDER_LENGOW_STATES, ORDER_TYPES, ORDER_SYNCHRONISATION, ERROR_TYPE} from "../../../const";
+import { ORDER_LENGOW_STATES, ORDER_TYPES, ORDER_SYNCHRONISATION } from '../../../const';
 import lgwActionButton from './components/lgw-action-button';
+import lgwActionLabel from './components/lgw-action-label';
 import lgwCountryIcon from './components/lgw-country-icon';
 import lgwOrderStateLabel from './components/lgw-order-state-label';
 import lgwOrderTypeIcon from './components/lgw-order-type-icon';
@@ -31,8 +32,7 @@ Component.register('lengow-order-list', {
             sortDirection: 'DESC',
             isLoading: false,
             filterLoading: false,
-            showDeleteModal: false,
-            showSyncResultModal: false,
+            showSyncModal: false,
             searchFilter: '',
             orderLengowStateFilter: [],
             orderTypeFilter: '',
@@ -40,7 +40,8 @@ Component.register('lengow-order-list', {
             availableOrderLengowStates: [],
             availableOrderTypes: [],
             availableMarketplaces: [],
-            syncResultMessages: [],
+            syncModalTitle: '',
+            syncModalMessages: [],
             orderWithError: 0,
             orderWaitingToBeSent: 0,
             reportMailEnabled: false,
@@ -163,7 +164,7 @@ Component.register('lengow-order-list', {
                 },
                 {
                     label: this.$tc('lengow-connector.order.type.delivered_by_marketplace'),
-                    value: ORDER_TYPES.delivered_by_marketplace
+                    value: ORDER_TYPES.delivered_by_marketplace,
                 },
                 {
                     label: this.$tc('lengow-connector.order.type.business'),
@@ -322,7 +323,7 @@ Component.register('lengow-order-list', {
         },
 
         onCloseSynResultModal() {
-            this.showSyncResultModal = false;
+            this.showSyncModal = false;
         },
 
         updateSelection(selected) {
@@ -458,8 +459,9 @@ Component.register('lengow-order-list', {
             this.isLoading = true;
             this.LengowConnectorOrderService.synchroniseOrders()
                 .then(response => {
-                    this.syncResultMessages = response;
-                    this.showSyncResultModal = true;
+                    this.syncModalTitle = this.$tc('lengow-connector.order.sync_modal_title_order');
+                    this.syncModalMessages = response;
+                    this.showSyncModal = true;
                     this.onRefresh();
                 })
                 .finally(() => {
@@ -478,8 +480,30 @@ Component.register('lengow-order-list', {
             });
             this.LengowConnectorOrderService.massReImportOrders({ lengowOrderIds })
                 .then(response => {
-                    this.syncResultMessages = response;
-                    this.showSyncResultModal = true;
+                    this.syncModalTitle = this.$tc('lengow-connector.order.sync_modal_title_order');
+                    this.syncModalMessages = response;
+                    this.showSyncModal = true;
+                    this.onRefresh();
+                })
+                .finally(() => {
+                    this.isLoading = false;
+                });
+        },
+
+        massReSendActions() {
+            this.isLoading = true;
+
+            let lengowOrderIds = [];
+            this.selection.forEach(orderSelected => {
+                if (orderSelected.isInError && orderSelected.orderProcessState === 1) {
+                    lengowOrderIds = [...lengowOrderIds, orderSelected.id];
+                }
+            });
+            this.LengowConnectorOrderService.massReSendActions({ lengowOrderIds })
+                .then(response => {
+                    this.syncModalTitle = this.$tc('lengow-connector.order.sync_modal_title_action');
+                    this.syncModalMessages = response;
+                    this.showSyncModal = true;
                     this.onRefresh();
                 })
                 .finally(() => {

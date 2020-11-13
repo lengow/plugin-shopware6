@@ -41,3 +41,13 @@ export const ACTION_BUTTON = {
     reimport: 'reimport',
     resend: 'resend',
 };
+
+export const ACTION_STATE = {
+    new: 0,
+    finish: 1,
+};
+
+export const ACTION_TYPE = {
+    ship: 'ship',
+    cancel: 'cancel',
+};

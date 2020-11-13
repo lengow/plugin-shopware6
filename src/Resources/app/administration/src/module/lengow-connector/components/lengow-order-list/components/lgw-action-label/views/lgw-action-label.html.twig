@@ -1,0 +1,10 @@
+{% block lgw_action_label %}
+    <template>
+        <div class="lgw-action-label">
+            <span v-show="hasActiveAction && !isLoading" :title="labelTitle">
+                {{ labelContent }}
+            </span>
+            <sw-loader v-show="isLoading" size="14px"></sw-loader>
+        </div>
+    </template>
+{% endblock %}

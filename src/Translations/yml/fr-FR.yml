@@ -65,10 +65,12 @@ fr:
         change_this: "Vous voulez modifier cela ?"
         synchronise_orders: "Synchroniser les commandes"
         mass_action_reimport: "Réimporter les commandes sélectionnées"
+        mass_action_resend: "Renvoyer les commandes sélectionnées"
         nb_product: "produit(s)"
         no_order_title: "Le meilleur est encore à venir !"
         no_order_description: "Vos produits sont bien visibles, vos ventes sont sur le point de décoller"
-        modal_sync_result_title: "Synchronisation des commandes terminée"
+        sync_modal_title_order: "Synchronisation des commandes terminée"
+        sync_modal_title_action: "Synchronisation des actions terminée"
         state:
           accepted: "Accepté"
           waiting_shipment: "En attente d'expédition"
@@ -105,6 +107,10 @@ fr:
           action: "L'action envoyée à la marketplace ne fonctionne pas"
           import: "Votre commande n'a pas été importée dans Shopware"
           no_error_message: "Erreur non identifiée, merci de contacter le support Lengow pour plus d'informations"
+        action_label:
+          action_ship_sent: "action ship envoyée"
+          action_cancel_sent: "action cancel envoyée"
+          action_waiting_return: "Action envoyée, en attente d'une réponse"
       settings:
         NavBar:
           title: "Paramètres" # todo faire les trad fr
@@ -207,10 +213,13 @@ fr:
   backend:
     lengow_log:
       error:
-        no_notification: "Pas de nouvelle notification sur vos commandes"
+        no_order_notification: "Pas de nouvelle notification sur vos commandes"
         nb_order_imported: "%{nb_order} commande(s) importée(s)"
         nb_order_updated: "%{nb_order} commande(s) mise(s) à jour"
         nb_order_with_error: "%{nb_order} commande(s) avec erreurs"
+        no_action_notification: "Pas de nouvelle notification sur vos actions"
+        nb_action_success: "%{nb_action} action(s) envoyées avec succès"
+        nb_action_error: "%{nb_action} action(s) bloquées par une erreur"
         rest_time_to_import: "Attendez %{rest_time} secondes avant de synchroniser de nouveau vos commandes"
         credentials_not_valid: "Votre identifiant de compte, votre jeton d'accès ou votre jeton secret ne sont pas valides"
         no_catalog_for_sales_channel: "Aucun identifiant de catalogue valide pour le sales channel %{sales_channel_name} (%{sales_channel_id})"

@@ -78,10 +78,12 @@
             "change_this": "Change this?",
             "synchronise_orders": "Synchronise Orders",
             "mass_action_reimport": "Re-import selected orders",
+            "mass_action_resend": "Re-send selected orders",
             "nb_product": "product(s)",
             "no_order_title": "The best is yet to come!",
             "no_order_description": "Your products have great visibility and your sales are about to prosper!",
-            "modal_sync_result_title": "Orders synchronisation finished",
+            "sync_modal_title_order": "Orders synchronisation finished",
+            "sync_modal_title_action": "Actions synchronisation finished",
             "state": {
                 "accepted": "Accepted",
                 "waiting_shipment": "Awaiting shipment",
@@ -122,6 +124,11 @@
                 "action": "Action sent to the marketplace did not work",
                 "import": "Order hasn't been imported into Shopware",
                 "no_error_message": "Unidentified error, please contact Lengow's support team for more information"
+            },
+            "action_label": {
+                "action_ship_sent": "action ship sent",
+                "action_cancel_sent": "action cancel sent",
+                "action_waiting_return": "Action sent, waiting for response"
             }
         },
         "settings": {

@@ -368,6 +368,13 @@ class LengowOrder
         $context = Context::createDefaultContext();
         $criteria = new Criteria();
         $criteria->setIds([$lengowOrderId]);
+        $criteria->addAssociation('order.deliveries')
+            ->addAssociation('order.deliveries.shippingMethod')
+            ->addAssociation('order.deliveries.shippingOrderAddress.country')
+            ->addAssociation('order.transactions.paymentMethod')
+            ->addAssociation('order.lineItems')
+            ->addAssociation('order.currency')
+            ->addAssociation('order.addresses.country');
         /** @var LengowOrderCollection $lengowOrderCollection */
         $lengowOrderCollection = $this->lengowOrderRepository->search($criteria, $context)->getEntities();
         if ($lengowOrderCollection->count() !== 0) {
@@ -398,6 +405,13 @@ class LengowOrder
             new EqualsFilter('marketplaceName', $marketplaceName),
             new EqualsFilter('deliveryAddressId', $deliveryAddressId),
         ]));
+        $criteria->addAssociation('order.deliveries')
+            ->addAssociation('order.deliveries.shippingMethod')
+            ->addAssociation('order.deliveries.shippingOrderAddress.country')
+            ->addAssociation('order.transactions.paymentMethod')
+            ->addAssociation('order.lineItems')
+            ->addAssociation('order.currency')
+            ->addAssociation('order.addresses.country');
         /** @var LengowOrderCollection $lengowOrderCollection */
         $lengowOrderCollection = $this->lengowOrderRepository->search($criteria, $context)->getEntities();
         if ($lengowOrderCollection->count() !== 0) {
@@ -418,7 +432,8 @@ class LengowOrder
         $context = Context::createDefaultContext();
         $criteria = new Criteria();
         $criteria->addFilter(new EqualsFilter('order.id', $orderId));
-        $criteria->addAssociation('order.deliveries.shippingMethod')
+        $criteria->addAssociation('order.deliveries')
+            ->addAssociation('order.deliveries.shippingMethod')
             ->addAssociation('order.deliveries.shippingOrderAddress.country')
             ->addAssociation('order.transactions.paymentMethod')
             ->addAssociation('order.lineItems')
@@ -445,6 +460,13 @@ class LengowOrder
             new EqualsFilter('order.orderNumber', $orderNumber),
             new EqualsFilter('deliveryAddressId', $deliveryAddressId),
         ]));
+        $criteria->addAssociation('order.deliveries')
+            ->addAssociation('order.deliveries.shippingMethod')
+            ->addAssociation('order.deliveries.shippingOrderAddress.country')
+            ->addAssociation('order.transactions.paymentMethod')
+            ->addAssociation('order.lineItems')
+            ->addAssociation('order.currency')
+            ->addAssociation('order.addresses.country');
         /** @var LengowOrderCollection $lengowOrderCollection */
         $lengowOrderCollection = $this->lengowOrderRepository->search($criteria, $context)->getEntities();
         return $lengowOrderCollection->count() !== 0 ? $lengowOrderCollection->first() : null;
@@ -477,9 +499,12 @@ class LengowOrder
             new EqualsFilter('orderProcessState', self::PROCESS_STATE_FINISH),
         ]));
         $criteria->addAssociation('order.deliveries')
+            ->addAssociation('order.deliveries.shippingMethod')
+            ->addAssociation('order.deliveries.shippingOrderAddress.country')
+            ->addAssociation('order.transactions.paymentMethod')
             ->addAssociation('order.lineItems')
             ->addAssociation('order.currency')
-            ->addAssociation('order.addresses');
+            ->addAssociation('order.addresses.country');
         /** @var LengowOrderCollection $lengowOrderCollection */
         $lengowOrderCollection = $this->lengowOrderRepository->search($criteria, $context)->getEntities();
         if ($lengowOrderCollection->count() !== 0) {
@@ -508,6 +533,13 @@ class LengowOrder
             new EqualsFilter('marketplaceSku', $marketplaceSku),
             new EqualsFilter('marketplaceName', $marketplaceName),
         ]));
+        $criteria->addAssociation('order.deliveries')
+            ->addAssociation('order.deliveries.shippingMethod')
+            ->addAssociation('order.deliveries.shippingOrderAddress.country')
+            ->addAssociation('order.transactions.paymentMethod')
+            ->addAssociation('order.lineItems')
+            ->addAssociation('order.currency')
+            ->addAssociation('order.addresses.country');
         /** @var LengowOrderCollection $lengowOrderCollection */
         $lengowOrderCollection = $this->lengowOrderRepository->search($criteria, Context::createDefaultContext())
             ->getEntities();
@@ -630,7 +662,8 @@ class LengowOrder
     {
         $criteria = new Criteria();
         $criteria->setIds([$orderId]);
-        $criteria->addAssociation('deliveries.shippingMethod')
+        $criteria->addAssociation('deliveries')
+            ->addAssociation('deliveries.shippingMethod')
             ->addAssociation('deliveries.shippingOrderAddress.country')
             ->addAssociation('transactions.paymentMethod')
             ->addAssociation('lineItems')
@@ -641,6 +674,22 @@ class LengowOrder
             ->getEntities();
         if ($orderCollection->count() !== 0) {
             return $orderCollection->first();
+        }
+        return null;
+    }
+
+    /**
+     * Get Shopware order by lengow order id
+     *
+     * @param string $lengowOrderId Lengow order id
+     *
+     * @return OrderEntity|null
+     */
+    public function getOrderByLengowOrderId(string $lengowOrderId): ?OrderEntity
+    {
+        $lengowOrder = $this->getLengowOrderById($lengowOrderId);
+        if ($lengowOrder && $lengowOrder->getOrder()) {
+            return $lengowOrder->getOrder();
         }
         return null;
     }

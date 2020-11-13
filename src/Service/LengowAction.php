@@ -279,6 +279,28 @@ class LengowAction
     }
 
     /**
+     * Get last order action type to re-send action
+     *
+     * @param string $orderId Shopware order id
+     *
+     * @return string|null
+     */
+    public function getLastOrderActionType(string $orderId): ?string
+    {
+        $context = Context::createDefaultContext();
+        $criteria = new Criteria();
+        $criteria->addFilter(new EqualsFilter('order.id', $orderId));
+        /** @var LengowActionCollection $lengowActionCollection */
+        $lengowActionCollection = $this->lengowActionRepository->search($criteria, $context)->getEntities();
+        if ($lengowActionCollection->count() !== 0) {
+            /** @var LengowActionEntity $lengowAction */
+            $lengowAction = $lengowActionCollection->last();
+            return $lengowAction->getActionType();
+        }
+        return null;
+    }
+
+    /**
      * Indicates whether an action can be created if it does not already exist
      *
      * @param array $params all available values
@@ -321,7 +343,7 @@ class LengowAction
                     'orderId' => $order->getId(),
                     'actionType' => $params[self::ARG_ACTION_TYPE],
                     'actionId' => $row->id,
-                    'orderLineSku' => (string) (isset($params[self::ARG_LINE]) ?? ''),
+                    'orderLineSku' => (string) ($params[self::ARG_LINE] ?? ''),
                     'parameters' => $params,
                 ]);
                 if ($success) {
@@ -360,7 +382,7 @@ class LengowAction
                     'orderId' => $order->getId(),
                     'actionType' => $params[self::ARG_ACTION_TYPE],
                     'actionId' => $result->id,
-                    'orderLineSku' => (string) (isset($params[self::ARG_LINE]) ?? ''),
+                    'orderLineSku' => (string) ($params[self::ARG_LINE] ?? ''),
                     'parameters' => $params,
                 ]);
                 if ($success) {

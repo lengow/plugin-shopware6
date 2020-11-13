@@ -2,12 +2,14 @@
 
 namespace Lengow\Connector\Controller;
 
+use Shopware\Core\Checkout\Order\OrderStates;
 use Shopware\Core\Framework\Routing\Annotation\RouteScope;
 use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\Routing\Annotation\Route;
 use Symfony\Component\HttpFoundation\JsonResponse;
 use Lengow\Connector\Entity\Lengow\OrderError\OrderErrorEntity as LengowOrderErrorEntity;
+use Lengow\Connector\Service\LengowAction;
 use Lengow\Connector\Service\LengowImport;
 use Lengow\Connector\Service\LengowLog;
 use Lengow\Connector\Service\LengowOrder;
@@ -41,24 +43,32 @@ class LengowOrderController extends AbstractController
     private $lengowOrderError;
 
     /**
+     * @var LengowAction Lengow action service
+     */
+    private $lengowAction;
+
+    /**
      * LengowOrderController constructor
      *
      * @param LengowImport $lengowImport Lengow import service
      * @param LengowLog $lengowLog Lengow log service
      * @param LengowOrder $lengowOrder Lengow order service
      * @param LengowOrderError $lengowOrderError Lengow order error service
+     * @param LengowAction $lengowAction Lengow action service
      */
     public function __construct(
         LengowImport $lengowImport,
         LengowLog $lengowLog,
         LengowOrder $lengowOrder,
-        LengowOrderError $lengowOrderError
+        LengowOrderError $lengowOrderError,
+        LengowAction $lengowAction
     )
     {
         $this->lengowImport = $lengowImport;
         $this->lengowLog = $lengowLog;
         $this->lengowOrder = $lengowOrder;
         $this->lengowOrderError = $lengowOrderError;
+        $this->lengowAction = $lengowAction;
     }
 
     /**
@@ -74,8 +84,8 @@ class LengowOrderController extends AbstractController
     {
         $this->lengowImport->init();
         $result = $this->lengowImport->exec();
-        $message = $this->loadMessage($result);
-        return new JsonResponse($message);
+        $messages = $this->loadMessages($result);
+        return new JsonResponse($messages);
     }
 
     /**
@@ -95,6 +105,29 @@ class LengowOrderController extends AbstractController
         $lengowOrderId = $request->get('lengowOrderId');
         if ($lengowOrderId) {
             $result = $this->loadAndImportOrder($lengowOrderId);
+        }
+        return new JsonResponse([
+            'success' => $result,
+        ]);
+    }
+
+    /**
+     * Re-send a action for a order
+     *
+     * @Route("/api/v{version}/_action/lengow/order/resend-action",
+     *     defaults={"auth_enabled"=true},
+     *     name="api.action.lengow.order.resend-action",
+     *     methods={"POST"})
+     *
+     * @param Request $request
+     * @return JsonResponse
+     */
+    public function reSendAction(Request $request): JsonResponse
+    {
+        $result = false;
+        $lengowOrderId = $request->get('lengowOrderId');
+        if ($lengowOrderId) {
+            $result = $this->loadAndResendAction($lengowOrderId);
         }
         return new JsonResponse([
             'success' => $result,
@@ -122,11 +155,40 @@ class LengowOrderController extends AbstractController
                 $this->loadAndImportOrder($lengowOrderId) ? $orderNew++ : $orderError++;
             }
         }
-        $message = $this->loadMessage([
+        $messages = $this->loadMessages([
             'order_new' => $orderNew,
             'order_error' => $orderError,
         ]);
-        return new JsonResponse($message);
+        return new JsonResponse($messages);
+    }
+
+    /**
+     * Re-send a list of actions
+     *
+     * @Route("/api/v{version}/_action/lengow/order/mass-resend-actions",
+     *     defaults={"auth_enabled"=true},
+     *     name="api.action.lengow.order.mass-resend-actions",
+     *     methods={"POST"})
+     *
+     * @param Request $request
+     * @return JsonResponse
+     */
+    public function massReSendActions(Request $request): JsonResponse
+    {
+        $actionSuccess = 0;
+        $actionError = 0;
+        $lengowOrderIds = $request->get('lengowOrderIds');
+        if (!empty($lengowOrderIds)) {
+            foreach ($lengowOrderIds as $lengowOrderId) {
+                $this->loadAndResendAction($lengowOrderId) ? $actionSuccess++ : $actionError++;
+            }
+        }
+        $results = [
+            'action_success' => $actionSuccess,
+            'action_error' => $actionError,
+        ];
+        $messages = $this->loadMessages($results, true);
+        return new JsonResponse($messages);
     }
 
     /**
@@ -208,19 +270,51 @@ class LengowOrderController extends AbstractController
     }
 
     /**
+     * Load Shopware order entity an try a re-send action
+     *
+     * @param string $lengowOrderId Lengow order id
+     *
+     * @return bool
+     */
+    private function loadAndResendAction(string $lengowOrderId): bool
+    {
+        $success = false;
+        $order = $this->lengowOrder->getOrderByLengowOrderId($lengowOrderId);
+        if ($order) {
+            $action = $this->lengowAction->getLastOrderActionType($order->getId());
+            if ($action === null) {
+                if ($order->getStateMachineState()
+                    && $order->getStateMachineState()->getTechnicalName() === OrderStates::STATE_CANCELLED
+                ) {
+                    $action = LengowAction::TYPE_CANCEL;
+                } else {
+                    $action = LengowAction::TYPE_SHIP;
+                }
+            }
+            $orderDelivery = $action === LengowAction::TYPE_SHIP && $order->getDeliveries()
+                ? $order->getDeliveries()->first()
+                : null;
+            $success = $this->lengowOrder->callAction($action, $order, $orderDelivery);
+        }
+        return $success;
+    }
+
+    /**
      * Generate message array (new, update and errors)
      *
      * @param array $result result from synchronisation process
+     * @param bool $action action synchronisation or not
      *
      * @return array
      */
-    private function loadMessage(array $result): array
+    private function loadMessages(array $result, bool $action = false): array
     {
         $messages = [];
         // if global error return this
         if (isset($result['error'][0])) {
             return [$this->lengowLog->decodeMessage($result['error'][0])];
         }
+        // specific messages for order synchronisation
         if (isset($result['order_new']) && $result['order_new'] > 0) {
             $messages[] = $this->lengowLog->decodeMessage(
                 'lengow_log.error.nb_order_imported',
@@ -242,9 +336,27 @@ class LengowOrderController extends AbstractController
                 ['nb_order' => $result['order_error']]
             );
         }
-        if (empty($messages)) {
-            $messages[] = $this->lengowLog->decodeMessage('lengow_log.error.no_notification');
+        // specific message for mass resend action
+        if ($action && isset($result['action_success']) && $result['action_success'] > 0) {
+            $messages[] = $this->lengowLog->decodeMessage(
+                'lengow_log.error.nb_action_success',
+                null,
+                ['nb_action' => $result['action_success']]
+            );
         }
+        if ($action && isset($result['action_error']) && $result['action_error'] > 0) {
+            $messages[] = $this->lengowLog->decodeMessage(
+                'lengow_log.error.nb_action_error',
+                null,
+                ['nb_action' => $result['action_error']]
+            );
+        }
+        // if no notification about orders or actions
+        if (empty($messages)) {
+            $key = $action ? 'lengow_log.error.no_action_notification' : 'lengow_log.error.no_order_notification';
+            $messages[] = $this->lengowLog->decodeMessage($key);
+        }
+        // return specific error for a Sales Channel
         if (isset($result['error'])) {
             foreach ($result['error'] as $salesChannelName => $values) {
                 $messages[] = $salesChannelName . ': ' . $this->lengowLog->decodeMessage($values);

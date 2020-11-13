@@ -88,6 +88,9 @@
                                         <a class="link link-default" @click="massReImportOrders">
                                             {{ $tc('lengow-connector.order.mass_action_reimport') }}
                                         </a>
+                                        <a class="link link-default" @click="massReSendActions">
+                                            {{ $tc('lengow-connector.order.mass_action_resend') }}
+                                        </a>
                                     </span>
                                 {% endblock %}
                             </template>
@@ -99,7 +102,14 @@
                                                            :orderProcessState="item.orderProcessState"
                                                            :onRefresh="onRefresh">
                                         </lgw-action-button>
-                                        <div v-else></div>
+                                        <div v-else>
+                                            <div v-if="item.order && item.orderProcessState === 1">
+                                                <lgw-action-label :orderId="item.order.id">
+                                                </lgw-action-label>
+                                            </div>
+                                            <div v-else>
+                                            </div>
+                                        </div>
                                     </template>
                                 {% endblock %}
                                 {% block lgw_order_list_grid_columns_order_lengow_state %}
@@ -170,12 +180,12 @@
                     {% endblock %}
 
                     {% block lgw_order_list_modal %}
-                        <sw-modal v-if="showSyncResultModal"
+                        <sw-modal v-if="showSyncModal"
                                   @modal-close="onCloseSynResultModal"
-                                  :title="$tc('lengow-connector.order.modal_sync_result_title')"
+                                  :title="syncModalTitle"
                                   variant="default">
                             <ul>
-                                <li v-for="message in syncResultMessages">
+                                <li v-for="message in syncModalMessages">
                                     {{ message }}
                                 </li>
                             </ul>

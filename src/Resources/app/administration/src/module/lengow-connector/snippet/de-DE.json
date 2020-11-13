@@ -78,10 +78,12 @@
             "change_this": "Ändern Sie dies?",
             "synchronise_orders": "Bestellungen synchronisieren",
             "mass_action_reimport": "Ausgewählte Bestellungen neu importieren",
+            "mass_action_resend": "Ausgewählte Bestellungen erneut senden",
             "nb_product": "produkt(en)",
             "no_order_title": "Das Beste kommt erst noch!",
             "no_order_description": "Ihre Produkte sind gut sichtbar, Sie werden sicherlich bald Ihre ersten Bestellungen erhalten",
-            "modal_sync_result_title": "Befehlssynchronisierung abgeschlossen",
+            "sync_modal_title_order": "Befehlssynchronisierung abgeschlossen",
+            "sync_modal_title_action": "Synchronisierung der Aktionen abgeschlossen",
             "state": {
                 "accepted": "Akzeptiert",
                 "waiting_shipment": "Warten auf Versand",
@@ -122,6 +124,11 @@
                 "action": "An Marktplatz gesendete Aktivität funktioniert nicht",
                 "import": "Bestellung konnte in Shopware nicht importiert werden",
                 "no_error_message": "Ein nicht identifizierbarer Fehler ist aufgetreten. Bitte kontaktieren Sie unseren Support!"
+            },
+            "action_label": {
+                "action_ship_sent": "Aktion ship gesendet",
+                "action_cancel_sent": "Aktion cancel gesendet",
+                "action_waiting_return": "Aktivität gesendet, warten auf Antwort"
             }
         },
         "Settings": {

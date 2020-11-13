@@ -10,8 +10,9 @@ use Shopware\Core\Framework\DataAbstractionLayer\EntityCollection;
 use Shopware\Core\Framework\DataAbstractionLayer\EntityRepositoryInterface;
 use Shopware\Core\Framework\DataAbstractionLayer\Search\Criteria;
 use Shopware\Core\Framework\DataAbstractionLayer\Search\Filter\EqualsFilter;
-use Shopware\Core\System\Language\LanguageCollection;
 use Shopware\Core\System\SalesChannel\Aggregate\SalesChannelDomain\SalesChannelDomainCollection;
+use Shopware\Core\System\User\UserCollection;
+use Shopware\Core\System\User\UserEntity;
 use Lengow\Connector\Connector;
 
 /**
@@ -20,6 +21,11 @@ use Lengow\Connector\Connector;
  */
 class EnvironmentInfoProvider
 {
+    /**
+     * @var string Default locale code
+     */
+    public const DEFAULT_LOCALE_CODE = 'en-GB';
+
     /**
      * @var string plugin name
      */
@@ -31,9 +37,9 @@ class EnvironmentInfoProvider
     private $kernel;
 
     /**
-     * @var EntityRepositoryInterface language repository
+     * @var EntityRepositoryInterface user repository
      */
-    private $languageRepository;
+    private $userRepository;
 
     /**
      * @var EntityRepositoryInterface sales channel repository
@@ -54,21 +60,21 @@ class EnvironmentInfoProvider
      * EnvironmentInfoProvider Construct
      *
      * @param Kernel $kernel Shopware kernel
-     * @param EntityRepositoryInterface $languageRepository language repository
+     * @param EntityRepositoryInterface $userRepository user repository
      * @param EntityRepositoryInterface $salesChannelRepository sales channel repository
      * @param EntityRepositoryInterface $salesChannelDomainRepository sales channel domain repository
      * @param EntityRepositoryInterface $paymentMethodRepository payment method repository
      */
     public function __construct(
         Kernel $kernel,
-        EntityRepositoryInterface $languageRepository,
+        EntityRepositoryInterface $userRepository,
         EntityRepositoryInterface $salesChannelRepository,
         EntityRepositoryInterface $salesChannelDomainRepository,
         EntityRepositoryInterface $paymentMethodRepository
     )
     {
         $this->kernel = $kernel;
-        $this->languageRepository = $languageRepository;
+        $this->userRepository = $userRepository;
         $this->salesChannelRepository = $salesChannelRepository;
         $this->salesChannelDomainRepository = $salesChannelDomainRepository;
         $this->paymentMethodRepository = $paymentMethodRepository;
@@ -81,22 +87,19 @@ class EnvironmentInfoProvider
      */
     public function getLocaleCode(): string
     {
-        // TODO get current context - don't create new context
         $context = Context::createDefaultContext();
-        $languageId = $context->getLanguageId();
-        $criteria = new Criteria([$languageId]);
+        $criteria = new Criteria();
         $criteria->addAssociation('locale');
-        /** @var LanguageCollection $languageCollection */
-        $languageCollection = $this->languageRepository->search($criteria, $context)->getEntities();
-        $language = $languageCollection->get($languageId);
-        if ($language === null) {
-            return 'en-GB';
+        /** @var UserCollection $userCollection */
+        $userCollection = $this->userRepository->search($criteria, $context)->getEntities();
+        if ($userCollection->count() !== 0) {
+            /** @var UserEntity $user */
+            $user = $userCollection->first();
+            if ($user->getLocale()) {
+                return $user->getLocale()->getCode();
+            }
         }
-        $locale = $language->getLocale();
-        if (!$locale) {
-            return 'en-GB';
-        }
-        return $locale->getCode();
+        return self::DEFAULT_LOCALE_CODE;
     }
 
     /**

@@ -95,6 +95,20 @@ Component.register('lgw-action-button', {
             });
         },
 
-        reSendAction() {},
+        reSendAction() {
+            this.isLoading = true;
+            this.LengowConnectorOrderService.reSendAction({
+                lengowOrderId: this.lengowOrderId,
+            }).then(response => {
+                if (response.success) {
+                    this.onRefresh();
+                } else {
+                    this.getLengowOrderErrors().then(result => {
+                        this.errors = result;
+                        this.isLoading = false;
+                    });
+                }
+            });
+        },
     },
 });

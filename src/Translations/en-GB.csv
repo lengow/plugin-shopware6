@@ -1,7 +1,10 @@
-lengow_log.error.no_notification|No new notification on order
+lengow_log.error.no_order_notification|No new notification on order
 lengow_log.error.nb_order_imported|%{nb_order} order(s) imported
 lengow_log.error.nb_order_updated|%{nb_order} order(s) updated
 lengow_log.error.nb_order_with_error|%{nb_order} order(s) with errors
+lengow_log.error.no_action_notification|No new notification on action
+lengow_log.error.nb_action_success|%{nb_action} action(s) successfully sent
+lengow_log.error.nb_action_error|%{nb_action} action(s) blocked by an error
 lengow_log.error.rest_time_to_import|Please wait %{rest_time} seconds before syncing your orders again
 lengow_log.error.credentials_not_valid|Account ID, token access or secret token are not valid
 lengow_log.error.no_catalog_for_sales_channel|No catalog ID valid for the sales channel %{sales_channel_name} (%{sales_channel_id})

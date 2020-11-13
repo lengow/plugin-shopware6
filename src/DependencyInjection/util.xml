@@ -8,7 +8,7 @@
 
         <service id="Lengow\Connector\Util\EnvironmentInfoProvider">
             <argument type="service" id="kernel"/>
-            <argument type="service" id="language.repository"/>
+            <argument type="service" id="user.repository"/>
             <argument type="service" id="sales_channel.repository"/>
             <argument type="service" id="sales_channel_domain.repository"/>
             <argument type="service" id="payment_method.repository"/>

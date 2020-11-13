@@ -11,6 +11,7 @@
             <argument type="service" id="Lengow\Connector\Service\LengowLog"/>
             <argument type="service" id="Lengow\Connector\Service\LengowOrder"/>
             <argument type="service" id="Lengow\Connector\Service\LengowOrderError"/>
+            <argument type="service" id="Lengow\Connector\Service\LengowAction"/>
             <tag name="controller.service_arguments"/>
         </service>
 

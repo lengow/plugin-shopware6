@@ -36,12 +36,44 @@ class LengowConnectorOrderService extends ApiService {
             });
     }
 
+    reSendAction(data) {
+        const headers = this.getBasicHeaders();
+
+        return this.httpClient
+            .post(
+                `_action/${this.getApiBasePath()}/order/resend-action`,
+                JSON.stringify(data),
+                {
+                    headers: headers
+                }
+            )
+            .then((response) => {
+                return ApiService.handleResponse(response);
+            });
+    }
+
     massReImportOrders(data) {
         const headers = this.getBasicHeaders();
 
         return this.httpClient
             .post(
                 `_action/${this.getApiBasePath()}/order/mass-reimport-orders`,
+                JSON.stringify(data),
+                {
+                    headers: headers
+                }
+            )
+            .then((response) => {
+                return ApiService.handleResponse(response);
+            });
+    }
+
+    massReSendActions(data) {
+        const headers = this.getBasicHeaders();
+
+        return this.httpClient
+            .post(
+                `_action/${this.getApiBasePath()}/order/mass-resend-actions`,
                 JSON.stringify(data),
                 {
                     headers: headers
