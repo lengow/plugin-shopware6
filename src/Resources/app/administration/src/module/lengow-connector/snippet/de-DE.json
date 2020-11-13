@@ -22,12 +22,12 @@
                 "contact": "Kontaktieren Sie Lengow",
                 "helpCenterLink": "Schauen Sie im Help Center",
                 "helpCenterTarget": "https:\/\/supportlengow.zendesk.com\/hc\/de-de\/articles\/360012203311",
-                "helpCenter": "um detaillierte Informationen zu der korrekten Einrichtung des Shopware-Plugins zu finden",
-                "footer": {
-                    "link": "https:\/\/www.lengow.com\/de",
-                    "plugin_name": "Lengow Shopware 6 Plugin"
-                }
+                "helpCenter": "um detaillierte Informationen zu der korrekten Einrichtung des Shopware-Plugins zu finden"
             }
+        },
+        "footer": {
+            "link": "https:\/\/www.lengow.com\/de",
+            "lengow_plugin_name": "Lengow Shopware 6 Plugin"
         },
         "contact": {
             "title": "Lassen Sie sich etwas von Ihrem Support-Team unterstützen",
@@ -130,6 +130,41 @@
                 "action_cancel_sent": "Aktion cancel gesendet",
                 "action_waiting_return": "Aktivität gesendet, warten auf Antwort"
             }
+        },
+        "orderTab": {
+            "title": "Lengow Bestellung Detailseite",
+            "order_id": "ID Commande",
+            "delivery_address_id": "Lieferaddresse-ID",
+            "currency": "Währung",
+            "commission": "Kommission",
+            "customer_email": "Kunden-Email",
+            "customer_name": "Kunden-Name",
+            "carrier": "Spediteur des Marktplatzes",
+            "carrier_method": "Versandart des Marktplatzes",
+            "carrier_tracking": "Sendungsverfolgungsnummer",
+            "carrier_id_relay": "ID Abholstation",
+            "is_express": "Expresszustellung",
+            "is_delivered_by_marketplace": "Wird vom Marktplatz",
+            "is_business": "Business",
+            "not_lengow_order": "Diese Bestellung ist nicht von Lengow",
+            "not_follow_by_lengow": " Aufgrund eines erneuten Imports, wird diese Bestellung durch Lengow nicht verfolgt",
+            "synchronize_id": "ID synchronisieren",
+            "check_synchronize_action": "Möchten Sie die Bestellung wirklich synchronisieren?",
+            "cancel_and_reimport": "Bestellungen erneut importieren",
+            "check_cancel_and_reimport": "Wollen Sie wirklich die Bestellung erneut importieren?",
+            "resend_action": " Aktion erneut senden",
+            "check_resend_action": "Wollen Sie wirklich die Bestellung %1 ?",
+            "no_order_importation": "Derzeit keine Synchronisierung",
+            "total_paid": "Menge",
+            "marketplace": "Marktplatzes",
+            "order_status": "Auftragsstatus",
+            "vat_number": "Umsatzsteuer",
+            "order_date": "Datum",
+            "imported_at": "Importiert am",
+            "extra": "JSON format",
+            "message": "Nachricht",
+            "status_yes": "Ja",
+            "status_no": "Nein"
         },
         "Settings": {
             "NavBar": {

@@ -5,6 +5,8 @@ import './components/lengow-settings';
 import './components/lengow-legal-notices';
 import './components/lengow-contact';
 import './components/lengow-footer';
+import './extension/sw-order-detail';
+import './components/lgw-order-detail-extension';
 
 Shopware.Module.register('lengow-connector', {
     color: '#ff3d58',
@@ -52,6 +54,20 @@ Shopware.Module.register('lengow-connector', {
                 parentPath: 'lengow.connector.dashboard',
             },
         },
+    },
+
+    routeMiddleware(next, currentRoute) {
+        if (currentRoute.name === 'sw.order.detail') {
+            currentRoute.children.push({
+                name: 'lgw.order.detail',
+                path: '/sw/order/detail/:id/lgw',
+                component: 'lgw-order-detail-extension',
+                meta: {
+                    parentPath: "sw.order.index"
+                }
+            });
+        }
+        next(currentRoute);
     },
 
     navigation: [

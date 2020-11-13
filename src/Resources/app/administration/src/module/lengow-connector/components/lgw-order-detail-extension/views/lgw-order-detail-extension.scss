@@ -1,0 +1,50 @@
+.lgw-order-detail-title {
+    font-size: 18px;
+}
+
+.lgw-order-detail-list {
+    width:50%;
+    float:left;
+    list-style-type: none;
+    font-size: 14px;
+    line-height: 15px;
+}
+
+.lgw-order-detail-list h6 {
+    font-weight: 600 !important;
+    font-size: 14px !important;
+    margin-bottom: 5px;
+}
+
+
+.lgw-order-detail-list-extra {
+    width:100%;
+    float:left;
+    list-style-type: none;
+    font-size: 14px;
+}
+
+.lgw-order-detail-list-extra  h6 {
+    font-weight: 600 !important;
+    font-size: 14px !important;
+    margin-bottom: 5px;
+}
+
+.lgw-box-sizing-border {
+    -webkit-box-sizing: border-box;
+    -moz-box-sizing: border-box;
+    box-sizing: border-box;
+}
+
+.textwrapper
+{
+    margin:5px 0;
+    padding:3px;
+}
+
+.textwrapper textarea {
+    width:100%;
+    border-color: #52667a;
+    color: #52667a;
+    font-size: 12px !important;
+}

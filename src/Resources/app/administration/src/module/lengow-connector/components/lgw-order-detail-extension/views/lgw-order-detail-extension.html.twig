@@ -1,0 +1,122 @@
+<sw-card title="">
+    <template v-if="isFromLengow">
+        <ul class="lgw-order-detail-list">
+            <li>
+                <h6>{{ $tc('lengow-connector.orderTab.order_id') }}</h6>
+                {{ marketplaceSku }}
+            </li>
+            <br/>
+            <li>
+                <h6>{{ $tc('lengow-connector.orderTab.marketplace') }}</h6>
+                {{ marketplaceName }}
+            </li>
+            <br/>
+            <li>
+                <h6>{{ $tc('lengow-connector.orderTab.delivery_address_id') }}</h6>
+                {{ deliveryAddressId }}
+            </li>
+            <br/>
+            <li>
+                <h6>{{ $tc('lengow-connector.orderTab.order_status') }}</h6>
+                {{ orderLengowState }}
+            </li>
+            <br/>
+            <li>
+                <h6>{{ $tc('lengow-connector.orderTab.total_paid') }}</h6>
+                {{ totalPaid }}
+            </li>
+            <br/>
+            <li>
+                <h6>{{ $tc('lengow-connector.orderTab.commission') }}</h6>
+                {{ commission }}
+            </li>
+            <br/>
+            <li>
+                <h6>{{ $tc('lengow-connector.orderTab.currency') }}</h6>
+                {{ currency }}
+            </li>
+            <br/>
+            <li>
+                <h6>{{ $tc('lengow-connector.orderTab.customer_name') }}</h6>
+                {{ customerName }}
+            </li>
+            <br/>
+            <li>
+                <h6>{{ $tc('lengow-connector.orderTab.customer_email') }}</h6>
+                {{ customerEmail }}
+            </li>
+            <br/>
+            <li>
+                <h6>{{ $tc('lengow-connector.orderTab.carrier') }}</h6>
+                {{ carrier }}
+            </li>
+            <br/>
+        </ul>
+        <ul class="lgw-order-detail-list">
+            <li>
+                <h6>{{ $tc('lengow-connector.orderTab.carrier_method') }}</h6>
+                {{ carrierMethod }}
+            </li>
+            <br/>
+            <li>
+                <h6>{{ $tc('lengow-connector.orderTab.carrier_tracking') }}</h6>
+                {{ carrierTracking }}
+            </li>
+            <br/>
+            <li>
+                <h6>{{ $tc('lengow-connector.orderTab.carrier_id_relay') }}</h6>
+                {{ carrierIdRelay }}
+            </li>
+            <br/>
+            <li>
+                <h6>{{ $tc('lengow-connector.orderTab.is_express') }}</h6>
+                <span v-if="isExpress">{{ $tc('lengow-connector.orderTab.status_yes') }}</span>
+                <span v-else>{{ $tc('lengow-connector.orderTab.status_no') }}</span>
+            </li>
+            <br/>
+            <li>
+                <h6>{{ $tc('lengow-connector.orderTab.is_delivered_by_marketplace') }}</h6>
+                <span v-if="isShippedByMarketplace">{{ $tc('lengow-connector.orderTab.status_yes') }}</span>
+                <span v-else>{{ $tc('lengow-connector.orderTab.status_no') }}</span>
+            </li>
+            <br/>
+            <li>
+                <h6>{{ $tc('lengow-connector.orderTab.is_business') }}</h6>
+                <span v-if="isB2b">{{ $tc('lengow-connector.orderTab.status_yes') }}</span>
+                <span v-else>{{ $tc('lengow-connector.orderTab.status_no') }}</span>
+            </li>
+            <br/>
+            <li>
+                <h6>{{ $tc('lengow-connector.orderTab.vat_number') }}</h6>
+                {{ customerVatNumber }}
+            </li>
+            <br/>
+            <li>
+                <h6>{{ $tc('lengow-connector.orderTab.order_date') }}</h6>
+                {{ orderDate }}
+            </li>
+            <br/>
+            <li>
+                <h6>{{ $tc('lengow-connector.orderTab.import_date') }}</h6>
+                {{ importedAt }}
+            </li>
+            <br/>
+            <li>
+                <h6>{{ $tc('lengow-connector.orderTab.message') }}</h6>
+                {{ message }}
+            </li>
+            <br/>
+        </ul>
+        <ul class="lgw-order-detail-list-extra">
+            <li>
+                <h6>{{ $tc('lengow-connector.orderTab.extra') }}</h6>
+                <div class="textwrapper">
+                    <textarea class="lgw-box-sizing-border" rows="8">{{ extra }}</textarea>
+                </div>
+            </li>
+        </ul>
+    </template>
+    <template v-else>
+        <h6>{{ $tc('lengow-connector.orderTab.not_lengow_order') }}</h6>
+    </template>
+</sw-card>

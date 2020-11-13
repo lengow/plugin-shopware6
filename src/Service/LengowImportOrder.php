@@ -1117,6 +1117,7 @@ class LengowImportOrder
                 $productId,
                 $productData['quantity']
             );
+            $lineItem->setStackable(true);
             $this->cartService->add($cart, $lineItem, $salesChannelContext);
         }
         if ($cart->getLineItems()->count() === 0) {

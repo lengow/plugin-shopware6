@@ -22,12 +22,12 @@
                 "contact": "Get in touch with Lengow.",
                 "helpCenterLink": "Visit our Help Center",
                 "helpCenterTarget": "https:\/\/supportlengow.zendesk.com\/hc\/en-us\/articles\/360012203311",
-                "helpCenter": "for detailed information on how to configure your Shopware plugin properly",
-                "footer": {
-                    "link": "https:\/\/www.lengow.com\/",
-                    "plugin_name": "Lengow Shopware 6 Plugin"
-                }
+                "helpCenter": "for detailed information on how to configure your Shopware plugin properly"
             }
+        },
+        "footer": {
+            "link": "https:\/\/www.lengow.com\/",
+            "lengow_plugin_name": "Lengow Shopware 6 Plugin"
         },
         "contact": {
             "title": "Get a little help from your support team!",
@@ -130,6 +130,44 @@
                 "action_cancel_sent": "action cancel sent",
                 "action_waiting_return": "Action sent, waiting for response"
             }
+        },
+        "orderTab": {
+            "title": "Lengow order detail page",
+            "order_id": "ID Commande",
+            "delivery_address_id": "ID d'adresse de livraison",
+            "currency": "Currency",
+            "commission": "Commission",
+            "customer_email": "Customer email",
+            "customer_name": "Customer name",
+            "carrier": "Carrier from marketplace",
+            "carrier_method": "Shipping method from marketplace",
+            "carrier_tracking": "Tracking number",
+            "carrier_id_relay": "ID relay",
+            "is_express": "Express delivery",
+            "is_delivered_by_marketplace": "Shipped by Marketplace",
+            "is_business": "Business",
+            "imported_at": "Imported at ",
+            "not_lengow_order": "This order is not from Lengow",
+            "not_follow_by_lengow": "Due to a reimportation, this order is not tracked by Lengow",
+            "synchronize_id": "Synchronize ID",
+            "check_synchronize_action": "Do you really want to synchronize the order?",
+            "cancel_and_reimport": "Re-import order",
+            "check_cancel_and_reimport": "Do you really want to re-import the order?",
+            "resend_action": "Resend Action",
+            "check_resend_action": "Do you really want to %1 the order?",
+            "no_order_importation": "No synchronisation for now",
+            "all_order_will_be_sent_to": "All order issue reports will be sent by mail to",
+            "no_order_will_be_sent": "No order issue reports will be sent by mail",
+            "total_paid": "Amount",
+            "marketplace": "marketplace",
+            "order_status": "Order status",
+            "vat_number": "VAT number",
+            "order_date": "Order creation date",
+            "import_date": "Order import date",
+            "message": "Message",
+            "extra": "Order JSON format",
+            "status_yes": "Yes",
+            "status_no": "No"
         },
         "settings": {
             "NavBar": {
