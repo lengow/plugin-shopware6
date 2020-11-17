@@ -2,6 +2,11 @@
 
 namespace Lengow\Connector\Service;
 
+use Shopware\Core\Framework\DataAbstractionLayer\EntityRepositoryInterface;
+use Shopware\Core\Framework\DataAbstractionLayer\Search\Criteria;
+use Shopware\Core\Framework\Context;
+use Symfony\Component\HttpFoundation\Request;
+use Symfony\Component\HttpFoundation\JsonResponse;
 use Lengow\Connector\Exception\LengowException;
 use Lengow\Connector\Factory\LengowFileFactory;
 use Lengow\Connector\Util\EnvironmentInfoProvider;
@@ -58,6 +63,11 @@ class LengowSync
     private const MARKETPLACE_FILE = 'marketplaces.json';
 
     /**
+     * @var string plugin type for lengow
+     */
+    private const PLUGIN_TYPE = 'shopware';
+
+    /**
      * @var LengowConnector Lengow connector service
      */
     private $lengowConnector;
@@ -83,6 +93,16 @@ class LengowSync
     private $environmentInfoProvider;
 
     /**
+     * @var LengowExport Lengow export service
+     */
+    private $lengowExport;
+
+    /**
+     * @var EntityRepositoryInterface $salesChannelRepository sales channel repository
+     */
+    private $salesChannelRepository;
+
+    /**
      * @var array cache time for catalog, account status, cms options and marketplace synchronisation
      */
     private $cacheTimes = array(
@@ -101,13 +121,17 @@ class LengowSync
      * @param LengowLog $lengowLog Lengow log service
      * @param LengowFileFactory $lengowFileFactory Lengow file factory
      * @param EnvironmentInfoProvider $environmentInfoProvider Environment info provider utility
+     * @param LengowExport $lengowExport Lengow export service
+     * @param EntityRepositoryInterface $salesChannelRepository shopware sales channel repository
      */
     public function __construct(
         LengowConnector $lengowConnector,
         LengowConfiguration $lengowConfiguration,
         LengowLog $lengowLog,
         LengowFileFactory $lengowFileFactory,
-        EnvironmentInfoProvider $environmentInfoProvider
+        EnvironmentInfoProvider $environmentInfoProvider,
+        LengowExport $lengowExport,
+        EntityRepositoryInterface $salesChannelRepository
     )
     {
         $this->lengowConnector = $lengowConnector;
@@ -115,6 +139,47 @@ class LengowSync
         $this->lengowLog = $lengowLog;
         $this->lengowFileFactory = $lengowFileFactory;
         $this->environmentInfoProvider = $environmentInfoProvider;
+        $this->lengowExport = $lengowExport;
+        $this->salesChannelRepository = $salesChannelRepository;
+    }
+
+    /**
+     * Get lengow sync data
+     *
+     * @return array
+     */
+    public function getSyncData() : array
+    {
+        $syncData = [
+            'domain_name' => $this->environmentInfoProvider->getBaseUrl(),
+            'token' => $this->lengowConfiguration->get('lengowGlobalToken'),
+            'type' => self::PLUGIN_TYPE,
+            'version' => $this->environmentInfoProvider->getVersion(),
+            'plugin_version' => $this->environmentInfoProvider::getPluginVersion(),
+            'email' => $this->lengowConfiguration->get('core.basicInformation.email'),
+            'cron_url' => $this->lengowConfiguration->getCronUrl(),
+            'return_url' => $this->environmentInfoProvider->getBaseUrl() . '/admin/lengow/connector/dashboard',
+            'shops' => [],
+        ];
+        $salesChannels = $this->environmentInfoProvider->getActiveSalesChannels();
+        if ($salesChannels->count() !== 0 ) {
+            foreach ($salesChannels as $salesChannel) {
+                $salesChannelId = $salesChannel->getId();
+                $salesChannelToken = $this->lengowConfiguration->get('lengowChannelToken', $salesChannelId);
+                $domainUrl = $this->environmentInfoProvider->getBaseUrl($salesChannelId);
+                $this->lengowExport->init($salesChannelId);
+                $syncData['shops'][$salesChannelId] = [
+                    'token' => $salesChannelToken,
+                    'shop_name' => $salesChannel->getName(),
+                    'domain_url' => $domainUrl,
+                    'feed_url' => $this->lengowConfiguration->getFeedUrl($salesChannelId),
+                    'total_product_number' => $this->lengowExport->getTotalProduct(),
+                    'exported_product_number' => $this->lengowExport->getTotalExportedProduct(),
+                    'enabled' => $this->lengowConfiguration->get('lengowStoreEnabled', $salesChannelId),
+                ];
+            }
+        }
+        return $syncData;
     }
 
     /**

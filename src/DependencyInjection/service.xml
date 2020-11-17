@@ -147,6 +147,8 @@
             <argument type="service" id="Lengow\Connector\Service\LengowLog"/>
             <argument type="service" id="Lengow\Connector\Factory\LengowFileFactory"/>
             <argument type="service" id="Lengow\Connector\Util\EnvironmentInfoProvider"/>
+            <argument type="service" id="Lengow\Connector\Service\LengowExport"/>
+            <argument type="service" id="sales_channel.repository"/>
         </service>
 
         <service id="Lengow\Connector\Service\LengowTranslation">

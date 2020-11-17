@@ -79,6 +79,9 @@ class LengowCronController extends LengowAbstractFrontController
     {
         $this->checkAccess($request, $context);
         $cronArgs = $this->createGetArgArray($request);
+        if ($cronArgs['get_sync'] === null || $cronArgs['get_sync']) {
+            return new Response(json_encode($this->lengowSync->getSyncData()));
+        }
         // sync catalogs id between Lengow and Shopware
         if ($cronArgs['sync'] === null || $cronArgs['sync'] === LengowSync::SYNC_CATALOG) {
             $this->lengowSync->syncCatalog($cronArgs['force'], $cronArgs['log_output']);

@@ -844,4 +844,29 @@ class LengowConfiguration
             }
         }
     }
+
+    /**
+     * Get Lengow cron url
+     *
+     * @return string
+     */
+    public function getCronUrl() : string
+    {
+        return $this->environmentInfoProvider->getBaseUrl()
+            .'/lengow/cron?token='
+            .$this->get('lengowGlobalToken');
+    }
+
+    /**
+     * Get sales channel Lengow feed url
+     *
+     * @param string $salesChannelId the sales channel id needed to construct url
+     * @return string
+     */
+    public function getFeedUrl(string $salesChannelId) : string
+    {
+        $salesChannelToken = $this->get('lengowChannelToken', $salesChannelId);
+        $domainUrl = $this->environmentInfoProvider->getBaseUrl($salesChannelId);
+        return $domainUrl . '/lengow/export?sales_channel_id=' . $salesChannelId . '&token=' . $salesChannelToken;
+    }
 }

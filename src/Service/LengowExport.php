@@ -209,22 +209,71 @@ class LengowExport
     /**
      * Init LengowExport class
      *
-     * @param array $exportArgs
+     * @param string $salesChannelId
+     * @param array|null $exportArgs
      */
-    public function init(array $exportArgs): void
+    public function init(string $salesChannelId, array $exportArgs = null): void
+    {
+        if ($exportArgs) {
+            $this->getParamsInit($exportArgs);
+        } elseif ($salesChannelId) {
+            $this->standaloneInit($salesChannelId);
+        }
+    }
+
+    /**
+     * Init export service only using module configuration
+     *
+     * @param string $salesChannelId sales channel id
+     */
+    public function standaloneInit(string $salesChannelId) : void
+    {
+        $this->exportConfiguration['log_output'] = false;
+        $this->exportConfiguration['stream'] = false;
+        $this->exportConfiguration = array_merge($this->exportConfiguration, [
+            'sales_channel_id' => $salesChannelId,
+            'out_of_stock' => $this->lengowConfiguration->get(
+                    LengowConfiguration::LENGOW_EXPORT_OUT_OF_STOCK_ENABLED,
+                    $salesChannelId
+                ) ?? false,
+            'variation' => $this->lengowConfiguration->get(
+                    LengowConfiguration::LENGOW_EXPORT_VARIATION_ENABLED,
+                    $salesChannelId
+                ) ?? true,
+            'inactive' => $this->lengowConfiguration->get(
+                    LengowConfiguration::LENGOW_EXPORT_DISABLED_PRODUCT,
+                    $salesChannelId
+                ) ?? false,
+            'selection' =>  $this->lengowConfiguration->get(
+                    LengowConfiguration::LENGOW_EXPORT_SELECTION_ENABLED,
+                    $salesChannelId
+                ) ?? false,
+            'product_ids' => '',
+            'offset' => 0,
+            'limit' => 0,
+            'format' => LengowFeed::FORMAT_CSV,
+            'currency' => $this->getExportCurrency($salesChannelId),
+            'shipping' => $this->getExportShippingMethod($salesChannelId),
+        ]);
+    }
+
+    /**
+     * Init export service using export get params
+     *
+     * @param array $exportArgs export get params
+     */
+    public function getParamsInit(array $exportArgs) : void
     {
         $this->exportConfiguration['log_output'] = $exportArgs['log_output'] ?? false;
         $this->exportConfiguration['stream'] = $exportArgs['log_output'] ?? false;
-        $this->exportConfiguration = [
-            'log_output' => $exportArgs['log_output'] ?? false,
+        $this->exportConfiguration = array_merge($this->exportConfiguration, [
             'selection' => $exportArgs['selection'],
             'out_of_stock' => $exportArgs['out_of_stock'] ?? false,
             'variation' => $exportArgs['variation'] ?? true,
             'inactive' => $exportArgs['inactive'] ?? false,
-            'format' => $this->validateFormat($exportArgs['format'] ?: ''),
-            'product_ids' => $exportArgs['product_ids'] ?: '',
+            'format' => $this->validateFormat($exportArgs['format'] ?? ''),
+            'product_ids' => $exportArgs['product_ids'] ?? '',
             'sales_channel_id' => $exportArgs['sales_channel_id'],
-            'stream' => $exportArgs['stream'] ?: false,
             'offset' => $exportArgs['offset'] ?? 0,
             'limit' => $exportArgs['limit'] ?? 0,
             'currency' => $this->getExportCurrency(
@@ -232,7 +281,7 @@ class LengowExport
                 ($exportArgs['currency'] ?? null)
             ),
             'shipping' => $this->getExportShippingMethod($exportArgs['sales_channel_id']),
-        ];
+        ]);
     }
 
     /**
@@ -259,11 +308,14 @@ class LengowExport
     /**
      * Get total export size
      *
-     * @param string $salesChannelId sales channel id to count
+     * @param string|null $salesChannelId sales channel id to count
      * @return int total export number
      */
-    public function getTotalExport(string $salesChannelId): int
+    public function getTotalProduct(string $salesChannelId = null): int
     {
+        if (!$salesChannelId && $this->exportConfiguration['sales_channel_id']) {
+            $salesChannelId = $this->exportConfiguration['sales_channel_id'];
+        }
         $categoryEntryPoint = $this->getCategoryEntryPoint($salesChannelId);
         $masterCategoryId = $this->getMasterCategory($categoryEntryPoint);
         if (!$masterCategoryId) {
@@ -279,15 +331,24 @@ class LengowExport
         return $total;
     }
 
+    /**
+     * Get total number of exported product for initialized salesChannel
+     *
+     * @return int
+     */
+    public function getTotalExportedProduct() : int
+    {
+        return count($this->getProductIdsExport());
+    }
 
     /**
      * Get all product ID in export // todo Refacto this method to use Raw sql (performance improvment)
      *
-     * @param string $salesChannelId sales channel id
      * @return array products ids
      */
-    public function getProductIdsExport(string $salesChannelId) : array
+    public function getProductIdsExport() : array
     {
+        $salesChannelId = $this->exportConfiguration['sales_channel_id'];
         // if selection is activated or product_ids get argument is used
         if ($this->exportConfiguration['selection'] || $this->exportConfiguration['product_ids']) {
             return $this->getSelectionProductIdsExport($this->getLengowProductIdsToExport($salesChannelId));
@@ -660,7 +721,7 @@ class LengowExport
             $this->lengowFeed->init($exportArgs['sales_channel_id'], $exportArgs['stream'], $exportArgs['format']);
             // Write headers
             $this->lengowFeed->write(LengowFeed::HEADER, $fields);
-            $this->init($exportArgs);
+            $this->init($exportArgs['sales_channel_id'], $exportArgs);
             // Log export start
             $this->lengowLog->write(
                 LengowLog::CODE_EXPORT,
@@ -769,7 +830,7 @@ class LengowExport
             ]),
             $this->exportConfiguration['log_output']
         );
-        $productIds = $this->getProductIdsExport($this->exportConfiguration['sales_channel_id']);
+        $productIds = $this->getProductIdsExport();
         foreach ($productIds as $productId) {
             // if offset specified in params
             if ($this->exportConfiguration['offset'] !== 0

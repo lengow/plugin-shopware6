@@ -1,5 +1,5 @@
 {% block lengow_dashboard %}
-    <template>
+    <template v-if="!isNew && !isLoading">
         <sw-page class="lgw-page" :showSearchBar="false">
             <template #content>
                 <div class="lgw-page">
@@ -60,5 +60,13 @@
                 </div>
             </template>
         </sw-page>
+    </template>
+    <template v-else>
+        <div class="lgw-container" v-if="isLoading">
+            <sw-loader size="100px"></sw-loader>#}
+        </div>
+        <div v-else>
+            <lgw-iframe-connexion></lgw-iframe-connexion>
+        </div>
     </template>
 {% endblock %}

@@ -134,10 +134,11 @@ class LengowExportController extends LengowAbstractFrontController
      */
     protected function modeSize(string $mode, string $salesChannelId): int
     {
+        $this->lengowExport->init($salesChannelId);
         if ($mode === 'size') {
-            return count($this->lengowExport->getProductIdsExport($salesChannelId));
+            return count($this->lengowExport->getTotalExportedProduct());
         } else if ($mode === 'total') {
-            return $this->lengowExport->getTotalExport($salesChannelId);
+            return $this->lengowExport->getTotalProduct();
         }
         return 0;
     }

@@ -1,0 +1,18 @@
+{% block lgw_iframe_connexion %}
+    <template>
+        <div>
+            <meta http-equiv="Content-Security-Policy" content="upgrade-insecure-requests">
+            <iframe id="lgw-sync-iframe"
+                    title="Lengow Iframe"
+                    :src="iframeSource"
+                    frameborder="0"
+                    border="0"
+                    @load="onLoadIframe"
+                    cellspacing="0"
+                    sandbox="allow-same-origin allow-scripts allow-forms"
+                    style="border-style: none;width: 100%; min-height: 1000px;">
+            </iframe>
+        </div>
+    </template>
+{% endblock %}
+strict-dynamic

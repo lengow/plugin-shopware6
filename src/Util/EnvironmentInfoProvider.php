@@ -14,6 +14,7 @@ use Shopware\Core\System\SalesChannel\Aggregate\SalesChannelDomain\SalesChannelD
 use Shopware\Core\System\User\UserCollection;
 use Shopware\Core\System\User\UserEntity;
 use Lengow\Connector\Connector;
+use Lengow\Connector\Service\LengowConfiguration;
 
 /**
  * Class EnvironmentInfoProvider
@@ -30,6 +31,11 @@ class EnvironmentInfoProvider
      * @var string plugin name
      */
     public const PLUGIN_NAME = 'Connector';
+
+    /**
+     * @var string plugin version
+     */
+    public const PLUGIN_VERSION = "1.0.0";
 
     /**
      * @var Kernel $kernel
@@ -136,6 +142,26 @@ class EnvironmentInfoProvider
     }
 
     /**
+     * Get shopware version
+     *
+     * @return string
+     */
+    public function getVersion(): string
+    {
+        return $this->kernel::SHOPWARE_FALLBACK_VERSION;
+    }
+
+    /**
+     * Get plugin version
+     *
+     * @return string
+     */
+    public static function getPluginVersion() : string
+    {
+        return self::PLUGIN_VERSION;
+    }
+
+    /**
      * Get the base url of the plugin
      *
      * @param string|null $salesChannelId Shopware sales channel id
@@ -171,6 +197,9 @@ class EnvironmentInfoProvider
                 $salesChannelDomain = $salesChannelDomainCollection->filterByProperty('salesChannelId', $salesChannelId)
                     ->first();
                 $baseUrl = $salesChannelDomain ? $salesChannelDomain->getUrl() : null;
+            }
+            if ($baseUrl === null) {
+                return $this->getBaseUrl();
             }
         }
         return $baseUrl;
