@@ -17,6 +17,7 @@ use Shopware\Core\Framework\DataAbstractionLayer\EntityRepositoryInterface;
 use Shopware\Core\Framework\DataAbstractionLayer\Search\Criteria;
 use Shopware\Core\Framework\DataAbstractionLayer\Search\Filter\EqualsFilter;
 use Shopware\Core\Framework\DataAbstractionLayer\Search\Filter\MultiFilter;
+use Shopware\Core\Framework\DataAbstractionLayer\Search\Filter\RangeFilter;
 use Shopware\Core\Framework\DataAbstractionLayer\Search\Grouping\FieldGrouping;
 use Shopware\Core\Framework\Uuid\Uuid;
 use Shopware\Core\System\StateMachine\Aggregation\StateMachineState\StateMachineStateCollection;
@@ -532,6 +533,50 @@ class LengowOrder
         $criteria->addFilter(new MultiFilter(MultiFilter::CONNECTION_AND, [
             new EqualsFilter('marketplaceSku', $marketplaceSku),
             new EqualsFilter('marketplaceName', $marketplaceName),
+        ]));
+        $criteria->addAssociation('order.deliveries')
+            ->addAssociation('order.deliveries.shippingMethod')
+            ->addAssociation('order.deliveries.shippingOrderAddress.country')
+            ->addAssociation('order.transactions.paymentMethod')
+            ->addAssociation('order.lineItems')
+            ->addAssociation('order.currency')
+            ->addAssociation('order.addresses.country');
+        /** @var LengowOrderCollection $lengowOrderCollection */
+        $lengowOrderCollection = $this->lengowOrderRepository->search($criteria, Context::createDefaultContext())
+            ->getEntities();
+        if ($lengowOrderCollection->count() !== 0) {
+            /** @var LengowOrderEntity $lengowOrder */
+            foreach ($lengowOrderCollection as $lengowOrder) {
+                if ($lengowOrder->getOrder() !== null) {
+                    $orders[] = $lengowOrder->getOrder();
+                }
+            }
+        }
+        return $orders;
+    }
+
+    /**
+     * Get all unsent orders
+     *
+     * @return array
+     */
+    public function getUnsentOrders(): array
+    {
+        $orders = [];
+        $criteria = new Criteria();
+        $criteria->addFilter(new MultiFilter(MultiFilter::CONNECTION_AND, [
+            new EqualsFilter('orderProcessState', self::PROCESS_STATE_IMPORT),
+            new EqualsFilter('isInError', false),
+            new MultiFilter(MultiFilter::CONNECTION_OR, [
+                new EqualsFilter(
+                    'order.stateMachineState.technicalName',
+                    OrderStates::STATE_COMPLETED
+                ),
+                new EqualsFilter(
+                    'order.deliveries.stateMachineState.technicalName',
+                    OrderDeliveryStates::STATE_SHIPPED
+                ),
+            ])
         ]));
         $criteria->addAssociation('order.deliveries')
             ->addAssociation('order.deliveries.shippingMethod')

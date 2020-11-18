@@ -25,6 +25,7 @@ lengow_log.exception.marketplace_name_require|marktplatzname ist erforderlich
 lengow_log.exception.arg_is_required|Aktion nicht ausführbar: %{arg_name} ist erforderlich
 lengow_log.exception.action_not_created|Aktion kann nicht erstellt werden: %{error_message}
 lengow_log.exception.action_not_created_api|Aktion kann nicht erstellt werden, da die Lengow-API nicht verfügbar ist. Bitte erneut versuchen
+lengow_log.exception.action_is_too_old|bestellungsaktion ist zu alt. Bitte erneut versuchen
 lengow_log.exception.no_connection_webservice|verbindung mit dem Lengow Webservice im sales channel %{sales_channel_name} (%{sales_channel_id}) funktionierte nicht
 lengow_log.exception.error_lengow_webservice|Lengow Webservice : %{error_code} - "%{error_message}" auf sales channel %{sales_channel_name} (%{sales_channel_id})
 lengow_log.exception.no_product_to_cart|Es befinden sich kein Produkt im Warenkorb

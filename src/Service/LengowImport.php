@@ -78,6 +78,11 @@ class LengowImport
     private $lengowSync;
 
     /**
+     * @var LengowActionSync Lengow action sync service
+     */
+    private $lengowActionSync;
+
+    /**
      * @var Swift_Mailer Swift mailer service
      */
     private $swiftMailer;
@@ -182,6 +187,7 @@ class LengowImport
      * @param LengowOrder $lengowOrder Lengow order service
      * @param LengowOrderError $lengowOrderError Lengow order error service
      * @param LengowSync $lengowSync Lengow sync service
+     * @param LengowActionSync $lengowActionSync Lengow action sync service
      * @param Swift_Mailer $swiftMailer Swift Mailer service
      */
     public function __construct(
@@ -192,6 +198,7 @@ class LengowImport
         LengowOrder $lengowOrder,
         LengowOrderError $lengowOrderError,
         LengowSync $lengowSync,
+        LengowActionSync $lengowActionSync,
         Swift_Mailer $swiftMailer
     )
     {
@@ -202,6 +209,7 @@ class LengowImport
         $this->lengowOrder = $lengowOrder;
         $this->lengowOrderError = $lengowOrderError;
         $this->lengowSync = $lengowSync;
+        $this->lengowActionSync = $lengowActionSync;
         $this->swiftMailer = $swiftMailer;
     }
 
@@ -401,21 +409,21 @@ class LengowImport
                 $this->lengowLog->write(
                     LengowLog::CODE_IMPORT,
                     $this->lengowLog->encodeMessage('lengow_log.error.nb_order_imported', [
-                        'nb_order' => $orderNew
+                        'nb_order' => $orderNew,
                     ]),
                     $this->logOutput
                 );
                 $this->lengowLog->write(
                     LengowLog::CODE_IMPORT,
                     $this->lengowLog->encodeMessage('lengow_log.error.nb_order_updated', [
-                        'nb_order' => $orderUpdate
+                        'nb_order' => $orderUpdate,
                     ]),
                     $this->logOutput
                 );
                 $this->lengowLog->write(
                     LengowLog::CODE_IMPORT,
                     $this->lengowLog->encodeMessage('lengow_log.error.nb_order_with_error', [
-                        'nb_order' => $orderError
+                        'nb_order' => $orderError,
                     ]),
                     $this->logOutput
                 );
@@ -439,6 +447,12 @@ class LengowImport
                 && $this->lengowConfiguration->get(LengowConfiguration::LENGOW_REPORT_MAIL_ENABLED)
             ) {
                 $this->sendMailAlert($this->logOutput);
+            }
+            // check if order action is finish (Ship / Cancel)
+            if (!$this->debugMode && !$this->importOneOrder && $this->importType === self::TYPE_MANUAL) {
+                $this->lengowActionSync->checkFinishAction($this->logOutput);
+                $this->lengowActionSync->checkOldAction($this->logOutput);
+                $this->lengowActionSync->checkNotSentAction($this->logOutput);
             }
         }
         if ($globalError) {

@@ -18,6 +18,15 @@
             <argument type="service" id="Lengow\Connector\Service\LengowConfiguration"/>
         </service>
 
+        <service id="Lengow\Connector\Service\LengowActionSync">
+            <argument type="service" id="Lengow\Connector\Service\LengowAction"/>
+            <argument type="service" id="Lengow\Connector\Service\LengowConfiguration"/>
+            <argument type="service" id="Lengow\Connector\Service\LengowConnector"/>
+            <argument type="service" id="Lengow\Connector\Service\LengowLog"/>
+            <argument type="service" id="Lengow\Connector\Service\LengowOrder"/>
+            <argument type="service" id="Lengow\Connector\Service\LengowOrderError"/>
+        </service>
+
         <service id="Lengow\Connector\Service\LengowAddress">
             <argument type="service" id="Lengow\Connector\Service\LengowLog"/>
             <argument type="service" id="Lengow\Connector\Util\StringCleaner"/>
@@ -54,6 +63,7 @@
             <argument type="service" id="Lengow\Connector\Service\LengowOrder"/>
             <argument type="service" id="Lengow\Connector\Service\LengowOrderError"/>
             <argument type="service" id="Lengow\Connector\Service\LengowSync"/>
+            <argument type="service" id="Lengow\Connector\Service\LengowActionSync"/>
             <argument type="service" id="swiftmailer.mailer.default"/>
         </service>
 

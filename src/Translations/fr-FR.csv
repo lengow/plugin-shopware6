@@ -25,6 +25,7 @@ lengow_log.exception.marketplace_name_require|le nom de la marketplace est requi
 lengow_log.exception.arg_is_required|envoi d'action impossible : %{arg_name} est requis
 lengow_log.exception.action_not_created|création d'action impossible : %{error_message}
 lengow_log.exception.action_not_created_api|création d'action impossible car l'API Lengow n'est pas disponible. Réessayez de nouveau
+lengow_log.exception.action_is_too_old|l'action est trop ancienne. Réessayez de nouveau
 lengow_log.exception.no_connection_webservice|la connexion ne se fait pas avec Lengow pour le sales channel %{sales_channel_name} (%{sales_channel_id})
 lengow_log.exception.error_lengow_webservice|l'API Lengow : %{error_code} - "%{error_message}" pour le sales channel %{sales_channel_name} (%{sales_channel_id})
 lengow_log.exception.no_product_to_cart|il n'y a pas de produit ajouté au panier

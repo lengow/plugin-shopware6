@@ -445,9 +445,9 @@ class LengowImportOrder
             if ($lengowOrder && $orderProcessState === LengowOrder::PROCESS_STATE_FINISH) {
                 $this->lengowOrderError->finishOrderErrors($lengowOrder->getId());
                 $this->lengowOrder->update($lengowOrder->getId(), [
-                    'is_in_error' => false,
-                    'order_lengow_state' => $this->orderStateLengow,
-                    'order_process_state' => $orderProcessState,
+                    'isInError' => false,
+                    'orderLengowState' => $this->orderStateLengow,
+                    'orderProcessState' => $orderProcessState,
                 ]);
 
             }

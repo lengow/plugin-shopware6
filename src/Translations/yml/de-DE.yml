@@ -276,6 +276,7 @@ de:
         arg_is_required: "Aktion nicht ausführbar: %{arg_name} ist erforderlich"
         action_not_created: "Aktion kann nicht erstellt werden: %{error_message}"
         action_not_created_api: "Aktion kann nicht erstellt werden, da die Lengow-API nicht verfügbar ist. Bitte erneut versuchen"
+        action_is_too_old: "bestellungsaktion ist zu alt. Bitte erneut versuchen"
         no_connection_webservice: "verbindung mit dem Lengow Webservice im sales channel %{sales_channel_name} (%{sales_channel_id}) funktionierte nicht"
         error_lengow_webservice: "Lengow Webservice : %{error_code} - \"%{error_message}\" auf sales channel %{sales_channel_name} (%{sales_channel_id})"
         no_product_to_cart: "Es befinden sich kein Produkt im Warenkorb"

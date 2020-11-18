@@ -8,6 +8,7 @@ use Symfony\Component\HttpFoundation\Response;
 use Symfony\Component\Routing\Annotation\Route;
 use Symfony\Component\HttpFoundation\Request;
 use Lengow\Connector\Service\LengowAccess;
+use Lengow\Connector\Service\LengowActionSync;
 use Lengow\Connector\Service\LengowConfiguration;
 use Lengow\Connector\Service\LengowImport;
 use Lengow\Connector\Service\LengowLog;
@@ -46,6 +47,11 @@ class LengowCronController extends LengowAbstractFrontController
     private $lengowSync;
 
     /**
+     * @var LengowActionSync Lengow action sync service
+     */
+    private $lengowActionSync;
+
+    /**
      * LengowAbstractFrontController constructor
      *
      * @param LengowAccess $lengowAccess Lengow access security service
@@ -53,18 +59,21 @@ class LengowCronController extends LengowAbstractFrontController
      * @param LengowLog $lengowLog Lengow log service
      * @param LengowImport $lengowImport Lengow import service
      * @param LengowSync $lengowSync Lengow sync service
+     * @param LengowActionSync $lengowActionSync Lengow action sync service
      */
     public function __construct(
         LengowAccess $lengowAccess,
         LengowConfiguration $lengowConfiguration,
         LengowLog $lengowLog,
         LengowImport $lengowImport,
-        LengowSync $lengowSync
+        LengowSync $lengowSync,
+        LengowActionSync $lengowActionSync
     )
     {
         parent::__construct($lengowAccess, $lengowConfiguration, $lengowLog);
         $this->lengowImport = $lengowImport;
         $this->lengowSync = $lengowSync;
+        $this->lengowActionSync = $lengowActionSync;
     }
 
     /**
@@ -90,6 +99,12 @@ class LengowCronController extends LengowAbstractFrontController
         if ($cronArgs['sync'] === null || $cronArgs['sync'] === LengowSync::SYNC_ORDER) {
             $this->lengowImport->init($cronArgs);
             $this->lengowImport->exec();
+        }
+        // sync actions between Lengow and Shopware
+        if ($cronArgs['sync'] === null || $cronArgs['sync'] === LengowSync::SYNC_ACTION) {
+            $this->lengowActionSync->checkFinishAction($cronArgs['log_output']);
+            $this->lengowActionSync->checkOldAction($cronArgs['log_output']);
+            $this->lengowActionSync->checkNotSentAction($cronArgs['log_output']);
         }
         // synchronise marketplaces between Lengow and Shopware
         if ($cronArgs['sync'] === LengowSync::SYNC_MARKETPLACE) {

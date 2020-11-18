@@ -10,6 +10,7 @@ use Shopware\Core\Framework\DataAbstractionLayer\EntityRepositoryInterface;
 use Shopware\Core\Framework\DataAbstractionLayer\Search\Criteria;
 use Shopware\Core\Framework\DataAbstractionLayer\Search\Filter\EqualsFilter;
 use Shopware\Core\Framework\DataAbstractionLayer\Search\Filter\MultiFilter;
+use Shopware\Core\Framework\DataAbstractionLayer\Search\Filter\RangeFilter;
 use Shopware\Core\Framework\Uuid\Uuid;
 use Lengow\Connector\Entity\Lengow\Action\ActionCollection as LengowActionCollection;
 use Lengow\Connector\Entity\Lengow\Action\ActionEntity as LengowActionEntity;
@@ -244,18 +245,33 @@ class LengowAction
     /**
      * Get lengow action from lengow action table by Lengow action id from API
      *
-     * @param int $actionId Lengow action id from API
+     * @param int $apiActionId Lengow action id from API
      *
      * @return LengowActionEntity|null
      */
-    public function getActionByActionId(int $actionId): ?LengowActionEntity
+    public function getActionByApiActionId(int $apiActionId): ?LengowActionEntity
     {
         $context = Context::createDefaultContext();
         $criteria = new Criteria();
-        $criteria->addFilter(new EqualsFilter('actionId', $actionId));
+        $criteria->addFilter(new EqualsFilter('actionId', $apiActionId));
         /** @var LengowActionCollection $lengowActionCollection */
         $lengowActionCollection = $this->lengowActionRepository->search($criteria, $context)->getEntities();
         return $lengowActionCollection->count() !== 0 ? $lengowActionCollection->first() : null;
+    }
+
+    /**
+     * Get all active actions
+     *
+     * @return EntityCollection|null
+     */
+    public function getActiveActions(): ?EntityCollection
+    {
+        $context = Context::createDefaultContext();
+        $criteria = new Criteria();
+        $criteria->addFilter(new EqualsFilter('state', self::STATE_NEW));
+        /** @var LengowActionCollection $lengowActionCollection */
+        $lengowActionCollection = $this->lengowActionRepository->search($criteria, $context)->getEntities();
+        return $lengowActionCollection->count() !== 0 ? $lengowActionCollection : null;
     }
 
     /**
@@ -271,6 +287,28 @@ class LengowAction
         $criteria = new Criteria();
         $criteria->addFilter(new MultiFilter(MultiFilter::CONNECTION_AND, [
             new EqualsFilter('order.id', $orderId),
+            new EqualsFilter('state', self::STATE_NEW),
+        ]));
+        /** @var LengowActionCollection $lengowActionCollection */
+        $lengowActionCollection = $this->lengowActionRepository->search($criteria, $context)->getEntities();
+        return $lengowActionCollection->count() !== 0 ? $lengowActionCollection : null;
+    }
+
+    /**
+     * Get old untreated actions of more than x days
+     *
+     * @param int $intervalTime interval time in seconds
+     *
+     * @return EntityCollection|null
+     */
+    public function getOldActions(int $intervalTime): ?EntityCollection
+    {
+        $context = Context::createDefaultContext();
+        $criteria = new Criteria();
+        $criteria->addFilter(new MultiFilter(MultiFilter::CONNECTION_AND, [
+            new RangeFilter('createdAt', [
+                RangeFilter::LT => date('Y-m-d h:m:i', (time() - $intervalTime)),
+            ]),
             new EqualsFilter('state', self::STATE_NEW),
         ]));
         /** @var LengowActionCollection $lengowActionCollection */
@@ -329,7 +367,7 @@ class LengowAction
             return $sendAction;
         }
         foreach ($result->results as $row) {
-            $orderAction = $this->getActionByActionId((int) $row->id);
+            $orderAction = $this->getActionByApiActionId((int) $row->id);
             if ($orderAction) {
                 if ($orderAction->getState() === self::STATE_NEW) {
                     $this->update($orderAction->getId(), [

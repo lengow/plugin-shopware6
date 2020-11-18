@@ -27,6 +27,7 @@ lengow_log.exception.marketplace_name_require|marketplace name is required
 lengow_log.exception.arg_is_required|can't send action: %{arg_name} is required
 lengow_log.exception.action_not_created|can't create action: %{error_message}
 lengow_log.exception.action_not_created_api|can't create action because Lengow API is unavailable. Please retry
+lengow_log.exception.action_is_too_old|order action is too old. Please retry
 lengow_log.exception.no_product_to_cart|no product to be added to cart
 lengow_log.exception.product_is_a_parent|product %{product_number} (%{product_id}) is a parent. Product variation is needed
 lengow_log.exception.no_quantity_for_product|product %{product_number} (%{product_id}) could not be added to cart. Make sure it is available to order or that there is enough in stock
@@ -102,12 +103,16 @@ log.import.quantity_back_reimported_order|adding quantity back to stock (order i
 log.import.order_successfully_imported|order successfully imported (ORDER ID %{order_number})
 log.import.order_synchronized_with_lengow|order successfully synchronised with Lengow webservice (ORDER ID %{order_id})
 log.import.order_not_synchronized_with_lengow|WARNING! Order could NOT be synchronised with Lengow webservice (ORDER ID %{order_id})
+log.order_action.check_completed_action|check completed actions
+log.order_action.check_old_action|check and finish old actions
+log.order_action.check_action_not_sent|check actions not sent
 log.order_action.try_to_send_action|try to send %{action} action (ORDER ID %{order_number})
 log.order_action.action_send|action %{action} was successfully sent (ORDER ID %{order_number})
 log.order_action.action_not_send|WARNING ! action %{action} could not be sent (ORDER ID %{order_number})
 log.order_action.call_tracking|call tracking with parameters: %{parameters}
 log.order_action.action_saved|call tracking saved in lengow_actions table
 log.order_action.call_action_failed|order action failed - %{decoded_message}
+log.order_action.connector_get_all_action|get order actions between %{date_from} and %{date_to}
 log.connector.call_api|call %{call_type} %{curl_url}
 log.connector.error_api|API call failed - %{error_code} - %{error_message}
 log.connector.curl_disabled|Curl extension is not enabled on the server

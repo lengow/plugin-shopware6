@@ -282,6 +282,7 @@ en:
         arg_is_required: "can't send action: %{arg_name} is required"
         action_not_created: "can't create action: %{error_message}"
         action_not_created_api: "can't create action because Lengow API is unavailable. Please retry"
+        action_is_too_old: "order action is too old. Please retry"
         no_product_to_cart: "no product to be added to cart"
         product_is_a_parent: "product %{product_number} (%{product_id}) is a parent. Product variation is needed"
         no_quantity_for_product: "product %{product_number} (%{product_id}) could not be added to cart. Make sure it is available to order or that there is enough in stock"
