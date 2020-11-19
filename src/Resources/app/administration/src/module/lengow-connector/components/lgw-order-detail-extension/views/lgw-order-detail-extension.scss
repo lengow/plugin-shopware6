@@ -10,6 +10,10 @@
     line-height: 15px;
 }
 
+.sw-order-detail .sw-card__content {
+    overflow: hidden !important;
+}
+
 .lgw-order-detail-list h6 {
     font-weight: 600 !important;
     font-size: 14px !important;
