@@ -8,7 +8,13 @@
                             <div class="lgw-box lgw-home-header text-center lgw-home-header-margin">
                                 <img :src="'connector/lengow-white-big.png' | asset" alt="lengow" class="img-responsive">
                                 <h1 style="color: white">{{ $tc('lengow-connector.dashboard.banner.title') }}</h1>
-                                <sw-button :disabled="false" :square="false" :block="false" :isLoading="false" style="margin-top: 15px" class="lgw-btn" target="_blank" :link="lengow_url">
+                                <sw-button :disabled="false"
+                                           :square="false"
+                                           :block="false"
+                                           :isLoading="false"
+                                           class="lgw-btn"
+                                           target="_blank"
+                                           :link="lengow_url">
                                     {{ $tc('lengow-connector.dashboard.banner.button') }}
                                 </sw-button>
                             </div>
@@ -45,7 +51,12 @@
                         <div class="lgw-row">
                             <div class="lgw-box">
                                 <h2>{{ $tc('lengow-connector.dashboard.help.title') }}</h2>
-                                <a>{{ $tc('lengow-connector.dashboard.help.contact') }}</a>
+                                <p>
+                                    <routerLink class="lgw-router-link" :to="{ name: 'lengow.connector.contact' }">
+                                        {{ $tc('lengow-connector.dashboard.help.contact') }}
+                                    </routerLink>
+                                </p>
+                                <br/>
                                 <p>
                                     <a :href="$tc('lengow-connector.dashboard.help.helpCenterTarget')" target="_blank">
                                         {{ $tc('lengow-connector.dashboard.help.helpCenterLink') }}
@@ -63,7 +74,7 @@
     </template>
     <template v-else>
         <div class="lgw-container" v-if="isLoading">
-            <sw-loader size="100px"></sw-loader>#}
+            <sw-loader size="50px"></sw-loader>
         </div>
         <div v-else>
             <lgw-iframe-connexion></lgw-iframe-connexion>
