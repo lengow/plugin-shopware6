@@ -10,7 +10,7 @@ const {
 Shopware.Component.register('lgw-order-detail-extension', {
     template,
 
-    inject: ['repositoryFactory'],
+    inject: ['repositoryFactory', 'LengowConnectorOrderService'],
 
     metaInfo() {
         return {
@@ -20,6 +20,9 @@ Shopware.Component.register('lgw-order-detail-extension', {
 
     data() {
         return {
+            isLoading: true,
+            btnSynchroLoading: false,
+            debugMode: true,
             isFromLengow: false,
             orderId: '',
             marketplaceSku: '',
@@ -52,10 +55,17 @@ Shopware.Component.register('lgw-order-detail-extension', {
             return this.repositoryFactory.create('lengow_order');
         },
 
+        lengowConfigRepository() {
+            return this.repositoryFactory.create('lengow_settings');
+        }
+
     },
 
     created() {
-        this.loadOrderData();
+        this.loadOrderData().then(() => {
+            this.isLoading = false;
+        });
+        this.loadSyncData();
     },
 
     methods: {
@@ -63,7 +73,7 @@ Shopware.Component.register('lgw-order-detail-extension', {
             this.orderId = this.$route.params.id
             const lengowOrderCriteria = new Criteria();
             lengowOrderCriteria.addFilter(Criteria.equals('orderId', this.orderId));
-            this.lengowOrderRepository.search(lengowOrderCriteria, Shopware.Context.api).then(result => {
+            return this.lengowOrderRepository.search(lengowOrderCriteria, Shopware.Context.api).then(result => {
                 if (result.total > 0) {
                     const lengowOrder = result.first();
                     console.log(lengowOrder);
@@ -104,5 +114,30 @@ Shopware.Component.register('lgw-order-detail-extension', {
                 }
             });
         },
+
+        loadSyncData() {
+            const lengowConfigCriteria = new Criteria();
+            lengowConfigCriteria.addFilter(Criteria.equals('name', 'lengowDebugEnabled'));
+            this.lengowConfigRepository.search(lengowConfigCriteria, Shopware.Context.api).then(result => {
+                if (result.total > 0) {
+                    this.debugMode = result.first().value === '1';
+                }
+            })
+        },
+
+        reSynchronizeOrder() {
+            this.btnSynchroLoading = true;
+            this.LengowConnectorOrderService.reSynchroniseOrder({'orderId': this.orderId}).then(() => {
+                this.btnSynchroLoading = false;
+            });
+        },
+
+        reImportOrder() {
+            console.log('WIP reimportOrder');
+        },
+
+        reSendAction() {
+            console.log('WIP re send action');
+        }
     },
 });

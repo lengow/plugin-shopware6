@@ -89,6 +89,39 @@ class LengowOrderController extends AbstractController
     }
 
     /**
+     * re-synchronise specific order
+     *
+     * @Route("/api/v{version}/_action/lengow/order/re-synchronise-order",
+     *     name="api.action.lengow.order.re-synchronise-order",
+     *     methods={"POST"})
+     *
+     * @param Request $request
+     * @return JsonResponse
+     */
+    public function reSynchroniseOrder(Request $request): JsonResponse
+    {
+        $orderId = $request->get('orderId');
+        $order = $this->lengowOrder->getOrderById($orderId);
+        $result = false;
+        if ($order) {
+            $result = $this->lengowOrder->synchronizeOrder($order);
+            $messageKey = $result
+                ? 'log.import.order_synchronized_with_lengow'
+                : 'log.import.order_not_synchronized_with_lengow';
+            $this->lengowLog->write(
+                LengowLog::CODE_IMPORT,
+                $this->lengowLog->encodeMessage($messageKey, [
+                    'order_id' => $order->getOrderNumber(),
+                ]),
+                false
+            );
+        }
+        return new JsonResponse([
+            'success' => $result,
+        ]);
+    }
+
+    /**
      * Re-import a specific order
      *
      * @Route("/api/v{version}/_action/lengow/order/reimport-order",

@@ -20,6 +20,22 @@ class LengowConnectorOrderService extends ApiService {
             });
     }
 
+    reSynchroniseOrder(orderId) {
+        const headers = this.getBasicHeaders();
+
+        return this.httpClient
+            .post(
+                `_action/${this.getApiBasePath()}/order/re-synchronise-order`,
+                JSON.stringify(orderId),
+                {
+                    headers: headers
+                }
+            )
+            .then((response) => {
+                return ApiService.handleResponse(response);
+            });
+    }
+
     reImportOrder(data) {
         const headers = this.getBasicHeaders();
 

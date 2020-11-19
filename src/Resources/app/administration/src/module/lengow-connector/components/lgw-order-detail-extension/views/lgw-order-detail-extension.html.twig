@@ -1,5 +1,41 @@
 <sw-card title="">
+    <div v-if="!isLoading">
     <template v-if="isFromLengow">
+        <div v-if="!debugMode" class="lgw-order-detail-button-row">
+            <sw-button
+                       :disabled="debugMode"
+                       :square="false"
+                       :block="false"
+                       :isLoading="btnSynchroLoading"
+                       target="_blank"
+                       size="small"
+                       class="lgw-order-detail-button"
+                       @click="reSynchronizeOrder">
+                {{ $tc('lengow-connector.orderTab.synchronize_id') }}
+            </sw-button>
+            <sw-button
+                       :disabled="debugMode"
+                       :square="false"
+                       :block="false"
+                       :isLoading="false"
+                       target="_blank"
+                       size="small"
+                       class="lgw-order-detail-button"
+                       @click="reImportOrder">
+                {{ $tc('lengow-connector.orderTab.cancel_and_reimport') }}
+            </sw-button>
+            <sw-button
+                       :disabled="debugMode"
+                       :square="false"
+                       :block="false"
+                       size="small"
+                       :isLoading="false"
+                       target="_blank"
+                       class="lgw-order-detail-button"
+                       @click="reSendAction">
+                {{ $tc('lengow-connector.orderTab.resend_action') }}
+            </sw-button>
+        </div>
         <ul class="lgw-order-detail-list">
             <li>
                 <h6>{{ $tc('lengow-connector.orderTab.order_id') }}</h6>
@@ -117,6 +153,10 @@
         </ul>
     </template>
     <template v-else>
-        <h6>{{ $tc('lengow-connector.orderTab.not_lengow_order') }}</h6>
+        <h6 class="lgw-not-lgw-order">{{ $tc('lengow-connector.orderTab.not_lengow_order') }}</h6>
     </template>
+    </div>
+    <div v-else>
+        <sw-loader v-show="isLoading" size="20px"></sw-loader>
+    </div>
 </sw-card>
