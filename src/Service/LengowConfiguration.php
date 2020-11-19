@@ -16,6 +16,7 @@ use Shopware\Core\Framework\DataAbstractionLayer\Event\EntityDeletedEvent;
 use Shopware\Core\System\SalesChannel\SalesChannelCollection;
 use Shopware\Core\System\SalesChannel\SalesChannelEntity;
 use Shopware\Core\Framework\Uuid\Uuid;
+use Lengow\Connector\Entity\Lengow\Settings\SettingsEntity as LengowSettingsEntity;
 use Lengow\Connector\Util\EnvironmentInfoProvider;
 
 /**
@@ -173,16 +174,19 @@ class LengowConfiguration
         self::LENGOW_ACCOUNT_STATUS_UPDATE => [
             'lengow_settings' => true,
             'global' => true,
+            'export' => false,
             'default_value' => '',
         ],
         self::LENGOW_OPTION_CMS_UPDATE => [
             'lengow_settings' => true,
             'global' => true,
+            'export' => false,
             'default_value' => '',
         ],
         self::LENGOW_CATALOG_UPDATE => [
             'lengow_settings' => true,
             'global' => true,
+            'export' => false,
             'default_value' => '',
         ],
         self::LENGOW_EXPORT_FORMAT => [
@@ -199,11 +203,13 @@ class LengowConfiguration
         self::LENGOW_MARKETPLACE_UPDATE => [
             'lengow_settings' => true,
             'global' => true,
+            'export' => false,
             'default_value' => '',
         ],
         self::LENGOW_LAST_SETTING_UPDATE => [
             'lengow_settings' => true,
             'global' => true,
+            'export' => false,
             'default_value' => '',
         ],
         self::LENGOW_PLUGIN_DATA => [
@@ -238,6 +244,7 @@ class LengowConfiguration
         self::LENGOW_LAST_EXPORT => [
             'lengow_settings' => true,
             'channel' => true,
+            'export' => false,
             'default_value' => '',
         ],
         self::LENGOW_IMPORT_DAYS => [
@@ -301,21 +308,25 @@ class LengowConfiguration
         self::LENGOW_IMPORT_IN_PROGRESS => [
             'lengow_settings' => true,
             'global' => true,
+            'export' => false,
             'default_value' => '',
         ],
         self::LENGOW_LAST_IMPORT_CRON => [
             'lengow_settings' => true,
             'global' => true,
+            'export' => false,
             'default_value' => '',
         ],
         self::LENGOW_LAST_IMPORT_MANUAL => [
             'lengow_settings' => true,
             'global' => true,
+            'export' => false,
             'default_value' => '',
         ],
         self::LENGOW_LAST_ACTION_SYNC => [
             'lengow_settings' => true,
             'global' => true,
+            'export' => false,
             'default_value' => '',
         ],
         self::LENGOW_TIMEZONE => [
@@ -661,6 +672,24 @@ class LengowConfiguration
             }
         }
         return $result;
+    }
+
+    /**
+     * Get Lengow setting by id
+     *
+     * @param string $settingId Lengow setting id
+     *
+     * @return LengowSettingsEntity|null
+     */
+    public function getSettingById(string $settingId): ?LengowSettingsEntity
+    {
+        $criteria = new Criteria();
+        $criteria->setIds([$settingId]);
+        $criteria->addAssociation('salesChannel');
+        $settingsCollection = $this->settingsRepository
+            ->search($criteria, Context::createDefaultContext())
+            ->getEntities();
+        return $settingsCollection->count() !== 0 ? $settingsCollection->first() : null;
     }
 
     /**

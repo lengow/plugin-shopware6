@@ -127,5 +127,5 @@ log.mail_report.send_mail_to|report email sent to %{email}
 log.mail_report.unable_send_mail_to|unable to send report email to %{email}
 log.orm.field_is_required|Error while creating record in database: %{field} is required
 log.orm.record_insert_failed|Error while inserting record in database: %{decoded_message}
-log.setting.setting_change|%{key} - old value %{old_value} replaced with %{value}
-log.setting.setting_change_for_sales_channel|%{key} - old value %{old_value} replaced with %{value} for sales channel %{sales_channel_id}
+log.setting.setting_change|%{key} has just been changed to %{value}
+log.setting.setting_change_for_sales_channel|%{key} has just been changed to %{value} for sales channel %{sales_channel_name} (%{sales_channel_id})

@@ -2,12 +2,12 @@
 
 namespace Lengow\Connector\Subscriber;
 
-use Lengow\Connector\Service\LengowLog;
 use Shopware\Core\Framework\DataAbstractionLayer\Event\EntityWrittenEvent;
 use Shopware\Core\Framework\DataAbstractionLayer\Event\EntityWrittenContainerEvent;
-use Shopware\Core\System\SystemConfig\SystemConfigDefinition;
 use Symfony\Component\EventDispatcher\EventSubscriberInterface;
+use Lengow\Connector\Entity\Lengow\Settings\SettingsDefinition as LengowSettingsDefinition;
 use Lengow\Connector\Service\LengowConfiguration;
+use Lengow\Connector\Service\LengowLog;
 
 /**
  * Class LengowSettingUpdateSubscriber
@@ -55,18 +55,17 @@ class LengowSettingUpdateSubscriber implements EventSubscriberInterface
      */
     public function detectLengowSettingEntryPoints(EntityWrittenContainerEvent $event): void
     {
-        if ($event->getEventByEntityName(SystemConfigDefinition::ENTITY_NAME) !== null) {
+        if ($event->getEventByEntityName(LengowSettingsDefinition::ENTITY_NAME) !== null) {
+            if ($event->getEvents() === null) {
+                return;
+            }
             /** @var EntityWrittenEvent $entityEvent */
             $entityEvent = $event->getEvents()->first();
             $payLoads = $entityEvent->getPayloads();
-            if (!empty($payLoads)) {
-                $key = $payLoads[0]['configurationKey'];
-                $value = $payLoads[0]['configurationValue'];
-                $salesChannelId = $payLoads[0]['salesChannelId'];
-                if (stristr($key, LengowConfiguration::LENGOW_SETTING_PATH)) {
-                    $key = str_replace(LengowConfiguration::LENGOW_SETTING_PATH, '', $key);
-                    $this->checkAndLog($key, $value, $salesChannelId);
-                }
+            if (!empty($payLoads) && isset($payLoads[0]['id'], $payLoads[0]['value'])) {
+                $id = $payLoads[0]['id'];
+                $value = $payLoads[0]['value'];
+                $this->checkAndLog($id, $value);
             }
         }
     }
@@ -74,54 +73,45 @@ class LengowSettingUpdateSubscriber implements EventSubscriberInterface
     /**
      * Check value and create a log if necessary
      *
-     * @param string $key name of Lengow setting
-     * @param mixed $value setting value
-     * @param string|null $salesChannelId Shopware sales channel id
+     * @param string $id Lengow setting id
+     * @param string $value setting value
      */
-    private function checkAndLog(string $key, $value, string $salesChannelId = null): void
+    private function checkAndLog(string $id, string $value): void
     {
-        if (!array_key_exists($key, LengowConfiguration::$lengowSettings)) {
+        // TODO retrieving the old value for comparison
+        $setting = $this->lengowConfiguration->getSettingById($id);
+        if ($setting === null || !array_key_exists($setting->getName(), LengowConfiguration::$lengowSettings)) {
             return;
         }
-        $setting = LengowConfiguration::$lengowSettings[$key];
-        $oldValue = $this->lengowConfiguration->get($key, $salesChannelId);
-        if (isset($setting['type']) && $setting['type'] === 'boolean') {
-            $value = (int)$value;
-            $oldValue = (int)$oldValue;
-        } elseif (isset($setting['type']) && $setting['type'] === 'array') {
-            $value = implode(',', $value);
-            $oldValue = implode(',', $oldValue);
-        }
-        if ($oldValue === $value) {
+        $settingData = LengowConfiguration::$lengowSettings[$setting->getName()];
+        if (isset($settingData['export']) && !$settingData['export']) {
             return;
         }
-        if (isset($setting['secret'])) {
+        if (isset($settingData['secret'])) {
             $value = preg_replace("/[a-zA-Z0-9]/", '*', $value);
-            $oldValue = preg_replace("/[a-zA-Z0-9]/", '*', $oldValue);
         }
-        if ($salesChannelId === null && isset($setting['global'])) {
+        if (isset($settingData['global']) && $setting->getSalesChannel() === null) {
             $this->lengowLog->write(
                 LengowLog::CODE_SETTING,
                 $this->lengowLog->encodeMessage('log.setting.setting_change', [
-                    'key' => $key,
-                    'old_value' => $oldValue,
+                    'key' => $setting->getName(),
                     'value' => $value,
                 ])
             );
         }
-        if ($salesChannelId && isset($setting['channel'])) {
+        if (isset($settingData['channel']) && $setting->getSalesChannel()) {
             $this->lengowLog->write(
                 LengowLog::CODE_SETTING,
                 $this->lengowLog->encodeMessage('log.setting.setting_change_for_sales_channel', [
-                    'key' => $key,
-                    'old_value' => $oldValue,
+                    'key' => $setting->getName(),
                     'value' => $value,
-                    'sales_channel_id' => $salesChannelId,
+                    'sales_channel_name' => $setting->getSalesChannel()->getName(),
+                    'sales_channel_id' => $setting->getSalesChannel()->getId(),
                 ])
             );
         }
         // save last update date for a specific settings (change synchronisation interval time)
-        if (isset($setting['update'])) {
+        if (isset($settingData['update'])) {
             $this->lengowConfiguration->set(LengowConfiguration::LENGOW_LAST_SETTING_UPDATE, (string)time());
         }
     }
