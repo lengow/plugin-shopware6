@@ -2,11 +2,6 @@
 
 namespace Lengow\Connector\Service;
 
-use Shopware\Core\Framework\DataAbstractionLayer\EntityRepositoryInterface;
-use Shopware\Core\Framework\DataAbstractionLayer\Search\Criteria;
-use Shopware\Core\Framework\Context;
-use Symfony\Component\HttpFoundation\Request;
-use Symfony\Component\HttpFoundation\JsonResponse;
 use Lengow\Connector\Exception\LengowException;
 use Lengow\Connector\Factory\LengowFileFactory;
 use Lengow\Connector\Util\EnvironmentInfoProvider;
@@ -98,11 +93,6 @@ class LengowSync
     private $lengowExport;
 
     /**
-     * @var EntityRepositoryInterface $salesChannelRepository sales channel repository
-     */
-    private $salesChannelRepository;
-
-    /**
      * @var array cache time for catalog, account status, cms options and marketplace synchronisation
      */
     private $cacheTimes = array(
@@ -114,6 +104,19 @@ class LengowSync
     );
 
     /**
+     * @var array valid sync actions
+     */
+    private $syncActions = [
+        self::SYNC_ORDER,
+        self::SYNC_CMS_OPTION,
+        self::SYNC_STATUS_ACCOUNT,
+        self::SYNC_MARKETPLACE,
+        self::SYNC_ACTION,
+        self::SYNC_CATALOG,
+        self::SYNC_PLUGIN_DATA,
+    ];
+
+    /**
      * LengowImportOrder Construct
      *
      * @param LengowConnector $lengowConnector Lengow connector service
@@ -122,7 +125,6 @@ class LengowSync
      * @param LengowFileFactory $lengowFileFactory Lengow file factory
      * @param EnvironmentInfoProvider $environmentInfoProvider Environment info provider utility
      * @param LengowExport $lengowExport Lengow export service
-     * @param EntityRepositoryInterface $salesChannelRepository shopware sales channel repository
      */
     public function __construct(
         LengowConnector $lengowConnector,
@@ -130,8 +132,7 @@ class LengowSync
         LengowLog $lengowLog,
         LengowFileFactory $lengowFileFactory,
         EnvironmentInfoProvider $environmentInfoProvider,
-        LengowExport $lengowExport,
-        EntityRepositoryInterface $salesChannelRepository
+        LengowExport $lengowExport
     )
     {
         $this->lengowConnector = $lengowConnector;
@@ -140,7 +141,18 @@ class LengowSync
         $this->lengowFileFactory = $lengowFileFactory;
         $this->environmentInfoProvider = $environmentInfoProvider;
         $this->lengowExport = $lengowExport;
-        $this->salesChannelRepository = $salesChannelRepository;
+    }
+
+    /**
+     * Is sync action
+     *
+     * @param string $action sync action
+     *
+     * @return bool
+     */
+    public function isSyncAction(string $action): bool
+    {
+        return in_array($action, $this->syncActions, true);
     }
 
     /**
@@ -152,30 +164,28 @@ class LengowSync
     {
         $syncData = [
             'domain_name' => $this->environmentInfoProvider->getBaseUrl(),
-            'token' => $this->lengowConfiguration->get('lengowGlobalToken'),
+            'token' => $this->lengowConfiguration->getToken(),
             'type' => self::PLUGIN_TYPE,
             'version' => $this->environmentInfoProvider->getVersion(),
-            'plugin_version' => $this->environmentInfoProvider::getPluginVersion(),
+            'plugin_version' => $this->environmentInfoProvider->getPluginVersion(),
             'email' => $this->lengowConfiguration->get('core.basicInformation.email'),
             'cron_url' => $this->lengowConfiguration->getCronUrl(),
             'return_url' => $this->environmentInfoProvider->getBaseUrl() . '/admin/lengow/connector/dashboard',
             'shops' => [],
         ];
         $salesChannels = $this->environmentInfoProvider->getActiveSalesChannels();
-        if ($salesChannels->count() !== 0 ) {
+        if ($salesChannels->count() !== 0) {
             foreach ($salesChannels as $salesChannel) {
                 $salesChannelId = $salesChannel->getId();
-                $salesChannelToken = $this->lengowConfiguration->get('lengowChannelToken', $salesChannelId);
-                $domainUrl = $this->environmentInfoProvider->getBaseUrl($salesChannelId);
                 $this->lengowExport->init($salesChannelId);
                 $syncData['shops'][$salesChannelId] = [
-                    'token' => $salesChannelToken,
+                    'token' => $this->lengowConfiguration->getToken($salesChannelId),
                     'shop_name' => $salesChannel->getName(),
-                    'domain_url' => $domainUrl,
+                    'domain_url' => $this->environmentInfoProvider->getBaseUrl($salesChannelId),
                     'feed_url' => $this->lengowConfiguration->getFeedUrl($salesChannelId),
                     'total_product_number' => $this->lengowExport->getTotalProduct(),
                     'exported_product_number' => $this->lengowExport->getTotalExportedProduct(),
-                    'enabled' => $this->lengowConfiguration->get('lengowStoreEnabled', $salesChannelId),
+                    'enabled' => $this->lengowConfiguration->salesChannelIsActive($salesChannelId),
                 ];
             }
         }
@@ -233,6 +243,62 @@ class LengowSync
     }
 
     /**
+     * Get options for all store
+     *
+     * @return array
+     */
+    public function getOptionData(): array
+    {
+        $data = [
+            'token' => $this->lengowConfiguration->getToken(),
+            'version' => $this->environmentInfoProvider->getVersion(),
+            'plugin_version' => $this->environmentInfoProvider->getPluginVersion(),
+            'options' => $this->lengowConfiguration->getAllValues(),
+            'shops' => [],
+        ];
+        $salesChannels = $this->environmentInfoProvider->getActiveSalesChannels();
+        if ($salesChannels->count() !== 0) {
+            foreach ($salesChannels as $salesChannel) {
+                $salesChannelId = $salesChannel->getId();
+                $this->lengowExport->init($salesChannelId);
+                $data['shops'][] = [
+                    'token' => $this->lengowConfiguration->getToken($salesChannelId),
+                    'enabled' => $this->lengowConfiguration->salesChannelIsActive($salesChannelId),
+                    'total_product_number' => $this->lengowExport->getTotalProduct(),
+                    'exported_product_number' =>$this->lengowExport->getTotalExportedProduct(),
+                    'options' => $this->lengowConfiguration->getAllValues($salesChannelId),
+                ];
+            }
+        }
+        return $data;
+    }
+
+    /**
+     * Set CMS options
+     *
+     * @param bool $force force cache update
+     * @param bool $logOutput see log or not
+     *
+     * @return bool
+     */
+    public function setCmsOption(bool $force = false, bool $logOutput = false): bool
+    {
+        if ($this->lengowConfiguration->isNewMerchant() || $this->lengowConfiguration->debugModeIsActive()) {
+            return false;
+        }
+        if (!$force) {
+            $updatedAt = $this->lengowConfiguration->get(LengowConfiguration::LENGOW_OPTION_CMS_UPDATE);
+            if ($updatedAt !== null && (time() - (int) $updatedAt) < $this->cacheTimes[self::SYNC_CMS_OPTION]) {
+                return false;
+            }
+        }
+        $options = json_encode($this->getOptionData());
+        $this->lengowConnector->queryApi(LengowConnector::PUT, LengowConnector::API_CMS, [], $options, $logOutput);
+        $this->lengowConfiguration->set(LengowConfiguration::LENGOW_OPTION_CMS_UPDATE, (string) time());
+        return true;
+    }
+
+    /**
      * Get marketplace data
      *
      * @param bool $force force cache update
@@ -248,7 +314,7 @@ class LengowSync
         if (!$force) {
             $updatedAt = $this->lengowConfiguration->get(LengowConfiguration::LENGOW_MARKETPLACE_UPDATE);
             if ($updatedAt !== null
-                && (time() - (int)$updatedAt) < $this->cacheTimes[self::SYNC_MARKETPLACE]
+                && (time() - (int) $updatedAt) < $this->cacheTimes[self::SYNC_MARKETPLACE]
                 && file_exists($filePath)
             ) {
                 // recovering data with the marketplaces.json file
@@ -276,7 +342,7 @@ class LengowSync
                 );
                 $marketplaceFile->write(json_encode($result));
                 $marketplaceFile->close();
-                $this->lengowConfiguration->set(LengowConfiguration::LENGOW_MARKETPLACE_UPDATE, (string)time());
+                $this->lengowConfiguration->set(LengowConfiguration::LENGOW_MARKETPLACE_UPDATE, (string) time());
             } catch (LengowException $e) {
                 $decodedMessage = $this->lengowLog->decodeMessage($e->getMessage());
                 $this->lengowLog->write(

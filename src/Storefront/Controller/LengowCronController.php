@@ -13,6 +13,7 @@ use Lengow\Connector\Service\LengowConfiguration;
 use Lengow\Connector\Service\LengowImport;
 use Lengow\Connector\Service\LengowLog;
 use Lengow\Connector\Service\LengowSync;
+use Lengow\Connector\Service\LengowTranslation;
 
 /**
  * Class LengowCronController
@@ -106,9 +107,24 @@ class LengowCronController extends LengowAbstractFrontController
             $this->lengowActionSync->checkOldAction($cronArgs['log_output']);
             $this->lengowActionSync->checkNotSentAction($cronArgs['log_output']);
         }
+        // sync options between Lengow and Shopware
+        if ($cronArgs['sync'] === null || $cronArgs['sync'] === LengowSync::SYNC_CMS_OPTION) {
+            $this->lengowSync->setCmsOption($cronArgs['force'], $cronArgs['log_output']);
+        }
         // synchronise marketplaces between Lengow and Shopware
         if ($cronArgs['sync'] === LengowSync::SYNC_MARKETPLACE) {
             $this->lengowSync->getMarketplaces($cronArgs['force'], $cronArgs['log_output']);
+        }
+        if ($cronArgs['sync'] && !$this->lengowSync->isSyncAction($cronArgs['sync'])) {
+            $errorMessage = $this->lengowLog->decodeMessage(
+                'log.import.not_valid_action',
+                LengowTranslation::DEFAULT_ISO_CODE,
+                [
+                    'action' => $cronArgs['sync'],
+                ]
+            );
+            header('HTTP/1.1 400 Bad Request');
+            die($errorMessage);
         }
         return new Response();
     }

@@ -96,25 +96,25 @@ class LengowConfiguration
             'default_value' => '',
         ],
         self::LENGOW_CHANNEL_TOKEN => [
-            'channel' => true,
             'lengow_settings' => true,
+            'channel' => true,
             'default_value' => '',
         ],
         self::LENGOW_ACCOUNT_ID => [
-            'global' => true,
             'lengow_settings' => true,
+            'global' => true,
             'default_value' => '',
         ],
         self::LENGOW_ACCESS_TOKEN => [
+            'lengow_settings' => true,
             'global' => true,
             'secret' => true,
-            'lengow_settings' => true,
             'default_value' => '',
         ],
         self::LENGOW_SECRET_TOKEN => [
+            'lengow_settings' => true,
             'global' => true,
             'secret' => true,
-            'lengow_settings' => true,
             'default_value' => '',
         ],
         self::LENGOW_AUTH_TOKEN => [
@@ -295,6 +295,7 @@ class LengowConfiguration
             'default_value' => '0',
         ],
         self::LENGOW_CURRENCY_CONVERSION_ENABLED => [
+            'lengow_settings' => true,
             'global' => true,
             'type' => 'boolean',
             'default_value' => '1',
@@ -473,7 +474,7 @@ class LengowConfiguration
         /** @var SalesChannelCollection $salesChannelCollection */
         $salesChannelCollection = $this->environmentInfoProvider->getActiveSalesChannels();
         foreach ($salesChannelCollection as $salesChannel) {
-            if ($this->get(self::LENGOW_CHANNEL_TOKEN, $salesChannel->getId()) === $token) {
+            if ($this->getToken($salesChannel->getId()) === $token) {
                 return $salesChannel;
             }
         }
@@ -693,6 +694,29 @@ class LengowConfiguration
     }
 
     /**
+     * Get Values by sales channel or global
+     *
+     * @param string|null $salesChannelId Shopware sales channel id
+     *
+     * @return array
+     */
+    public function getAllValues(string $salesChannelId = null): array
+    {
+        $rows = [];
+        foreach (self::$lengowSettings as $key => $value) {
+            if (isset($value['export']) && !$value['export']) {
+                continue;
+            }
+            if ($salesChannelId && isset($value['channel']) && $value['channel']) {
+                $rows[$key] = $this->get($key, $salesChannelId);
+            } else if ($salesChannelId === null && isset($value['global']) && $value['global']) {
+                $rows[$key] = $this->get($key);
+            }
+        }
+        return $rows;
+    }
+
+    /**
      * @param string $key config name
      * @param string|null $salesChannelId sales channel
      *
@@ -881,20 +905,19 @@ class LengowConfiguration
      */
     public function getCronUrl() : string
     {
-        return $this->environmentInfoProvider->getBaseUrl()
-            .'/lengow/cron?token='
-            .$this->get('lengowGlobalToken');
+        return $this->environmentInfoProvider->getBaseUrl() . '/lengow/cron?token=' . $this->getToken();
     }
 
     /**
      * Get sales channel Lengow feed url
      *
      * @param string $salesChannelId the sales channel id needed to construct url
+     *
      * @return string
      */
     public function getFeedUrl(string $salesChannelId) : string
     {
-        $salesChannelToken = $this->get('lengowChannelToken', $salesChannelId);
+        $salesChannelToken = $this->getToken($salesChannelId);
         $domainUrl = $this->environmentInfoProvider->getBaseUrl($salesChannelId);
         return $domainUrl . '/lengow/export?sales_channel_id=' . $salesChannelId . '&token=' . $salesChannelToken;
     }

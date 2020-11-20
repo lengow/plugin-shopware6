@@ -62,6 +62,7 @@ log.export.execution_time|execution time: %{time} seconds
 log.export.generate_feed_available_here|the export for the sales channel %{sales_channel_name} generated the following file: %{link_file_export}
 log.export.error_configurable_product_disabled|WARNING! %{nb_child} children product(s) associated with parents products are disabled
 log.export.error_folder_not_created_or_writable|unable to create or access export folder (Lengow/Export)
+log.import.not_valid_action|Action: %{action} is not a valid action
 log.import.debug_mode_active|WARNING! Debug Mode is activated
 log.import.start|## start %{type} import ##
 log.import.end|## end %{type} import ##

@@ -156,7 +156,7 @@ class EnvironmentInfoProvider
      *
      * @return string
      */
-    public static function getPluginVersion() : string
+    public function getPluginVersion() : string
     {
         return self::PLUGIN_VERSION;
     }
@@ -243,9 +243,14 @@ class EnvironmentInfoProvider
      * @param EntityRepositoryInterface $shippingMethodRepository shopware shipping method repository
      * @return string
      */
-    public static function getShippingMethodDefaultValue(string $salesChannelId, EntityRepositoryInterface $shippingMethodRepository): string {
+    public static function getShippingMethodDefaultValue(
+        string $salesChannelId,
+        EntityRepositoryInterface $shippingMethodRepository
+    ): string
+    {
         $shippingMethodCriteria = new Criteria();
-        $shippingMethodCriteria->getAssociation('salesChannel')->addFilter(new EqualsFilter('salesChannel.id', $salesChannelId));
+        $shippingMethodCriteria->getAssociation('salesChannel')
+            ->addFilter(new EqualsFilter('salesChannel.id', $salesChannelId));
         $result = $shippingMethodRepository
             ->search($shippingMethodCriteria, Context::createDefaultContext());
         if ($result->count() !== 0) {

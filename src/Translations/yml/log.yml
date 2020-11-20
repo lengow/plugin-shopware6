@@ -26,6 +26,7 @@ en:
         error_configurable_product_disabled: "WARNING! %{nb_child} children product(s) associated with parents products are disabled"
         error_folder_not_created_or_writable: "unable to create or access export folder (Lengow/Export)"
       import:
+        not_valid_action: "Action: %{action} is not a valid action"
         debug_mode_active: "WARNING! Debug Mode is activated"
         start: "## start %{type} import ##"
         end: "## end %{type} import ##"
