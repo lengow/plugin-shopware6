@@ -9,3 +9,21 @@
 #lgw-order-grid .sw-data-grid__cell-content {
   overflow: visible;
 }
+
+.blue-frame {
+    border-radius: 3px;
+    padding: 2px;
+    background: #cdf1ff;
+    border: 1px solid #00aeef;
+    color: #2e6592;
+    font-size: 12px;
+    margin-left:auto;
+}
+
+.sw-page .smart-bar__header h2 {
+    font-size: 22px !important;
+}
+
+.sw-page .smart-bar__header h2 .blue-frame {
+    font-weight: normal !important;
+}

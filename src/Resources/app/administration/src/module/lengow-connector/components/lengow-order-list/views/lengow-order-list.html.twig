@@ -16,10 +16,12 @@
                         {% block lgw_order_list_smart_bar_header_title_text %}
                             {{ $tc('lengow-connector.page.orders') }}
                         {% endblock %}
-
                         {% block lgw_order_list_smart_bar_header_amount %}
                             <span v-if="!isLoading" class="sw-page__smart-bar-amount">
                                 ({{ total }})
+                            </span>
+                            <span v-if="debugMode" class="blue-frame">
+                                {{ $tc('lengow-connector.order.debug_warning_message') }}
                             </span>
                         {% endblock %}
                     </h2>
@@ -53,7 +55,6 @@
                 {% endblock %}
             </template>
         {% endblock %}
-
         {% block lgw_order_list_smart_bar_actions %}
             <template #smart-bar-actions>
                 {% block lgw_order_list_smart_bar_actions_slot %}

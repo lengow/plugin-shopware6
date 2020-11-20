@@ -1,3 +1,4 @@
+import './components/lgw-debug-warning';
 import './components/lengow-export-list';
 import './components/lengow-dashboard';
 import './components/lengow-order-list';

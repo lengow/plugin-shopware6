@@ -79,6 +79,7 @@ de:
         no_order_description: "Ihre Produkte sind gut sichtbar, Sie werden sicherlich bald Ihre ersten Bestellungen erhalten"
         sync_modal_title_order: "Befehlssynchronisierung abgeschlossen"
         sync_modal_title_action: "Synchronisierung der Aktionen abgeschlossen"
+        debug_warning_message: "Sie sind im Debug Mode. Sie können Bestellungen importieren, die Interaktion mit Lengow ist aber nicht möglich"
         state:
           accepted: "Akzeptiert"
           waiting_shipment: "Warten auf Versand"

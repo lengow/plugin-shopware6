@@ -52,6 +52,7 @@ Component.register('lengow-order-list', {
             orderWithErrorLoading: false,
             orderWaitingToBeSentLoading: false,
             selection: [],
+            debugMode: false,
         };
     },
 
@@ -346,6 +347,7 @@ Component.register('lengow-order-list', {
                     'lengowLastImportManual',
                     'lengowReportMailEnabled',
                     'lengowReportMailAddress',
+                    'lengowDebugEnabled',
                 ]),
             );
             this.lengowSettingsRepository
@@ -356,6 +358,9 @@ Component.register('lengow-order-list', {
                         response.forEach(setting => {
                             settings[setting.name] = setting.value;
                         });
+                    }
+                    if (settings['lengowDebugEnabled'] === '1') {
+                        this.debugMode = true;
                     }
                     if (
                         settings['lengowLastImportCron'] !== undefined &&
