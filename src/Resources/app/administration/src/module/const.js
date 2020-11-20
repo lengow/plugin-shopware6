@@ -54,3 +54,17 @@ export const ACTION_TYPE = {
     ship: 'ship',
     cancel: 'cancel',
 };
+
+export const ORDER_PROCESS_STATE = {
+    new: 0,
+    import: 1,
+    finish: 2,
+};
+
+export const SHOPWARE_ORDER_DELIVERY_STATE = {
+    shipped: 'shipped',
+}
+
+export const SHOPWARE_ORDER_STATE = {
+    canceled: 'canceled'
+}

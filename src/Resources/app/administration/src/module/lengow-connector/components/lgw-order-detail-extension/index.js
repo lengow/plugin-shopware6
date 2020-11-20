@@ -1,5 +1,6 @@
 import template from './views/lgw-order-detail-extension.html.twig';
 import './views/lgw-order-detail-extension.scss';
+import {ACTION_STATE, ORDER_PROCESS_STATE, SHOPWARE_ORDER_DELIVERY_STATE, SHOPWARE_ORDER_STATE} from "../../../const";
 
 const {
     Component,
@@ -21,14 +22,19 @@ Shopware.Component.register('lgw-order-detail-extension', {
     data() {
         return {
             isLoading: true,
-            btnSynchroLoading: false,
+            btnSynchroLoading: true,
+            btnActionDisplay: false,
+            btnActionLoading: false,
             debugMode: true,
             isFromLengow: false,
             orderId: '',
+            lengowOrder: null,
+            lengowOrderId: '',
             marketplaceSku: '',
             marketplaceName: '',
             deliveryAddressId: '',
             orderLengowState: '',
+            orderProcessState: '',
             totalPaid: '',
             commission: '',
             currency: '',
@@ -55,8 +61,16 @@ Shopware.Component.register('lgw-order-detail-extension', {
             return this.repositoryFactory.create('lengow_order');
         },
 
+        orderRepository() {
+            return this.repositoryFactory.create('order');
+        },
+
         lengowConfigRepository() {
             return this.repositoryFactory.create('lengow_settings');
+        },
+
+        lengowActionRepository() {
+            return this.repositoryFactory.create('lengow_action');
         }
 
     },
@@ -64,8 +78,9 @@ Shopware.Component.register('lgw-order-detail-extension', {
     created() {
         this.loadOrderData().then(() => {
             this.isLoading = false;
+            this.loadDebugMode();
+            this.loadSyncData();
         });
-        this.loadSyncData();
     },
 
     methods: {
@@ -76,12 +91,13 @@ Shopware.Component.register('lgw-order-detail-extension', {
             return this.lengowOrderRepository.search(lengowOrderCriteria, Shopware.Context.api).then(result => {
                 if (result.total > 0) {
                     const lengowOrder = result.first();
-                    console.log(lengowOrder);
                     this.isFromLengow = true;
+                    this.lengowOrderId = lengowOrder.id;
                     this.marketplaceSku = lengowOrder.marketplaceSku || '-';
                     this.marketplaceName = lengowOrder.marketplaceName || '-';
                     this.deliveryAddressId = lengowOrder.deliveryAddressId || '-';
                     this.orderLengowState = lengowOrder.orderLengowState || '-';
+                    this.orderProcessState = lengowOrder.orderProcessState || '';
                     this.totalPaid = lengowOrder.totalPaid || '-';
                     this.commission = lengowOrder.commission || '-';
                     this.currency = lengowOrder.currency || '-';
@@ -116,13 +132,60 @@ Shopware.Component.register('lgw-order-detail-extension', {
         },
 
         loadSyncData() {
+            const lengowActionCriteria = new Criteria();
+            lengowActionCriteria.addFilter(Criteria.equals('state', ACTION_STATE.new));
+            lengowActionCriteria.addFilter(Criteria.equals('orderId', this.orderId));
+            this.lengowActionRepository.search(lengowActionCriteria, Shopware.Context.api).then(result => {
+                if ((result.total > 0)) {
+                    this.canResendAction();
+                }
+            });
+        },
+
+        loadDebugMode() {
             const lengowConfigCriteria = new Criteria();
             lengowConfigCriteria.addFilter(Criteria.equals('name', 'lengowDebugEnabled'));
             this.lengowConfigRepository.search(lengowConfigCriteria, Shopware.Context.api).then(result => {
                 if (result.total > 0) {
                     this.debugMode = result.first().value === '1';
                 }
-            })
+                this.btnSynchroLoading = false;
+            });
+        },
+
+        canResendAction() {
+            const orderCriteria = new Criteria();
+            orderCriteria.addAssociation('deliveries');
+            orderCriteria.setIds([this.orderId]);
+            return this.orderRepository.search(orderCriteria, Shopware.Context.api).then(result => {
+                if (!(result.total > 0)) {
+                    return;
+                }
+                const order = result.first();
+                let orderDeliveryState = this.getOrderDeliveryState(order);
+                let orderState = '';
+                if (order.stateMachineState && order.stateMachineState.technicalName) {
+                    orderState = result.first().stateMachineState.technicalName;
+                }
+                if ((orderDeliveryState === SHOPWARE_ORDER_DELIVERY_STATE.shipped
+                    || orderState === SHOPWARE_ORDER_STATE.canceled)
+                    && this.lengowOrderId
+                    && this.orderProcessState !== ORDER_PROCESS_STATE.finish
+                ) {
+                    this.btnActionDisplay = true;
+                }
+            });
+        },
+
+        getOrderDeliveryState(order) {
+            let orderDeliveryState = '';
+            if (order.deliveries.length > 0) {
+                const orderDelivery = order.deliveries.first();
+                if (orderDelivery.stateMachineState.technicalName) {
+                    orderDeliveryState = orderDelivery.stateMachineState.technicalName;
+                }
+            }
+            return orderDeliveryState;
         },
 
         reSynchronizeOrder() {
@@ -137,7 +200,12 @@ Shopware.Component.register('lgw-order-detail-extension', {
         },
 
         reSendAction() {
-            console.log('WIP re send action');
+            this.btnActionLoading = true;
+            this.LengowConnectorOrderService.reSendAction({
+                lengowOrderId: this.lengowOrderId,
+            }).then(() => {
+                this.btnActionLoading = false;
+            })
         }
     },
 });
