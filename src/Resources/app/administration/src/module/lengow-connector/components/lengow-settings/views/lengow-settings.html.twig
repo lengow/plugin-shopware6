@@ -1,78 +1,90 @@
 {% block lengow_settings %}
     <sw-page style="background: #F1F1F1" :showSearchBar="false">
-        <template #content>
-            <div class="lgw-settings-container">
-                <div class="lgw-settings-box text-center lgw-settings-tab">
-                    <h1 style="margin-top: 50px;">Settings</h1>
-                    <div class="lgw-home-menu text-center" style="padding-top: 20px; padding-bottom: 100px">
-                        <div v-if="selectedTabGeneral"
-                             class="lgw-col-4 lgw-settings-box lgw-left-block"
-                             @click="onChangeSelectedTab('general')">
-                            <div class="lgw-settings-box-link">
-                                <h2>{{ $tc('lengow-connector.settings.NavBar.generalTab') }}</h2>
-                                <br /><hr>
+        {% block lgw_settings_smart_bar_header %}
+            <template #smart-bar-header>
+                {% block lgw_settings_smart_bar_header_title %}
+                    <h2>
+                        {% block lgw_settings_smart_bar_header_title_text %}
+                            {{ $tc('lengow-connector.page.settings') }}
+                        {% endblock %}
+                    </h2>
+                {% endblock %}
+            </template>
+        {% endblock %}
+        {% block lgw_settings_content %}
+            <template #content>
+                <div class="lgw-settings-container">
+                    <div class="lgw-settings-box text-center lgw-settings-tab">
+                        <div class="lgw-home-menu text-center" style="padding-top: 20px; padding-bottom: 100px">
+                            <div v-if="selectedTabGeneral"
+                                 class="lgw-col-4 lgw-settings-box lgw-left-block"
+                                 @click="onChangeSelectedTab('general')">
+                                <div class="lgw-settings-box-link">
+                                    <h2>{{ $tc('lengow-connector.settings.NavBar.generalTab') }}</h2>
+                                    <br /><hr>
+                                </div>
                             </div>
-                        </div>
-                        <div v-else
-                             class="lgw-col-4 lgw-settings-box lgw-left-block"
-                             @click="onChangeSelectedTab('general')">
-                            <div class="lgw-settings-box-link">
-                                <h3>{{ $tc('lengow-connector.settings.NavBar.generalTab') }}</h3>
+                            <div v-else
+                                 class="lgw-col-4 lgw-settings-box lgw-left-block"
+                                 @click="onChangeSelectedTab('general')">
+                                <div class="lgw-settings-box-link">
+                                    <h3>{{ $tc('lengow-connector.settings.NavBar.generalTab') }}</h3>
+                                </div>
                             </div>
-                        </div>
-                        <div v-if="selectedTabExport"
-                             class="lgw-col-4 lgw-settings-box"
-                             @click="onChangeSelectedTab('export')">
-                            <div class="lgw-settings-box-link">
-                                <h2>{{ $tc('lengow-connector.settings.NavBar.exportTab') }}</h2>
-                                <br /><hr>
+                            <div v-if="selectedTabExport"
+                                 class="lgw-col-4 lgw-settings-box"
+                                 @click="onChangeSelectedTab('export')">
+                                <div class="lgw-settings-box-link">
+                                    <h2>{{ $tc('lengow-connector.settings.NavBar.exportTab') }}</h2>
+                                    <br /><hr>
+                                </div>
                             </div>
-                        </div>
-                        <div v-else
-                             class="lgw-col-4 lgw-settings-box"
-                             @click="onChangeSelectedTab('export')">
-                            <div class="lgw-settings-box-link">
-                                <h3>{{ $tc('lengow-connector.settings.NavBar.exportTab') }}</h3>
+                            <div v-else
+                                 class="lgw-col-4 lgw-settings-box"
+                                 @click="onChangeSelectedTab('export')">
+                                <div class="lgw-settings-box-link">
+                                    <h3>{{ $tc('lengow-connector.settings.NavBar.exportTab') }}</h3>
+                                </div>
                             </div>
-                        </div>
-                        <div v-if="selectedTabImport"
-                             class="lgw-col-4 lgw-settings-box lgw-right-block"
-                             @click="onChangeSelectedTab('import')">
-                            <div class="lgw-settings-box-link">
-                                <h2>{{ $tc('lengow-connector.settings.NavBar.importTab') }}</h2>
-                                <br /><hr>
+                            <div v-if="selectedTabImport"
+                                 class="lgw-col-4 lgw-settings-box lgw-right-block"
+                                 @click="onChangeSelectedTab('import')">
+                                <div class="lgw-settings-box-link">
+                                    <h2>{{ $tc('lengow-connector.settings.NavBar.importTab') }}</h2>
+                                    <br /><hr>
+                                </div>
                             </div>
-                        </div>
-                        <div v-else
-                             class="lgw-col-4 lgw-settings-box lgw-right-block"
-                             @click="onChangeSelectedTab('import')">
-                            <div class="lgw-settings-box-link">
-                                <h3>{{ $tc('lengow-connector.settings.NavBar.importTab') }}</h3>
+                            <div v-else
+                                 class="lgw-col-4 lgw-settings-box lgw-right-block"
+                                 @click="onChangeSelectedTab('import')">
+                                <div class="lgw-settings-box-link">
+                                    <h3>{{ $tc('lengow-connector.settings.NavBar.importTab') }}</h3>
+                                </div>
                             </div>
                         </div>
                     </div>
+                    <template v-if="configLoaded">
+                        <keep-alive>
+                                <lengow-general-settings v-if="selectedTabGeneral"
+                                                         :config="config"
+                                                         :onSaveSettings="onSaveSettings"
+                                                         :key="generalSettingsKey">
+                                </lengow-general-settings>
+                                <lengow-export-settings v-if="selectedTabExport"
+                                                        :config="config"
+                                                        :onSaveSettings="onSaveSettings">
+                                </lengow-export-settings>
+                                <lengow-import-settings v-if="selectedTabImport"
+                                                        :config="config"
+                                                        :onSaveSettings="onSaveSettings">
+                                </lengow-import-settings>
+                        </keep-alive>
+                    </template>
+                    <template v-else>
+                        <sw-loader size="100px"></sw-loader>
+                    </template>
                 </div>
-                <template v-if="configLoaded">
-                    <keep-alive>
-                            <lengow-general-settings v-if="selectedTabGeneral"
-                                                     :config="config"
-                                                     :onSaveSettings="onSaveSettings"
-                                                     :key="generalSettingsKey">
-                            </lengow-general-settings>
-                            <lengow-export-settings v-if="selectedTabExport"
-                                                    :config="config"
-                                                    :onSaveSettings="onSaveSettings">
-                            </lengow-export-settings>
-                            <lengow-import-settings v-if="selectedTabImport"
-                                                    :config="config"
-                                                    :onSaveSettings="onSaveSettings">
-                            </lengow-import-settings>
-                    </keep-alive>
-                </template>
-                <template v-else>
-                    <sw-loader size="100px"></sw-loader>
-                </template>
-            </div>
-        </template>
+            </template>
+        {% endblock %}
     </sw-page>
 {% endblock %}

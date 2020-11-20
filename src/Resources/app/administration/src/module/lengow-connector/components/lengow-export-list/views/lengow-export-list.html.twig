@@ -1,179 +1,192 @@
 {% block lengow_export_product_list %}
     <sw-page class="sw-product-list" style="background: #F1F1F1" :showSearchBar="false">
-        <template #content>
-            <div class="lgw-container">
-                <!-- Sales channel selector -->
-                {% block lengow_export_choose_sales_channel %}
-                    <div class="sw-system-config__global-sales-channel-switch">
-                        <sw-sales-channel-switch  ref="lgwSalesChannelSwitch" @change-sales-channel-id="onSalesChannelChanged">
-                        </sw-sales-channel-switch>
-                    </div>
+        {% block lgw_product_list_smart_bar_header %}
+            <template #smart-bar-header>
+                {% block lgw_product_list_smart_bar_header_title %}
+                    <h2>
+                        {% block lgw_product_list_smart_bar_header_title_text %}
+                            {{ $tc('lengow-connector.page.products') }}
+                        {% endblock %}
+                    </h2>
                 {% endblock %}
-                {% block lengow_export_filters %}
-                    <div class="sw-card__content" v-if="salesChannelSelected">
-                        <div class="lengow-box text-center">
-                            <div>
-                                <a :href="downloadLink">
-                                    <span style="float: right;">
-                                        <sw-icon name="default-action-cloud-download" color="#3498db"></sw-icon>
+            </template>
+        {% endblock %}
+        {% block lgw_product_list_content %}
+            <template #content>
+                <div class="lgw-container">
+                    <!-- Sales channel selector -->
+                    {% block lengow_export_choose_sales_channel %}
+                        <div class="sw-system-config__global-sales-channel-switch">
+                            <sw-sales-channel-switch  ref="lgwSalesChannelSwitch" @change-sales-channel-id="onSalesChannelChanged">
+                            </sw-sales-channel-switch>
+                        </div>
+                    {% endblock %}
+                    {% block lengow_export_filters %}
+                        <div class="sw-card__content" v-if="salesChannelSelected">
+                            <div class="lengow-box text-center">
+                                <div>
+                                    <a :href="downloadLink">
+                                        <span style="float: right;">
+                                            <sw-icon name="default-action-cloud-download" color="#3498db"></sw-icon>
+                                        </span>
+                                    </a>
+                                </div>
+                                <div v-if="!countLoading" class="lgw-tooltip">
+                                    <span class="stats-big-value">{{ salesChannelName }}</span>
+                                    <span class="lgw-tooltip-text">
+                                        {{ currentSalesChannelId }}
+                                        {{ salesChannelDomain }}
                                     </span>
-                                </a>
+                                </div>
+                                <div v-if="!countLoading" class="margin-standard text-center">
+                                    <p class="products-exported small light">
+                                        {{ $tc('lengow-connector.products.datas.nbProductExportLabel') }}
+                                        <span class="stats-big-value">{{ exportedCount }}</span>
+                                    </p>
+                                    <p class="products-available small light">
+                                        {{ $tc('lengow-connector.products.datas.nbProductExportableLabel') }}
+                                        <span class="stats-big-value">{{ exportableCount }}</span>
+                                    </p>
+                                </div>
+                                <div v-else class="margin-standard text-center lgw-count-loader">
+                                    <sw-loader size="10px"></sw-loader>
+                                </div>
                             </div>
-                            <div v-if="!countLoading" class="lgw-tooltip">
-                                <span class="stats-big-value">{{ salesChannelName }}</span>
-                                <span class="lgw-tooltip-text">
-                                    {{ currentSalesChannelId }}
-                                    {{ salesChannelDomain }}
-                                </span>
+                            <div class="lgw-float-center">
+                                <sw-switch-field class="text-center"
+                                                 v-model="productSelection"
+                                                 :label="$tc('lengow-connector.products.activateSelectionLabel')"
+                                                 @change="onActivateSelection">
+                                </sw-switch-field>
                             </div>
-                            <div v-if="!countLoading" class="margin-standard text-center">
-                                <p class="products-exported small light">
-                                    {{ $tc('lengow-connector.products.datas.nbProductExportLabel') }}
-                                    <span class="stats-big-value">{{ exportedCount }}</span>
-                                </p>
-                                <p class="products-available small light">
-                                    {{ $tc('lengow-connector.products.datas.nbProductExportableLabel') }}
-                                    <span class="stats-big-value">{{ exportableCount }}</span>
-                                </p>
-                            </div>
-                            <div v-else class="margin-standard text-center lgw-count-loader">
-                                <sw-loader size="10px"></sw-loader>
-                            </div>
-                        </div>
-                        <div class="lgw-float-center">
-                            <sw-switch-field class="text-center"
-                                             v-model="productSelection"
-                                             :label="$tc('lengow-connector.products.activateSelectionLabel')"
-                                             @change="onActivateSelection">
-                            </sw-switch-field>
-                        </div>
-                        <hr /><br/>
-                        <div class="lgw-row" v-if="productSelection">
-                            <div class="lgw-col-4">
-                                <sw-single-select
-                                        v-model="activeFilterText"
-                                        :options="isActiveOptions"
-                                        :label="$tc('lengow-connector.products.filters.activeFilterLabel')"
-                                        @change="onActiveFilter"
-                                        class="">
-                                </sw-single-select>
-                            </div>
-                            <div class="lgw-col-4">
-                                <sw-single-select
-                                        v-model="stockFilterText"
-                                        :options="isWithStockOptions"
-                                        :label="$tc('lengow-connector.products.filters.stockFilterLabel')"
-                                        @change="onStockFilter"
-                                        class="">
-                                </sw-single-select>
-                            </div>
-                            <div class="lgw-col-4">
-                                <sw-text-field
-                                        v-model="searchFilterText"
-                                        :label="$tc('lengow-connector.products.filters.searchFilterLabel')"
-                                        @input="onSearchFilter">
-                                </sw-text-field>
+                            <hr /><br/>
+                            <div class="lgw-row" v-if="productSelection">
+                                <div class="lgw-col-4">
+                                    <sw-single-select
+                                            v-model="activeFilterText"
+                                            :options="isActiveOptions"
+                                            :label="$tc('lengow-connector.products.filters.activeFilterLabel')"
+                                            @change="onActiveFilter"
+                                            class="">
+                                    </sw-single-select>
+                                </div>
+                                <div class="lgw-col-4">
+                                    <sw-single-select
+                                            v-model="stockFilterText"
+                                            :options="isWithStockOptions"
+                                            :label="$tc('lengow-connector.products.filters.stockFilterLabel')"
+                                            @change="onStockFilter"
+                                            class="">
+                                    </sw-single-select>
+                                </div>
+                                <div class="lgw-col-4">
+                                    <sw-text-field
+                                            v-model="searchFilterText"
+                                            :label="$tc('lengow-connector.products.filters.searchFilterLabel')"
+                                            @input="onSearchFilter">
+                                    </sw-text-field>
+                                </div>
                             </div>
                         </div>
-                    </div>
-                {% endblock %}
-                {% block lengow_export_product_list_content %}
-                    <div class="lgw-product-grid"  v-if="(salesChannelSelected && productSelection)">
-                        {% block lengow_export_product_list_grid %}
-                            <sw-entity-listing ref="swProductGrid"
-                                               :items="products"
-                                               :columns="productColumns"
-                                               :repository="productRepository"
-                                               detailRoute="sw.product.detail"
-                                               :showSelection="true"
-                                               :isLoading="isLoading"
-                                               @column-sort="onStartSorting"
-                                               @selection-change="updateSelection"
-                                               @update-records="onColumnSort">
-                                <template #delete-action>
-                                    <span></span> <!-- Remove delete action from entity listing -->
-                                </template>
-                                <template #>
-                                </template>
-                                <template slot="bulk">
-                                    {% block sw_data_grid_bulk_selected_count %}
-                                        <span class="sw-data-grid__bulk-selected bulk-link">Total Selected : </span>
-                                        <span class="sw-data-grid__bulk-selected sw-data-grid__bulk-selected-count">{{ totalSelected }}</span>
+                    {% endblock %}
+                    {% block lengow_export_product_list_content %}
+                        <div class="lgw-product-grid"  v-if="(salesChannelSelected && productSelection)">
+                            {% block lengow_export_product_list_grid %}
+                                <sw-entity-listing ref="swProductGrid"
+                                                   :items="products"
+                                                   :columns="productColumns"
+                                                   :repository="productRepository"
+                                                   detailRoute="sw.product.detail"
+                                                   :showSelection="true"
+                                                   :isLoading="isLoading"
+                                                   @column-sort="onStartSorting"
+                                                   @selection-change="updateSelection"
+                                                   @update-records="onColumnSort">
+                                    <template #delete-action>
+                                        <span></span> <!-- Remove delete action from entity listing -->
+                                    </template>
+                                    <template #>
+                                    </template>
+                                    <template slot="bulk">
+                                        {% block sw_data_grid_bulk_selected_count %}
+                                            <span class="sw-data-grid__bulk-selected bulk-link">Total Selected : </span>
+                                            <span class="sw-data-grid__bulk-selected sw-data-grid__bulk-selected-count">{{ totalSelected }}</span>
+                                        {% endblock %}
+                                        {% block sw_data_grid_bulk_selected_actions_content %}
+                                            <span class="sw-data-grid__bulk-selected bulk-link">
+                                                <a class="link link-default" @click="onSelectAllProducts">
+                                                    Select All
+                                                </a>
+                                            </span>
+                                            <span class="sw-data-grid__bulk-selected bulk-link">
+                                                <a class="link link-default" @click="onPublishOnLengow">
+                                                    Publish on lengow
+                                                </a>
+                                            </span>
+                                            <span class="sw-data-grid__bulk-selected bulk-link">
+                                                <a class="link link-default" @click="onUnpublishOnLengow">
+                                                    Unpublish on lengow
+                                                </a>
+                                            </span>
+                                        {% endblock %}
+                                    </template>
+                                    {% block lengow_export_product_list_grid_columns %}
+                                        {% block lengow_export_product_list_grid_columns_name_preview %}
+                                            <template #preview-name="{ item }">
+                                                <sw-media-preview-v2 :source="item.cover ? item.cover.media : null"></sw-media-preview-v2>
+                                            </template>
+                                        {% endblock %}
+                                        {% block lengow_export_product_list_grid_columns_active %}
+                                            <template #column-active="{ item }">
+                                                {% block lengow_export_product_list_grid_columns_active_content %}
+                                                    <template>
+                                                        <sw-icon v-if="item.active" name="small-default-checkmark-line-medium" small class="is--active"></sw-icon>
+                                                        <sw-icon v-else name="small-default-x-line-medium" small class="is--inactive"></sw-icon>
+                                                    </template>
+                                                {% endblock %}
+                                            </template>
+                                            <template #column-extensions.activeInLengow.active="{ item }">
+                                                {% block lengow_export_product_list_grid_columns_activeInLengow_content %}
+                                                    <template>
+                                                        <sw-switch-field
+                                                                class="lgw-no-background"
+                                                                v-model="item.extensions.activeInLengow.active"
+                                                                label="activate"
+                                                                @change="OnActivateOnLengow({ item })"></sw-switch-field>
+                                                    </template>
+                                                {% endblock %}
+                                            </template>
+                                        {% endblock %}
+                                        {% block lengow_export_product_list_grid_columns_price %}
+                                            <template v-for="currency in currencies"
+                                                      :slot="`column-price-${currency.isoCode}`"
+                                                      slot-scope="{ item }">
+                                                {{ getCurrencyPriceByCurrencyId(currency.id, item.price).gross | currency(currency.isoCode) }}
+                                            </template>
+                                        {% endblock %}
+                                        {% block lengow_export_product_list_grid_columns_stock %}
+                                            <template #column-stock="{ item, compact }">
+                                                {% block lengow_export_product_list_grid_columns_stock_content %}
+                                                    <template>
+                                                        {{ item.stock }}
+                                                        <sw-color-badge :variant="item.stock | stockColorVariant"></sw-color-badge>
+                                                    </template>
+                                                {% endblock %}
+                                            </template>
+                                        {% endblock %}
                                     {% endblock %}
-                                    {% block sw_data_grid_bulk_selected_actions_content %}
-                                        <span class="sw-data-grid__bulk-selected bulk-link">
-                                            <a class="link link-default" @click="onSelectAllProducts">
-                                                Select All
-                                            </a>
-                                        </span>
-                                        <span class="sw-data-grid__bulk-selected bulk-link">
-                                            <a class="link link-default" @click="onPublishOnLengow">
-                                                Publish on lengow
-                                            </a>
-                                        </span>
-                                        <span class="sw-data-grid__bulk-selected bulk-link">
-                                            <a class="link link-default" @click="onUnpublishOnLengow">
-                                                Unpublish on lengow
-                                            </a>
-                                        </span>
-                                    {% endblock %}
-                                </template>
-                                {% block lengow_export_product_list_grid_columns %}
-                                    {% block lengow_export_product_list_grid_columns_name_preview %}
-                                        <template #preview-name="{ item }">
-                                            <sw-media-preview-v2 :source="item.cover ? item.cover.media : null"></sw-media-preview-v2>
-                                        </template>
-                                    {% endblock %}
-                                    {% block lengow_export_product_list_grid_columns_active %}
-                                        <template #column-active="{ item }">
-                                            {% block lengow_export_product_list_grid_columns_active_content %}
-                                                <template>
-                                                    <sw-icon v-if="item.active" name="small-default-checkmark-line-medium" small class="is--active"></sw-icon>
-                                                    <sw-icon v-else name="small-default-x-line-medium" small class="is--inactive"></sw-icon>
-                                                </template>
-                                            {% endblock %}
-                                        </template>
-                                        <template #column-extensions.activeInLengow.active="{ item }">
-                                            {% block lengow_export_product_list_grid_columns_activeInLengow_content %}
-                                                <template>
-                                                    <sw-switch-field
-                                                            class="lgw-no-background"
-                                                            v-model="item.extensions.activeInLengow.active"
-                                                            label="activate"
-                                                            @change="OnActivateOnLengow({ item })"></sw-switch-field>
-                                                </template>
-                                            {% endblock %}
-                                        </template>
-                                    {% endblock %}
-                                    {% block lengow_export_product_list_grid_columns_price %}
-                                        <template v-for="currency in currencies"
-                                                  :slot="`column-price-${currency.isoCode}`"
-                                                  slot-scope="{ item }">
-                                            {{ getCurrencyPriceByCurrencyId(currency.id, item.price).gross | currency(currency.isoCode) }}
-                                        </template>
-                                    {% endblock %}
-                                    {% block lengow_export_product_list_grid_columns_stock %}
-                                        <template #column-stock="{ item, compact }">
-                                            {% block lengow_export_product_list_grid_columns_stock_content %}
-                                                <template>
-                                                    {{ item.stock }}
-                                                    <sw-color-badge :variant="item.stock | stockColorVariant"></sw-color-badge>
-                                                </template>
-                                            {% endblock %}
-                                        </template>
-                                    {% endblock %}
-                                {% endblock %}
-                            </sw-entity-listing>
-                        {% endblock %}
-                        {% block lengow_export_product_list_empty_state %}
-                            <sw-empty-state v-if="!isLoading && !total" :title="$tc('sw-product.list.messageEmpty')"></sw-empty-state>
-                        {% endblock %}
-                        {% block lengow_export_product_list_grid_loader %}
-                            <sw-loader v-if="isLoading || !salesChannelSelected"></sw-loader>
-                        {% endblock %}
-                    </div>
-                {% endblock %}
-            </div>
-        </template>
+                                </sw-entity-listing>
+                            {% endblock %}
+                            {% block lengow_export_product_list_empty_state %}
+                                <sw-empty-state v-if="!isLoading && !total" :title="$tc('sw-product.list.messageEmpty')"></sw-empty-state>
+                            {% endblock %}
+                            {% block lengow_export_product_list_grid_loader %}
+                                <sw-loader v-if="isLoading || !salesChannelSelected"></sw-loader>
+                            {% endblock %}
+                        </div>
+                    {% endblock %}
+                </div>
+            </template>
+        {% endblock %}
     </sw-page>
 {% endblock %}

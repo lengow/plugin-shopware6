@@ -1,11 +1,7 @@
 import template from './views/lengow-legal-notices.html.twig';
-import {LENGOW_URL} from "../../../const";
+import './views/lengow-legal-notices.scss';
 
-const {
-    Component,
-    Mixin,
-    Data: { Criteria },
-} = Shopware;
+const { Component } = Shopware;
 
 Component.register('lengow-legal-notices', {
     template,

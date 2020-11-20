@@ -1,8 +1,16 @@
 {
     "lengow-connector": {
+        "page": {
+            "dashboard": "Dashboard",
+            "products": "Products",
+            "orders": "Orders",
+            "help": "Help",
+            "settings": "Settings",
+            "legal_notices": "Legal notices"
+        },
         "dashboard": {
             "banner": {
-                "title": "Hello, Welcome among us !",
+                "title": "Hi! Welcome back!",
                 "button": "Go to Lengow"
             },
             "products": {

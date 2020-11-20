@@ -1,25 +1,40 @@
 {% block lgw_contact %}
-    <sw-page class="lgw-page" :showSearchBar="false">
-        <template #content>
-            <div class="lgw-container text-center">
-                <br/><br/>
-                <h2>{{ $tc('lengow-connector.contact.title') }}</h2>
-                <p>
-                    <br/>
-                    {{ $tc('lengow-connector.contact.contain_text_support') }}
-                    <a style="text-decoration: none;" :href="$tc('lengow-connector.contact.link_lengow_support')">
-                        {{ $tc('lengow-connector.contact.title_lengow_support') }}
-                    </a>
-                    .
-                    <br/><br/>
-                    {{ $tc('lengow-connector.contact.contain_text_support_hour') }}
-                    <br/><br/>
-                    {{ $tc('lengow-connector.contact.find_answer') }}
-                    <a style="text-decoration: none;" :href="$tc('lengow-connector.contact.knowledge_link_url')">
-                        {{ $tc('lengow-connector.contact.link_magento_guide') }}
-                    </a>
-                </p>
-            </div>
-        </template>
+    <sw-page class="lgw-contact" :showSearchBar="false">
+        {% block lgw_contact_smart_bar_header %}
+            <template #smart-bar-header>
+                {% block lgw_contact_smart_bar_header_title %}
+                    <h2>
+                        {% block lgw_contact_smart_bar_header_title_text %}
+                            {{ $tc('lengow-connector.page.help') }}
+                        {% endblock %}
+                    </h2>
+                {% endblock %}
+            </template>
+        {% endblock %}
+        {% block lgw_contact_content %}
+            <template #content>
+                <div class="lgw-container text-center">
+                    <div class="lgw-box">
+                        <h2>{{ $tc('lengow-connector.contact.title') }}</h2>
+                        <p>
+                            <br/>
+                            {{ $tc('lengow-connector.contact.contain_text_support') }}
+                            <a :href="$tc('lengow-connector.contact.link_lengow_support')">
+                                {{ $tc('lengow-connector.contact.title_lengow_support') }}
+                            </a>
+                            <br/><br/>
+                            {{ $tc('lengow-connector.contact.contain_text_support_hour') }}
+                            <br/><br/>
+                            {{ $tc('lengow-connector.contact.find_answer') }}
+                            <a :href="$tc('lengow-connector.contact.knowledge_link_url')">
+                                {{ $tc('lengow-connector.contact.link_magento_guide') }}
+                            </a>
+                        </p>
+                    </div>
+                    <lengow-footer>
+                    </lengow-footer>
+                </div>
+            </template>
+        {% endblock %}
     </sw-page>
 {% endblock %}

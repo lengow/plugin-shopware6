@@ -3,7 +3,6 @@ import lgwConnexionIframe from './components/lgw-Iframe-connexion';
 import './views/lengow-dashboard.scss';
 import { envMixin, LENGOW_URL } from "../../../const";
 
-
 const {
     Component,
     Mixin,

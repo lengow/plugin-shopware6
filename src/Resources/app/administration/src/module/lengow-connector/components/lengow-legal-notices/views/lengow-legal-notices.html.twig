@@ -1,39 +1,56 @@
 {% block lgw_legal_notices %}
-    <sw-page class="lgw-page" :showSearchBar="false">
-        <template #content>
-            <div class="lgw-container">
-                {% block lgw_company_infos %}
-                    <div><br/>
-                        <h3>SAS Lengow</h3>
-                        <span>{{ $tc('lengow-connector.legals.simplified_company') }}</span>
-                        <br/>
-                        <span>{{ $tc('lengow-connector.legals.social_capital') }} 368 778 €</span>
-                        <br/>
-                        <span>{{ $tc('lengow-connector.legals.cnil_declaration') }} 1748784 v 0</span>
-                        <br/>
-                        <span>{{ $tc('lengow-connector.legals.company_registration_number') }} 513 381 434</span>
-                        <br/>
-                        <span>{{ $tc('lengow-connector.legals.vat_identification_number') }} FR42513381434</span>
-                    </div>
+    <sw-page class="lgw-legal-notices" :showSearchBar="false">
+        {% block lgw_legal_notices_smart_bar_header %}
+            <template #smart-bar-header>
+                {% block lgw_legal_notices_smart_bar_header_title %}
+                    <h2>
+                        {% block lgw_legal_notices_smart_bar_header_title_text %}
+                            {{ $tc('lengow-connector.page.legal_notices') }}
+                        {% endblock %}
+                    </h2>
                 {% endblock %}
-                {% block lgw_company_contact %}
-                    <div>
-                        <br/><br/>
-                        <h3>{{ $tc('lengow-connector.legals.address') }}</h3>
-                        <span>6 rue René Viviani 44200 Nantes</span>
-                        <br/><br/><br/>
+            </template>
+        {% endblock %}
+        {% block lgw_legal_notices_content %}
+            <template #content>
+                <div class="lgw-container lgw-legal-notices">
+                    <div class="lgw-box">
+                        {% block lgw_company_infos %}
+                            <div><br/>
+                                <h3>SAS Lengow</h3>
+                                <span>{{ $tc('lengow-connector.legals.simplified_company') }}</span>
+                                <br/>
+                                <span>{{ $tc('lengow-connector.legals.social_capital') }} 368 778 €</span>
+                                <br/>
+                                <span>{{ $tc('lengow-connector.legals.cnil_declaration') }} 1748784 v 0</span>
+                                <br/>
+                                <span>{{ $tc('lengow-connector.legals.company_registration_number') }} 513 381 434</span>
+                                <br/>
+                                <span>{{ $tc('lengow-connector.legals.vat_identification_number') }} FR42513381434</span>
+                            </div>
+                        {% endblock %}
+                        {% block lgw_company_contact %}
+                            <div>
+                                <br/><br/>
+                                <h3>{{ $tc('lengow-connector.legals.address') }}</h3>
+                                <span>6 rue René Viviani 44200 Nantes</span>
+                                <br/><br/><br/>
+                            </div>
+                            <div>
+                                <h3>{{ $tc('lengow-connector.legals.contact') }}</h3>
+                                <span>Email : contact@lengow.com<br/>Phone: +33 (0)2 85 52 64 14</span>
+                                <br/><br/><br/>
+                            </div>
+                            <div>
+                                <h3>{{ $tc('lengow-connector.legals.hosting') }}</h3>
+                                <span>OXALIDE<br/>RCS Paris : 803 816 529<br/>25 Boulevard de Strasbourg – 75010 Paris<br/>+33 (0)1 75 77 16 66</span>
+                            </div>
+                        {% endblock %}
                     </div>
-                    <div>
-                        <h3>{{ $tc('lengow-connector.legals.contact') }}</h3>
-                        <span>Email : contact@lengow.com<br/>Phone: +33 (0)2 85 52 64 14</span>
-                        <br/><br/><br/>
-                    </div>
-                    <div>
-                        <h3>{{ $tc('lengow-connector.legals.hosting') }}</h3>
-                        <span>OXALIDE<br/>RCS Paris : 803 816 529<br/>25 Boulevard de Strasbourg – 75010 Paris<br/>+33 (0)1 75 77 16 66</span>
-                    </div>
-                {% endblock %}
-            </div>
-        </template>
+                    <lengow-footer>
+                    </lengow-footer>
+                </div>
+            </template>
+        {% endblock %}
     </sw-page>
 {% endblock %}

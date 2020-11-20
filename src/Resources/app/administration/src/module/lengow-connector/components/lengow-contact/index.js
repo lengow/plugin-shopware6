@@ -1,11 +1,7 @@
 import template from './views/lengow-contact.html.twig';
-import {LENGOW_URL} from "../../../const";
+import './views/lengow-contact.scss';
 
-const {
-    Component,
-    Mixin,
-    Data: { Criteria },
-} = Shopware;
+const { Component } = Shopware;
 
 Component.register('lengow-contact', {
     template,
