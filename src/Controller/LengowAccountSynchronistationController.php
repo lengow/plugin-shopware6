@@ -10,6 +10,7 @@ use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\Routing\Annotation\Route;
 use Symfony\Component\HttpFoundation\JsonResponse;
 use Lengow\Connector\Service\LengowSync;
+use Lengow\Connector\Util\EnvironmentInfoProvider;
 
 /**
  * Class LengowAccountSynchronistationController
@@ -22,6 +23,7 @@ class LengowAccountSynchronistationController extends AbstractController
      * @var LengowSync $lengowSync Lengow synchronisation service
      */
     private $lengowSync;
+
 
     /**
      * LengowOrderController constructor
@@ -45,6 +47,27 @@ class LengowAccountSynchronistationController extends AbstractController
         $response = [
             'function' => 'sync',
             'parameters' => $this->lengowSync->getSyncData(),
+        ];
+        return new JsonResponse($response);
+    }
+
+    /**
+     * Get plugin data
+     *
+     * @Route("/api/v{version}/_action/lengow/synchronisation/get-plugin-data", name="api.action.lengow.synchronisation.get-sync-data", methods={"GET"})
+     *
+     * @return JsonResponse
+     */
+    public function getPluginData(): JsonResponse
+    {
+        $pluginData = $this->lengowSync->getPluginData();
+        if (!$pluginData) {
+            return new JsonResponse(['success' => false]);
+        }
+        $response = [
+            'success' => $pluginData !== null,
+            'plugin_data' => $pluginData,
+            'should_update' => version_compare(EnvironmentInfoProvider::PLUGIN_VERSION, $pluginData['version'], '<'),
         ];
         return new JsonResponse($response);
     }

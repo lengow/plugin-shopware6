@@ -1,6 +1,10 @@
 fr:
   administration:
     lengow-connector:
+      global:
+          new_version_available_1: "La nouvelle version"
+          new_version_available_2: "est disponible !"
+          download_plugin: "Télécharger"
       page:
         dashboard: "Tableau de bord"
         products: "Produits"

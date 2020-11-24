@@ -1,5 +1,10 @@
 {
     "lengow-connector": {
+        "global": {
+            "new_version_available_1": "A new version",
+            "new_version_available_2": "is available!",
+            "download_plugin": "Download"
+        },
         "page": {
             "dashboard": "Dashboard",
             "products": "Products",

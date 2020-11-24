@@ -63,6 +63,11 @@ class LengowSync
     private const PLUGIN_TYPE = 'shopware';
 
     /**
+     * @var string plugin data type for lengow
+     */
+    private const PLUGIN_DATA_TYPE = 'shopware6';
+
+    /**
      * @var LengowConnector Lengow connector service
      */
     private $lengowConnector;
@@ -363,5 +368,48 @@ class LengowSync
             }
         }
         return false;
+    }
+
+    /**
+     * Get plugin data from api once a day
+     *
+     * @param bool $force force call if it has been less than a day
+     * @param false $logOutput should log output
+     * @return array|null
+     */
+    public function getPluginData(bool $force = false, bool $logOutput = false): ?array
+    {
+        if (!$force) {
+            $updatedAt = $this->lengowConfiguration->get('lengowPluginDataUpdate');
+            if ($updatedAt !== null
+                && (time() - (int)$updatedAt) < $this->cacheTimes[self::SYNC_PLUGIN_DATA]
+                && $this->lengowConfiguration->get('lengowPluginData')
+            ) {
+                return json_decode($this->lengowConfiguration->get('lengowPluginData'), true);
+            }
+        }
+        $plugins = $this->lengowConnector->queryApi(
+            LengowConnector::GET,
+            LengowConnector::API_PLUGIN,
+            [],
+            '',
+            $logOutput
+        );
+        if (!$plugins) {
+            $pluginData = $this->lengowConfiguration->get('lengowPluginData');
+            return $pluginData ? json_decode($pluginData, true) : null;
+        }
+        foreach ($plugins as $plugin) {
+            if ($plugin->type === self::PLUGIN_DATA_TYPE) {
+                $pluginData = [
+                    'version' => $plugin->version,
+                    'download_link' => $plugin->archive,
+                ];
+                $this->lengowConfiguration->set('lengowPluginData', json_encode($pluginData));
+                $this->lengowConfiguration->set('lengowPluginDataUpdate', (string) time());
+                return $pluginData;
+            }
+        }
+        return null;
     }
 }
