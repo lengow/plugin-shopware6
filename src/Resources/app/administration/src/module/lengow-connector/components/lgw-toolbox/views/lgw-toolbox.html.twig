@@ -1,0 +1,193 @@
+{% block lgw_toolbox %}
+    <sw-page class="lgw-toolbox" :showSearchBar="false">
+        {% block lgw_toolbox_smart_bar_header %}
+            <template #smart-bar-header>
+                {% block lgw_toolbox_smart_bar_header_title %}
+                    <h2>
+                        {% block lgw_toolbox_smart_bar_header_title_text %}
+                            {{ $tc('lengow-connector.page.toolbox') }}
+                            <lgw-debug-warning></lgw-debug-warning>
+                            <lgw-update-warning></lgw-update-warning>
+                        {% endblock %}
+                    </h2>
+                {% endblock %}
+            </template>
+        {% endblock %}
+        {% block lgw_toolbox_content %}
+            <template #content>
+                <div v-if="!dataIsLoading" class="lgw-container">
+                    <div class="lgw-box">
+                        <div class="lgw-box-title">{{ $tc('lengow-connector.toolbox.checklist.title') }}</div>
+                        <div class="lgw-list">
+                            <div class="lgw-list-left">
+                                <ul>
+                                    <lgw-list-element :title="$tc('lengow-connector.toolbox.checklist.curl_message')"
+                                                      :value="data.checklist.curl_activated"
+                                                      :helpText="$tc('lengow-connector.toolbox.checklist.curl_help')"
+                                                      :type="'bool'">
+                                    </lgw-list-element>
+                                    <lgw-list-element :title="$tc('lengow-connector.toolbox.checklist.simple_xml_message')"
+                                                      :value="data.checklist.simple_xml_activated"
+                                                      :helpText="$tc('lengow-connector.toolbox.checklist.simple_xml_help')"
+                                                      :type="'bool'">
+                                    </lgw-list-element>
+                                </ul>
+                            </div>
+                            <div class="lgw-list-right">
+                                <ul>
+                                    <lgw-list-element :title="$tc('lengow-connector.toolbox.checklist.json_php_message')"
+                                                      :value="data.checklist.json_activated"
+                                                      :helpText="$tc('lengow-connector.toolbox.checklist.json_php_help')"
+                                                      :type="'bool'">
+                                    </lgw-list-element>
+                                    <lgw-list-element :title="$tc('lengow-connector.toolbox.checklist.checksum_message')"
+                                                      :value="data.checklist.md5_success"
+                                                      :helpText="$tc('lengow-connector.toolbox.checklist.checksum_help')"
+                                                      :type="'bool'">
+                                    </lgw-list-element>
+                                </ul>
+                            </div>
+                            <div class="lgw-clearfix"></div>
+                        </div>
+                    </div>
+                    <div class="lgw-box">
+                        <div class="lgw-box-title">{{ $tc('lengow-connector.toolbox.plugin.title') }}</div>
+                        <div class="lgw-list">
+                            <div class="lgw-list-left">
+                                <ul>
+                                    <lgw-list-element :title="$tc('lengow-connector.toolbox.plugin.version')"
+                                                      :value="data.plugin.version">
+                                    </lgw-list-element>
+                                    <lgw-list-element :title="$tc('lengow-connector.toolbox.plugin.plugin_version')"
+                                                      :value="data.plugin.plugin_version">
+                                    </lgw-list-element>
+                                    <lgw-list-element :title="$tc('lengow-connector.toolbox.plugin.debug_disabled')"
+                                                      :value="data.plugin.debug_mode_disable"
+                                                      :type="'bool'">
+                                    </lgw-list-element>
+                                    <lgw-list-element :title="$tc('lengow-connector.toolbox.plugin.write_permission')"
+                                                      :value="data.plugin.write_permission"
+                                                      :type="'bool'">
+                                    </lgw-list-element>
+                                </ul>
+                            </div>
+                            <div class="lgw-list-right">
+                                <ul>
+                                    <lgw-list-element :title="$tc('lengow-connector.toolbox.plugin.server_ip')"
+                                                      :value="data.plugin.server_ip">
+                                    </lgw-list-element>
+                                    <lgw-list-element :title="$tc('lengow-connector.toolbox.plugin.authorized_ip_enable')"
+                                                      :value="data.plugin.authorized_ip_enable"
+                                                      :type="'bool'">
+                                    </lgw-list-element>
+                                    <lgw-list-element :title="$tc('lengow-connector.toolbox.plugin.authorized_ips')"
+                                                      :value="data.plugin.authorized_ips"
+                                                      :type="'array'">
+                                    </lgw-list-element>
+                                </ul>
+                            </div>
+                            <div class="lgw-clearfix"></div>
+                        </div>
+                    </div>
+                    <div class="lgw-box">
+                        <div class="lgw-box-title">{{ $tc('lengow-connector.toolbox.import.title') }}</div>
+                        <div class="lgw-list">
+                            <ul>
+                                <lgw-list-element :title="$tc('lengow-connector.toolbox.import.global_token')"
+                                                  :value="data.import.token">
+                                </lgw-list-element>
+                                <lgw-list-element :title="$tc('lengow-connector.toolbox.import.url_import')"
+                                                  :value="data.import.cron_url">
+                                </lgw-list-element>
+                            </ul>
+                            <div class="lgw-list-separator"></div>
+                            <div class="lgw-list-left">
+                                <ul>
+                                    <lgw-list-element :title="$tc('lengow-connector.toolbox.import.import_in_progress')"
+                                                      :value="data.plugin.import_is_in_process"
+                                                      :helpText="$tc('lengow-connector.toolbox.import.no_import')"
+                                                      :type="'bool'">
+                                    </lgw-list-element>
+                                    <lgw-list-element :title="$tc('lengow-connector.toolbox.import.last_import')"
+                                                      :value="data.import.last_import"
+                                                      :type="'date'">
+                                    </lgw-list-element>
+                                    <lgw-list-element :title="$tc('lengow-connector.toolbox.import.last_import_type')"
+                                                      :value="data.import.last_import_type">
+                                    </lgw-list-element>
+                                </ul>
+                            </div>
+                            <div class="lgw-list-right">
+                                <ul>
+                                    <lgw-list-element :title="$tc('lengow-connector.toolbox.import.nb_order_imported')"
+                                                      :value="data.import.nb_order_imported">
+                                    </lgw-list-element>
+                                    <lgw-list-element :title="$tc('lengow-connector.toolbox.import.nb_order_to_be_sent')"
+                                                      :value="data.import.nb_order_to_be_sent">
+                                    </lgw-list-element>
+                                    <lgw-list-element :title="$tc('lengow-connector.toolbox.import.nb_order_with_error')"
+                                                      :value="data.import.nb_order_with_error">
+                                    </lgw-list-element>
+                                </ul>
+                            </div>
+                            <div class="lgw-clearfix"></div>
+                        </div>
+                    </div>
+                    <div v-for="sales_channel in data.export" class="lgw-box">
+                        <div class="lgw-box-title">{{ sales_channel.shop_name }}</div>
+                        <div class="lgw-list">
+                            <ul>
+                                <lgw-list-element :title="$tc('lengow-connector.toolbox.export.id')"
+                                                  :value="sales_channel.shop_id">
+                                </lgw-list-element>
+
+                                <lgw-list-element :title="$tc('lengow-connector.toolbox.export.domain_url')"
+                                                  :value="sales_channel.domain_url">
+                                </lgw-list-element>
+                                <lgw-list-element :title="$tc('lengow-connector.toolbox.export.token')"
+                                                  :value="sales_channel.token">
+                                </lgw-list-element>
+                                <lgw-list-element :title="$tc('lengow-connector.toolbox.export.feed_url')"
+                                                  :value="sales_channel.feed_url">
+                                </lgw-list-element>
+                            </ul>
+                            <div class="lgw-list-separator"></div>
+                            <div class="lgw-list-left">
+                                <ul>
+                                    <lgw-list-element :title="$tc('lengow-connector.toolbox.export.enabled')"
+                                                      :value="sales_channel.enabled"
+                                                      :type="'bool'">
+                                    </lgw-list-element>
+                                    <lgw-list-element :title="$tc('lengow-connector.toolbox.export.catalog_id')"
+                                                      :value="sales_channel.catalog_ids"
+                                                      :type="'array'">
+                                    </lgw-list-element>
+                                    <lgw-list-element :title="$tc('lengow-connector.toolbox.export.last_export')"
+                                                      :value="sales_channel.last_export"
+                                                      :type="'date'">
+                                    </lgw-list-element>
+                                </ul>
+                            </div>
+                            <div class="lgw-list-right">
+                                <ul>
+                                    <lgw-list-element :title="$tc('lengow-connector.toolbox.export.total_product_number')"
+                                                      :value="sales_channel.total_product_number">
+                                    </lgw-list-element>
+                                    <lgw-list-element :title="$tc('lengow-connector.toolbox.export.exported_product_number')"
+                                                      :value="sales_channel.exported_product_number">
+                                    </lgw-list-element>
+                                </ul>
+                            </div>
+                            <div class="lgw-clearfix"></div>
+                        </div>
+                    </div>
+                    <lengow-footer>
+                    </lengow-footer>
+                </div>
+                <div v-else>
+                    <sw-loader></sw-loader>
+                </div>
+            </template>
+        {% endblock %}
+    </sw-page>
+{% endblock %}

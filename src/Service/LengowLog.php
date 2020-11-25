@@ -55,7 +55,7 @@ class LengowLog
     /**
      * @var string name of logs folder
      */
-    private const LOG_FOLDER_NAME = 'Logs';
+    public const LOG_FOLDER_NAME = 'Logs';
 
     /**
      * @var int life of log files in days

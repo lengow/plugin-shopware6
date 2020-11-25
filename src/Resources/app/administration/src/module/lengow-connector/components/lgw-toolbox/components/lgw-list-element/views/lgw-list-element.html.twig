@@ -1,0 +1,19 @@
+{% block lgw_list_element %}
+    <template>
+        <div class="lgw-list-element">
+            <li v-show="!isLoading">
+                <h6>{{ title }}</h6>
+                <sw-icon v-if="showIcon" :name="iconName" small :class="iconClass"></sw-icon>
+                <div v-else>
+                    <span v-if="isDate">
+                        {{ content | date({hour: '2-digit', minute: '2-digit'}) }}
+                    </span>
+                    <span v-else>
+                        {{ content }}
+                    </span>
+                </div>
+            </li>
+            <sw-loader v-show="isLoading" size="14px"></sw-loader>
+        </div>
+    </template>
+{% endblock %}

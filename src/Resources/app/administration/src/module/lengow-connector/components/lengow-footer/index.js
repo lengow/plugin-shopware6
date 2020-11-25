@@ -1,12 +1,8 @@
 import template from './views/lengow-footer.html.twig';
 import './views/lengow-footer.css';
-import { envMixin, LENGOW_URL, MODULE_VERSION } from "../../../const";
+import { envMixin, LENGOW_URL, MODULE_VERSION } from '../../../const';
 
-const {
-    Component,
-    Mixin,
-    Data: { Criteria },
-} = Shopware;
+const { Component } = Shopware;
 
 Component.register('lengow-footer', {
     template,
@@ -19,7 +15,7 @@ Component.register('lengow-footer', {
             moduleVersion: MODULE_VERSION,
             currentYear: new Date().getFullYear(),
             preprod: false,
-        }
+        };
     },
 
     created() {
@@ -27,6 +23,4 @@ Component.register('lengow-footer', {
             this.preprod = true;
         }
     },
-
-
 });

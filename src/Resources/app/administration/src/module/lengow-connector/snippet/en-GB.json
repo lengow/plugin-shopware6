@@ -11,7 +11,8 @@
             "orders": "Orders",
             "help": "Help",
             "settings": "Settings",
-            "legal_notices": "Legal notices"
+            "legal_notices": "Legal notices",
+            "toolbox": "Toolbox"
         },
         "dashboard": {
             "banner": {
@@ -298,23 +299,54 @@
                     "label": "Enable import of B2B orders without tax",
                     "description": "Activate this option to import B2B orders without tax"
                 }
-            },
-            "lengow_order_status_settings": {
-                "label": "Order Status",
-                "description": "Match your Lengow order status to retrieve them in your orders easily",
-                "id_waiting_shipment": {
-                    "label": "Orders in preparation"
-                },
-                "id_shipped": {
-                    "label": "Shipped orders"
-                },
-                "id_canceled": {
-                    "label": "Cancelled orders"
-                },
-                "id_shipped_by_mp": {
-                    "label": "Orders shipped by marketplace"
-                }
             }
+        },
+        "toolbox": {
+            "checklist": {
+                "title": "Checklist",
+                "curl_message": "Lengow needs the CURL PHP extension",
+                "curl_help": "The CURL extension is not installed or enabled in your PHP installation",
+                "simple_xml_message": "Lengow needs the SimpleXML PHP extension",
+                "simple_xml_help": "The SimpleXML extension is not installed or enabled in your PHP installation",
+                "json_php_message": "Lengow needs the JSON PHP extension",
+                "json_php_help": "The JSON extension is not installed or enabled in your PHP installation",
+                "checksum_message": "Plugin files check",
+                "checksum_help": "Some files have been changed by the customer"
+            },
+            "plugin": {
+                "title": "Plugin information",
+                "version": "Shopware version",
+                "plugin_version": "Plugin version",
+                "debug_disabled": "Debug Mode disabled",
+                "write_permission": "Read and write permission from media folder",
+                "server_ip": "Server IP",
+                "authorized_ip_enable": "Authorisation by IP enabled",
+                "authorized_ips": "Authorised IP"
+            },
+            "import": {
+                "title": "Synchronisation information",
+                "global_token": "Synchronisation token",
+                "url_import": "Synchronisation URL",
+                "nb_order_imported": "Orders imported by Lengow",
+                "nb_order_to_be_sent": "Orders waiting to be sent",
+                "nb_order_with_error": "Orders with errors",
+                "import_in_progress": "Synchronisation in progress",
+                "no_import": "No synchronisation in progress",
+                "last_import": "Last synchronisation",
+                "last_import_type": "Last synchronisation type"
+            },
+            "export": {
+                "id": "Sales channel id",
+                "domain_url": "Sales channel URL",
+                "token": "Export token",
+                "feed_url": "Export URL for this sales channel",
+                "enabled": "Sales channel followed by Lengow",
+                "catalog_id": "Lengow catalogs id synchronised",
+                "last_export": "Last export",
+                "total_product_number": "Products available in the sales channel",
+                "exported_product_number": "Products exported in the sales channel"
+            },
+            "none": "none"
         }
     }
 }

@@ -9,6 +9,7 @@ import './components/lengow-contact';
 import './components/lengow-footer';
 import './extension/sw-order-detail';
 import './components/lgw-order-detail-extension';
+import './components/lgw-toolbox';
 
 Shopware.Module.register('lengow-connector', {
     color: '#ff3d58',
@@ -52,6 +53,13 @@ Shopware.Module.register('lengow-connector', {
         contact: {
             component: 'lengow-contact',
             path: 'contact',
+            meta: {
+                parentPath: 'lengow.connector.dashboard',
+            },
+        },
+        toolbox: {
+            component: 'lgw-toolbox',
+            path: 'toolbox',
             meta: {
                 parentPath: 'lengow.connector.dashboard',
             },

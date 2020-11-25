@@ -17,6 +17,7 @@ use Shopware\Core\Framework\DataAbstractionLayer\EntityRepositoryInterface;
 use Shopware\Core\Framework\DataAbstractionLayer\Search\Criteria;
 use Shopware\Core\Framework\DataAbstractionLayer\Search\Filter\EqualsFilter;
 use Shopware\Core\Framework\DataAbstractionLayer\Search\Filter\MultiFilter;
+use Shopware\Core\Framework\DataAbstractionLayer\Search\Filter\NotFilter;
 use Shopware\Core\Framework\DataAbstractionLayer\Search\Filter\RangeFilter;
 use Shopware\Core\Framework\DataAbstractionLayer\Search\Grouping\FieldGrouping;
 use Shopware\Core\Framework\Uuid\Uuid;
@@ -1137,5 +1138,47 @@ class LengowOrder
             $orderLinesByPackage[(int)$package->delivery->id] = $packageLines;
         }
         return $orderLinesByPackage[$lengowOrder->getDeliveryAddressId()] ?? [];
+    }
+
+    /**
+     * Return the number of Lengow orders imported in Shopware
+     *
+     * @return int
+     */
+    public function countOrderImportedByLengow(): int
+    {
+        $context = Context::createDefaultContext();
+        $criteria = new Criteria();
+        $criteria->addFilter(new NotFilter(NotFilter::CONNECTION_AND, [new EqualsFilter('orderId', null)]));
+        /** @var LengowOrderCollection $lengowOrderCollection */
+        return $this->lengowOrderRepository->search($criteria, $context)->getEntities()->count();
+    }
+
+    /**
+     * Return the number of Lengow orders with error
+     *
+     * @return int
+     */
+    public function countOrderWithError(): int
+    {
+        $context = Context::createDefaultContext();
+        $criteria = new Criteria();
+        $criteria->addFilter(new EqualsFilter('isInError', true));
+        /** @var LengowOrderCollection $lengowOrderCollection */
+        return $this->lengowOrderRepository->search($criteria, $context)->getEntities()->count();
+    }
+
+    /**
+     * Return the number of Lengow orders to be sent
+     *
+     * @return int
+     */
+    public function countOrderToBeSent(): int
+    {
+        $context = Context::createDefaultContext();
+        $criteria = new Criteria();
+        $criteria->addFilter(new EqualsFilter('orderProcessState', 1));
+        /** @var LengowOrderCollection $lengowOrderCollection */
+        return $this->lengowOrderRepository->search($criteria, $context)->getEntities()->count();
     }
 }

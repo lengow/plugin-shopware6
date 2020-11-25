@@ -12,6 +12,7 @@ de:
         help: "Hilfe"
         settings: "Einstellungen"
         legal_notices: "Rechtshinweise"
+        toolbox: "Toolbox"
       dashboard:
         banner:
           title: "Hallo und herzlich willkommen!"
@@ -246,17 +247,48 @@ de:
           import_btob:
             label: "Import von B2B-Bestellungen ohne Steuern ermöglichen"
             description: "Aktivieren Sie diese Option, um B2B-Bestellungen ohne Steuer zu importieren"
-        lengow_order_status_settings:
-          label: "Lieferstatus"
-          description: "Passen Sie den Lengow Lieferstatus an um Ihre Lieferungen einfach abzufragen"
-          id_waiting_shipment:
-            label: "Lieferung in Vorbereitung"
-          id_shipped:
-            label: "Versandte Bestellungen"
-          id_canceled:
-            label: "Stornierte Bestellungen"
-          id_shipped_by_mp:
-            label: "Bestellung von Marktplatz versandt"
+      toolbox:
+        checklist:
+          title: "Checkliste"
+          curl_message: "Lengow benötigt die CURL-PHP-Erweiterung"
+          curl_help: "Die CURL-Erweiterung ist in Ihrer PHP-Installation nicht installiert oder aktiviert"
+          simple_xml_message: "Lengow benötigt die SimpleXML-PHP-Erweiterung"
+          simple_xml_help: "Die SimpleXML-Erweiterung ist in Ihrer PHP-Installation nicht installiert oder aktiviert"
+          json_php_message: "Lengow benötigt die JSON-PHP-Erweiterung"
+          json_php_help: "Die JSON-Erweiterung ist in Ihrer PHP-Installation nicht installiert oder aktiviert"
+          checksum_message: "Prüfung von Plugin-Dateien"
+          checksum_help: "Einige Dateien wurden vom Kunden geändert"
+        plugin:
+          title: "Information zum Plugin"
+          version: "Version von Shopware"
+          plugin_version: "Version des Plugins"
+          debug_disabled: "Debug Mode ist deaktiviert"
+          write_permission: "Genehmigung vom Mediumordner schreiben"
+          server_ip: "Server IP"
+          authorized_ip_enable: "Autorisierung über IP aktiviert"
+          authorized_ips: "Autorisierte IP"
+        import:
+          title: "Informationen zur Synchronisierung"
+          global_token: "Synchronisierungs-Token"
+          url_import: "Synchronisations-URL"
+          nb_order_imported: "Bestellungen importiert durch Lengow"
+          nb_order_to_be_sent: "Bestellungen die auf den Versand warten"
+          nb_order_with_error: "Fehlerhaste Bestellungen"
+          import_in_progress: "Synchronisation im Gange"
+          no_import: "Keine Synchronisierung im Gange"
+          last_import: "Letzte Synchronisierung"
+          last_import_type: "Letzte Synchronisationsart"
+        export:
+          id: "Verkaufskanäle id"
+          domain_url: "Domain-URL"
+          token: "Export Token"
+          feed_url: "Export-URL für diesen Vertriebskanal"
+          enabled: "Verkaufskanal gefolgt von Lengow"
+          catalog_id: "Lengow Kataloge id synchronisiert"
+          last_export: "Letzter Export"
+          total_product_number: "Im Vertriebskanal verfügbare Produkte"
+          exported_product_number: "Im Verkaufskanal exportierte Produkte"
+        none: "kein"
   backend:
     lengow_log:
       error:
