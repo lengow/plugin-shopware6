@@ -21,7 +21,7 @@
                        target="_blank"
                        size="small"
                        class="lgw-order-detail-button"
-                       @click="reImportOrder">
+                       @click="toggleModal">
                 {{ $tc('lengow-connector.orderTab.cancel_and_reimport') }}
             </sw-button>
             <sw-button v-if="btnActionDisplay"
@@ -35,6 +35,34 @@
                        @click="reSendAction">
                 {{ $tc('lengow-connector.orderTab.resend_action') }}
             </sw-button>
+            <sw-modal v-show="modalDisplay"
+                      :title="$tc('lengow-connector.orderTab.cancel_and_reimport')"
+                      :closable="false"
+                      :isLoading="modalLoading">
+                {{ $tc('lengow-connector.orderTab.check_cancel_and_reimport') }}
+                <template slot="modal-footer">
+                    <sw-button
+                               :square="false"
+                               :block="false"
+                               size="small"
+                               :isLoading="false"
+                               target="_blank"
+                               class="lgw-order-detail-button lgw-modal-btn-yes"
+                               @click="reImportOrder">
+                        {{ $tc('lengow-connector.orderTab.status_yes') }}
+                    </sw-button>
+                    <sw-button
+                        :square="false"
+                        :block="false"
+                        size="small"
+                        :isLoading="false"
+                        target="_blank"
+                        class="lgw-order-detail-button lgw-modal-btn-no"
+                        @click="toggleModal">
+                        {{ $tc('lengow-connector.orderTab.status_no') }}
+                    </sw-button>
+                </template>
+            </sw-modal>
         </div>
         <ul class="lgw-order-detail-list">
             <li>

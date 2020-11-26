@@ -89,6 +89,11 @@ class LengowOrder
     public const STATE_REFUNDED = 'refunded';
 
     /**
+     * @var string order state lengow technical error
+     */
+    public const STATE_TECHNICAL_ERROR = 'technical_error';
+
+    /**
      * @var string order type prime
      */
     public const TYPE_PRIME = 'is_prime';
@@ -879,6 +884,33 @@ class LengowOrder
             ? StateMachineTransitionActions::ACTION_COMPLETE
             : $actionName;
         $this->addTransition(OrderDefinition::ENTITY_NAME, $order->getId(), $actionName);
+    }
+
+    /**
+     * Put a shopware order in Lengow technical error state
+     *
+     * @param OrderEntity $order Shopware order
+     */
+    public function putOrderInLengowTechnicalErrorState(OrderEntity $order) : void
+    {
+        $this->addTransition(
+            OrderDefinition::ENTITY_NAME,
+            $order->getId(),
+            self::STATE_TECHNICAL_ERROR
+        );
+    }
+
+    /**
+     * Set a lengow order as re-imported
+     *
+     * @param LengowOrderEntity $lengowOrder the lengow order
+     * @return bool
+     */
+    public function setAsReImported(LengowOrderEntity $lengowOrder) : bool
+    {
+        return $this->update($lengowOrder->getId(), [
+            'isReimported' => true,
+        ]);
     }
 
     /**

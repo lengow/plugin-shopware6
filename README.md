@@ -61,4 +61,4 @@ To change this environment, you must modify the two constants present in the fil
 
 ## Changelog
 
-The changelog and all available commits are located under [CHANGELOG](CHANGELOG).
+The changelog and all available commits are located under [CHANGELOG](CHANGELOG.md).

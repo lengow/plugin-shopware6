@@ -145,6 +145,52 @@ class LengowOrderController extends AbstractController
     }
 
     /**
+     * Re-import a specific failed order
+     *
+     * @Route("/api/v{version}/_action/lengow/order/reimport-failed-order",
+     *     defaults={"auth_enabled"=true},
+     *     name="api.action.lengow.order.reimport-order",
+     *     methods={"POST"})
+     *
+     * @param Request $request
+     * @return JsonResponse
+     */
+    public function reImportFailedOrder(Request $request): JsonResponse
+    {
+        $success = false;
+        $newOrderId = '';
+        $lengowOrderId = $request->get('lengowOrderId');
+        $orderId = $request->get('orderId');
+        $lengowOrder = $lengowOrderId ? $this->lengowOrder->getLengowOrderById($lengowOrderId) : null;
+        $order = $orderId ? $this->lengowOrder->getOrderById($orderId) : null;
+        if (!$this->lengowOrder->setAsReImported($lengowOrder)) {
+            $lengowOrder = null;
+        }
+        if ($lengowOrder && $order) {
+            $this->lengowImport->init([
+                'type' => LengowImport::TYPE_MANUAL,
+                'marketplace_sku' => $lengowOrder->getMarketplaceSku(),
+                'marketplace_name' => $lengowOrder->getMarketplaceName(),
+                'delivery_address_id' => $lengowOrder->getDeliveryAddressId(),
+                'sales_channel_id' => $lengowOrder->getSalesChannel()->getId(),
+            ]);
+            $result = $this->lengowImport->exec();
+            if (isset($result['order_id'], $result['order_new'])
+                && (int)$result['order_id'] !== $orderId
+                && $result['order_new']
+            ) {
+                $this->lengowOrder->putOrderInLengowTechnicalErrorState($order);
+                $newOrderId = $result['order_id'];
+                $success = true;
+            }
+        }
+        return new JsonResponse([
+            'success' => $success,
+            'new_order_id' => $newOrderId,
+        ]);
+    }
+
+    /**
      * Re-send a action for a order
      *
      * @Route("/api/v{version}/_action/lengow/order/resend-action",

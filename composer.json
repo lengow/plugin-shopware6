@@ -18,9 +18,15 @@
     "extra": {
         "shopware-plugin-class": "Lengow\\Connector\\Connector",
         "copyright": "(c) by Lengow SAS",
+        "manufacturerLink": "https://www.lengow.com",
+        "supportLink": "https://support.lengow.com",
         "label": {
             "de-DE": "Lengow Für Shopware",
             "en-GB": "Lengow For Shopware"
+        },
+        "description": {
+            "de-DE": "Lengow allows you to easily export your product catalogue from your Shopware store and sell on Amazon, Cdiscount, Google Shopping, Criteo, LeGuide.com, Ebay, Rakuten, Priceminister. Choose from our 1,800 available marketing channels!",
+            "en-GB": "Lengow allows you to easily export your product catalogue from your Shopware store and sell on Amazon, Cdiscount, Google Shopping, Criteo, LeGuide.com, Ebay, Rakuten, Priceminister. Choose from our 1,800 available marketing channels!"
         }
     },
     "require": {

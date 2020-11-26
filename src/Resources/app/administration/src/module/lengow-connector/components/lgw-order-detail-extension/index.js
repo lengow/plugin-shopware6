@@ -25,6 +25,10 @@ Shopware.Component.register('lgw-order-detail-extension', {
             btnSynchroLoading: true,
             btnActionDisplay: false,
             btnActionLoading: false,
+            btnReimportDisplay: false,
+            btnReimportLoading: false,
+            modalDisplay: false,
+            modalLoading: false,
             debugMode: true,
             isFromLengow: false,
             orderId: '',
@@ -188,6 +192,14 @@ Shopware.Component.register('lgw-order-detail-extension', {
             return orderDeliveryState;
         },
 
+        toggleModal() {
+            if (this.modalDisplay) {
+                this.modalDisplay = false;
+            } else {
+                this.modalDisplay = true;
+            }
+        },
+
         reSynchronizeOrder() {
             this.btnSynchroLoading = true;
             this.LengowConnectorOrderService.reSynchroniseOrder({'orderId': this.orderId}).then(() => {
@@ -196,7 +208,25 @@ Shopware.Component.register('lgw-order-detail-extension', {
         },
 
         reImportOrder() {
-            console.log('WIP reimportOrder');
+            this.btnReimportLoading = true;
+            this.modalLoading = true;
+            this.LengowConnectorOrderService.reImportFailedOrder({
+                lengowOrderId: this.lengowOrderId,
+                orderId: this.orderId
+            }).then((response) => {
+                if (response.success) {
+                    this.toggleModal();
+                    this.modalLoading = false;
+                    this.orderId = response.new_order_id;
+                }
+            }).finally(() => {
+                this.btnReimportLoading = false;
+                this.modalLoading = false;
+                this.$router.push({ name: 'sw.order.detail', params: { id: this.orderId } })
+                if (this.modalDisplay === true) {
+                    this.toggleModal();
+                }
+            });
         },
 
         reSendAction() {

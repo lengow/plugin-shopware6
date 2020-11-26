@@ -6,11 +6,11 @@ use Doctrine\DBAL\Connection;
 use Shopware\Core\Framework\Migration\MigrationStep;
 use Shopware\Core\Framework\Uuid\Uuid;
 
-class Migration1595860347Init extends MigrationStep
+class Migration1606313662Init extends MigrationStep
 {
     public function getCreationTimestamp(): int
     {
-        return 1595860347;
+        return 1606229693;
     }
 
     public function update(Connection $connection): void
@@ -170,16 +170,104 @@ class Migration1595860347Init extends MigrationStep
          * Add lengow_technical_error new order state in state_machine_state table
          * order state are linked to state_machine (order.state here)
          */
-        $uuid = Uuid::randomHex(); // Generate new uuid for insert
+        $StateUuid = Uuid::randomHex(); // Generate new uuid for insert
         $connection->executeUpdate('
             INSERT IGNORE INTO state_machine_state VALUES (
-                UNHEX("' . $uuid . '"),
+                UNHEX("' . $StateUuid . '"),
                 "lengow_technical_error",
                 (SELECT id FROM state_machine WHERE technical_name = "order.state"),
                 NOW(),
                 null
             );
         ');
+
+        $statesAvailable = $connection->fetchAll('
+            SELECT id
+            FROM state_machine_state
+            WHERE state_machine_id IN (
+                SELECT id
+                FROM state_machine
+                WHERE technical_name = "order.state"
+            )
+        ');
+        foreach ($statesAvailable as $state) {
+            /**
+             * Add all state transition needed for order to go to lengow technical error
+             * Once an order is in lengow technical error, it state cannot be changed
+             */
+            $uuid = Uuid::randomHex(); // Generate new uuid for insert
+            $availableStateUuid = Uuid::fromBytesToHex($state['id']);
+            $connection->executeUpdate('
+                INSERT IGNORE INTO state_machine_transition VALUES (
+                    UNHEX("' . $uuid . '"),
+                    "technical_error",
+                    (
+                        SELECT id
+                        FROM state_machine
+                        WHERE technical_name = "order.state"
+                    ),
+                    UNHEX("' . $availableStateUuid . '"),
+                    (
+                        SELECT id
+                        FROM state_machine_state
+                        WHERE technical_name = "lengow_technical_error"
+                    ),
+                    null,
+                    NOW(),
+                    null
+                )
+            ');
+        }
+        $uuid = Uuid::randomHex(); // Generate new uuid for insert
+        $connection->executeUpdate('
+            INSERT INTO state_machine_transition VALUES (
+                UNHEX("' . $uuid . '"),
+                "cancel_technical_error",
+                (
+                    SELECT id
+                    FROM state_machine
+                    WHERE technical_name = "order.state"
+                ),
+                (
+                    SELECT id
+                    FROM state_machine_state
+                    WHERE technical_name = "open"
+                    AND state_machine_id = (
+                        SELECT id
+                        FROM state_machine
+                        WHERE technical_name = "order.state"
+                    )
+                ),
+                (
+                    SELECT id
+                    FROM state_machine_state
+                    WHERE technical_name = "lengow_technical_error"
+                ),
+                null,
+                NOW(),
+                null
+            )
+        ');
+        $languageAvailable = $connection->fetchAll('SELECT id FROM `language`');
+        foreach ($languageAvailable as $language) {
+            $languageId = Uuid::fromBytesToHex($language['id']);
+            if ($languageId) {
+                $connection->executeUpdate('
+                    INSERT IGNORE INTO state_machine_state_translation VALUES (
+                        UNHEX("' . $languageId . '"),
+                        (
+                            SELECT id
+                            FROM state_machine_state
+                            WHERE technical_name = "lengow_technical_error"
+                        ),
+                        "Lengow technical error",
+                        null,
+                        NOW(),
+                        null
+                    )
+                ');
+            }
+        }
     }
 
     public function updateDestructive(Connection $connection): void

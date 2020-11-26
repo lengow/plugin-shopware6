@@ -146,7 +146,7 @@ en:
           synchronize_id: "Synchronize ID"
           check_synchronize_action: "Do you really want to synchronize the order?"
           cancel_and_reimport: "Re-import order"
-          check_cancel_and_reimport: "Do you really want to re-import the order?"
+          check_cancel_and_reimport: "Re-importing the order will set the status of this one as Lengow-Technical-Error and create a new one in your back office, are you sure ?"
           resend_action: "Resend Action"
           check_resend_action: "Do you really want to %1 the order?"
           no_order_importation: "No synchronisation for now"

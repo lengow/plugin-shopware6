@@ -145,7 +145,7 @@ de:
           synchronize_id: "ID synchronisieren"
           check_synchronize_action: "Möchten Sie die Bestellung wirklich synchronisieren?"
           cancel_and_reimport: "Bestellungen erneut importieren"
-          check_cancel_and_reimport: "Wollen Sie wirklich die Bestellung erneut importieren?"
+          check_cancel_and_reimport: "Durch den Reimport der Bestellung wird der Status dieser Bestellung als Lengow-Technical-Error gesetzt und eine neue Bestellung in Ihrem Backoffice erstellt, sind Sie sicher ?"
           resend_action: " Aktion erneut senden"
           check_resend_action: "Wollen Sie wirklich die Bestellung %1 ?"
           no_order_importation: "Derzeit keine Synchronisierung"

@@ -166,7 +166,7 @@
             "synchronize_id": "Synchronisez l'ID",
             "check_synchronize_action": "Vous voulez vous vraiment réimporter la commande ?",
             "cancel_and_reimport": "Réimporter la commande",
-            "check_cancel_and_reimport": "Vous voulez vous vraiment réimporter la commande ?",
+            "check_cancel_and_reimport": "Réimporter cette commande changera le status de celle-ci en Lengow-Technical-Error et en créera une nouvelle dans votre back office, vous êtes sûr ?",
             "resend_action": "Renvoyer l'action",
             "no_order_importation": "Aucune synchronisation pour le moment",
             "total_paid": "Prix total",
