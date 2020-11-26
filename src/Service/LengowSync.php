@@ -50,7 +50,7 @@ class LengowSync
     /**
      * @var string name of logs folder
      */
-    private const CONFIG_FOLDER_NAME = 'Config';
+    public const CONFIG_FOLDER_NAME = 'Config';
 
     /**
      * @var string name of logs folder

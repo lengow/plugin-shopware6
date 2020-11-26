@@ -297,6 +297,11 @@
             }
         },
         "toolbox": {
+            "menu": {
+                "overview": "Vue d'ensemble",
+                "checksum": "Checksum",
+                "log": "Logs"
+            },
             "checklist": {
                 "title": "Checklist",
                 "curl_message": "Lengow a besoin de l'extension PHP CURL",
@@ -340,6 +345,16 @@
                 "last_export": "Dernier export",
                 "total_product_number": "Produits disponibles du canal de vente",
                 "exported_product_number": "Produits exportés du canal de vente"
+            },
+            "checksum": {
+                "title": "Intégrité des données",
+                "file_not_exists": "Le fichier checkmd5.csv n'est pas valide. Enregistrement impossible !",
+                "summary": "Sommaire",
+                "file_checked": "fichier(s) vérifié(s)",
+                "file_modified": "fichier(s) modifié(s)",
+                "file_deleted": "fichier(s) supprimé(s)",
+                "list_modified_file": "Liste des fichiers modifiés",
+                "list_deleted_file": "Liste des fichiers supprimés"
             },
             "none": "aucun"
         }

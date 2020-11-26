@@ -248,6 +248,10 @@ de:
             label: "Import von B2B-Bestellungen ohne Steuern ermöglichen"
             description: "Aktivieren Sie diese Option, um B2B-Bestellungen ohne Steuer zu importieren"
       toolbox:
+        menu:
+          overview: "Übersicht"
+          checksum: "Prüfsumme"
+          log: "Logs"
         checklist:
           title: "Checkliste"
           curl_message: "Lengow benötigt die CURL-PHP-Erweiterung"
@@ -288,6 +292,15 @@ de:
           last_export: "Letzter Export"
           total_product_number: "Im Vertriebskanal verfügbare Produkte"
           exported_product_number: "Im Verkaufskanal exportierte Produkte"
+        checksum:
+          title: "Integrität der Dateiprüfsumme"
+          file_not_exists: "checkmd5.csv Datei ist nicht verfügbar. Die Prüfung ist nicht möglich !"
+          summary: "Zusammenfassung"
+          file_checked: "Dateien überprüft"
+          file_modified: "Dateien geändert"
+          file_deleted: "Dateien gelöscht"
+          list_modified_file: "Liste der geänderten Dateien"
+          list_deleted_file: "Liste der gelöschten Dateien"
         none: "kein"
   backend:
     lengow_log:

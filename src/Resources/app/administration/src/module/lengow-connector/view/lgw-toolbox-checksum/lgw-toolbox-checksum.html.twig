@@ -1,0 +1,55 @@
+{% block lgw_toolbox_checksum %}
+    <div v-if="!isLoading">
+        {% block lgw_toolbox_checksum_overview %}
+            <sw-card :title="$tc('lengow-connector.toolbox.checksum.title')">
+                <h4>{{ $tc('lengow-connector.toolbox.checksum.summary') }}</h4>
+                <div v-if="checksumAvailable" class="lgw-list">
+                    <ul>
+                        <lgw-list-element :title="fileCheckedCounterLabel"
+                                          :value="fileCheckedCounterValue"
+                                          :type="'bool'">
+                        </lgw-list-element>
+                        <lgw-list-element :title="fileModifiedCounterLabel"
+                                          :value="fileModifiedCounterValue"
+                                          :type="'bool'">
+                        </lgw-list-element>
+                        <lgw-list-element :title="fileDeletedCounterLabel"
+                                          :value="fileDeletedCounterValue"
+                                          :type="'bool'">
+                        </lgw-list-element>
+                    </ul>
+                </div>
+                <div v-else>
+                    {{ $tc('lengow-connector.toolbox.checksum.file_not_exists') }}
+                </div>
+            </sw-card>
+        {% endblock %}
+        {% block lgw_toolbox_checksum_file_modified %}
+            <sw-card v-if="fileHasModified" :title="$tc('lengow-connector.toolbox.checksum.list_modified_file')">
+                <h4>{{ fileModifiedCounterLabel }}</h4>
+                <div class="lgw-list">
+                    <ul>
+                        <li v-for="file in fileModified">
+                            {{ file }}
+                        </li>
+                    </ul>
+                </div>
+            </sw-card>
+        {% endblock %}
+        {% block lgw_toolbox_checksum_file_deleted %}
+            <sw-card v-if="fileHasDeleted" :title="$tc('lengow-connector.toolbox.checksum.list_deleted_file')">
+                <h4>{{ fileDeletedCounterLabel }}</h4>
+                <div class="lgw-list">
+                    <ul>
+                        <li v-for="file in fileDeleted">
+                            {{ file }}
+                        </li>
+                    </ul>
+                </div>
+            </sw-card>
+        {% endblock %}
+    </div>
+    <div v-else>
+        <sw-loader></sw-loader>
+    </div>
+{% endblock %}

@@ -1,10 +1,8 @@
-import template from './views/lgw-toolbox.html.twig';
-import './views/lgw-toolbox.scss';
-import lgwListElement from './components/lgw-list-element';
+import template from './lgw-toolbox-base.html.twig';
 
 const { Component } = Shopware;
 
-Component.register('lgw-toolbox', {
+Component.register('lgw-toolbox-base', {
     template,
 
     inject: ['LengowConnectorToolboxService'],
@@ -14,7 +12,7 @@ Component.register('lgw-toolbox', {
     data() {
         return {
             data: [],
-            dataIsLoading: false,
+            isLoading: false,
         };
     },
 
@@ -32,13 +30,13 @@ Component.register('lgw-toolbox', {
 
     methods: {
         loadToolboxData() {
-            this.dataIsLoading = true;
-            this.LengowConnectorToolboxService.getAllData()
+            this.isLoading = true;
+            this.LengowConnectorToolboxService.getOverviewData()
                 .then(response => {
                     this.data = response;
                 })
                 .finally(() => {
-                    this.dataIsLoading = false;
+                    this.isLoading = false;
                 });
         },
     },

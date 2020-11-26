@@ -252,6 +252,10 @@ en:
             label: "Enable import of B2B orders without tax"
             description: "Activate this option to import B2B orders without tax"
       toolbox:
+        menu:
+          overview: "Overview"
+          checksum: "Checksum"
+          log: "Logs"
         checklist:
           title: "Checklist"
           curl_message: "Lengow needs the CURL PHP extension"
@@ -292,6 +296,15 @@ en:
           last_export: "Last export"
           total_product_number: "Products available in the sales channel"
           exported_product_number: "Products exported in the sales channel"
+        checksum:
+          title: "File Checksum integrity"
+          file_not_exists: "checkmd5.csv file is not available. Checking is impossible!"
+          summary: "Summary"
+          file_checked: "files checked"
+          file_modified: "files modified"
+          file_deleted: "files deleted"
+          list_modified_file: "List of modified files"
+          list_deleted_file: "List of deleted files"
         none: 'none'
   backend:
     lengow_log:

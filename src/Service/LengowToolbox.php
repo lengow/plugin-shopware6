@@ -72,6 +72,7 @@ class LengowToolbox
             'plugin' => $this->getPluginData(),
             'import' => $this->getImportData(),
             'export' => $this->getExportData(),
+            'check_file_md5' => $this->getChecksumData(),
         ];
     }
 
@@ -82,11 +83,12 @@ class LengowToolbox
      */
     public function getChecklistData(): array
     {
+        $checksumData = $this->getChecksumData();
         return [
             'curl_activated' => $this->isCurlActivated(),
             'simple_xml_activated' => $this->isSimpleXMLActivated(),
             'json_activated' => $this->isJsonActivated(),
-            'md5_success' => true, // TODO add md5 verification
+            'md5_success' => $checksumData['success'],
         ];
     }
 
@@ -161,6 +163,52 @@ class LengowToolbox
     }
 
     /**
+     * Get files checksum
+     *
+     * @return array
+     */
+    public function getChecksumData(): array
+    {
+        $fileCounter = 0;
+        $fileModified = [];
+        $fileDeleted = [];
+        $sep = DIRECTORY_SEPARATOR;
+        $pluginPath = $this->environmentInfoProvider->getPluginPath();
+        $fileName = $pluginPath . $sep . LengowSync::CONFIG_FOLDER_NAME . $sep . 'checkmd5.csv';
+        if (file_exists($fileName)) {
+            $md5Available = true;
+            if (($file = fopen($fileName, 'r')) !== false) {
+                while (($data = fgetcsv($file, 1000, '|')) !== false) {
+                    $fileCounter++;
+                    $filePath = $this->environmentInfoProvider->getPluginBasePath() . $data[0];
+                    if (file_exists($filePath)) {
+                        $fileMd = md5_file($filePath);
+                        if ($fileMd !== $data[1]) {
+                            $fileModified[] = $filePath;
+                        }
+                    } else {
+                        $fileDeleted[] = $filePath;
+                    }
+                }
+                fclose($file);
+            }
+        } else {
+           $md5Available = false;
+        }
+        $fileModifiedCounter = count($fileModified);
+        $fileDeletedCounter = count($fileDeleted);
+        return [
+            'available' => $md5Available,
+            'success' => !$md5Available || $fileModifiedCounter > 0 || $fileModifiedCounter > 0,
+            'file_checked_counter' => $fileCounter,
+            'file_modified_counter' => $fileModifiedCounter,
+            'file_deleted_counter' => $fileDeletedCounter,
+            'file_modified' => $fileModified,
+            'file_deleted' => $fileDeleted,
+        ];
+    }
+
+    /**
      * Check if PHP Curl is activated
      *
      * @return bool
@@ -199,7 +247,7 @@ class LengowToolbox
     {
         $sep = DIRECTORY_SEPARATOR;
         $pluginPath = $this->environmentInfoProvider->getPluginPath();
-        $filePath = $pluginPath . $sep . LengowLog::LOG_FOLDER_NAME . $sep . 'test.txt';
+        $filePath = $pluginPath . $sep . LengowSync::CONFIG_FOLDER_NAME . $sep . 'test.txt';
         try {
             $file = fopen($filePath, 'w+');
             if (!$file) {
