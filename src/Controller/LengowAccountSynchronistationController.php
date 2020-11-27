@@ -38,7 +38,9 @@ class LengowAccountSynchronistationController extends AbstractController
     /**
      * Get all sync data
      *
-     * @Route("/api/v{version}/_action/lengow/synchronisation/get-sync-data", name="api.action.lengow.synchronisation.get-sync-data", methods={"GET"})
+     * @Route("/api/v{version}/_action/lengow/synchronisation/get-sync-data",
+     *      name="api.action.lengow.synchronisation.get-sync-data",
+     *      methods={"GET"})
      *
      * @return JsonResponse
      */
@@ -54,7 +56,9 @@ class LengowAccountSynchronistationController extends AbstractController
     /**
      * Get plugin data
      *
-     * @Route("/api/v{version}/_action/lengow/synchronisation/get-plugin-data", name="api.action.lengow.synchronisation.get-sync-data", methods={"GET"})
+     * @Route("/api/v{version}/_action/lengow/synchronisation/get-plugin-data",
+     *      name="api.action.lengow.synchronisation.get-plugin-data",
+     *      methods={"GET"})
      *
      * @return JsonResponse
      */
@@ -69,6 +73,33 @@ class LengowAccountSynchronistationController extends AbstractController
             'plugin_data' => $pluginData,
             'should_update' => version_compare(EnvironmentInfoProvider::PLUGIN_VERSION, $pluginData['version'], '<'),
         ];
+        return new JsonResponse($response);
+    }
+
+    /**
+     * Get Account data
+     *
+     * @Route("/api/v{version}/_action/lengow/synchronisation/get-account-status",
+     *     name="api.action.lengow.synchronisation.get-account-status",
+     *     methods={"GET"})
+     *
+     * @return JsonResponse
+     */
+    public function getAccountStatus(Request $request): JsonResponse
+    {
+        if ($request->get('force') && $request->get('force') === true) {
+            $accountStatus = $this->lengowSync->getAccountStatus(true);
+        } else {
+            $accountStatus = $this->lengowSync->getAccountStatus();
+        }
+        if (!$accountStatus) {
+            return new JsonResponse(['success' => false]);
+        }
+        $response = array_merge([
+                'success' => true,
+            ],
+            $accountStatus
+        );
         return new JsonResponse($response);
     }
 }

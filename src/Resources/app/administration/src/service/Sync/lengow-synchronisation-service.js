@@ -34,6 +34,21 @@ class LengowSynchronisationService extends ApiService {
                 return ApiService.handleResponse(response);
             });
     }
+
+    getAccountStatus(shouldForce) {
+        const headers = this.getBasicHeaders();
+        return this.httpClient
+            .get(
+                `_action/${this.getApiBasePath()}/synchronisation/get-account-status`,
+                {
+                    headers: headers,
+                    params: {force: shouldForce}
+                }
+            )
+            .then((response) => {
+                return ApiService.handleResponse(response);
+            });
+    }
 }
 
 export default LengowSynchronisationService;

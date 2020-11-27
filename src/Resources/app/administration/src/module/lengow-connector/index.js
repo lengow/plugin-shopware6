@@ -1,5 +1,6 @@
 import './components/lgw-debug-warning';
 import './components/lgw-update-warning'
+import './components/lgw-free-trial-warning';
 import './components/lengow-export-list';
 import './components/lengow-dashboard';
 import './components/lengow-order-list';

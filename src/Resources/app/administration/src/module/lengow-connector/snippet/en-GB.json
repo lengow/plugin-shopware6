@@ -3,7 +3,16 @@
         "global": {
             "new_version_available_1": "A new version",
             "new_version_available_2": "is available!",
-            "download_plugin": "Download"
+            "download_plugin": "Download",
+            "title_end_free_trial": "All good things come to an end",
+            "subtitle_end_free_trial": "You've reached the end of your trial!",
+            "first_description_end_free_trial": "Your free 15-day trial period on Lengow has now expired. We know that it is sad news, but the best is yet to come! We sincerely hope Lengow has helped you improve your business.",
+            "second_description_end_free_trial": "Your account will be suspended until you purchase a new subscription. All existing distributions and importations will also be suspended.",
+            "third_description_end_free_trial": "Don't forget that trial accounts are deleted 30 days after the end of the trial period. Make sure to subscribe so you do not lose the work you've done building channels.",
+            "upgrade_account_button": "It's ok, I'm ready to subscribe!",
+            "refresh_action": "Refresh my account",
+            "trial_1": "Trial period : ",
+            "trial_2": " day(s) left"
         },
         "page": {
             "dashboard": "Dashboard",

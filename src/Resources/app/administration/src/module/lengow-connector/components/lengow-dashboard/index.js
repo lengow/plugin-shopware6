@@ -1,5 +1,6 @@
 import template from './views/lengow-dashboard.html.twig';
 import lgwConnexionIframe from './components/lgw-Iframe-connexion';
+import lgwFreeTrialExpired from './components/lgw-free-trial-expired';
 import './views/lengow-dashboard.scss';
 import { envMixin, LENGOW_URL } from "../../../const";
 
@@ -21,6 +22,7 @@ Component.register('lengow-dashboard', {
             lengow_url: LENGOW_URL,
             isNew: false,
             isLoading: true,
+            isTrialExpired: false,
         }
     },
 
@@ -55,6 +57,11 @@ Component.register('lengow-dashboard', {
             }).finally(() => {
                 this.isLoading = false;
             });
+        },
+
+        setTrialExpired() {
+            this.isTrialExpired = true;
+            this.isNew = true;
         }
     }
 });

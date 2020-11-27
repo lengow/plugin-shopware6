@@ -3,7 +3,16 @@
         "global": {
             "new_version_available_1": "La nouvelle version",
             "new_version_available_2": "est disponible !",
-            "download_plugin": "Télécharger"
+            "download_plugin": "Télécharger",
+            "title_end_free_trial": "Toutes les bonnes choses ont une fin...",
+            "subtitle_end_free_trial": "Vous avez atteint la fin de votre période d'essai !",
+            "first_description_end_free_trial": "Vos 15 jours d'essai gratuit sur la plateforme Lengow sont maintenant terminés. Nous espérons qu'ils ont été bénéfiques à votre activité e-commerce.",
+            "second_description_end_free_trial": "Votre compte va être désactivé jusqu'à ce que vous souscriviez à un abonnement sur la plateforme Lengow. Toutes les diffusions en cours ainsi que les importations vont être momentanément stoppées.",
+            "third_description_end_free_trial": "Votre compte d'essai sera supprimé 30 jours après expiration. Pour conserver l'intégralité des paramètres que vous avez défini, pensez à souscrire dès maintenant !",
+            "upgrade_account_button": "Je suis prêt à souscrire !",
+            "refresh_action": "Actualiser mon compte",
+            "trial_1": "Période d'essai : ",
+            "trial_2": " jour(s) restant(s)."
         },
         "page": {
             "dashboard": "Tableau de bord",

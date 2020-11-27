@@ -412,4 +412,45 @@ class LengowSync
         }
         return null;
     }
+
+
+    /**
+     * Get account status from api once a day
+     *
+     * @param bool $force force call if it has been less than a day
+     * @param bool $logOutput should log output
+     * @return array|null
+     */
+    public function getAccountStatus(bool $force = false, bool $logOutput = false): ?array
+    {
+        if (!$force) {
+            $updatedAt = $this->lengowConfiguration->get('lengowAccountStatusUpdate');
+            if ($updatedAt !== null
+                && (time() - (int)$updatedAt) < $this->cacheTimes[self::SYNC_PLUGIN_DATA]
+                && $this->lengowConfiguration->get('lengowAccountStatus')
+            ) {
+                return json_decode($this->lengowConfiguration->get('lengowAccountStatus'), true);
+            }
+        }
+        $status = null;
+        $accountData = $this->lengowConnector->queryApi(
+            LengowConnector::GET,
+            LengowConnector::API_PLAN,
+            [],
+            '',
+            $logOutput
+        );
+        if ($accountData && isset($accountData->isFreeTrial)) {
+            $status = [
+                'type' => $accountData->isFreeTrial ? 'free_trial' : '',
+                'day' => (int) $accountData->leftDaysBeforeExpired < 0 ? 0 : (int) $accountData->leftDaysBeforeExpired,
+                'expired' => (bool) $accountData->isExpired,
+            ];
+            $this->lengowConfiguration->set('lengowAccountStatus', json_encode($status));
+            $this->lengowConfiguration->set('lengowAccountStatusUpdate', (string) time());
+        } else if ($this->lengowConfiguration->get('lengowAccountStatusUpdate')) {
+            $status = json_decode($this->lengowConfiguration->get('lengowAccountStatusUpdate'), true);
+        }
+        return $status;
+    }
 }

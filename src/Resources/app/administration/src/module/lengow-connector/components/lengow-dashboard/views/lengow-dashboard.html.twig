@@ -9,6 +9,7 @@
                                 {{ $tc('lengow-connector.page.dashboard') }}
                                 <lgw-debug-warning></lgw-debug-warning>
                                 <lgw-update-warning></lgw-update-warning>
+                                <lgw-free-trial-warning :setTrialExpired="setTrialExpired"></lgw-free-trial-warning>
                             {% endblock %}
                         </h2>
                     {% endblock %}
@@ -87,12 +88,20 @@
             {% endblock %}
         </sw-page>
     </template>
-    <template v-else>
+    <template v-else-if="isNew && !isTrialExpired">
         <div class="lgw-container" v-if="isLoading">
             <sw-loader size="50px"></sw-loader>
         </div>
         <div v-else>
             <lgw-iframe-connexion></lgw-iframe-connexion>
+        </div>
+    </template>
+    <template v-else-if="isTrialExpired">
+        <div class="lgw-container" v-if="isLoading">
+            <sw-loader size="50px"></sw-loader>
+        </div>
+        <div v-else>
+            <lgw-free-trial-expired></lgw-free-trial-expired>
         </div>
     </template>
 {% endblock %}

@@ -115,6 +115,14 @@ class LengowCronController extends LengowAbstractFrontController
         if ($cronArgs['sync'] === LengowSync::SYNC_MARKETPLACE) {
             $this->lengowSync->getMarketplaces($cronArgs['force'], $cronArgs['log_output']);
         }
+        // synchronise plugin data between Lengow and Shopware
+        if ($cronArgs['sync'] === LengowSync::SYNC_PLUGIN_DATA) {
+            $this->lengowSync->getPluginData($cronArgs['force'], $cronArgs['log_output']);
+        }
+        // synchronise account status between Lengow and Shopware
+        if ($cronArgs['sync'] === LengowSync::SYNC_STATUS_ACCOUNT) {
+            $this->lengowSync->getAccountStatus($cronArgs['force'], $cronArgs['log_output']);
+        }
         if ($cronArgs['sync'] && !$this->lengowSync->isSyncAction($cronArgs['sync'])) {
             $errorMessage = $this->lengowLog->decodeMessage(
                 'log.import.not_valid_action',

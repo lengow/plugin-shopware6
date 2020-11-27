@@ -1,0 +1,42 @@
+{% block lgw_free_trial_expired %}
+    <template>
+        <div class="lgw-page">
+            <div class="lgw-free-trial-container">
+                <div class="lgw-row">
+                    <div class="expired-text-block lgw-col-6 text-center">
+                        <div class="">
+                            <h2>{{ $tc('lengow-connector.global.title_end_free_trial') }}</h2>
+                            <h3>{{ $tc('lengow-connector.global.subtitle_end_free_trial') }}</h3>
+                            <p>{{ $tc('lengow-connector.global.first_description_end_free_trial') }}</p>
+                            <p>{{ $tc('lengow-connector.global.second_description_end_free_trial') }}</p>
+                            <p>{{ $tc('lengow-connector.global.third_description_end_free_trial') }}</p>
+                            <sw-button :disabled="false"
+                                       :square="false"
+                                       :block="false"
+                                       :isLoading="false"
+                                       class="lgw-btn lgw-free-trial-button"
+                                       target="_blank"
+                                       :link="lengow_url">
+                                {{ $tc('lengow-connector.global.upgrade_account_button') }}
+                            </sw-button>
+                            <sw-button :disabled="false"
+                                       :square="false"
+                                       :block="false"
+                                       :isLoading="false"
+                                       class="lgw-btn lgw-free-trial-button"
+                                       target="_blank"
+                                       @click="reloadAccountStatus">
+                                {{ $tc('lengow-connector.global.refresh_action') }}
+                            </sw-button>
+                        </div>
+                    </div>
+                    <div class="lgw-col-6">
+                        <div class="vertical-center">
+                            <img :src="'connector/lengow-blue.png' | asset" alt="lengow" class="center-block">
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </template>
+{% endblock %}
