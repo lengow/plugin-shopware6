@@ -7,12 +7,13 @@ import './components/lengow-settings';
 import './components/lengow-legal-notices';
 import './components/lengow-contact';
 import './components/lengow-footer';
-import './components/lgw-list-element';
+import './components/lgw-description-list-element';
 import './components/lgw-order-detail-extension';
 import './extension/sw-order-detail';
 import './page/lgw-toolbox';
 import './view/lgw-toolbox-base';
 import './view/lgw-toolbox-checksum';
+import './view/lgw-toolbox-log';
 
 Shopware.Module.register('lengow-connector', {
     color: '#ff3d58',
@@ -77,6 +78,13 @@ Shopware.Module.register('lengow-connector', {
                 checksum: {
                     component: 'lgw-toolbox-checksum',
                     path: 'checksum',
+                    meta: {
+                        parentPath: 'lengow.connector.dashboard',
+                    }
+                },
+                log: {
+                    component: 'lgw-toolbox-log',
+                    path: 'log',
                     meta: {
                         parentPath: 'lengow.connector.dashboard',
                     }

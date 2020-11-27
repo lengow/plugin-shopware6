@@ -752,7 +752,7 @@ class LengowConfiguration
                 case 'boolean':
                     return (bool)$value;
                 case 'array':
-                    return explode(';', trim(str_replace(["\r\n", ',', ' '], ';', $value), ';'));
+                    return $value ? explode(';', trim(str_replace(["\r\n", ',', ' '], ';', $value), ';')) : [];
             }
         }
         return $value;

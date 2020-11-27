@@ -4,6 +4,7 @@ namespace Lengow\Connector\Controller;
 
 use Shopware\Core\Framework\Routing\Annotation\RouteScope;
 use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
+use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\Routing\Annotation\Route;
 use Symfony\Component\HttpFoundation\JsonResponse;
 use Lengow\Connector\Service\LengowToolbox;
@@ -62,5 +63,35 @@ class LengowToolboxController extends AbstractController
     public function getChecksumData(): JsonResponse
     {
         return new JsonResponse($this->lengowToolbox->getChecksumData());
+    }
+
+    /**
+     * Get log data
+     *
+     * @Route("/api/v{version}/_action/lengow/toolbox/get-log-data",
+     *     name="api.action.lengow.toolbox.get-log-data",
+     *     methods={"GET"})
+     *
+     * @return JsonResponse
+     */
+    public function getLogData(): JsonResponse
+    {
+        return new JsonResponse($this->lengowToolbox->getLogData());
+    }
+
+    /**
+     * Download log file individually or globally
+     *
+     * @Route("/api/v{version}/_action/lengow/order/download-log",
+     *     defaults={"auth_enabled"=true},
+     *     name="api.action.lengow.toolbox.download-log",
+     *     methods={"POST"})
+     *
+     * @param Request $request
+     */
+    public function downloadLog(Request $request): void
+    {
+        $fileName = $request->get('fileName');
+        $this->lengowToolbox->downloadLog($fileName === 'logs' ? null : $fileName);
     }
 }

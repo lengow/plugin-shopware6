@@ -1,9 +1,9 @@
-import template from './views/lgw-list-element.html.twig';
-import './views/lgw-list-element.scss';
+import template from './views/lgw-description-list-element.html.twig';
+import './views/lgw-description-list-element.scss';
 
 const { Component } = Shopware;
 
-Component.register('lgw-list-element', {
+Component.register('lgw-description-list-element', {
     template,
 
     inject: [],
@@ -38,6 +38,7 @@ Component.register('lgw-list-element', {
             iconClass: '',
             content: '',
             isDate: false,
+            isArray: false,
             isLoading: false,
         };
     },
@@ -63,14 +64,14 @@ Component.register('lgw-list-element', {
                     if (this.value) {
                         this.showIcon = true;
                         this.iconName = 'small-default-checkmark-line-medium';
-                        this.iconClass = 'is--active green';
+                        this.iconClass = 'is--active lgw-check-green';
                     } else {
                         if (this.helpText !== '') {
                             this.content = this.helpText;
                         } else {
                             this.showIcon = true;
                             this.iconName = 'small-default-x-line-medium';
-                            this.iconClass = 'is--inactive red';
+                            this.iconClass = 'is--inactive lgw-check-red';
                         }
                     }
                     break;
@@ -84,7 +85,8 @@ Component.register('lgw-list-element', {
                     break;
                 case 'array':
                     if (this.value.length > 0) {
-                        this.content = this.value.join(', ');
+                        this.isArray = true;
+                        this.content = this.value;
                     } else {
                         this.content = emptyValue;
                     }

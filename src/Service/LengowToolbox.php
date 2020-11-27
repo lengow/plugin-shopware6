@@ -26,6 +26,11 @@ class LengowToolbox
     private $lengowImport;
 
     /**
+     * @var LengowLog $lengowLog Lengow log service
+     */
+    private $lengowLog;
+
+    /**
      * @var LengowOrder $lengowOrder Lengow order service
      */
     private $lengowOrder;
@@ -41,6 +46,7 @@ class LengowToolbox
      * @param LengowConfiguration $lengowConfiguration Lengow configuration service
      * @param LengowExport $lengowExport Lengow export service
      * @param LengowImport $lengowImport Lengow import service
+     * @param LengowLog $lengowLog Lengow log service
      * @param LengowOrder $lengowOrder Lengow order service
      * @param EnvironmentInfoProvider $environmentInfoProvider Lengow environment info provider utility
      *
@@ -49,6 +55,7 @@ class LengowToolbox
         LengowConfiguration $lengowConfiguration,
         LengowExport $lengowExport,
         LengowImport $lengowImport,
+        LengowLog $lengowLog,
         LengowOrder $lengowOrder,
         EnvironmentInfoProvider $environmentInfoProvider
     )
@@ -56,6 +63,7 @@ class LengowToolbox
         $this->lengowConfiguration = $lengowConfiguration;
         $this->lengowExport = $lengowExport;
         $this->lengowImport = $lengowImport;
+        $this->lengowLog = $lengowLog;
         $this->lengowOrder = $lengowOrder;
         $this->environmentInfoProvider = $environmentInfoProvider;
     }
@@ -72,7 +80,8 @@ class LengowToolbox
             'plugin' => $this->getPluginData(),
             'import' => $this->getImportData(),
             'export' => $this->getExportData(),
-            'check_file_md5' => $this->getChecksumData(),
+            'checksum' => $this->getChecksumData(),
+            'log' => $this->getLogData(),
         ];
     }
 
@@ -199,13 +208,42 @@ class LengowToolbox
         $fileDeletedCounter = count($fileDeleted);
         return [
             'available' => $md5Available,
-            'success' => !$md5Available || $fileModifiedCounter > 0 || $fileModifiedCounter > 0,
+            'success' => !$md5Available || !($fileModifiedCounter > 0) || !($fileModifiedCounter > 0),
             'file_checked_counter' => $fileCounter,
             'file_modified_counter' => $fileModifiedCounter,
             'file_deleted_counter' => $fileDeletedCounter,
             'file_modified' => $fileModified,
             'file_deleted' => $fileDeleted,
         ];
+    }
+
+    /**
+     * Get all log files available
+     *
+     * @return array
+     */
+    public function getLogData(): array
+    {
+        $logs = [];
+        $files = $this->lengowLog->getFilesFromFolder();
+        foreach ($files as $file) {
+            preg_match('/^logs-([0-9]{4}-[0-9]{2}-[0-9]{2})\.txt$/', $file->getFileName(), $match);
+            $logs[] = [
+                'name' => $file->getFileName(),
+                'date' => $match[1],
+            ];
+        }
+        return array_reverse($logs);
+    }
+
+    /**
+     * Download log file individually or globally
+     *
+     * @param string|null $fileName name of file to download
+     */
+    public function downloadLog(string $fileName = null): void
+    {
+        $this->lengowLog->download($fileName);
     }
 
     /**

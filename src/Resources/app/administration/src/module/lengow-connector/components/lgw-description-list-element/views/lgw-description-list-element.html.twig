@@ -1,0 +1,23 @@
+{% block lgw_description_list_element %}
+    <template>
+        <div v-if="!isLoading" class="lgw-description-list-element">
+            <dt>{{ title }}</dt>
+            <dd>
+                <sw-icon v-if="showIcon" :name="iconName" small :class="iconClass"></sw-icon>
+                <div v-else-if="isDate">
+                    {{ content | date({hour: '2-digit', minute: '2-digit'}) }}
+                </div>
+                <div v-else-if="isArray">
+                    <sw-button v-for="value in content"
+                            :key="value"
+                            size="x-small">
+                        {{ value }}
+                    </sw-button>
+                </div>
+                <span v-else>
+                    {{ content }}
+                </span>
+            </dd>
+        </div>
+    </template>
+{% endblock %}

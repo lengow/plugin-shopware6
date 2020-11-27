@@ -16,29 +16,32 @@
         {% block lgw_toolbox_content %}
             <sw-card-view slot="content">
                 {% block lgw_toolbox_content_tabs %}
-                    <sw-tabs>
+                    <sw-tabs v-if="!isLoading">
                         {% block lgw_toolbox_content_tabs_base %}
                             <sw-tabs-item :route="{ name: 'lengow.connector.toolbox.base' }"
                                           title="$tc('lengow-connector.toolbox.menu.overview')">
                                 {{ $tc('lengow-connector.toolbox.menu.overview') }}
                             </sw-tabs-item>
                         {% endblock %}
-
                         {% block lgw_toolbox_content_tabs_checksum %}
                             <sw-tabs-item :route="{ name: 'lengow.connector.toolbox.checksum' }"
                                           title="{{ $tc('lengow-connector.toolbox.menu.checksum') }}">
                                 {{ $tc('lengow-connector.toolbox.menu.checksum') }}
                             </sw-tabs-item>
                         {% endblock %}
+                        {% block lgw_toolbox_content_tabs_log %}
+                            <sw-tabs-item :route="{ name: 'lengow.connector.toolbox.log' }"
+                                          title="{{ $tc('lengow-connector.toolbox.menu.log') }}">
+                                    {{ $tc('lengow-connector.toolbox.menu.log') }}
+                            </sw-tabs-item>
+                        {% endblock %}
                     </sw-tabs>
                 {% endblock %}
-
                 {% block lgw_toolbox_content_view %}
                     <router-view></router-view>
                 {% endblock %}
-
                 {% block lgw_toolbox_content_footer %}
-                    <lengow-footer></lengow-footer>
+                    <lengow-footer v-if="!isLoading"></lengow-footer>
                 {% endblock %}
             </sw-card-view>
         {% endblock %}

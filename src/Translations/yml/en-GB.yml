@@ -305,6 +305,12 @@ en:
           file_deleted: "files deleted"
           list_modified_file: "List of modified files"
           list_deleted_file: "List of deleted files"
+        log:
+          title: "Log Files"
+          description: "Find all the maintenance logs below (imported orders, errors reports...). They will be recorded here for 20 days."
+          button_download: "Download log files"
+          placeholder: "Please choose a log file..."
+          download_all_files: "Download all files"
         none: 'none'
   backend:
     lengow_log:

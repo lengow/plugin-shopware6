@@ -1,0 +1,24 @@
+{% block lgw_toolbox_log %}
+    <div v-if="!isLoading" class="lgw-toolbox-log">
+        {% block lgw_toolbox_log_download %}
+            <sw-card :title="$tc('lengow-connector.toolbox.log.title')">
+                <span class="lgw-description">{{ $tc('lengow-connector.toolbox.log.description') }}</span>
+                <sw-single-select :placeholder="$tc('lengow-connector.toolbox.log.placeholder')"
+                                  :options="availableLogs"
+                                  :isLoading="isLoading"
+                                  :value="logFilter"
+                                  @change="onChangeLogFilter">
+                </sw-single-select>
+                <sw-button v-if="showButton"
+                           variant="primary"
+                           @click="downloadLog"
+                           :isLoading="buttonIsLoading">
+                    {{ $tc('lengow-connector.toolbox.log.button_download') }}
+                </sw-button>
+            </sw-card>
+        {% endblock %}
+    </div>
+    <div v-else>
+        <sw-loader></sw-loader>
+    </div>
+{% endblock %}

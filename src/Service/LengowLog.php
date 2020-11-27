@@ -226,31 +226,29 @@ class LengowLog
     /**
      * Download log file individually or globally
      *
-     * @param string|null $file name of file to download
+     * @param string|null $fileName name of file to download
      */
-    public function download($file = null): void
+    public function download($fileName = null): void
     {
-        if ($file && preg_match('/^logs-([0-9]{4}-[0-9]{2}-[0-9]{2})\.txt$/', $file, $match)) {
-            $sep = DIRECTORY_SEPARATOR;
-            $filename = $this->environmentInfoProvider->getPluginPath() . $sep . self::LOG_FOLDER_NAME . '/' . $file;
-            $handle = fopen($filename, 'r');
-            $contents = fread($handle, filesize($filename));
-            header('Content-type: text/plain');
-            header('Content-Disposition: attachment; filename="' . $match[1] . '.txt"');
-            echo $contents;
-            exit();
+        /** @var LengowFile[] $logFiles */
+        if ($fileName && preg_match('/^logs-(\d{4}-\d{2}-\d{2})\.txt$/', $fileName)) {
+            $logFiles = [$this->lengowFileFactory->create(self::LOG_FOLDER_NAME, $fileName)];
         } else {
-            /** @var LengowFile[] $logFiles */
+            $fileName = 'logs.txt';
             $logFiles = $this->getFilesFromFolder();
-            header('Content-type: text/plain');
-            header('Content-Disposition: attachment; filename="logs.txt"');
-            foreach ($logFiles as $logFile) {
-                $filePath = $logFile->getPath();
-                $handle = fopen($filePath, 'r');
-                $contents = fread($handle, filesize($filePath));
-                echo $contents;
-            }
-            exit();
         }
+        $contents = '';
+        foreach ($logFiles as $logFile) {
+            $filePath = $logFile->getPath();
+            $handle = fopen($filePath, 'r');
+            $fileSize = filesize($filePath);
+            if ($fileSize > 0) {
+                $contents .= fread($handle, $fileSize);
+            }
+        }
+        header('Content-type: text/plain');
+        header('Content-Disposition: attachment; filename="' . $fileName . '"');
+        echo $contents;
+        exit();
     }
 }

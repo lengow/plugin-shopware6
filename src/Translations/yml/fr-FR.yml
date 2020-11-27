@@ -300,6 +300,12 @@ fr:
           file_deleted: "fichier(s) supprimé(s)"
           list_modified_file: "Liste des fichiers modifiés"
           list_deleted_file: "Liste des fichiers supprimés"
+        log:
+          title: "Fichiers de Log"
+          description: "Retrouvez ci-dessous tout l'historique des logs (commandes importées, messages d'erreurs...). Ils seront sauvegardés ici pendant 20 jours"
+          button_download: "Télécharger les fichiers de log"
+          placeholder: "Choisissez un fichier de log..."
+          download_all_files: "Télécharger tous les fichiers"
         none: 'aucun'
   backend:
     lengow_log:

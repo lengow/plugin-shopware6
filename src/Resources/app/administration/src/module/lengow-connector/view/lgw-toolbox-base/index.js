@@ -1,24 +1,20 @@
 import template from './lgw-toolbox-base.html.twig';
 
 const { Component } = Shopware;
+const { mapState, mapGetters } = Shopware.Component.getComponentHelper();
 
 Component.register('lgw-toolbox-base', {
     template,
 
-    inject: ['LengowConnectorToolboxService'],
+    inject: [],
 
     mixins: [],
 
     data() {
-        return {
-            data: [],
-            isLoading: false,
-        };
+        return {};
     },
 
-    created() {
-        this.loadToolboxData();
-    },
+    created() {},
 
     metaInfo() {
         return {
@@ -26,18 +22,11 @@ Component.register('lgw-toolbox-base', {
         };
     },
 
-    computed: {},
+    computed: {
+        ...mapState('lgwToolbox', ['overviewData', 'loading']),
 
-    methods: {
-        loadToolboxData() {
-            this.isLoading = true;
-            this.LengowConnectorToolboxService.getOverviewData()
-                .then(response => {
-                    this.data = response;
-                })
-                .finally(() => {
-                    this.isLoading = false;
-                });
-        },
+        ...mapGetters('lgwToolbox', ['isLoading']),
     },
+
+    methods: {},
 });

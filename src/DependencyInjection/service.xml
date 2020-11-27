@@ -164,6 +164,7 @@
             <argument type="service" id="Lengow\Connector\Service\LengowConfiguration"/>
             <argument type="service" id="Lengow\Connector\Service\LengowExport"/>
             <argument type="service" id="Lengow\Connector\Service\LengowImport"/>
+            <argument type="service" id="Lengow\Connector\Service\LengowLog"/>
             <argument type="service" id="Lengow\Connector\Service\LengowOrder"/>
             <argument type="service" id="Lengow\Connector\Util\EnvironmentInfoProvider"/>
         </service>

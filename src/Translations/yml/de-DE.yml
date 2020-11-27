@@ -301,6 +301,12 @@ de:
           file_deleted: "Dateien gelöscht"
           list_modified_file: "Liste der geänderten Dateien"
           list_deleted_file: "Liste der gelöschten Dateien"
+        log:
+          title: "Log-Dateien"
+          description: "Unten finden Sie alle Wartungsprotokolle (importierte Aufträge, Fehlerberichte...). Sie werden hier für 20 Tage aufgezeichnet"
+          button_download: "Protokolldateien herunterladen"
+          placeholder: "Bitte wählen Sie eine Log-Datei..."
+          download_all_files: "Alle Dateien herunterladen"
         none: "kein"
   backend:
     lengow_log:
