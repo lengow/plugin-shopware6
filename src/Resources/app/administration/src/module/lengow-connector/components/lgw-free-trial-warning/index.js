@@ -21,7 +21,7 @@ Component.register('lgw-free-trial-warning', {
 
     data() {
         return {
-            freeTrialEnabled: true,
+            freeTrialEnabled: false,
             dayLeft: '',
             isExpired: false,
         }
