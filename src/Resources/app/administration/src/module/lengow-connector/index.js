@@ -1,16 +1,16 @@
-import './components/lengow-export-list';
-import './components/lgw-action-button';
-import './components/lgw-action-label';
-import './components/lgw-conditional-string-field';
-import './components/lgw-country-icon';
-import './components/lgw-debug-warning';
-import './components/lgw-description-list-element';
-import './components/lgw-footer';
-import './components/lgw-free-trial-warning';
-import './components/lgw-lockable-string-field';
-import './components/lgw-order-state-label';
-import './components/lgw-order-type-icon';
-import './components/lgw-update-warning';
+import './page/lgw-product-list';
+import './component/lgw-action-button';
+import './component/lgw-action-label';
+import './component/lgw-conditional-string-field';
+import './component/lgw-country-icon';
+import './component/lgw-debug-warning';
+import './component/lgw-description-list-element';
+import './component/lgw-footer';
+import './component/lgw-free-trial-warning';
+import './component/lgw-lockable-string-field';
+import './component/lgw-order-state-label';
+import './component/lgw-order-type-icon';
+import './component/lgw-update-warning';
 import './extension/sw-order-detail';
 import './page/lgw-contact';
 import './page/lgw-dashboard';
@@ -39,9 +39,9 @@ Shopware.Module.register('lengow-connector', {
             component: 'lgw-dashboard',
             path: 'dashboard',
         },
-        export: {
-            component: 'lengow-export-list',
-            path: 'export',
+        product: {
+            component: 'lgw-product-list',
+            path: 'product',
             meta: {
                 parentPath: 'lengow.connector.dashboard',
             },

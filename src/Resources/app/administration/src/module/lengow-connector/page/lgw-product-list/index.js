@@ -1,5 +1,5 @@
-import template from './views/lengow-export-list.html.twig';
-import './views/lengow-export-list.scss';
+import template from './lgw-product-list.html.twig';
+import './lgw-product-list.scss';
 
 const {
     Component,
@@ -7,7 +7,7 @@ const {
     Data: { Criteria },
 } = Shopware;
 
-Component.register('lengow-export-list', {
+Component.register('lgw-product-list', {
     template,
 
     inject: ['repositoryFactory', 'numberRangeService', 'acl', 'LengowConnectorExportService'],
