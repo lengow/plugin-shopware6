@@ -1,35 +1,27 @@
-import template from './views/lgw-update-warning.html.twig';
-import './views/lgw-update-warning.scss';
+import template from './lgw-update-warning.html.twig';
+import './lgw-update-warning.scss';
 
-import {LENGOW_URL, MODULE_VERSION} from "../../../const";
+import { LENGOW_URL } from '../../../const';
 
-const {
-    Component,
-    Mixin,
-    Data: { Criteria },
-} = Shopware;
+const { Component } = Shopware;
 
 Component.register('lgw-update-warning', {
     template,
 
-    inject: ['repositoryFactory', 'LengowSynchronisationService',],
+    inject: ['LengowConnectorSyncService'],
 
     data() {
         return {
             display: false,
             newVersion: null,
             link: '',
-        }
+        };
     },
 
-    computed: {
-        lengowSettingsRepository() {
-            return this.repositoryFactory.create('lengow_settings');
-        },
-    },
+    computed: {},
 
     created() {
-        this.LengowSynchronisationService.getPluginData().then(data => {
+        this.LengowConnectorSyncService.getPluginData().then(data => {
             if (data.success && data.should_update) {
                 this.display = true;
                 this.newVersion = data.plugin_data.version;
@@ -37,5 +29,4 @@ Component.register('lgw-update-warning', {
             }
         });
     },
-
 });

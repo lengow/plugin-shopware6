@@ -1,5 +1,5 @@
 import LengowConnectorOrderService from '../service/api/lengow-connector-order-service';
-import LengowSynchronisationService from '../service/Sync/lengow-synchronisation-service';
+import LengowConnectorSyncService from '../service/api/lengow-connector-sync-service';
 import LengowConnectorToolboxService from '../service/api/lengow-connector-toolbox-service';
 
 const { Application } = Shopware;
@@ -9,9 +9,9 @@ Application.addServiceProvider('LengowConnectorOrderService', container => {
   return new LengowConnectorOrderService(initContainer.httpClient, container.loginService);
 });
 
-Application.addServiceProvider('LengowSynchronisationService', container => {
+Application.addServiceProvider('LengowConnectorSyncService', container => {
   const initContainer = Application.getContainer('init');
-  return new LengowSynchronisationService(initContainer.httpClient, container.loginService);
+  return new LengowConnectorSyncService(initContainer.httpClient, container.loginService);
 });
 
 Application.addServiceProvider('LengowConnectorToolboxService', container => {

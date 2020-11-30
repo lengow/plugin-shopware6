@@ -15,7 +15,7 @@
             <tag name="controller.service_arguments"/>
         </service>
 
-        <service id="Lengow\Connector\Controller\LengowAccountSynchronistationController">
+        <service id="Lengow\Connector\Controller\LengowSyncController">
             <argument type="service" id="Lengow\Connector\Service\LengowSync"/>
             <tag name="controller.service_arguments"/>
         </service>

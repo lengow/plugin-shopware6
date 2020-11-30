@@ -1,16 +1,12 @@
-import template from './views/lgw-free-trial-warning.html.twig';
-import './views/lgw-free-trial-warning.scss';
+import template from './lgw-free-trial-warning.html.twig';
+import './lgw-free-trial-warning.scss';
 
-const {
-    Component,
-    Mixin,
-    Data: { Criteria },
-} = Shopware;
+const { Component } = Shopware;
 
 Component.register('lgw-free-trial-warning', {
     template,
 
-    inject: ['LengowSynchronisationService'],
+    inject: ['LengowConnectorSyncService'],
 
     props: {
         setTrialExpired: {
@@ -24,11 +20,11 @@ Component.register('lgw-free-trial-warning', {
             freeTrialEnabled: false,
             dayLeft: '',
             isExpired: false,
-        }
+        };
     },
 
     created() {
-        this.LengowSynchronisationService.getAccountStatus(false).then(result => {
+        this.LengowConnectorSyncService.getAccountStatus(false).then(result => {
             if (result.success) {
                 this.freeTrialEnabled = result.type === 'free_trial';
                 this.dayLeft = result.day;
@@ -37,6 +33,6 @@ Component.register('lgw-free-trial-warning', {
                     this.setTrialExpired();
                 }
             }
-        })
+        });
     },
 });

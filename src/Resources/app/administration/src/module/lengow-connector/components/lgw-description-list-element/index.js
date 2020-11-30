@@ -1,5 +1,5 @@
-import template from './views/lgw-description-list-element.html.twig';
-import './views/lgw-description-list-element.scss';
+import template from './lgw-description-list-element.html.twig';
+import './lgw-description-list-element.scss';
 
 const { Component } = Shopware;
 

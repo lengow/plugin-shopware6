@@ -1,17 +1,29 @@
-import './components/lgw-debug-warning';
-import './components/lgw-update-warning'
-import './components/lgw-free-trial-warning';
 import './components/lengow-export-list';
-import './components/lengow-dashboard';
-import './components/lengow-order-list';
-import './components/lengow-settings';
-import './components/lengow-legal-notices';
-import './components/lengow-contact';
-import './components/lengow-footer';
+import './components/lgw-action-button';
+import './components/lgw-action-label';
+import './components/lgw-conditional-string-field';
+import './components/lgw-country-icon';
+import './components/lgw-debug-warning';
 import './components/lgw-description-list-element';
-import './components/lgw-order-detail-extension';
+import './components/lgw-footer';
+import './components/lgw-free-trial-warning';
+import './components/lgw-lockable-string-field';
+import './components/lgw-order-state-label';
+import './components/lgw-order-type-icon';
+import './components/lgw-update-warning';
 import './extension/sw-order-detail';
+import './page/lgw-contact';
+import './page/lgw-dashboard';
+import './page/lgw-legal-notices';
+import './page/lgw-order-list';
+import './page/lgw-setting';
 import './page/lgw-toolbox';
+import './view/lgw-dashboard-connexion';
+import './view/lgw-dashboard-free-trial';
+import './view/lgw-order-detail-extension';
+import './view/lgw-setting-export';
+import './view/lgw-setting-general';
+import './view/lgw-setting-import';
 import './view/lgw-toolbox-base';
 import './view/lgw-toolbox-checksum';
 import './view/lgw-toolbox-log';
@@ -24,7 +36,7 @@ Shopware.Module.register('lengow-connector', {
 
     routes: {
         dashboard: {
-            component: 'lengow-dashboard',
+            component: 'lgw-dashboard',
             path: 'dashboard',
         },
         export: {
@@ -35,28 +47,28 @@ Shopware.Module.register('lengow-connector', {
             },
         },
         order: {
-            component: 'lengow-order-list',
+            component: 'lgw-order-list',
             path: 'order',
             meta: {
                 parentPath: 'lengow.connector.dashboard',
             },
         },
-        settings: {
-            component: 'lengow-settings',
-            path: 'settings',
+        setting: {
+            component: 'lgw-setting',
+            path: 'setting',
             meta: {
                 parentPath: 'lengow.connector.dashboard',
             },
         },
         legal: {
-            component: 'lengow-legal-notices',
+            component: 'lgw-legal-notices',
             path: 'legal',
             meta: {
                 parentPath: 'lengow.connector.dashboard',
             },
         },
         contact: {
-            component: 'lengow-contact',
+            component: 'lgw-contact',
             path: 'contact',
             meta: {
                 parentPath: 'lengow.connector.dashboard',

@@ -1,10 +1,6 @@
-import template from './views/sw-order-detail.html.twig';
+import template from './sw-order-detail.html.twig';
 
-const {
-    Component,
-    Mixin,
-    Data: { Criteria },
-} = Shopware;
+const { Component } = Shopware;
 
 Component.override('sw-order-detail', {
     template,

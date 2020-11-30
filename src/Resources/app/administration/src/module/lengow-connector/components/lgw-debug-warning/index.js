@@ -1,9 +1,8 @@
-import template from './views/lgw-debug-warning.html.twig';
-import './views/lgw-debug-warning.scss';
+import template from './lgw-debug-warning.html.twig';
+import './lgw-debug-warning.scss';
 
 const {
     Component,
-    Mixin,
     Data: { Criteria },
 } = Shopware;
 
@@ -15,7 +14,7 @@ Component.register('lgw-debug-warning', {
     data() {
         return {
             debugMode: false,
-        }
+        };
     },
 
     computed: {
@@ -31,7 +30,6 @@ Component.register('lgw-debug-warning', {
             if (response.total > 0) {
                 this.debugMode = response.first().value === '1';
             }
-        })
+        });
     },
-
 });
