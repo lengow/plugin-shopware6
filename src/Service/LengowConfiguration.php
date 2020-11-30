@@ -196,9 +196,9 @@ class LengowConfiguration
         ],
         self::LENGOW_EXPORT_VARIATION_ENABLED => [
             'lengow_settings' => true,
-            'global' => true,
+            'channel' => true,
             'type' => 'boolean',
-            'default_value' => '0',
+            'default_value' => '1',
         ],
         self::LENGOW_MARKETPLACE_UPDATE => [
             'lengow_settings' => true,
@@ -290,9 +290,9 @@ class LengowConfiguration
         ],
         self::LENGOW_EXPORT_OUT_OF_STOCK_ENABLED => [
             'lengow_settings' => true,
-            'global' => true,
+            'channel' => true,
             'type' => 'boolean',
-            'default_value' => '0',
+            'default_value' => '1',
         ],
         self::LENGOW_CURRENCY_CONVERSION_ENABLED => [
             'lengow_settings' => true,

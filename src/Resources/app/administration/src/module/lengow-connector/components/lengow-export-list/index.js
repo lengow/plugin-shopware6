@@ -10,7 +10,7 @@ const {
 Component.register('lengow-export-list', {
     template,
 
-    inject: ['repositoryFactory', 'numberRangeService', 'acl'],
+    inject: ['repositoryFactory', 'numberRangeService', 'acl', 'LengowConnectorExportService'],
 
     mixins: [
         Mixin.getByName('notification'),
@@ -295,65 +295,13 @@ Component.register('lengow-export-list', {
         },
 
         setupExportedCount() {
-            this.getExportable();
-            if (this.productSelection) {
-                this.setupExportedCountWithSelection();
-            } else {
-                this.setupExportedCountWithoutSelection();
-            }
-        },
-
-        getExportable(mode) {
-            const arr = [];
-            const categoryCriteria = new Criteria();
-            categoryCriteria.addFilter(Criteria.contains('category.path', this.currentEntryPoint));
-            categoryCriteria.addAssociation('products');
-            if (!this.countInactive) {
-                categoryCriteria.addFilter(Criteria.equals('products.active', true));
-            }
-            this.categoryRepository
-                .search(categoryCriteria, Shopware.Context.api)
-                .then(categoryCollection => {
-                    // eslint-disable-next-line no-restricted-syntax
-                    for (const category of categoryCollection) {
-                        const ids = category.products.getIds();
-                        ids.forEach(id => arr.push(id));
-                    }
-                    this.exportableCount = arr.length;
-                    if (mode === 'noSelection') {
-                        this.exportedCount = arr.length;
-                    }
-                });
-        },
-
-        setupExportedCountWithSelection() {
-            const lengowProductCriteria = new Criteria();
-            lengowProductCriteria.addFilter(Criteria.equals('salesChannelId', this.currentSalesChannelId));
-            this.lengowProductRepository.search(lengowProductCriteria, Shopware.Context.api).then((result) => {
-                if (!this.countInactive) {
+            this.LengowConnectorExportService.getExportCount(this.currentSalesChannelId).then(response => {
+                if (response.success) {
+                    this.exportableCount = response.total;
+                    this.exportedCount = response.exported;
                     this.countLoading = false;
-                    this.exportedCount = result.total;
-                    return ;
                 }
-                const ids = [];
-                result.forEach(lengowProduct => {
-                    ids.push(lengowProduct.productId)
-                });
-                const productCritria = new Criteria();
-                if (!this.countInactive) {
-                    productCritria.addFilter(Criteria.equals('active', true));
-                }
-                productCritria.setIds(ids);
-                this.productRepository.search(productCritria, Shopware.Context.api).then((result) => {
-                    this.exportedCount = result.total;
-                    this.countLoading = false;
-                });
             });
-        },
-
-        setupExportedCountWithoutSelection() {
-            this.getExportable('noSelection');
-            this.countLoading = false;
         },
 
         onSalesChannelChanged(salesChannelId) {

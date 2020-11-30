@@ -92,7 +92,7 @@ class LengowExportController extends LengowAbstractFrontController
             'sales_channel_id' => $request->query->get('sales_channel_id'),
             'format' => $request->query->get('format') ?? '',
             'mode' => $request->query->get('mode'),
-            'stream' => $request->query->get('stream') === '1',
+            'stream' => $request->query->get('stream') !== '0',
             'product_ids' => $request->query->get('product_ids'),
             'limit' => (int) $request->query->get('limit'),
             'offset' => (int) $request->query->get('offset'),
@@ -136,7 +136,7 @@ class LengowExportController extends LengowAbstractFrontController
     {
         $this->lengowExport->init($salesChannelId);
         if ($mode === 'size') {
-            return count($this->lengowExport->getTotalExportedProduct());
+            return $this->lengowExport->getTotalExportedProduct();
         } else if ($mode === 'total') {
             return $this->lengowExport->getTotalProduct();
         }

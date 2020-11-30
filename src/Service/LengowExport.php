@@ -322,12 +322,21 @@ class LengowExport
             return 0;
         }
         $categoryCriteria = new Criteria();
-        $categoryCriteria->addAssociation('products');
+        $categoryCriteria->addFilter(new ContainsFilter('path', $masterCategoryId))->addAssociation('products');
         $categoryCollection = $this->categoryRepository->search($categoryCriteria, Context::createDefaultContext());
-        $total = 0;
+
+        $parentProductCounter = 0;
+        $childProductCounter = 0;
         foreach ($categoryCollection as $category) {
-            $total += count($category->getProducts());
+            foreach ($category->getProducts() as $product) {
+                if ($product->getParentId() === null) {
+                    $parentProductCounter++;
+                    $children = $this->getChild($product);
+                    $childProductCounter += count($this->getExportableChild($children));
+                }
+            }
         }
+        $total = $parentProductCounter + $childProductCounter;
         return $total;
     }
 
@@ -436,6 +445,9 @@ class LengowExport
     public function getSelectionProductIdsExport(array $productIds) : array
     {
         $selectionProductIdsExport = [];
+        if (empty($productIds)) {
+            return $selectionProductIdsExport;
+        }
         $productCriteria = new Criteria();
         $productCriteria->setIds($productIds);
         $productCollection = $this->productRepository->search($productCriteria, Context::createDefaultContext())->getEntities();
