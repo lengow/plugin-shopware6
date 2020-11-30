@@ -10,7 +10,7 @@ const {
 Component.register('lgw-dashboard', {
     template,
 
-    inject: ['repositoryFactory'],
+    inject: ['repositoryFactory', 'LengowConnectorSyncService'],
 
     mixins: [envMixin],
 
@@ -19,7 +19,8 @@ Component.register('lgw-dashboard', {
             lengow_url: LENGOW_URL,
             isNew: false,
             isLoading: true,
-            isTrialExpired: false,
+            trialLoading: true,
+            trialExpired: false,
         };
     },
 
@@ -31,6 +32,7 @@ Component.register('lgw-dashboard', {
 
     created() {
         this.isNewMerchant();
+        this.isTrialExpired();
     },
 
     methods: {
@@ -56,9 +58,16 @@ Component.register('lgw-dashboard', {
             });
         },
 
-        setTrialExpired() {
-            this.isTrialExpired = true;
-            this.isNew = true;
-        }
+        isTrialExpired() {
+            this.LengowConnectorSyncService.getAccountStatus(false).then(result => {
+                if (result.success) {
+                    this.trialExpired = result.expired;
+                    this.trialLoading = false;
+                } else {
+                    this.trialExpired = true;
+                    this.trialLoading = false;
+                }
+            });
+        },
     }
 });

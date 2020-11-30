@@ -20,6 +20,7 @@ import './page/lgw-setting';
 import './page/lgw-toolbox';
 import './view/lgw-dashboard-connexion';
 import './view/lgw-dashboard-free-trial';
+import './view/lgw-dashboard-home';
 import './view/lgw-order-detail-extension';
 import './view/lgw-setting-export';
 import './view/lgw-setting-general';

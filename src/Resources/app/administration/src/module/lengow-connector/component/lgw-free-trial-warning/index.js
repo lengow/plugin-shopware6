@@ -8,13 +8,6 @@ Component.register('lgw-free-trial-warning', {
 
     inject: ['LengowConnectorSyncService'],
 
-    props: {
-        setTrialExpired: {
-            type: Object,
-            required: true,
-        },
-    },
-
     data() {
         return {
             freeTrialEnabled: false,
@@ -29,9 +22,6 @@ Component.register('lgw-free-trial-warning', {
                 this.freeTrialEnabled = result.type === 'free_trial';
                 this.dayLeft = result.day;
                 this.isExpired = result.expired;
-                if (this.isExpired) {
-                    this.setTrialExpired();
-                }
             }
         });
     },
