@@ -2,15 +2,15 @@
     <template>
         <div class="lgw-setting-container">
             <div class="lgw-setting-block-title">
-                <h3>|  {{ $tc('lengow-connector.settings.title.exclusions') }}</h3>
+                <h3>|  {{ $tc('lengow-connector.setting.title.exclusions') }}</h3>
             </div>
             <div class="lgw-setting-block" v-if="render">
                 <div>
                     <sw-help-text class="lgw-help-text"
-                                  :text="$tc('lengow-connector.settings.lengow_export_settings.disabled_products.description')"
+                                  :text="$tc('lengow-connector.setting.lengow_export_setting.disabled_products.description')"
                                   :width="200"
                                   tooltipPosition="right"/>
-                    <h4>{{ $tc('lengow-connector.settings.lengow_export_settings.disabled_products.label') }}</h4>
+                    <h4>{{ $tc('lengow-connector.setting.lengow_export_setting.disabled_products.label') }}</h4>
                     <template v-for="salesChannel in salesChannels">
                         <sw-switch-field class="text-center"
                                          :label="salesChannel.name"
@@ -19,10 +19,10 @@
                         </sw-switch-field>
                     </template>
                     <sw-help-text class="lgw-help-text"
-                                  :text="$tc('lengow-connector.settings.lengow_export_settings.lengow_selection.description')"
+                                  :text="$tc('lengow-connector.setting.lengow_export_setting.lengow_selection.description')"
                                   :width="200"
                                   tooltipPosition="right"/>
-                    <h4>{{ $tc('lengow-connector.settings.lengow_export_settings.lengow_selection.label') }}</h4>
+                    <h4>{{ $tc('lengow-connector.setting.lengow_export_setting.lengow_selection.label') }}</h4>
                     <template v-for="salesChannel in salesChannels">
                         <sw-switch-field class="text-center"
                                          :label="salesChannel.name"
@@ -36,12 +36,12 @@
                 <sw-loader size="50px"></sw-loader>
             </template>
             <div class="lgw-setting-block-title">
-                <h3>|  {{ $tc('lengow-connector.settings.lengow_export_settings.shipping.label') }}</h3>
+                <h3>|  {{ $tc('lengow-connector.setting.lengow_export_setting.shipping.label') }}</h3>
             </div>
             <div class="lgw-setting-block" v-if="render">
                 <div>
                     <sw-help-text class="lgw-help-text"
-                                  :text="$tc('lengow-connector.settings.lengow_export_settings.shipping.description')"
+                                  :text="$tc('lengow-connector.setting.lengow_export_setting.shipping.description')"
                                   :width="200"
                                   tooltipPosition="right"/>
                     <sw-select-field v-for="salesChannel in salesChannels"

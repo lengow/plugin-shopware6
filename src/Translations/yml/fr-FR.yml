@@ -2,18 +2,18 @@ fr:
   administration:
     lengow-connector:
       global:
-          new_version_available_1: "La nouvelle version"
-          new_version_available_2: "est disponible !"
-          download_plugin: "Télécharger"
-          title_end_free_trial: "Toutes les bonnes choses ont une fin..."
-          subtitle_end_free_trial: "Vous avez atteint la fin de votre période d'essai !"
-          first_description_end_free_trial: "Vos 15 jours d'essai gratuit sur la plateforme Lengow sont maintenant terminés. Nous espérons qu'ils ont été bénéfiques à votre activité e-commerce."
-          second_description_end_free_trial: "Votre compte va être désactivé jusqu'à ce que vous souscriviez à un abonnement sur la plateforme Lengow. Toutes les diffusions en cours ainsi que les importations vont être momentanément stoppées."
-          third_description_end_free_trial: "Votre compte d'essai sera supprimé 30 jours après expiration. Pour conserver l'intégralité des paramètres que vous avez défini, pensez à souscrire dès maintenant !"
-          upgrade_account_button: "Je suis prêt à souscrire !"
-          refresh_action: "Actualiser mon compte"
-          trial_1: "Période d'essai : "
-          trial_2: " jour(s) restant(s)."
+        new_version_available_1: "La nouvelle version"
+        new_version_available_2: "est disponible !"
+        download_plugin: "Télécharger"
+        title_end_free_trial: "Toutes les bonnes choses ont une fin..."
+        subtitle_end_free_trial: "Vous avez atteint la fin de votre période d'essai !"
+        first_description_end_free_trial: "Vos 15 jours d'essai gratuit sur la plateforme Lengow sont maintenant terminés. Nous espérons qu'ils ont été bénéfiques à votre activité e-commerce."
+        second_description_end_free_trial: "Votre compte va être désactivé jusqu'à ce que vous souscriviez à un abonnement sur la plateforme Lengow. Toutes les diffusions en cours ainsi que les importations vont être momentanément stoppées."
+        third_description_end_free_trial: "Votre compte d'essai sera supprimé 30 jours après expiration. Pour conserver l'intégralité des paramètres que vous avez défini, pensez à souscrire dès maintenant !"
+        upgrade_account_button: "Je suis prêt à souscrire !"
+        refresh_action: "Actualiser mon compte"
+        trial_1: "Période d'essai : "
+        trial_2: " jour(s) restant(s)."
       page:
         dashboard: "Tableau de bord"
         products: "Produits"
@@ -38,9 +38,9 @@ fr:
         help:
           title: "Besoin d'aide ?"
           contact: "Prenez contact avec les équipes lengow"
-          helpCenterLink: "Visitez notre help center"
-          helpCenterTarget: "https://supportlengow.zendesk.com/hc/fr-fr/articles/360012203311"
-          helpCenter:
+          help_center_link: "Visitez notre help center"
+          help_center_target: "https://supportlengow.zendesk.com/hc/fr-fr/articles/360012203311"
+          help_center:
       footer:
         link: 'https://www.lengow.com/fr'
         plugin_name: 'Lengow Shopware 6 Module'
@@ -64,17 +64,21 @@ fr:
         address: "Adresse"
         contact: "Contact"
         hosting: "Hébergement"
-      products:
-        activateSelectionLabel: "Activer la selection produit"
-        datas:
-          nbProductExportLabel: "Total produits exportés :"
-          nbProductExportableLabel: "Total produits exportables :"
-        filters:
-          activeFilterLabel: "Actif / Inactif"
-          stockFilterLabel: "Avec stock / Sans stock"
-          searchFilterLabel: "Recherche par id / nom / reference"
-        columns:
-          activeInLengow: "Actif dans lengow"
+      product:
+        activate_selection_label: "Activer la selection produit"
+        mass_action_select: "Sélectionner tout"
+        mass_action_publish: "Publier sur lengow"
+        mass_action_unpublish: "Dépublier sur lengow"
+        total_selected: "Total sélectionné"
+        data:
+          nb_product_export_label: "Total produits exportés :"
+          nb_product_exportable_label: "Total produits exportables :"
+        filter:
+          active_filter_label: "Actif / Inactif"
+          stock_filter_label: "Avec stock / Sans stock"
+          search_filter_label: "Recherche par id / nom / reference"
+        column:
+          active_in_lengow: "Actif dans lengow"
       order:
         title: "Commandes"
         order_with_error: "en erreur"
@@ -130,59 +134,59 @@ fr:
           import: "Votre commande n'a pas été importée dans Shopware"
           no_error_message: "Erreur non identifiée, merci de contacter le support Lengow pour plus d'informations"
         action_label:
-            action_ship_sent: "action ship envoyée"
-            action_cancel_sent: "action cancel envoyée"
-            action_waiting_return: "Action envoyée, en attente d'une réponse"
+          action_ship_sent: "action ship envoyée"
+          action_cancel_sent: "action cancel envoyée"
+          action_waiting_return: "Action envoyée, en attente d'une réponse"
       orderTab:
-          title: "Lengow order detail page"
-          order_id: "ID Commande"
-          delivery_address_id: "ID d'adresse de livraison"
-          currency: "Devise"
-          commission: "Commission"
-          customer_email: "Email client"
-          customer_name: "Nom du client"
-          carrier: "Transporteur de la marketplace"
-          carrier_method: "Mode d'expédition de la marketplace"
-          carrier_tracking: "Numéro de tracking"
-          carrier_id_relay: "ID du point relais"
-          is_express: "Livraison Express"
-          is_delivered_by_marketplace: "Expédié par la marketplace"
-          is_business: "Business"
-          imported_at: "Importée à "
-          not_lengow_order: "Cette commandes ne provient pas de Lengow"
-          not_follow_by_lengow: "A cause d'une ré-importation, cette commande n'est plus suivi par Lengow"
-          synchronize_id: "Synchronisez l'ID"
-          check_synchronize_action: "Vous voulez vous vraiment réimporter la commande ?"
-          cancel_and_reimport: "Réimporter la commande"
-          check_cancel_and_reimport: "Réimporter cette commande changera le status de celle-ci en Lengow-Technical-Error et en créera une nouvelle dans votre back office, vous êtes sûr ?"
-          resend_action: "Renvoyer l'action"
-          no_order_importation: "Aucune synchronisation pour le moment"
-          total_paid: "Prix total"
-          marketplace: "Place de marché"
-          order_status: "Statut de la commande"
-          vat_number: "Numéro VAT"
-          order_date: "Date de la commande"
-          import_date: "Importée à"
-          message: "Message"
-          extra: "Format JSON de la commande"
-          status_yes: "Oui"
-          status_no: "Non"
-      settings:
-        NavBar:
-          title: "Paramètres" # todo faire les trad fr
-          generalTab: "General"
-          exportTab: "Export"
-          importTab: "Import"
+        title: "Lengow order detail page"
+        order_id: "ID Commande"
+        delivery_address_id: "ID d'adresse de livraison"
+        currency: "Devise"
+        commission: "Commission"
+        customer_email: "Email client"
+        customer_name: "Nom du client"
+        carrier: "Transporteur de la marketplace"
+        carrier_method: "Mode d'expédition de la marketplace"
+        carrier_tracking: "Numéro de tracking"
+        carrier_id_relay: "ID du point relais"
+        is_express: "Livraison Express"
+        is_delivered_by_marketplace: "Expédié par la marketplace"
+        is_business: "Business"
+        imported_at: "Importée à "
+        not_lengow_order: "Cette commandes ne provient pas de Lengow"
+        not_follow_by_lengow: "A cause d'une ré-importation, cette commande n'est plus suivi par Lengow"
+        synchronize_id: "Synchronisez l'ID"
+        check_synchronize_action: "Vous voulez vous vraiment réimporter la commande ?"
+        cancel_and_reimport: "Réimporter la commande"
+        check_cancel_and_reimport: "Réimporter cette commande changera le status de celle-ci en Lengow-Technical-Error et en créera une nouvelle dans votre back office, vous êtes sûr ?"
+        resend_action: "Renvoyer l'action"
+        no_order_importation: "Aucune synchronisation pour le moment"
+        total_paid: "Prix total"
+        marketplace: "Place de marché"
+        order_status: "Statut de la commande"
+        vat_number: "Numéro VAT"
+        order_date: "Date de la commande"
+        import_date: "Importée à"
+        message: "Message"
+        extra: "Format JSON de la commande"
+        status_yes: "Oui"
+        status_no: "Non"
+      setting:
+        nav_bar:
+          title: "Paramètres"
+          general: "General"
+          export: "Export"
+          import: "Import"
         title:
-          credentials: "Credentials"
-          salesChannel: "Sales Channels"
+          credentials: "Identifiants"
+          sales_channel: "Canaux de vente"
           security: "Securité & tracker"
           timezone: "Timezone"
           exclusions: "Exclusions"
           shipping: "Methode de transport par defaut"
           marketplaces: "Marketplaces"
           others: "Autres"
-        lengow_main_settings:
+        lengow_main_setting:
           label: "Paramètres principaux"
           description: "Vous trouverez ci-dessous vos identifiants de connexion à Lengow.\nLes ID Lengow, Access Token et Secret Token sont automatiquement complétés lors de votre première connexion : veuillez à ne pas les modifier."
           account:
@@ -215,7 +219,7 @@ fr:
           timezone:
             label: "Timezone"
             description: "Choix de la Timezone. Attention, ce paramètre est utilisé lors de l'import de vos commandes depuis l'API Lengow"
-        lengow_export_settings:
+        lengow_export_setting:
           label: "Paramètres d'export"
           description: "Définissez les paramètres pour créer votre flux."
           disabled_products:
@@ -227,7 +231,7 @@ fr:
           dispatcher:
             label: "Transporteur par défaut"
             description: "Sélectionnez un transporteur par défaut pour calculer les frais de livraison"
-        lengow_import_settings:
+        lengow_import_setting:
           label: "Paramètres d'import"
           description: "Toutes vos commandes sont centralisées sur votre plateforme Lengow : choisissez ici si vous voulez synchroniser et importer vos commandes dans votre backoffice Shopware. Vos stocks seront ainsi mis à jour dans votre backoffice Shopware."
           ship_mp_enabled:

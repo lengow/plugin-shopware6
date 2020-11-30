@@ -42,11 +42,11 @@
                                 </div>
                                 <div v-if="!countLoading" class="margin-standard text-center">
                                     <p class="products-exported small light">
-                                        {{ $tc('lengow-connector.products.datas.nbProductExportLabel') }}
+                                        {{ $tc('lengow-connector.product.data.nb_product_export_label') }}
                                         <span class="stats-big-value">{{ exportedCount }}</span>
                                     </p>
                                     <p class="products-available small light">
-                                        {{ $tc('lengow-connector.products.datas.nbProductExportableLabel') }}
+                                        {{ $tc('lengow-connector.product.data.nb_product_exportable_label') }}
                                         <span class="stats-big-value">{{ exportableCount }}</span>
                                     </p>
                                 </div>
@@ -57,7 +57,7 @@
                             <div class="lgw-float-center">
                                 <sw-switch-field class="text-center"
                                                  v-model="productSelection"
-                                                 :label="$tc('lengow-connector.products.activateSelectionLabel')"
+                                                 :label="$tc('lengow-connector.product.activate_selection_label')"
                                                  @change="onActivateSelection">
                                 </sw-switch-field>
                             </div>
@@ -67,7 +67,7 @@
                                     <sw-single-select
                                             v-model="activeFilterText"
                                             :options="isActiveOptions"
-                                            :label="$tc('lengow-connector.products.filters.activeFilterLabel')"
+                                            :label="$tc('lengow-connector.product.filter.active_filter_label')"
                                             @change="onActiveFilter"
                                             class="">
                                     </sw-single-select>
@@ -76,7 +76,7 @@
                                     <sw-single-select
                                             v-model="stockFilterText"
                                             :options="isWithStockOptions"
-                                            :label="$tc('lengow-connector.products.filters.stockFilterLabel')"
+                                            :label="$tc('lengow-connector.product.filter.stock_filter_label')"
                                             @change="onStockFilter"
                                             class="">
                                     </sw-single-select>
@@ -84,7 +84,7 @@
                                 <div class="lgw-col-4">
                                     <sw-text-field
                                             v-model="searchFilterText"
-                                            :label="$tc('lengow-connector.products.filters.searchFilterLabel')"
+                                            :label="$tc('lengow-connector.product.filter.search_filter_label')"
                                             @input="onSearchFilter">
                                     </sw-text-field>
                                 </div>
@@ -111,23 +111,25 @@
                                     </template>
                                     <template slot="bulk">
                                         {% block sw_data_grid_bulk_selected_count %}
-                                            <span class="sw-data-grid__bulk-selected bulk-link">Total Selected : </span>
+                                            <span class="sw-data-grid__bulk-selected bulk-link">
+                                                {{ $tc('lengow-connector.product.total_selected') }} :
+                                            </span>
                                             <span class="sw-data-grid__bulk-selected sw-data-grid__bulk-selected-count">{{ totalSelected }}</span>
                                         {% endblock %}
                                         {% block sw_data_grid_bulk_selected_actions_content %}
                                             <span class="sw-data-grid__bulk-selected bulk-link">
                                                 <a class="link link-default" @click="onSelectAllProducts">
-                                                    Select All
+                                                    {{ $tc('lengow-connector.product.mass_action_select') }}
                                                 </a>
                                             </span>
                                             <span class="sw-data-grid__bulk-selected bulk-link">
                                                 <a class="link link-default" @click="onPublishOnLengow">
-                                                    Publish on lengow
+                                                    {{ $tc('lengow-connector.product.mass_action_publish') }}
                                                 </a>
                                             </span>
                                             <span class="sw-data-grid__bulk-selected bulk-link">
                                                 <a class="link link-default" @click="onUnpublishOnLengow">
-                                                    Unpublish on lengow
+                                                    {{ $tc('lengow-connector.product.mass_action_unpublish') }}
                                                 </a>
                                             </span>
                                         {% endblock %}

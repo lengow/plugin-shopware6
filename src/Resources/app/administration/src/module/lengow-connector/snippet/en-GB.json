@@ -43,9 +43,9 @@
             "help": {
                 "title": "Need some help?",
                 "contact": "Get in touch with Lengow.",
-                "helpCenterLink": "Visit our Help Center",
-                "helpCenterTarget": "https:\/\/supportlengow.zendesk.com\/hc\/en-us\/articles\/360012203311",
-                "helpCenter": "for detailed information on how to configure your Shopware plugin properly"
+                "help_center_link": "Visit our Help Center",
+                "help_center_target": "https:\/\/supportlengow.zendesk.com\/hc\/en-us\/articles\/360012203311",
+                "help_enter": "for detailed information on how to configure your Shopware plugin properly"
             }
         },
         "footer": {
@@ -74,20 +74,23 @@
             "contact": "Contact",
             "hosting": "Hosting"
         },
-        "products": {
-            "activateSelectionLabel": "Activate product selection",
-            "datas": {
-                "nbProductExportLabel": "Total product exported :",
-                "nbProductExportableLabel": "Total product exportable :",
-                "downloadLinkLabel": "Download link :"
+        "product": {
+            "activate_selection_label": "Activate product selection",
+            "mass_action_select": "Select All",
+            "mass_action_publish": "Publish on lengow",
+            "mass_action_unpublish": "Unpublish on lengow",
+            "total_selected": "Total Selected",
+            "data": {
+                "nb_product_export_label": "Total product exported :",
+                "nb_product_exportable_label": "Total product exportable :"
             },
-            "filters": {
-                "activeFilterLabel": "Active \/ Inactive",
-                "stockFilterLabel": "With stock \/ Without stock",
-                "searchFilterLabel": "Search by id \/ name \/ reference"
+            "filter": {
+                "active_filter_label": "Active \/ Inactive",
+                "stock_filter_label": "With stock \/ Without stock",
+                "search_filter_label": "Search by id \/ name \/ reference"
             },
-            "columns": {
-                "activeInLengow": "Active in Lengow"
+            "column": {
+                "active_in_lengow": "Active in Lengow"
             }
         },
         "order": {
@@ -193,16 +196,16 @@
             "status_yes": "Yes",
             "status_no": "No"
         },
-        "settings": {
-            "NavBar": {
+        "setting": {
+            "nav_bar": {
                 "title": "Settings",
-                "generalTab": "General",
-                "exportTab": "Export",
-                "importTab": "Import"
+                "general": "General",
+                "export": "Export",
+                "import": "Import"
             },
             "title": {
                 "credentials": "Credentials",
-                "salesChannel": "Sales Channels",
+                "sales_channel": "Sales Channels",
                 "security": "Security & tracker",
                 "timezone": "Timezone",
                 "exclusions": "Exclusions",
@@ -210,7 +213,7 @@
                 "marketplaces": "Marketplaces",
                 "others": "Others"
             },
-            "lengow_main_settings": {
+            "lengow_main_setting": {
                 "label": "Main settings",
                 "description": "Below you will find your Lengow login details.\nAccount ID, Access Token and Secret Token are automatically completed at your first connection : please do not change them.",
                 "account": {
@@ -254,7 +257,7 @@
                     "description": "Choose your corresponding timezone, please choose wisely as this timezone is used when importing orders from Lengow API"
                 }
             },
-            "lengow_export_settings": {
+            "lengow_export_setting": {
                 "label": "Export settings",
                 "description": "Define the settings to create your feed.",
                 "disabled_products": {
@@ -270,7 +273,7 @@
                     "description": "Select the default shipping method to calculate shipping costs"
                 }
             },
-            "lengow_import_settings": {
+            "lengow_import_setting": {
                 "label": "Import settings",
                 "description": "All your orders are centralized in your Lengow platform : choose here if you want to synchronize and import your orders in your Shopware backoffice. It will also decrease your products stock in your backoffice",
                 "ship_mp_enabled": {

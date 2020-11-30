@@ -517,7 +517,7 @@ Component.register('lgw-product-list', {
             return [
                 {
                     property: 'extensions.activeInLengow.active',
-                    label: this.$tc('lengow-connector.products.columns.activeInLengow'),
+                    label: this.$tc('lengow-connector.product.column.active_in_lengow'),
                     inlineEdit: 'boolean',
                     align: 'center',
                     allowResize: false,
