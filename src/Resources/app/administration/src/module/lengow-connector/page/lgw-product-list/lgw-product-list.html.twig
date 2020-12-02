@@ -33,25 +33,27 @@
                                         </span>
                                     </a>
                                 </div>
-                                <div v-if="!countLoading" class="lgw-tooltip">
+                                <div v-if="!isLoading" class="lgw-tooltip">
                                     <span class="stats-big-value">{{ salesChannelName }}</span>
                                     <span class="lgw-tooltip-text">
                                         {{ currentSalesChannelId }}
                                         {{ salesChannelDomain }}
                                     </span>
                                 </div>
-                                <div v-if="!countLoading" class="margin-standard text-center">
-                                    <p class="products-exported small light">
-                                        {{ $tc('lengow-connector.product.data.nb_product_export_label') }}
-                                        <span class="stats-big-value">{{ exportedCount }}</span>
-                                    </p>
-                                    <p class="products-available small light">
-                                        {{ $tc('lengow-connector.product.data.nb_product_exportable_label') }}
-                                        <span class="stats-big-value">{{ exportableCount }}</span>
-                                    </p>
-                                </div>
-                                <div v-else class="margin-standard text-center lgw-count-loader">
-                                    <sw-loader size="10px"></sw-loader>
+                                <div class="lgw-count">
+                                    <div v-if="!countLoading" class="margin-standard text-center" >
+                                        <p class="products-exported small light">
+                                            {{ $tc('lengow-connector.product.data.nb_product_export_label') }}
+                                            <span class="stats-big-value">{{ exportedCount }}</span>
+                                        </p>
+                                        <p class="products-available small light">
+                                            {{ $tc('lengow-connector.product.data.nb_product_exportable_label') }}
+                                            <span class="stats-big-value">{{ exportableCount }}</span>
+                                        </p>
+                                    </div>
+                                    <div v-else class="margin-standard text-center lgw-count-loader">
+                                        <sw-loader size="20px"></sw-loader>
+                                    </div>
                                 </div>
                             </div>
                             <div class="lgw-float-center">
@@ -118,11 +120,6 @@
                                         {% endblock %}
                                         {% block sw_data_grid_bulk_selected_actions_content %}
                                             <span class="sw-data-grid__bulk-selected bulk-link">
-                                                <a class="link link-default" @click="onSelectAllProducts">
-                                                    {{ $tc('lengow-connector.product.mass_action_select') }}
-                                                </a>
-                                            </span>
-                                            <span class="sw-data-grid__bulk-selected bulk-link">
                                                 <a class="link link-default" @click="onPublishOnLengow">
                                                     {{ $tc('lengow-connector.product.mass_action_publish') }}
                                                 </a>
@@ -180,9 +177,6 @@
                                         {% endblock %}
                                     {% endblock %}
                                 </sw-entity-listing>
-                            {% endblock %}
-                            {% block lgw_product_list_empty_state %}
-                                <sw-empty-state v-if="!isLoading && !total" :title="$tc('sw-product.list.messageEmpty')"></sw-empty-state>
                             {% endblock %}
                             {% block lgw_product_list_grid_loader %}
                                 <sw-loader v-if="isLoading || !salesChannelSelected"></sw-loader>

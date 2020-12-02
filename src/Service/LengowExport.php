@@ -324,7 +324,6 @@ class LengowExport
         $categoryCriteria = new Criteria();
         $categoryCriteria->addFilter(new ContainsFilter('path', $masterCategoryId))->addAssociation('products');
         $categoryCollection = $this->categoryRepository->search($categoryCriteria, Context::createDefaultContext());
-
         $parentProductCounter = 0;
         $childProductCounter = 0;
         foreach ($categoryCollection as $category) {
@@ -332,12 +331,11 @@ class LengowExport
                 if ($product->getParentId() === null) {
                     $parentProductCounter++;
                     $children = $this->getChild($product);
-                    $childProductCounter += count($this->getExportableChild($children));
+                    $childProductCounter += count($children);
                 }
             }
         }
-        $total = $parentProductCounter + $childProductCounter;
-        return $total;
+        return $parentProductCounter + $childProductCounter;
     }
 
     /**
@@ -351,7 +349,7 @@ class LengowExport
     }
 
     /**
-     * Get all product ID in export // todo Refacto this method to use Raw sql (performance improvment)
+     * Get all product ID in export (all exportable products) // todo Refacto this method to use Raw sql (performance improvment)
      *
      * @return array products ids
      */
@@ -401,6 +399,38 @@ class LengowExport
             ]),
             $this->exportConfiguration['log_output']
         );
+        return $productIdArray;
+    }
+
+    /**
+     * retrieve all parent products for saleChannelId
+     *
+     * @param string $salesChannelId
+     * @return array
+     */
+    public function getAllProductIdForSalesChannel(string $salesChannelId) : array
+    {
+        $categoryEntryPoint = $this->getCategoryEntryPoint($salesChannelId);
+        $masterCategoryId = $this->getMasterCategory($categoryEntryPoint);
+        if (!$masterCategoryId) {
+            $this->lengowLog->write(
+                LengowLog::CODE_EXPORT,
+                $this->lengowLog->encodeMessage('log.export.category_not_found'),
+                $this->exportConfiguration['log_output']
+            );
+            return [];
+        }
+        $categoryCriteria = new Criteria();
+        $categoryCriteria->addFilter(new ContainsFilter('path', $masterCategoryId))->addAssociation('products');
+        $categoryCollection = $this->categoryRepository->search($categoryCriteria, Context::createDefaultContext());
+        $productIdArray = [];
+        foreach ($categoryCollection as $category) {
+            foreach ($category->getProducts() as $product) {
+                if ($product->getParentId() === null) {
+                    $productIdArray[] = $product->getId();
+                }
+            }
+        }
         return $productIdArray;
     }
 

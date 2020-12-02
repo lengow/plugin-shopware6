@@ -41,7 +41,7 @@ class LengowExportController extends AbstractController
      * @Route("/api/v{version}/_action/lengow/export/get-export-count",
      *     name="api.action.lengow.export.get-export-count",
      *     methods={"GET"})
-     * 
+     *
      * @param Request $request
      * @return JsonResponse
      */
@@ -58,5 +58,57 @@ class LengowExportController extends AbstractController
             return new JsonResponse($response);
         }
         return new JsonResponse(['success' => false]);
+    }
+
+    /**
+     * Get product count value (parent + all variants)
+     *
+     * @Route("/api/v{version}/_action/lengow/export/get-product-count",
+     *     name="api.action.lengow.export.get-product-count",
+     *     methods={"GET"})
+     *
+     * @param Request $request
+     * @return JsonResponse
+     */
+    public function getProductCount(Request $request) : JsonResponse
+    {
+        if ($request->get('productId') && $request->get('salesChannelId')) {
+            $this->lengowExport->init($request->get('salesChannelId'));
+            $response = [
+                'success' => true,
+                'countValue' => count($this->lengowExport->getSelectionProductIdsExport([$request->get('productId')])),
+            ];
+        } else {
+            $response = [
+                'success' => false,
+            ];
+        }
+        return new JsonResponse($response);
+    }
+
+    /**
+     * Get product list for salesChannelId
+     *
+     * @Route("/api/v{version}/_action/lengow/export/get-product-list",
+     *     name="api.action.lengow.export.get-product-list",
+     *     methods={"GET"})
+     *
+     * @param Request $request
+     * @return JsonResponse
+     */
+    public function getProductList(Request $request) : JsonResponse
+    {
+        if ($request->get('salesChannelId')) {
+            $this->lengowExport->init($request->get('salesChannelId'));
+            $response = [
+                'success' => true,
+                'productList' => $this->lengowExport->getAllProductIdForSalesChannel($request->get('salesChannelId')),
+            ];
+        } else {
+            $response = [
+                'success' => false,
+            ];
+        }
+        return new JsonResponse($response);
     }
 }

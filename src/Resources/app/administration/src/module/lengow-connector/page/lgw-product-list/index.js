@@ -53,7 +53,6 @@ Component.register('lgw-product-list', {
             },
             productSelection: false,
             productSelectionSelectAll: false,
-            countInactive: false,
             selection: [],
             totalSelected: 0,
             exportedCount: 0,
@@ -281,88 +280,54 @@ Component.register('lgw-product-list', {
                 });
         },
 
-        setupCountInactiveProduct() {
-            const lengowSettingsCriteria = new Criteria();
-            lengowSettingsCriteria.addFilter(Criteria.equals('salesChannelId', this.currentSalesChannelId));
-            lengowSettingsCriteria.addFilter(Criteria.equals('name', 'lengowExportDisabledProduct'));
-            this.lengowSettingsRepository
-                .search(lengowSettingsCriteria, Shopware.Context.api)
-                .then(result => {
-                    if (result.total > 0) {
-                        this.countInactive = result.first().value === '1';
-                    }
-                });
-        },
-
         setupExportedCount() {
             this.LengowConnectorExportService.getExportCount(this.currentSalesChannelId).then(response => {
                 if (response.success) {
                     this.exportableCount = response.total;
                     this.exportedCount = response.exported;
-                    this.countLoading = false;
                 }
+            }).finally(() => {
+                this.countLoading = false;
             });
         },
 
         onSalesChannelChanged(salesChannelId) {
             this.salesChannelSelected = true;
-            this.resetFilters();
             this.isLoading = true;
             this.countLoading = true;
+            this.resetFilters();
             this.currentSalesChannelId = salesChannelId;
             this.setupSelectionActivated();
             this.setExportLink(salesChannelId);
-            const salesChannelCriteria = new Criteria();
-            salesChannelCriteria.setIds([salesChannelId]);
-            salesChannelCriteria.addAssociation('domains');
-            return this.salesChannelRepository
-                .search(salesChannelCriteria, Shopware.Context.api)
-                .then(salesChannelCollection => {
-                    salesChannelCollection.find(entry => {
-                        const categoryCriteria = new Criteria();
-                        categoryCriteria.setIds([entry.navigationCategoryId]);
-                        this.categoryRepository
-                            .search(categoryCriteria, Shopware.Context.api)
-                            .then(categoryCollection => {
-                                const masterCategory = categoryCollection.first();
-                                this.currentEntryPoint = masterCategory.id;
-                                this.processCategoryTree(masterCategory.id);
-                            });
-                        this.setupCountInactiveProduct();
-                    });
-                    this.salesChannelName = salesChannelCollection.first().name;
-                    if (salesChannelCollection.first().domains.first()) {
-                        this.salesChannelDomain = salesChannelCollection.first().domains.first().url;
-                    } else {
-                        this.salesChannelDomain = 'Headless';
-                    }
-                })
-                .catch(() => {
-                    this.isLoading = false;
+            this.LengowConnectorExportService.getProductList(salesChannelId).then(data => {
+                this.productIds = data.productList;
+                return this.updateProductList().then(() => {
+                    const salesChannelCriteria = new Criteria();
+                    salesChannelCriteria.setIds([salesChannelId]);
+                    salesChannelCriteria.addAssociation('domains');
+                    return this.salesChannelRepository
+                        .search(salesChannelCriteria, Shopware.Context.api)
+                        .then(salesChannelCollection => {
+                            if (salesChannelCollection.first()) {
+                                this.salesChannelName = salesChannelCollection.first().name;
+                                if (salesChannelCollection.first().domains.first()) {
+                                    this.salesChannelDomain = salesChannelCollection.first().domains.first().url;
+                                } else {
+                                    this.salesChannelDomain = 'Headless';
+                                }
+                            }
+                        });
                 });
-        },
+            }).finally(() => {
+                this.isLoading = false;
+            });
 
-        processCategoryTree(treeMasterCategoryId) {
-            const categoryCriteria = new Criteria();
-            categoryCriteria.addFilter(Criteria.contains('category.path', treeMasterCategoryId));
-            categoryCriteria.addAssociation('products');
-            this.categoryRepository
-                .search(categoryCriteria, Shopware.Context.api)
-                .then(categoryCollection => {
-                    // eslint-disable-next-line no-restricted-syntax
-                    for (const category of categoryCollection) {
-                        const ids = category.products.getIds();
-                        ids.forEach(id => this.productIds.push(id));
-                    }
-                    this.updateProductList();
-                });
         },
 
         updateProductList() {
             this.total = this.products.total;
-            const productCriteria = new Criteria(this.page, this.limit);
+            const productCriteria = new Criteria();
             this.naturalSorting = this.sortBy === 'productNumber';
-            productCriteria.setTerm(this.term);
             productCriteria.addFilter(Criteria.equalsAny('product.id', this.productIds));
             productCriteria.addSorting(
                 Criteria.sort(this.sortBy, this.sortDirection, this.naturalSorting),
@@ -396,16 +361,6 @@ Component.register('lgw-product-list', {
                     this.isLoading = false;
                     this.productIds = [];
                 });
-        },
-
-        onSelectAllProducts() {
-            this.selection = this.products;
-            this.totalSelected = this.selection.total;
-            this.$refs.swProductGrid.records.forEach(item => {
-                if (this.$refs.swProductGrid.isSelected(item.id) !== true) {
-                    this.$refs.swProductGrid.selectItem(true, item);
-                }
-            });
         },
 
         updateSelection(selected) {
@@ -450,7 +405,7 @@ Component.register('lgw-product-list', {
                     });
                     const toPublish = this.selection.filter(x => !ids.includes(x));
                     toPublish.forEach(productId => {
-                        const lengowProduct = this.lengowProductRepository.create(Shopware.Context.api);
+                        const lengowProduct = this.lengowProductRepository.create(Shopware.Context.api); // todo passer cette partie dans le php
                         lengowProduct.productId = productId;
                         lengowProduct.salesChannelId = this.currentSalesChannelId;
                         this.lengowProductRepository.save(lengowProduct, Shopware.Context.api);
@@ -480,7 +435,13 @@ Component.register('lgw-product-list', {
                 lengowProduct.productId = selectedItem.id;
                 lengowProduct.salesChannelId = this.currentSalesChannelId;
                 this.lengowProductRepository.save(lengowProduct, Shopware.Context.api);
-                this.exportedCount++;
+                this.countLoading = true;
+                this.LengowConnectorExportService.getProductCountValue(selectedItem.id, this.currentSalesChannelId).then(response => {
+                    if (response.success) {
+                        this.exportedCount += response.countValue;
+                    }
+                    this.countLoading = false;
+                });
                 return;
             }
             const lengowProductCriteria = new Criteria();
@@ -491,20 +452,20 @@ Component.register('lgw-product-list', {
                 .then(result =>
                     this.lengowProductRepository.delete(result.data[0], Shopware.Context.api),
                 );
-            this.exportedCount--;
-        },
-
-        updateTotal({ total }) {
-            this.total = total;
+            this.countLoading = true;
+            this.LengowConnectorExportService.getProductCountValue(selectedItem.id, this.currentSalesChannelId).then(response => {
+                if (response.success) {
+                    this.exportedCount -= response.countValue;
+                }
+                this.countLoading = false;
+            });
         },
 
         getCurrencyPriceByCurrencyId(currencyId, prices) {
             const priceForProduct = prices.find(price => price.currencyId === currencyId);
-
             if (priceForProduct) {
                 return priceForProduct;
             }
-
             return {
                 currencyId: null,
                 gross: null,
@@ -576,6 +537,9 @@ Component.register('lgw-product-list', {
                     this.tempListActivated.includes(item.id)
                 ) {
                     item.extensions.activeInLengow.active = true;
+                } else {
+                    item.extensions.activeInLengow.active =
+                        typeof item.extensions.activeInLengow.activeArray[this.currentSalesChannelId] !== 'undefined';
                 }
             });
         },

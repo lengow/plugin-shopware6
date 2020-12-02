@@ -448,8 +448,8 @@ class LengowSync
             ];
             $this->lengowConfiguration->set('lengowAccountStatus', json_encode($status));
             $this->lengowConfiguration->set('lengowAccountStatusUpdate', (string) time());
-        } else if ($this->lengowConfiguration->get('lengowAccountStatusUpdate')) {
-            $status = json_decode($this->lengowConfiguration->get('lengowAccountStatusUpdate'), true);
+        } else if ($this->lengowConfiguration->get('lengowAccountStatus')) {
+            $status = json_decode($this->lengowConfiguration->get('lengowAccountStatus'), true);
         }
         return $status;
     }

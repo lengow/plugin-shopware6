@@ -73,8 +73,17 @@
   margin: 8px;
 }
 
+.lgw-product-list .lgw-count {
+  height: 60px;
+}
+
 .lgw-product-list .lgw-count-loader {
-  display: inline;
+  padding-top: 40px
+}
+
+.lgw-product-list .lgw-count-loader .sw-loader {
+  position: inherit;
+  background: #f9fafb;
 }
 
 .lgw-product-list .lgw-download-icon {
