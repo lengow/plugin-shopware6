@@ -437,4 +437,4 @@
 /src/Translations/fr-FR.csv|1ab747c05c9183df7870e09031b5e3db
 /src/Translations/de-DE.csv|b55eba8c6a7f8124b7d5cf0a4557dc51
 /src/Util/StringCleaner.php|6842e4e36db4cdbcab89e8228139bc55
-/src/Util/EnvironmentInfoProvider.php|8de6899d0491b5aacccefcc571e8cd97
+/src/Util/EnvironmentInfoProvider.php|ad1064f23b5654b3ee4516d8889b54b8

@@ -148,7 +148,7 @@ class EnvironmentInfoProvider
      */
     public function getVersion(): string
     {
-        return $this->kernel::SHOPWARE_FALLBACK_VERSION;
+        return $this->kernel->getContainer()->getParameter('kernel.shopware_version');
     }
 
     /**
