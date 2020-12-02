@@ -12,7 +12,8 @@
             "upgrade_account_button": "Je suis prêt à souscrire !",
             "refresh_action": "Actualiser mon compte",
             "trial_1": "Période d'essai : ",
-            "trial_2": " jour(s) restant(s)."
+            "trial_2": " jour(s) restant(s).",
+            "upgrade_account": "Souscrire"
         },
         "page": {
             "dashboard": "Tableau de bord",

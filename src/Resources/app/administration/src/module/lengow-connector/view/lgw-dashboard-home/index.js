@@ -1,6 +1,6 @@
 import template from './lgw-dashboard-home.html.twig';
 import './lgw-dashboard-home.scss';
-import { envMixin, LENGOW_URL } from '../../../const';
+import { LENGOW_URL } from '../../../const';
 
 const { Component } = Shopware;
 

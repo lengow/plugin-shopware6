@@ -1,5 +1,6 @@
 import template from './lgw-free-trial-warning.html.twig';
 import './lgw-free-trial-warning.scss';
+import { LENGOW_URL } from '../../../const';
 
 const { Component } = Shopware;
 
@@ -13,6 +14,7 @@ Component.register('lgw-free-trial-warning', {
             freeTrialEnabled: false,
             dayLeft: '',
             isExpired: false,
+            link: LENGOW_URL,
         };
     },
 

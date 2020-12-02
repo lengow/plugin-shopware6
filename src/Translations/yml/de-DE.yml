@@ -13,7 +13,8 @@ de:
         upgrade_account_button: "Einverstanden, ich bin bereit für das Upgrade"
         refresh_action: "Meinen Account aktualisieren"
         trial_1: "Testzeitraum: "
-        trial_2: " Tag(e) verbleiben"
+        trial_2: " Tag(e) verbleiben."
+        upgrade_account: "Abonnieren"
       page:
         dashboard: "Dashboard"
         products: "Produkte"

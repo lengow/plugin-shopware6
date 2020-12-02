@@ -12,7 +12,8 @@
             "upgrade_account_button": "It's ok, I'm ready to subscribe!",
             "refresh_action": "Refresh my account",
             "trial_1": "Trial period : ",
-            "trial_2": " day(s) left"
+            "trial_2": " day(s) left.",
+            "upgrade_account": "Subscribe"
         },
         "page": {
             "dashboard": "Dashboard",

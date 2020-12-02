@@ -14,6 +14,7 @@ fr:
         refresh_action: "Actualiser mon compte"
         trial_1: "Période d'essai : "
         trial_2: " jour(s) restant(s)."
+        upgrade_account: "Souscrire"
       page:
         dashboard: "Tableau de bord"
         products: "Produits"

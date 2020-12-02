@@ -1,9 +1,9 @@
 {% block lgw_update_warning %}
     <template>
         <span v-if="display" class="lgw-update-warning" >
-                {{ $tc('lengow-connector.global.new_version_available_1') }}
-                {{ newVersion }}
-                {{ $tc('lengow-connector.global.new_version_available_2') }}
+            {{ $tc('lengow-connector.global.new_version_available_1') }}
+            {{ newVersion }}
+            {{ $tc('lengow-connector.global.new_version_available_2') }}
             <a :href="link">
                 {{ $tc('lengow-connector.global.download_plugin') }}
             </a>
