@@ -1,11 +1,8 @@
 {% block lgw_setting_export %}
-    <template>
-        <div class="lgw-setting-container">
-            <div class="lgw-setting-block-title">
-                <h3>|  {{ $tc('lengow-connector.setting.title.exclusions') }}</h3>
-            </div>
-            <div class="lgw-setting-block" v-if="render">
-                <div>
+    <sw-card-view class="lgw-setting-export">
+        {% block lgw_setting_export_selection %}
+            <sw-card :title="$tc('lengow-connector.setting.title.exclusions')">
+                <template v-if="render">
                     <sw-help-text class="lgw-help-text"
                                   :text="$tc('lengow-connector.setting.lengow_export_setting.disabled_products.description')"
                                   :width="200"
@@ -30,16 +27,15 @@
                                          @change="onSaveSettings($event, 'lengowSelectionEnabled', salesChannel.salesChannelId)">
                         </sw-switch-field>
                     </template>
-                </div>
-            </div>
-            <template v-else>
-                <sw-loader size="50px"></sw-loader>
-            </template>
-            <div class="lgw-setting-block-title">
-                <h3>|  {{ $tc('lengow-connector.setting.lengow_export_setting.shipping.label') }}</h3>
-            </div>
-            <div class="lgw-setting-block" v-if="render">
-                <div>
+                </template>
+                <template v-else>
+                    <sw-loader></sw-loader>
+                </template>
+            </sw-card>
+        {% endblock %}
+        {% block lgw_setting_export_shipping %}
+            <sw-card :title="$tc('lengow-connector.setting.lengow_export_setting.shipping.label')">
+                <template v-if="render">
                     <sw-help-text class="lgw-help-text"
                                   :text="$tc('lengow-connector.setting.lengow_export_setting.shipping.description')"
                                   :width="200"
@@ -55,11 +51,14 @@
                             </option>
                         </template>
                     </sw-select-field>
-                </div>
-            </div>
-            <template v-else>
-                <sw-loader size="50px"></sw-loader>
-            </template>
-        </div>
-    </template>
+                </template>
+                <template v-else>
+                    <sw-loader></sw-loader>
+                </template>
+            </sw-card>
+        {% endblock %}
+        {% block lgw_setting_export_footer %}
+            <lgw-footer></lgw-footer>
+        {% endblock %}
+    </sw-card-view>
 {% endblock %}

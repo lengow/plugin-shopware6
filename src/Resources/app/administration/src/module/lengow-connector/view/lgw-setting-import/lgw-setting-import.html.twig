@@ -1,10 +1,7 @@
 {% block lgw_setting_import %}
-    <template>
-        <div class="lgw-setting-container">
-            <div class="lgw-setting-block-title">
-                <h3>|  {{ $tc('lengow-connector.setting.title.marketplaces') }}</h3>
-            </div>
-            <div class="lgw-setting-block">
+    <sw-card-view class="lgw-setting-import">
+        {% block lgw_setting_import_marketplaces %}
+            <sw-card :title="$tc('lengow-connector.setting.title.marketplaces')">
                 <sw-help-text class="lgw-help-text"
                               :text="$tc('lengow-connector.setting.lengow_import_setting.ship_mp_enabled.description')"
                               :width="200"
@@ -23,12 +20,11 @@
                                  v-model="lengowImportStockShipMp"
                                  @change="onSaveSettings($event, 'lengowImportStockShipMp')">
                 </sw-switch-field>
-            </div>
-            <div class="lgw-setting-block-title">
-                <h3>|  {{ $tc('lengow-connector.setting.lengow_import_setting.shipping.label') }}</h3>
-            </div>
-            <div class="lgw-setting-block" v-if="render">
-                <div>
+            </sw-card>
+        {% endblock %}
+        {% block lgw_setting_import_shipping %}
+            <sw-card :title="$tc('lengow-connector.setting.lengow_import_setting.shipping.label')">
+                <template v-if="render">
                     <sw-help-text class="lgw-help-text"
                                   :text="$tc('lengow-connector.setting.lengow_import_setting.shipping.description')"
                                   :width="200"
@@ -44,15 +40,14 @@
                             </option>
                         </template>
                     </sw-select-field>
-                </div>
-            </div>
-            <template v-else>
-                <sw-loader size="50px"></sw-loader>
-            </template>
-            <div class="lgw-setting-block-title">
-                <h3>|  {{ $tc('lengow-connector.setting.title.others') }}</h3>
-            </div>
-            <div class="lgw-setting-block">
+                </template>
+                <template v-else>
+                    <sw-loader></sw-loader>
+                </template>
+            </sw-card>
+        {% endblock %}
+        {% block lgw_setting_import_other %}
+            <sw-card :title="$tc('lengow-connector.setting.title.others')">
                 <sw-help-text class="lgw-help-text"
                               :text="$tc('lengow-connector.setting.lengow_import_setting.import_days.description')"
                               :width="200"
@@ -66,15 +61,15 @@
                                  @change="onSaveSettings($event, 'lengowImportDays')">
                 </sw-number-field>
                 <lgw-conditional-string-field
-                    :locked="lengowReportMailEnabled"
-                    :fieldContent="lengowReportMailAddress"
-                    :onSaveSettings="onSaveSettings"
-                    fieldPlaceholder="exemple@info.fr;exemple2@info.fr"
-                    :switchLabel="$tc('lengow-connector.setting.lengow_import_setting.report_mail_enabled.label')"
-                    switchSettingsKey="lengowReportMailEnabled"
-                    fieldSettingsKey="lengowReportMailAddress"
-                    :fieldLabel="$tc('lengow-connector.setting.lengow_import_setting.report_mail_address.label')"
-                    :helpText="$tc('lengow-connector.setting.lengow_import_setting.report_mail_address.description')">
+                        :locked="lengowReportMailEnabled"
+                        :fieldContent="lengowReportMailAddress"
+                        :onSaveSettings="onSaveSettings"
+                        fieldPlaceholder="exemple@info.fr;exemple2@info.fr"
+                        :switchLabel="$tc('lengow-connector.setting.lengow_import_setting.report_mail_enabled.label')"
+                        switchSettingsKey="lengowReportMailEnabled"
+                        fieldSettingsKey="lengowReportMailAddress"
+                        :fieldLabel="$tc('lengow-connector.setting.lengow_import_setting.report_mail_address.label')"
+                        :helpText="$tc('lengow-connector.setting.lengow_import_setting.report_mail_address.description')">
                 </lgw-conditional-string-field>
                 <sw-help-text class="lgw-help-text"
                               :text="$tc('lengow-connector.setting.lengow_import_setting.currency_conversion_title.description')"
@@ -85,6 +80,15 @@
                                  v-model="lengowCurrencyConversion"
                                  @change="onSaveSettings($event, 'lengowCurrencyConversion')">
                 </sw-switch-field>
+                {#<sw-help-text class="lgw-help-text"
+                              :text="$tc('lengow-connector.setting.lengow_import_setting.import_btob.description')"
+                              :width="200"
+                              tooltipPosition="right"/>
+                <sw-switch-field class="text-center"
+                                 :label="$tc('lengow-connector.setting.lengow_import_setting.import_btob.label')"
+                                 v-model="lengowImportB2b"
+                                 @change="onSaveSettings($event, 'lengowImportB2b')">
+                </sw-switch-field>#}
                 <sw-help-text class="lgw-help-text"
                               :text="$tc('lengow-connector.setting.lengow_import_setting.debug_mode.description')"
                               :width="200"
@@ -94,7 +98,10 @@
                                  v-model="lengowDebugEnabled"
                                  @change="onSaveSettings($event, 'lengowDebugEnabled')">
                 </sw-switch-field>
-            </div>
-        </div>
-    </template>
+            </sw-card>
+        {% endblock %}
+        {% block lgw_setting_import_footer %}
+            <lgw-footer></lgw-footer>
+        {% endblock %}
+    </sw-card-view>
 {% endblock %}

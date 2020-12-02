@@ -1,4 +1,5 @@
 import template from './lgw-dashboard-connexion.html.twig';
+import './lgw-dashboard-connexion.scss';
 import { envMixin, LENGOW_CMS_URL } from '../../../const';
 
 const {

@@ -28,8 +28,7 @@ Shopware.Component.register('lgw-order-detail-extension', {
             btnSynchroLoading: true,
             btnActionDisplay: false,
             btnActionLoading: false,
-            btnReimportDisplay: false,
-            btnReimportLoading: false,
+            btnReimportLoading: true,
             modalDisplay: false,
             modalLoading: false,
             debugMode: true,
@@ -155,6 +154,7 @@ Shopware.Component.register('lgw-order-detail-extension', {
                     this.debugMode = result.first().value === '1';
                 }
                 this.btnSynchroLoading = false;
+                this.btnReimportLoading = false;
             });
         },
 

@@ -1,5 +1,5 @@
 {% block lgw_product_list %}
-    <sw-page class="lgw-product-list" style="background: #F1F1F1" :showSearchBar="false">
+    <sw-page class="lgw-product-list" :showSearchBar="false">
         {% block lgw_product_list_smart_bar_header %}
             <template #smart-bar-header>
                 {% block lgw_product_list_smart_bar_header_title %}
@@ -28,7 +28,7 @@
                             <div class="lengow-box text-center">
                                 <div>
                                     <a :href="downloadLink">
-                                        <span style="float: right;">
+                                        <span class="lgw-download-icon">
                                             <sw-icon name="default-action-cloud-download" color="#3498db"></sw-icon>
                                         </span>
                                     </a>

@@ -1,76 +1,70 @@
 {% block lgw_setting_general %}
-    <template>
-        <div class="lgw-setting-container">
-            <div class="lgw-setting-block-title">
-                <h3>
-                    <sw-icon class="lgw-setting-icon" v-if="!credentialLocked"
-                             name="default-lock-closed" small>
-                    </sw-icon>
-                    <sw-icon class="lgw-setting-icon" v-else
-                             name="default-lock-open" small>
-                    </sw-icon>
-                     <span>|  {{ $tc('lengow-connector.setting.title.credentials') }} </span>
-                </h3>
-            </div>
-            <div class="lgw-setting-block">
-                <lgw-lockable-string-field :fieldContent="lengowAccountId"
-                                           :locked="!credentialLocked"
-                                           :fieldLabel="$tc('lengow-connector.setting.lengow_main_setting.account.label')"
-                                           :onSaveSettings="onSaveSettings"
-                                           settingsKey="lengowAccountId"
-                                           :helpText="$tc('lengow-connector.setting.lengow_main_setting.account.description')">
+    <sw-card-view class="lgw-setting-general">
+        {% block lgw_setting_general_credentials %}
+            <sw-card :title="$tc('lengow-connector.setting.title.credentials')">
+                <lgw-lockable-string-field
+                        :fieldContent="lengowAccountId"
+                        :locked="!credentialLocked"
+                        :fieldLabel="$tc('lengow-connector.setting.lengow_main_setting.account.label')"
+                        :onSaveSettings="onSaveSettings"
+                        settingsKey="lengowAccountId"
+                        :helpText="$tc('lengow-connector.setting.lengow_main_setting.account.description')">
                 </lgw-lockable-string-field>
-                <lgw-lockable-string-field :fieldContent="lengowAccessToken"
-                                           :locked="!credentialLocked"
-                                           :fieldLabel="$tc('lengow-connector.setting.lengow_main_setting.access.label')"
-                                           :onSaveSettings="onSaveSettings"
-                                           settingsKey="lengowAccessToken"
-                                           :helpText="$tc('lengow-connector.setting.lengow_main_setting.access.description')">
+                <lgw-lockable-string-field
+                        :fieldContent="lengowAccessToken"
+                        :locked="!credentialLocked"
+                        :fieldLabel="$tc('lengow-connector.setting.lengow_main_setting.access.label')"
+                        :onSaveSettings="onSaveSettings"
+                        settingsKey="lengowAccessToken"
+                        :helpText="$tc('lengow-connector.setting.lengow_main_setting.access.description')">
                 </lgw-lockable-string-field>
-                <lgw-lockable-string-field :fieldContent="lengowSecretToken"
-                                           :locked="!credentialLocked"
-                                           :fieldLabel="$tc('lengow-connector.setting.lengow_main_setting.secret.label')"
-                                           :onSaveSettings="onSaveSettings"
-                                           settingsKey="lengowSecretToken"
-                                           :helpText="$tc('lengow-connector.setting.lengow_main_setting.secret.description')">
+                <lgw-lockable-string-field
+                        :fieldContent="lengowSecretToken"
+                        :locked="!credentialLocked"
+                        :fieldLabel="$tc('lengow-connector.setting.lengow_main_setting.secret.label')"
+                        :onSaveSettings="onSaveSettings"
+                        settingsKey="lengowSecretToken"
+                        :helpText="$tc('lengow-connector.setting.lengow_main_setting.secret.description')">
                 </lgw-lockable-string-field>
-            </div>
-            <div class="lgw-setting-block-title">
-                <h3>|  {{ $tc('lengow-connector.setting.title.sales_channel') }}</h3>
-            </div>
-            <div v-if="render" class="lgw-setting-block">
-                <lgw-conditional-string-field v-for="salesChannel in salesChannels"
-                                               switchSettingsKey="lengowStoreEnabled"
-                                               fieldSettingsKey="lengowCatalogId"
-                                               :settingsSalesChannelId="salesChannel.salesChannelId"
-                                               :onSaveSettings="onSaveSettings"
-                                               :fieldContent="salesChannel.catalogId"
-                                               :locked="salesChannel.enabled"
-                                               :switchLabel="$tc('lengow-connector.setting.lengow_main_setting.enable.label') + ' ' + salesChannel.label"
-                                               :switchHelpText="$tc('lengow-connector.setting.lengow_main_setting.enable.description')"
-                                               :fieldLabel="$tc('lengow-connector.setting.lengow_main_setting.catalog.label')"
-                                               :helpText="$tc('lengow-connector.setting.lengow_main_setting.catalog.description')">
-                </lgw-conditional-string-field>
-            </div>
-            <template v-else>
-                <sw-loader size="50px"></sw-loader>
-            </template>
-            <div class="lgw-setting-block-title">
-                <h3>|  {{ $tc('lengow-connector.setting.title.security') }}</h3>
-            </div>
-            <div class="lgw-setting-block">
+            </sw-card>
+        {% endblock %}
+        {% block lgw_setting_general_sales_channel %}
+            <sw-card :title="$tc('lengow-connector.setting.title.sales_channel')">
+                <template v-if="render">
+                    <lgw-conditional-string-field
+                            v-if="render"
+                            v-for="salesChannel in salesChannels"
+                            switchSettingsKey="lengowStoreEnabled"
+                            fieldSettingsKey="lengowCatalogId"
+                            :settingsSalesChannelId="salesChannel.salesChannelId"
+                            :onSaveSettings="onSaveSettings"
+                            :fieldContent="salesChannel.catalogId"
+                            :locked="salesChannel.enabled"
+                            :switchLabel="$tc('lengow-connector.setting.lengow_main_setting.enable.label') + ' ' + salesChannel.label"
+                            :switchHelpText="$tc('lengow-connector.setting.lengow_main_setting.enable.description')"
+                            :fieldLabel="$tc('lengow-connector.setting.lengow_main_setting.catalog.label')"
+                            :helpText="$tc('lengow-connector.setting.lengow_main_setting.catalog.description')">
+                    </lgw-conditional-string-field>
+                </template>
+                <template v-else>
+                    <sw-loader></sw-loader>
+                </template>
+            </sw-card>
+        {% endblock %}
+        {% block lgw_setting_general_sales_security %}
+            <sw-card :title="$tc('lengow-connector.setting.title.security')">
                 <lgw-conditional-string-field
-                    :switchLabel="$tc('lengow-connector.setting.lengow_main_setting.ip_enable.label')"
-                    :fieldLabel="$tc('lengow-connector.setting.lengow_main_setting.ip.label')"
-                    :locked="lengowIpEnabled"
-                    :fieldContent="lengowAuthorizedIp"
-                    switchSettingsKey="lengowIpEnabled"
-                    fieldSettingsKey="lengowAuthorizedIp"
-                    :onSaveSettings="onSaveSettings"
-                    :switchHelpText="$tc('lengow-connector.setting.lengow_main_setting.ip_enable.description')"
-                    :helpText="$tc('lengow-connector.setting.lengow_main_setting.ip.description')">
+                        :switchLabel="$tc('lengow-connector.setting.lengow_main_setting.ip_enable.label')"
+                        :fieldLabel="$tc('lengow-connector.setting.lengow_main_setting.ip.label')"
+                        :locked="lengowIpEnabled"
+                        :fieldContent="lengowAuthorizedIp"
+                        switchSettingsKey="lengowIpEnabled"
+                        fieldSettingsKey="lengowAuthorizedIp"
+                        :onSaveSettings="onSaveSettings"
+                        :switchHelpText="$tc('lengow-connector.setting.lengow_main_setting.ip_enable.description')"
+                        :helpText="$tc('lengow-connector.setting.lengow_main_setting.ip.description')">
                 </lgw-conditional-string-field>
-                <sw-help-text class="lgw-help-text"
+                {#<sw-help-text class="lgw-help-text"
                               :text="$tc('lengow-connector.setting.lengow_main_setting.tracking_enable.description')"
                               :width="200"
                               tooltipPosition="right"/>
@@ -90,16 +84,15 @@
                                  @change="onSaveSettings($event, 'lengowTrackingId')">
                     <option value="id">Id</option>
                     <option value="productNumber">Product Number</option>
-                </sw-select-field>
-            </div>
-            <div class="lgw-setting-block-title">
-                <h3>|  {{ $tc('lengow-connector.setting.title.timezone') }}</h3>
-            </div>
-            <div class="lgw-setting-block">
+                </sw-select-field>#}
+            </sw-card>
+        {% endblock %}
+        {% block lgw_setting_general_timezone %}
+            <sw-card :title="$tc('lengow-connector.setting.title.timezone')">
                 <sw-help-text class="lgw-help-text"
-                              :text="$tc('lengow-connector.setting.lengow_main_setting.timezone.description')"
-                              :width="200"
-                              tooltipPosition="right"/>
+                    :text="$tc('lengow-connector.setting.lengow_main_setting.timezone.description')"
+                    :width="200"
+                    tooltipPosition="right"/>
                 <sw-select-field placeholder="Select timezone"
                                  :label="$tc('lengow-connector.setting.lengow_main_setting.timezone.label')"
                                  v-model="lengowTimezone"
@@ -187,7 +180,10 @@
                     <option value="Pacific/Fiji">(GMT+12:00) Fiji, Kamchatka, Marshall Is.</option>
                     <option value="Pacific/Tongatapu">(GMT+13:00) Nuku'alofa</option>
                 </sw-select-field>
-            </div>
-        </div>
-    </template>
+            </sw-card>
+        {% endblock %}
+        {% block lgw_setting_general_footer %}
+            <lgw-footer></lgw-footer>
+        {% endblock %}
+    </sw-card-view>
 {% endblock %}

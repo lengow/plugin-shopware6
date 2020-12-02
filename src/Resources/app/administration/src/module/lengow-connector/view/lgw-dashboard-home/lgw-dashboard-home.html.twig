@@ -1,4 +1,4 @@
-<sw-page class="lgw-page" :showSearchBar="false">
+<sw-page class="lgw-dashboard-home" :showSearchBar="false">
     {% block lgw_dashboard_smart_bar_header %}
         <template #smart-bar-header>
             {% block lgw_dashboard_smart_bar_header_title %}
@@ -15,72 +15,70 @@
     {% endblock %}
     {% block lgw_dashboard_content %}
         <template #content>
-            <div class="lgw-page">
-                <div class="lgw-container">
-                    <div class="lgw-row">
-                        <div class="lgw-box lgw-home-header text-center lgw-home-header-margin">
-                            <img :src="'connector/lengow-white-big.png' | asset" alt="lengow" class="img-responsive">
-                            <h1 style="color: white">{{ $tc('lengow-connector.dashboard.banner.title') }}</h1>
-                            <sw-button :disabled="false"
-                                       :square="false"
-                                       :block="false"
-                                       :isLoading="false"
-                                       class="lgw-btn"
-                                       target="_blank"
-                                       :link="lengow_url">
-                                {{ $tc('lengow-connector.dashboard.banner.button') }}
-                            </sw-button>
-                        </div>
+            <div class="lgw-container">
+                <div class="lgw-row">
+                    <div class="lgw-box lgw-dashboard-home-header text-center">
+                        <img :src="'connector/lengow-white-big.png' | asset" alt="lengow" class="img-responsive">
+                        <h1>{{ $tc('lengow-connector.dashboard.banner.title') }}</h1>
+                        <sw-button :disabled="false"
+                                   :square="false"
+                                   :block="false"
+                                   :isLoading="false"
+                                   class="lgw-btn"
+                                   target="_blank"
+                                   :link="lengow_url">
+                            {{ $tc('lengow-connector.dashboard.banner.button') }}
+                        </sw-button>
                     </div>
-                    <div class="lgw-row lgw-home-menu text-center">
-                        <div class="lgw-col-4 lgw-box-link lgw-left-block">
-                            <routerLink :to="{ name: 'lengow.connector.product' }" tag='span'>
-                                <div class="lgw-box">
-                                    <img :src="'connector/home-products.png' | asset" class="img-responsive">
-                                    <h2>{{ $tc('lengow-connector.dashboard.products.title') }}</h2>
-                                    <p>{{ $tc('lengow-connector.dashboard.products.desc') }}</p>
-                                </div>
-                            </routerLink>
-                        </div>
-                        <div class="lgw-col-4 lgw-box-link">
-                            <routerLink :to="{ name: 'lengow.connector.order' }" tag='span'>
-                                <div class="lgw-box">
-                                    <img :src="'connector/home-orders.png' | asset" class="img-responsive">
-                                    <h2>{{ $tc('lengow-connector.dashboard.orders.title') }}</h2>
-                                    <p>{{ $tc('lengow-connector.dashboard.orders.desc') }}</p>
-                                </div>
-                            </routerLink>
-                        </div>
-                        <div class="lgw-col-4 lgw-box-link lgw-right-block">
-                            <routerLink :to="{ name: 'lengow.connector.setting' }" tag='span'>
-                                <div class="lgw-box">
-                                    <img :src="'connector/home-settings.png' | asset" class="img-responsive">
-                                    <h2>{{ $tc('lengow-connector.dashboard.settings.title') }}</h2>
-                                    <p>{{ $tc('lengow-connector.dashboard.settings.desc') }}</p>
-                                </div>
-                            </routerLink>
-                        </div>
-                    </div>
-                    <div class="lgw-row">
-                        <div class="lgw-box">
-                            <h2>{{ $tc('lengow-connector.dashboard.help.title') }}</h2>
-                            <p>
-                                <routerLink class="lgw-router-link" :to="{ name: 'lengow.connector.contact' }">
-                                    {{ $tc('lengow-connector.dashboard.help.contact') }}
-                                </routerLink>
-                            </p>
-                            <br/>
-                            <p>
-                                <a :href="$tc('lengow-connector.dashboard.help.helpCenterTarget')" target="_blank">
-                                    {{ $tc('lengow-connector.dashboard.help.helpCenterLink') }}
-                                </a>
-                                {{ $tc('lengow-connector.dashboard.help.helpCenter') }}
-                            </p>
-                        </div>
-                    </div>
-                    <lgw-footer>
-                    </lgw-footer>
                 </div>
+                <div class="lgw-row lgw-home-menu text-center">
+                    <div class="lgw-col-4 lgw-box-link lgw-left-block">
+                        <routerLink :to="{ name: 'lengow.connector.product' }" tag='span'>
+                            <div class="lgw-box">
+                                <img :src="'connector/home-products.png' | asset" class="img-responsive">
+                                <h2>{{ $tc('lengow-connector.dashboard.products.title') }}</h2>
+                                <p>{{ $tc('lengow-connector.dashboard.products.desc') }}</p>
+                            </div>
+                        </routerLink>
+                    </div>
+                    <div class="lgw-col-4 lgw-box-link">
+                        <routerLink :to="{ name: 'lengow.connector.order' }" tag='span'>
+                            <div class="lgw-box">
+                                <img :src="'connector/home-orders.png' | asset" class="img-responsive">
+                                <h2>{{ $tc('lengow-connector.dashboard.orders.title') }}</h2>
+                                <p>{{ $tc('lengow-connector.dashboard.orders.desc') }}</p>
+                            </div>
+                        </routerLink>
+                    </div>
+                    <div class="lgw-col-4 lgw-box-link lgw-right-block">
+                        <routerLink :to="{ name: 'lengow.connector.setting' }" tag='span'>
+                            <div class="lgw-box">
+                                <img :src="'connector/home-settings.png' | asset" class="img-responsive">
+                                <h2>{{ $tc('lengow-connector.dashboard.settings.title') }}</h2>
+                                <p>{{ $tc('lengow-connector.dashboard.settings.desc') }}</p>
+                            </div>
+                        </routerLink>
+                    </div>
+                </div>
+                <div class="lgw-row">
+                    <div class="lgw-box">
+                        <h2>{{ $tc('lengow-connector.dashboard.help.title') }}</h2>
+                        <p>
+                            <routerLink class="lgw-router-link" :to="{ name: 'lengow.connector.contact' }">
+                                {{ $tc('lengow-connector.dashboard.help.contact') }}
+                            </routerLink>
+                        </p>
+                        <br/>
+                        <p>
+                            <a :href="$tc('lengow-connector.dashboard.help.help_center_target')" target="_blank">
+                                {{ $tc('lengow-connector.dashboard.help.help_center_link') }}
+                            </a>
+                            {{ $tc('lengow-connector.dashboard.help.help_center') }}
+                        </p>
+                    </div>
+                </div>
+                <lgw-footer>
+                </lgw-footer>
             </div>
         </template>
     {% endblock %}

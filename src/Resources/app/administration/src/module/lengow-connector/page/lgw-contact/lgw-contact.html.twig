@@ -14,29 +14,26 @@
             </template>
         {% endblock %}
         {% block lgw_contact_content %}
-            <template #content>
-                <div class="lgw-container text-center">
-                    <div class="lgw-box">
-                        <h2>{{ $tc('lengow-connector.contact.title') }}</h2>
-                        <p>
-                            <br/>
-                            {{ $tc('lengow-connector.contact.contain_text_support') }}
-                            <a :href="$tc('lengow-connector.contact.link_lengow_support')">
-                                {{ $tc('lengow-connector.contact.title_lengow_support') }}
-                            </a>
-                            <br/><br/>
-                            {{ $tc('lengow-connector.contact.contain_text_support_hour') }}
-                            <br/><br/>
-                            {{ $tc('lengow-connector.contact.find_answer') }}
-                            <a :href="$tc('lengow-connector.contact.knowledge_link_url')">
-                                {{ $tc('lengow-connector.contact.link_magento_guide') }}
-                            </a>
-                        </p>
-                    </div>
-                    <lgw-footer>
-                    </lgw-footer>
-                </div>
-            </template>
+            <sw-card-view slot="content">
+                <sw-card>
+                    <h2>{{ $tc('lengow-connector.contact.title') }}</h2>
+                    <p>
+                        <br/>
+                        {{ $tc('lengow-connector.contact.contain_text_support') }}
+                        <a :href="$tc('lengow-connector.contact.link_lengow_support')">
+                            {{ $tc('lengow-connector.contact.title_lengow_support') }}
+                        </a>
+                        <br/><br/>
+                        {{ $tc('lengow-connector.contact.contain_text_support_hour') }}
+                        <br/><br/>
+                        {{ $tc('lengow-connector.contact.find_answer') }}
+                        <a :href="$tc('lengow-connector.contact.knowledge_link_url')">
+                            {{ $tc('lengow-connector.contact.link_magento_guide') }}
+                        </a>
+                    </p>
+                </sw-card>
+                <lgw-footer></lgw-footer>
+            </sw-card-view>
         {% endblock %}
     </sw-page>
 {% endblock %}

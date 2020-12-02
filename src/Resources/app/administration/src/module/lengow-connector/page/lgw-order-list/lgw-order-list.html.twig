@@ -1,5 +1,5 @@
 {% block lgw_order_list %}
-    <sw-page class="sw-order-list" style="background: #F1F1F1">
+    <sw-page class="sw-order-list">
         {% block lgw_order_list_search_bar %}
             <template #search-bar>
                 <sw-search-bar initialSearchType="lengow_order"
@@ -20,11 +20,11 @@
                             <span v-if="!isLoading" class="sw-page__smart-bar-amount">
                                 ({{ total }})
                             </span>
-                            <span v-if="debugMode" class="blue-frame">
-                                {{ $tc('lengow-connector.order.debug_warning_message') }}
-                            </span>
                         {% endblock %}
                     </h2>
+                    <span v-if="debugMode" class="blue-frame">
+                        {{ $tc('lengow-connector.order.debug_warning_message') }}
+                    </span>
                     <div id="lgw-sync-data">
                         <div v-if="!settingsLoading && !orderWithErrorLoading && !orderWaitingToBeSentLoading">
                             <p>

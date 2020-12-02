@@ -1,6 +1,6 @@
 {% block lgw_dashboard_connexion %}
     <template>
-        <div>
+        <div class="lgw-dashboard-connexion">
             <meta http-equiv="Content-Security-Policy" content="upgrade-insecure-requests">
             <iframe id="lgw-sync-iframe"
                     title="Lengow Iframe"
@@ -9,8 +9,7 @@
                     border="0"
                     @load="onLoadIframe"
                     cellspacing="0"
-                    sandbox="allow-same-origin allow-scripts allow-forms"
-                    style="border-style: none;width: 100%; min-height: 1000px;">
+                    sandbox="allow-same-origin allow-scripts allow-forms">
             </iframe>
         </div>
     </template>

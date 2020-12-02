@@ -37,20 +37,20 @@ en:
           desc: "Configure your Shopware plugin main settings"
         help:
           title: "Need some help?"
-          contact: "Get in touch with Lengow."
+          contact: "Get in touch with Lengow"
           help_center_link: "Visit our Help Center"
           help_center_target: "https://supportlengow.zendesk.com/hc/en-us/articles/360012203311"
-          help_enter: "for detailed information on how to configure your Shopware plugin properly"
+          help_center: "for detailed information on how to configure your Shopware plugin properly"
       footer:
         link: 'https://www.lengow.com/'
         lengow_plugin_name: 'Lengow Shopware 6 Plugin'
       contact:
         title: "Get a little help from your support team!"
         contain_text_support: "Ask us anything about Lengow or share your feedback with"
-        title_lengow_support: "Lengow Support."
+        title_lengow_support: "Lengow Support"
         link_lengow_support: "https://supportlengow.zendesk.com/hc/en-us/requests/new"
         need_some_help: "Need some help?"
-        contain_text_support_hour: "We’ll do our best to get back to you during regular business hours (Monday to Friday – 9am to 6pm GMT+1)."
+        contain_text_support_hour: "We’ll do our best to get back to you during regular business hours (Monday to Friday – 9am to 6pm GMT+1)"
         find_answer: "You can also find answers in our"
         link_magento_guide: "Shopware 6 dedicated guide"
         knowledge_link_url: "https://support.lengow.com/"
@@ -137,7 +137,7 @@ en:
           action_ship_sent: "action ship sent"
           action_cancel_sent: "action cancel sent"
           action_waiting_return: "Action sent, waiting for response"
-      orderTab:
+      order_tab:
         title: "Lengow order detail page"
         order_id: "ID Commande"
         delivery_address_id: "ID d'adresse de livraison"

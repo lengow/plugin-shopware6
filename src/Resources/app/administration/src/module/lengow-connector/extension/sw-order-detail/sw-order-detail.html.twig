@@ -2,9 +2,7 @@
     {% parent %}
 
     {% block lengow_connector_order_data %}
-        <sw-tabs-item
-                      :route="{ name: 'lgw.order.detail', params: { id: $route.params.id } }"
-                      title="Lengow">
+        <sw-tabs-item :route="{ name: 'lgw.order.detail', params: { id: $route.params.id } }" title="Lengow">
             Lengow
         </sw-tabs-item>
     {% endblock %}

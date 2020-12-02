@@ -11,19 +11,20 @@
 }
 
 .blue-frame {
-    border-radius: 3px;
-    padding: 2px;
-    background: #cdf1ff;
-    border: 1px solid #00aeef;
-    color: #2e6592;
-    font-size: 12px;
-    margin-left:auto;
+  display: inline-block;
+  border-radius: 3px;
+  margin: 5px 0;
+  padding: 4px 8px;
+  background: #cdf1ff;
+  border: 1px solid #00aeef;
+  color: #2e6592;
+  font-size: 12px;
 }
 
 .sw-page .smart-bar__header h2 {
-    font-size: 22px !important;
+  font-size: 22px !important;
 }
 
 .sw-page .smart-bar__header h2 .blue-frame {
-    font-weight: normal !important;
+  font-weight: normal !important;
 }

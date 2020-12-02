@@ -55,10 +55,10 @@
         "contact": {
             "title": "Lassen Sie sich etwas von Ihrem Support-Team unterstützen",
             "contain_text_support": "Kontaktieren Sie uns bei Fragen und teilen Sie uns Ihr Feedback mit über den",
-            "title_lengow_support": "Lengow Support.",
+            "title_lengow_support": "Lengow Support",
             "link_lengow_support": "https:\/\/supportlengow.zendesk.com\/hc\/en-us\/requests\/new",
             "need_some_help": "Brauchen Sie Hilfe?",
-            "contain_text_support_hour": "Wir werden alles tun, um Sie während der normalen Geschäftszeiten (Montag - Freitag von 09:00 - 18:00 (MEZ+1)) zurückzurufen.",
+            "contain_text_support_hour": "Wir werden alles tun, um Sie während der normalen Geschäftszeiten (Montag - Freitag von 09:00 - 18:00 (MEZ+1)) zurückzurufen",
             "find_answer": "Sie können Antworten auch in unserem",
             "link_magento_guide": "Shopware 6 Begleithandbuch finden",
             "knowledge_link_url": "https:\/\/support.lengow.com\/"
@@ -158,7 +158,7 @@
                 "action_waiting_return": "Aktivität gesendet, warten auf Antwort"
             }
         },
-        "orderTab": {
+        "order_tab": {
             "title": "Lengow Bestellung Detailseite",
             "order_id": "ID Commande",
             "delivery_address_id": "Lieferaddresse-ID",

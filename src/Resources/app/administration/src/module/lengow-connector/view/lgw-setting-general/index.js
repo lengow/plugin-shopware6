@@ -1,4 +1,5 @@
 import template from './lgw-setting-general.html.twig';
+import './lgw-setting-general.scss';
 
 const {
     Component,

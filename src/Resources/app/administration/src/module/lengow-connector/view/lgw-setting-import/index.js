@@ -1,4 +1,5 @@
 import template from './lgw-setting-import.html.twig';
+import './lgw-setting-import.scss';
 
 const {
     Component,
@@ -30,6 +31,7 @@ Component.register('lgw-setting-import', {
             lengowReportMailEnabled: null,
             lengowReportMailAddress: [],
             lengowCurrencyConversion: false,
+            lengowImportB2b: false,
             lengowDebugEnabled: false,
             salesChannels: [],
             shippingMethods: [],
@@ -72,6 +74,7 @@ Component.register('lgw-setting-import', {
         this.lengowReportMailEnabled = this.config.lengowReportMailEnabled.value === '1';
         this.lengowReportMailAddress = this.config.lengowReportMailAddress.value;
         this.lengowCurrencyConversion = this.config.lengowCurrencyConversion.value === '1';
+        this.lengowImportB2b = this.config.lengowImportB2b.value === '1';
         this.lengowDebugEnabled = this.config.lengowDebugEnabled.value === '1';
     },
 

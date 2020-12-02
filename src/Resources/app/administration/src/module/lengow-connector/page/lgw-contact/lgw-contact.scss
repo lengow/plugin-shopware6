@@ -1,19 +1,14 @@
-.lgw-contact {
-  background: #F1F1F1;
+.lgw-contact .sw-card__content {
+  text-align: center;
+  padding: 45px 60px 70px;
 }
 
-.lgw-contact .lgw-box {
-  display: block;
-  border-radius: 3px;
-  padding: 45px 60px 70px 60px;;
-  box-shadow: 0 3px 0 0 rgba(0,0,0,.05);
-  margin: 30px 0;
-  position: relative;
-  top: 0;
-  background: white;
+.lgw-contact h2 {
+  font-size: 23px;
+  margin: 15px 0 30px;
 }
 
 .lgw-contact a {
+  color: #00aeef;
   text-decoration: none;
 }
-

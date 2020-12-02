@@ -1,4 +1,3 @@
-import './page/lgw-product-list';
 import './component/lgw-action-button';
 import './component/lgw-action-label';
 import './component/lgw-conditional-string-field';
@@ -16,6 +15,7 @@ import './page/lgw-contact';
 import './page/lgw-dashboard';
 import './page/lgw-legal-notices';
 import './page/lgw-order-list';
+import './page/lgw-product-list';
 import './page/lgw-setting';
 import './page/lgw-toolbox';
 import './view/lgw-dashboard-connexion';
@@ -111,7 +111,7 @@ Shopware.Module.register('lengow-connector', {
         if (currentRoute.name === 'sw.order.detail') {
             currentRoute.children.push({
                 name: 'lgw.order.detail',
-                path: '/sw/order/detail/:id/lgw',
+                path: '/sw/order/detail/:id/lengow',
                 component: 'lgw-order-detail-extension',
                 meta: {
                     parentPath: "sw.order.index"
