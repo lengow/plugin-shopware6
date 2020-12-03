@@ -190,6 +190,8 @@ de:
         lengow_main_setting:
           label: "Haupteinstellungen"
           description: "Im Folgenden finden Sie Ihre Lengow Zugangsdaten.\nKonto ID, Zugangstoken, Geheimtoken werden bei der ersten Anmeldung automatisch aufgefüllt: bitte keine Änderungen eingeben!"
+          saved_message_1: "Einstellung"
+          saved_message_2: "gespeichert"
           account:
             label: "Account ID"
             description: "Ihr Lengow Account ID. Bitte nicht ändern."

@@ -3,6 +3,7 @@ import './lgw-setting.scss';
 
 const {
     Component,
+    Mixin,
     Data: { Criteria },
 } = Shopware;
 
@@ -10,6 +11,10 @@ Component.register('lgw-setting', {
     template,
 
     inject: ['repositoryFactory'],
+
+    mixins: [
+        Mixin.getByName('notification')
+    ],
 
     data() {
         return {
@@ -62,8 +67,6 @@ Component.register('lgw-setting', {
         },
 
         onSaveSettings(event, key, salesChannelId) {
-            // todo remove before release
-            console.log("save settings : " + key + ' with value : ' + event + ' for salesChannel : ' + salesChannelId);
             let reload = false;
             const lengowConfigCriteria = new Criteria();
             if (salesChannelId) {
@@ -81,7 +84,7 @@ Component.register('lgw-setting', {
                     if (key === "lengowDebugEnabled") { // activate debug mode need to reload config data
                         reload = true;
                     }
-                    this.lengowConfigRepository.sync([lengowConfig], Shopware.Context.api).then(result => {
+                    return this.lengowConfigRepository.sync([lengowConfig], Shopware.Context.api).then(result => {
                         if (reload) {
                             this.generalSettingsKey += 1;
                             this.configLoaded = false;
@@ -89,6 +92,12 @@ Component.register('lgw-setting', {
                         }
                     })
                 }
+            }).finally(() => {
+                this.createNotificationInfo({
+                    message: this.$tc('lengow-connector.setting.lengow_main_setting.saved_message_1')
+                        + ' ' + key + ' '
+                        + this.$tc('lengow-connector.setting.lengow_main_setting.saved_message_2'),
+                });
             });
         },
 

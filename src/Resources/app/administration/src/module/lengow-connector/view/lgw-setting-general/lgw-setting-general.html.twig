@@ -53,38 +53,45 @@
         {% endblock %}
         {% block lgw_setting_general_sales_security %}
             <sw-card :title="$tc('lengow-connector.setting.title.security')">
-                <lgw-conditional-string-field
-                        :switchLabel="$tc('lengow-connector.setting.lengow_main_setting.ip_enable.label')"
-                        :fieldLabel="$tc('lengow-connector.setting.lengow_main_setting.ip.label')"
-                        :locked="lengowIpEnabled"
-                        :fieldContent="lengowAuthorizedIp"
-                        switchSettingsKey="lengowIpEnabled"
-                        fieldSettingsKey="lengowAuthorizedIp"
-                        :onSaveSettings="onSaveSettings"
-                        :switchHelpText="$tc('lengow-connector.setting.lengow_main_setting.ip_enable.description')"
-                        :helpText="$tc('lengow-connector.setting.lengow_main_setting.ip.description')">
-                </lgw-conditional-string-field>
-                {#<sw-help-text class="lgw-help-text"
-                              :text="$tc('lengow-connector.setting.lengow_main_setting.tracking_enable.description')"
-                              :width="200"
-                              tooltipPosition="right"/>
-                <sw-switch-field class="text-center"
-                                 :label="$tc('lengow-connector.setting.lengow_main_setting.tracking_enable.label')"
-                                 v-model="lengowTrackingEnabled"
-                                 @change="onSaveSettings($event, 'lengowTrackingEnabled')">
-                </sw-switch-field>
                 <sw-help-text class="lgw-help-text"
-                              :text="$tc('lengow-connector.setting.lengow_main_setting.tracking_id.description')"
+                              :text="$tc('lengow-connector.setting.lengow_main_setting.ip_enable.description')"
                               :width="200"
-                              v-show="lengowTrackingEnabled"
-                              tooltipPosition="right"/>
-                <sw-select-field :label="$tc('lengow-connector.setting.lengow_main_setting.tracking_id.label')"
-                                 v-model="lengowTrackingId"
-                                 v-show="lengowTrackingEnabled"
-                                 @change="onSaveSettings($event, 'lengowTrackingId')">
-                    <option value="id">Id</option>
-                    <option value="productNumber">Product Number</option>
-                </sw-select-field>#}
+                              tooltipPosition="right"></sw-help-text>
+                <sw-switch-field class="text-center"
+                                 :label="$tc('lengow-connector.setting.lengow_main_setting.ip_enable.label')"
+                                 v-model="lengowIpEnabled"
+                                 @change="onSaveSettings($event, 'lengowIpEnabled')">
+                </sw-switch-field>
+                <lgw-lockable-string-field :fieldContent="lengowAuthorizedIp"
+                                           :locked="!lengowIpEnabled"
+                                           :fieldLabel="$tc('lengow-connector.setting.lengow_main_setting.ip.label')"
+                                           :onSaveSettings="onSaveSettings"
+                                           settingsKey="lengowAuthorizedIp"
+                                           :helpText="$tc('lengow-connector.setting.lengow_main_setting.ip.description')">
+                </lgw-lockable-string-field>
+{#                <sw-help-text class="lgw-help-text"#}
+{#                              :text="$tc('lengow-connector.setting.lengow_main_setting.tracking_enable.description')"#}
+{#                              :width="200"#}
+{#                              tooltipPosition="right">#}
+{#                </sw-help-text>#}
+{#                <sw-switch-field class="text-center"#}
+{#                                 :label="$tc('lengow-connector.setting.lengow_main_setting.tracking_enable.label')"#}
+{#                                 v-model="lengowTrackingEnabled"#}
+{#                                 @change="onSaveSettings($event, 'lengowTrackingEnabled')">#}
+{#                </sw-switch-field>#}
+{#                <sw-help-text class="lgw-help-text"#}
+{#                              :text="$tc('lengow-connector.setting.lengow_main_setting.tracking_id.description')"#}
+{#                              :width="200"#}
+{#                              v-show="lengowTrackingEnabled"#}
+{#                              tooltipPosition="right">#}
+{#                </sw-help-text>#}
+{#                <sw-select-field :label="$tc('lengow-connector.setting.lengow_main_setting.tracking_id.label')"#}
+{#                                 v-model="lengowTrackingId"#}
+{#                                 v-show="lengowTrackingEnabled"#}
+{#                                 @change="onSaveSettings($event, 'lengowTrackingId')">#}
+{#                    <option value="id">Id</option>#}
+{#                    <option value="productNumber">Product Number</option>#}
+{#                </sw-select-field>#}
             </sw-card>
         {% endblock %}
         {% block lgw_setting_general_timezone %}

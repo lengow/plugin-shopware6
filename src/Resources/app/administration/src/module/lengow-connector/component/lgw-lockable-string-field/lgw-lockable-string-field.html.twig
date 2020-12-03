@@ -11,8 +11,7 @@
                 :copyable="false"
                 :copyableTooltip="false"
                 :disabled="locked"
-                @change="onSaveSettings($event, settingsKey, settingsSalesChannelId)"
-                @change="handleChange"
+                @change="handleChange($event)"
                 :placeholder="fieldPlaceholder"
                 :label="fieldLabel"
                 :value="fieldContent">

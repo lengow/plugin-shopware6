@@ -50,6 +50,7 @@ Component.register('lgw-lockable-string-field', {
     methods: {
         handleChange(value) {
           this.fieldContent = value;
+          this.onSaveSettings(value, this.settingsKey, this.settingsSalesChannelId);
         },
     }
 });

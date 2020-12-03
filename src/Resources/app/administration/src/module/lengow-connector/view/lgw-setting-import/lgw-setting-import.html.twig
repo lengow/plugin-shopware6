@@ -60,21 +60,23 @@
                                  :label="$tc('lengow-connector.setting.lengow_import_setting.import_days.label')"
                                  @change="onSaveSettings($event, 'lengowImportDays')">
                 </sw-number-field>
-                <lgw-conditional-string-field
-                        :locked="lengowReportMailEnabled"
-                        :fieldContent="lengowReportMailAddress"
-                        :onSaveSettings="onSaveSettings"
-                        fieldPlaceholder="exemple@info.fr;exemple2@info.fr"
-                        :switchLabel="$tc('lengow-connector.setting.lengow_import_setting.report_mail_enabled.label')"
-                        switchSettingsKey="lengowReportMailEnabled"
-                        fieldSettingsKey="lengowReportMailAddress"
-                        :fieldLabel="$tc('lengow-connector.setting.lengow_import_setting.report_mail_address.label')"
-                        :helpText="$tc('lengow-connector.setting.lengow_import_setting.report_mail_address.description')">
-                </lgw-conditional-string-field>
+                <sw-switch-field class="text-center"
+                                 :label="$tc('lengow-connector.setting.lengow_import_setting.report_mail_enabled.label')"
+                                 v-model="lengowReportMailEnabled"
+                                 @change="onSaveSettings($event, 'lengowReportMailEnabled')">
+                </sw-switch-field>
+                <lgw-lockable-string-field :fieldContent="lengowReportMailAddress"
+                                           :locked="!lengowReportMailEnabled"
+                                           :fieldLabel="$tc('lengow-connector.setting.lengow_import_setting.report_mail_address.label')"
+                                           :onSaveSettings="onSaveSettings"
+                                           settingsKey="lengowReportMailAddress"
+                                           :helpText="$tc('lengow-connector.setting.lengow_import_setting.report_mail_address.description')">
+                </lgw-lockable-string-field>
                 <sw-help-text class="lgw-help-text"
                               :text="$tc('lengow-connector.setting.lengow_import_setting.currency_conversion_title.description')"
                               :width="200"
-                              tooltipPosition="right"/>
+                              tooltipPosition="right">
+                </sw-help-text>
                 <sw-switch-field class="text-center"
                                  :label="$tc('lengow-connector.setting.lengow_import_setting.currency_conversion_title.label')"
                                  v-model="lengowCurrencyConversion"
