@@ -40,7 +40,7 @@ de:
           title: "Benötigen Sie Hilfe?"
           contact: "Kontaktieren Sie Lengow"
           help_center_link: "Schauen Sie im Help Center"
-          help_center_target: "https://supportlengow.zendesk.com/hc/de-de/articles/360012203311"
+          help_center_target: "https://support.lengow.com/kb/guide/de/shopware-6-1KEHaAuucG/Steps/98507"
           help_center: "um detaillierte Informationen zu der korrekten Einrichtung des Shopware-Plugins zu finden"
       footer:
         link: 'https://www.lengow.com/de'
@@ -54,7 +54,7 @@ de:
         contain_text_support_hour: "Wir werden alles tun, um Sie während der normalen Geschäftszeiten (Montag - Freitag von 09:00 - 18:00 (MEZ+1)) zurückzurufen"
         find_answer: "Sie können Antworten auch in unserem"
         link_magento_guide: "Shopware 6 Begleithandbuch finden"
-        knowledge_link_url: "https://support.lengow.com/"
+        knowledge_link_url: "https://support.lengow.com/kb/guide/de/shopware-6-1KEHaAuucG/Steps/98507"
       legals:
         title: "Rechtshinweise"
         simplified_company: "Gesellschaft mit einfacher Haftungsbeschränkung"
