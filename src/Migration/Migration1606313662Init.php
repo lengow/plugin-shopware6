@@ -220,7 +220,7 @@ class Migration1606313662Init extends MigrationStep
         }
         $uuid = Uuid::randomHex(); // Generate new uuid for insert
         $connection->executeUpdate('
-            INSERT INTO state_machine_transition VALUES (
+            INSERT IGNORE INTO state_machine_transition VALUES (
                 UNHEX("' . $uuid . '"),
                 "cancel_technical_error",
                 (
