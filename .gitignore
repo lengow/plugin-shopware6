@@ -6,5 +6,5 @@ src/Logs/*.txt
 node_modules
 package-lock.json
 src/Config/marketplaces.json
-Export/*
-!Export/index.php
+src/Export/*
+!src/Export/index.php

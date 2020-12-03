@@ -1036,7 +1036,7 @@ class LengowOrder
                 $logOutput
             );
         } catch (Exception $e) {
-            $message = $this->lengowLog->decodeMessage($e->getMessage());
+            $message = $this->lengowLog->decodeMessage($e->getMessage(), LengowTranslation::DEFAULT_ISO_CODE);
             $this->lengowLog->write(
                 LengowLog::CODE_CONNECTOR,
                 $this->lengowLog->encodeMessage('log.connector.error_api', [
@@ -1121,10 +1121,11 @@ class LengowOrder
                     LengowOrderError::TYPE_ERROR_SEND
                 );
             }
+            $decodedMessage = $this->lengowLog->decodeMessage($errorMessage, LengowTranslation::DEFAULT_ISO_CODE);
             $this->lengowLog->write(
                 LengowLog::CODE_ACTION,
                 $this->lengowLog->encodeMessage('log.order_action.call_action_failed', [
-                    'decoded_message' => $this->lengowLog->decodeMessage($errorMessage),
+                    'decoded_message' => $decodedMessage,
                 ]),
                 false,
                 $lengowOrder->getMarketplaceSku()

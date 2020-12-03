@@ -2,13 +2,8 @@
 
 namespace Lengow\Connector\Storefront\Controller;
 
-use Shopware\Core\Framework\Context;
 use Shopware\Core\Framework\Routing\Annotation\RouteScope;
 use Shopware\Core\System\SalesChannel\SalesChannelContext;
-use Shopware\Storefront\Controller\StorefrontController;
-use Shopware\Core\Framework\DataAbstractionLayer\Search\Criteria;
-use Shopware\Core\Framework\DataAbstractionLayer\Search\Filter\EqualsFilter;
-use Shopware\Core\Framework\DataAbstractionLayer\EntityRepositoryInterface;
 use Symfony\Component\Routing\Annotation\Route;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\Response;
@@ -53,7 +48,7 @@ class LengowExportController extends LengowAbstractFrontController
      * @Route("/lengow/export", name="frontend.lengow.export", methods={"GET"})
      * @return Response
      */
-    public function export(Request $request, SalesChannelContext $context)
+    public function export(Request $request, SalesChannelContext $context): Response
     {
         $salesChannelName = $this->checkAccess($request, $context, false);
         $exportArgs = $this->createGetArgArray($request);
@@ -63,21 +58,7 @@ class LengowExportController extends LengowAbstractFrontController
         if ($exportArgs['mode']) {
             return new Response($this->modeSize($exportArgs['mode'], $exportArgs['sales_channel_id'] ));
         }
-        if (!$this->lengowExport->exec($salesChannelName, $exportArgs)) {
-            $this->lengowLog->write(
-                LengowLog::CODE_EXPORT,
-                $this->lengowLog->encodeMessage('log.export.export_failed'),
-                $exportArgs['log_output']
-            );
-        } else {
-            $this->lengowLog->write(
-                LengowLog::CODE_EXPORT,
-                $this->lengowLog->encodeMessage('log.export.end', [
-                    'sales_channel_name' => $salesChannelName,
-                ]),
-                $exportArgs['log_output']
-            );
-        }
+        $this->lengowExport->exec($salesChannelName, $exportArgs);
         return new Response();
     }
 
@@ -90,7 +71,7 @@ class LengowExportController extends LengowAbstractFrontController
     {
         return [
             'sales_channel_id' => $request->query->get('sales_channel_id'),
-            'format' => $request->query->get('format') ?? '',
+            'format' => $request->query->get('format') ?? 'csv',
             'mode' => $request->query->get('mode'),
             'stream' => $request->query->get('stream') !== '0',
             'product_ids' => $request->query->get('product_ids'),

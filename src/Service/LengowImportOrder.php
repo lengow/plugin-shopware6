@@ -603,7 +603,7 @@ class LengowImportOrder
             if ($lengowOrder->isInError()) {
                 $this->lengowOrderError->create($lengowOrder->getId(), $errorMessage);
             }
-            $decodedMessage = $this->lengowLog->decodeMessage($errorMessage);
+            $decodedMessage = $this->lengowLog->decodeMessage($errorMessage, LengowTranslation::DEFAULT_ISO_CODE);
             $this->lengowLog->write(
                 LengowLog::CODE_IMPORT,
                 $this->lengowLog->encodeMessage('log.import.order_import_failed', [

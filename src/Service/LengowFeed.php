@@ -65,6 +65,11 @@ class LengowFeed
     public const FOOTER = 'footer';
 
     /**
+     * @var string name of export folder
+     */
+    public const EXPORT_FOLDER_NAME = 'Export';
+
+    /**
      * @var string feed content
      */
     protected $content = '';
@@ -78,11 +83,6 @@ class LengowFeed
      * @var string export format
      */
     private $format;
-
-    /**
-     * @var string export folder
-     */
-    public $exportFolder;
 
     /**
      * @var string salesChannel Id to export
@@ -105,6 +105,11 @@ class LengowFeed
     private $environmentInfoProvider;
 
     /**
+     * @var LengowLog Lengow log instance
+     */
+    private $lengowLog;
+
+    /**
      * @var array formats available for export
      */
     public static $availableFormats = [
@@ -115,20 +120,21 @@ class LengowFeed
     ];
 
     /**
-     * @var string Lengow export folder
-     */
-    public static $lengowExportFolder = '..' . DIRECTORY_SEPARATOR . 'Export';
-
-    /**
      * LengowFeed constructor
      *
      * @param LengowFileFactory $lengowFileFactory
      * @param EnvironmentInfoProvider $environmentInfoProvider
+     * @param LengowLog $lengowLog
      */
-    public function __construct(LengowFileFactory $lengowFileFactory, EnvironmentInfoProvider $environmentInfoProvider)
+    public function __construct(
+        LengowFileFactory $lengowFileFactory,
+        EnvironmentInfoProvider $environmentInfoProvider,
+        LengowLog $lengowLog
+    )
     {
         $this->lengowFileFactory = $lengowFileFactory;
         $this->environmentInfoProvider = $environmentInfoProvider;
+        $this->lengowLog = $lengowLog;
     }
 
     /**
@@ -145,7 +151,7 @@ class LengowFeed
         $this->format = $format;
         $this->salesChannelId = $salesChannelId;
         if (!$stream) {
-            $this->initExportFile($salesChannelId);
+            $this->initExportFile();
         }
     }
 
@@ -154,18 +160,21 @@ class LengowFeed
      *
      * @throws LengowException
      */
-    public function initExportFile($salesChannelId) : void
+    public function initExportFile() : void
     {
         $sep = DIRECTORY_SEPARATOR;
-        $this->exportFolder = self::$lengowExportFolder;
-        $folderPath  = $this->environmentInfoProvider->getPluginBasePath() . $sep . $this->exportFolder;
+        $folderPath  = $this->environmentInfoProvider->getPluginPath() . $sep . self::EXPORT_FOLDER_NAME;
         if (!file_exists($folderPath)) {
-            if (!mkdir($folderPath)) {
-                throw new LengowException(); // todo log here
+            if (!mkdir($folderPath) && !is_dir($folderPath)) {
+                throw new LengowException(
+                    $this->lengowLog->encodeMessage('log.export.error_unable_to_create_folder', [
+                        'folder_path' => $folderPath,
+                    ])
+                );
             }
         }
-        $fileName = $salesChannelId . '-flux-' . time() . '.' . $this->format;
-        $this->lengowFile = $this->lengowFileFactory->create($this->exportFolder, $fileName);
+        $fileName = $this->salesChannelId . '-flux-' . time() . '.' . $this->format;
+        $this->lengowFile = $this->lengowFileFactory->create(self::EXPORT_FOLDER_NAME, $fileName);
     }
 
     /**
@@ -173,9 +182,9 @@ class LengowFeed
      *
      * @param string $type data type (header, body or footer)
      * @param array $data export data
-     * @param boolean $isFirst is first product
+     * @param bool $isFirst is first product
      */
-    public function write($type, $data = [], $isFirst = false): void
+    public function write(string $type, array $data = [], bool $isFirst = false): void
     {
         switch ($type) {
             case self::HEADER:
@@ -208,8 +217,8 @@ class LengowFeed
     {
         $this->write(self::FOOTER);
         if (!$this->stream) {
-            $oldFileName = 'flux.' . $this->format;
-            $oldFile = $this->lengowFileFactory->create($this->exportFolder, $oldFileName);
+            $oldFileName = $this->salesChannelId . '-flux.' . $this->format;
+            $oldFile = $this->lengowFileFactory->create(self::EXPORT_FOLDER_NAME, $oldFileName);
             if ($oldFile->exists()) {
                 $oldFilePath = $oldFile->getPath();
                 $oldFile->delete();
@@ -235,7 +244,7 @@ class LengowFeed
     public function getExportFilePath() : string
     {
         $sep = DIRECTORY_SEPARATOR;
-        return $this->lengowFile->getFolderPath() . $sep . 'flux.' . $this->format;
+        return $this->lengowFile->getFolderPath() . $sep . $this->lengowFile->getFileName();
     }
 
     /**
@@ -243,7 +252,7 @@ class LengowFeed
      *
      * @param string $content feed content to be flushed
      */
-    public function flush($content) : void
+    public function flush(string $content) : void
     {
         if ($this->stream) {
             echo $content;
@@ -281,7 +290,7 @@ class LengowFeed
      *
      * @return string
      */
-    protected function getHeader($data) : string
+    protected function getHeader(array $data) : string
     {
         switch ($this->format) {
             case self::FORMAT_CSV:
@@ -307,6 +316,7 @@ class LengowFeed
      *
      * @param array $data data to export as body
      * @param bool $isFirst is first product
+     *
      * @return string
      */
     protected function getBody(array $data, bool $isFirst) : string

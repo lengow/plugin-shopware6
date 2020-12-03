@@ -349,7 +349,10 @@ class LengowSync
                 $marketplaceFile->close();
                 $this->lengowConfiguration->set(LengowConfiguration::LENGOW_MARKETPLACE_UPDATE, (string) time());
             } catch (LengowException $e) {
-                $decodedMessage = $this->lengowLog->decodeMessage($e->getMessage());
+                $decodedMessage = $this->lengowLog->decodeMessage(
+                    $e->getMessage(),
+                    LengowTranslation::DEFAULT_ISO_CODE
+                );
                 $this->lengowLog->write(
                     LengowLog::CODE_IMPORT,
                     $this->lengowLog->encodeMessage('log.import.marketplace_update_failed', [

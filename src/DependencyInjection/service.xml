@@ -95,7 +95,6 @@
             <argument type="service" id="currency.repository"/>
             <argument type="service" id="language.repository"/>
             <argument type="service" id="custom_field.repository"/>
-            <argument type="service" id="custom_field_set.repository"/>
             <argument type="service" id="property_group_translation.repository"/>
             <argument type="service" id="Lengow\Connector\Service\LengowLog"/>
             <argument type="service" id="Lengow\Connector\Service\LengowFeed"/>
@@ -105,6 +104,7 @@
         <service id="Lengow\Connector\Service\LengowFeed">
             <argument type="service" id="Lengow\Connector\Factory\LengowFileFactory"/>
             <argument type="service" id="Lengow\Connector\Util\EnvironmentInfoProvider"/>
+            <argument type="service" id="Lengow\Connector\Service\LengowLog"/>
         </service>
 
         <service id="Lengow\Connector\Service\LengowLog">

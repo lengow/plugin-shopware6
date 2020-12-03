@@ -313,10 +313,11 @@ class LengowActionSync
             'isInError' => true,
         ]);
         $this->lengowOrderError->create($lengowOrder->getId(), $errorMessage, LengowOrderError::TYPE_ERROR_SEND);
+        $decodedMessage = $this->lengowLog->decodeMessage($errorMessage, LengowTranslation::DEFAULT_ISO_CODE);
         $this->lengowLog->write(
             LengowLog::CODE_ACTION,
             $this->lengowLog->encodeMessage('log.order_action.call_action_failed', [
-                'decoded_message' => $this->lengowLog->decodeMessage($errorMessage),
+                'decoded_message' => $decodedMessage,
             ]),
             $logOutput,
             $lengowOrder->getMarketplaceSku()

@@ -2,6 +2,7 @@
 
 namespace Lengow\Connector\Service;
 
+use \Exception;
 use Shopware\Core\Framework\Context;
 use Shopware\Core\Framework\DataAbstractionLayer\EntityRepositoryInterface;
 use Shopware\Core\Framework\DataAbstractionLayer\Search\Criteria;
@@ -10,10 +11,7 @@ use Shopware\Core\Content\Product\ProductEntity;
 use Shopware\Core\Content\Product\ProductCollection;
 use Shopware\Core\Checkout\Shipping\ShippingMethodEntity;
 use Shopware\Core\Framework\DataAbstractionLayer\Search\Filter\EqualsFilter;
-use Shopware\Core\Framework\DataAbstractionLayer\Search\Filter\EqualsAnyFilter;
-use Shopware\Core\Framework\DataAbstractionLayer\Search\Filter\MultiFilter;
 use Shopware\Core\Framework\DataAbstractionLayer\Search\Filter\ContainsFilter;
-use Shopware\Core\Framework\Uuid\Uuid;
 use Lengow\Connector\Exception\LengowException;
 
 /**
@@ -47,25 +45,20 @@ class LengowExport
      */
     private $lengowProductRepository;
 
-    /*
+    /**
      * @var EntityRepositoryInterface shopware currency repository
      */
     private $currencyRepository;
 
-    /*
+    /**
      * @var EntityRepositoryInterface shopware languages repository
      */
     private $languageRepository;
 
     /**
-     * @var EntityRepositoryInterface  shopware custom field repository
+     * @var EntityRepositoryInterface shopware custom field repository
      */
     private $customFieldRepository;
-
-    /**
-     * @var EntityRepositoryInterface shopware custom field set repository
-     */
-    private $customFieldSetRepository;
 
     /**
      * @var EntityRepositoryInterface shopware property group translation repository
@@ -97,25 +90,14 @@ class LengowExport
      */
     public static $defaultFields = [
         'id' => 'id',
-        'name' => 'name',
-        'description' => 'description',
-        'description_html' => 'description_html',
-        'supplier' => 'supplier',
-        'url' => 'url',
         'sku' => 'sku',
         'sku_supplier' => 'sku_supplier',
         'ean' => 'ean',
+        'name' => 'name',
         'quantity' => 'quantity',
-        'parent_id' => 'parent_id',
         'status' => 'status',
-        'minimal_quantity' => 'minimal_quantity',
-        'weight' => 'weight',
-        'width' => 'width',
-        'height' => 'height',
-        'length' => 'length',
-        'size_unit' => 'size_unit',
-        'weight_unit' => 'weight_unit',
         'category' => 'category',
+        'url' => 'url',
         'price_excl_tax' => 'price_excl_tax',
         'price_incl_tax' => 'price_incl_tax',
         'price_before_discount_excl_tax' => 'price_before_discount_excl_tax',
@@ -123,9 +105,16 @@ class LengowExport
         'discount_percent' => 'discount_percent',
         'discount_start_date' => 'discount_start_date',
         'discount_end_date' => 'discount_end_date',
-        'currency' => 'currency',
         'shipping_cost' => 'shipping_cost',
         'shipping_delay' => 'shipping_delay',
+        'size_unit' => 'size_unit',
+        'weight_unit' => 'weight_unit',
+        'weight' => 'weight',
+        'width' => 'width',
+        'height' => 'height',
+        'length' => 'length',
+        'minimal_quantity' => 'minimal_quantity',
+        'currency' => 'currency',
         'image_url_1' => 'image_url_1',
         'image_url_2' => 'image_url_2',
         'image_url_3' => 'image_url_3',
@@ -137,11 +126,15 @@ class LengowExport
         'image_url_9' => 'image_url_9',
         'image_url_10' => 'image_url_10',
         'type' => 'type',
+        'parent_id' => 'parent_id',
         'variation' => 'variation',
         'language' => 'language',
+        'description' => 'description',
+        'description_html' => 'description_html',
         'description_short' => 'description_short',
         'meta_title' => 'meta_title',
         'meta_keyword' => 'meta_keyword',
+        'supplier' => 'supplier',
     ];
 
     /**
@@ -157,6 +150,16 @@ class LengowExport
     private $exportConfiguration;
 
     /**
+     * @var int counter for parent product
+     */
+    private $parentProductCounter = 0;
+
+    /**
+     * @var int counter for child product
+     */
+    private $childProductCounter = 0;
+
+    /**
      * LengowExport constructor
      * @param LengowConfiguration $lengowConfiguration lengow config access
      * @param EntityRepositoryInterface $productRepository product repository
@@ -164,11 +167,10 @@ class LengowExport
      * @param EntityRepositoryInterface $categoryRepository category repository
      * @param EntityRepositoryInterface $shippingMethodRepository, shipping method repository
      * @param EntityRepositoryInterface $lengowProductRepository lengow product repository
-     * @param EntityRepositoryInterface $currencyRepository lengow product repository
-     * @param EntityRepositoryInterface $languageRepository lengow product repository
-     * @param EntityRepositoryInterface $customFieldRepository lengow product repository
-     * @param EntityRepositoryInterface $customFieldSetRepository lengow product repository
-     * @param EntityRepositoryInterface $propertyGroupTranslationRepository
+     * @param EntityRepositoryInterface $currencyRepository currency repository
+     * @param EntityRepositoryInterface $languageRepository language repository
+     * @param EntityRepositoryInterface $customFieldRepository custom field repository
+     * @param EntityRepositoryInterface $propertyGroupTranslationRepository property group repository
      * @param LengowLog $lengowLog Lengow log service
      * @param LengowFeed $lengowFeed lengow feed service
      * @param LengowProduct $lengowProduct lengow product service
@@ -183,7 +185,6 @@ class LengowExport
         EntityRepositoryInterface $currencyRepository,
         EntityRepositoryInterface $languageRepository,
         EntityRepositoryInterface $customFieldRepository,
-        EntityRepositoryInterface $customFieldSetRepository,
         EntityRepositoryInterface $propertyGroupTranslationRepository,
         LengowLog $lengowLog,
         LengowFeed $lengowFeed,
@@ -199,7 +200,6 @@ class LengowExport
         $this->shippingMethodRepository = $shippingMethodRepository;
         /** export exec repository */
         $this->customFieldRepository = $customFieldRepository;
-        $this->customFieldSetRepository = $customFieldSetRepository;
         $this->propertyGroupTranslationRepository = $propertyGroupTranslationRepository;
         $this->lengowFeed = $lengowFeed;
         $this->lengowProduct = $lengowProduct;
@@ -252,8 +252,7 @@ class LengowExport
             'offset' => 0,
             'limit' => 0,
             'format' => LengowFeed::FORMAT_CSV,
-            'currency' => $this->getExportCurrency($salesChannelId),
-            'shipping' => $this->getExportShippingMethod($salesChannelId),
+            'currency' => null,
         ]);
     }
 
@@ -276,11 +275,7 @@ class LengowExport
             'sales_channel_id' => $exportArgs['sales_channel_id'],
             'offset' => $exportArgs['offset'] ?? 0,
             'limit' => $exportArgs['limit'] ?? 0,
-            'currency' => $this->getExportCurrency(
-                $exportArgs['sales_channel_id'],
-                ($exportArgs['currency'] ?? null)
-            ),
-            'shipping' => $this->getExportShippingMethod($exportArgs['sales_channel_id']),
+            'currency' => $exportArgs['currency'] ?? null,
         ]);
     }
 
@@ -375,30 +370,20 @@ class LengowExport
         $categoryCriteria->addFilter(new ContainsFilter('path', $masterCategoryId))->addAssociation('products');
         $categoryCollection = $this->categoryRepository->search($categoryCriteria, Context::createDefaultContext());
         $productIdArray = [];
-        $parentProductCounter = 0;
-        $childProductCounter = 0;
         foreach ($categoryCollection as $category) {
             foreach ($category->getProducts() as $product) {
                 if ($product->getParentId() === null) {
                     if ($this->isExportable($product)) {
                         $productIdArray[] = $product->getId();
-                        $parentProductCounter++;
+                        $this->parentProductCounter++;
                     }
                     $children = $this->getChild($product);
-                    $childProductCounter += count($this->getExportableChild($children));
+                    $this->childProductCounter += count($this->getExportableChild($children));
                     $productIdArray = array_merge($productIdArray, $this->getExportableChild($children));
                 }
             }
         }
-        $this->lengowLog->write(
-            LengowLog::CODE_EXPORT,
-            $this->lengowLog->encodeMessage('log.export.total_product_exported', [
-                'nb_products' => count($productIdArray),
-                'nb_products_children' => $childProductCounter,
-                'nb_products_parent' => $parentProductCounter,
-            ]),
-            $this->exportConfiguration['log_output']
-        );
+
         return $productIdArray;
     }
 
@@ -480,9 +465,8 @@ class LengowExport
         }
         $productCriteria = new Criteria();
         $productCriteria->setIds($productIds);
-        $productCollection = $this->productRepository->search($productCriteria, Context::createDefaultContext())->getEntities();
-        $parentProductCounter = 0;
-        $childProductCounter = 0;
+        $productCollection = $this->productRepository->search($productCriteria, Context::createDefaultContext())
+            ->getEntities();
         if ($productCollection->count() > 0) {
             foreach ($productCollection as $product) {
                 if ($product->getParentId()) { // skip product if it's a child
@@ -490,25 +474,16 @@ class LengowExport
                 }
                 if ($this->isExportable($product)) {
                     $selectionProductIdsExport[] = $product->getId();
-                    $parentProductCounter++;
+                    $this->parentProductCounter++;
                 }
                 $children = $this->getChild($product);
-                $childProductCounter += count($this->getExportableChild($children));
+                $this->childProductCounter += count($this->getExportableChild($children));
                 $selectionProductIdsExport = array_merge(
                     $selectionProductIdsExport,
                     $this->getExportableChild($children)
                 );
             }
         }
-        $this->lengowLog->write(
-            LengowLog::CODE_EXPORT,
-            $this->lengowLog->encodeMessage('log.export.total_product_exported', [
-                'nb_products' => count($selectionProductIdsExport),
-                'nb_products_children' => $childProductCounter,
-                'nb_products_parent' => $parentProductCounter,
-            ]),
-            $this->exportConfiguration['log_output']
-        );
         return $selectionProductIdsExport;
     }
 
@@ -547,9 +522,10 @@ class LengowExport
      * Get child id from a parent product
      *
      * @param ProductEntity $parentProduct the parent product
+     *
      * @return ProductCollection
      */
-    public function getChild(ProductEntity $parentProduct) : ProductCollection
+    public function getChild(ProductEntity $parentProduct): ProductCollection
     {
         $productCriteria = new Criteria();
         $productCriteria->addFilter(new EqualsFilter('parentId', $parentProduct->getId()));
@@ -560,9 +536,10 @@ class LengowExport
      * Get sales channel category entry point
      *
      * @param string $salesChannelId sales channel id
+     *
      * @return string|null
      */
-    private function getCategoryEntryPoint(string $salesChannelId)
+    private function getCategoryEntryPoint(string $salesChannelId): ?string
     {
         $salesChannelCriteria = new Criteria();
         $salesChannelCriteria->setIds([$salesChannelId]);
@@ -702,7 +679,7 @@ class LengowExport
             new Criteria(),
             Context::createDefaultContext()
         );
-        $salesChannels = (array) $result->getEntities()->getElements();
+        $salesChannels = $result->getEntities()->getElements();
         $ids = [];
         foreach ($salesChannels as $salesChannel) {
             $ids[] = $salesChannel->getId();
@@ -721,7 +698,7 @@ class LengowExport
             new Criteria(),
             Context::createDefaultContext()
         );
-        $currencies = (array) $result->getEntities()->getElements();
+        $currencies = $result->getEntities()->getElements();
         $iso = [];
         foreach ($currencies as $currency) {
             $iso[] = $currency->getIsoCode();
@@ -740,7 +717,7 @@ class LengowExport
             new Criteria(),
             Context::createDefaultContext()
         );
-        $langs = (array) $result->getEntities()->getElements();
+        $langs = $result->getEntities()->getElements();
         $languages = [];
         foreach ($langs as $language) {
             $languages[] = $language->getName();
@@ -753,33 +730,39 @@ class LengowExport
      *
      * @param string $salesChannelName the sales channel name for logging export
      * @param array $exportArgs the export arguments to init export
+     *
      * @return bool
-     * @throws LengowException
      */
     public function exec(string $salesChannelName, array $exportArgs) : bool
     {
         try {
-            $fields = $this->getHeaderFields($exportArgs['sales_channel_id']);
-            $this->lengowFeed->init($exportArgs['sales_channel_id'], $exportArgs['stream'], $exportArgs['format']);
-            // Write headers
-            $this->lengowFeed->write(LengowFeed::HEADER, $fields);
-            $this->init($exportArgs['sales_channel_id'], $exportArgs);
-            // Log export start
             $this->lengowLog->write(
                 LengowLog::CODE_EXPORT,
-                $this->lengowLog->encodeMessage('log.export.start', [
-                    'sales_channel_name' => $salesChannelName,
-                ]),
-                $this->exportConfiguration['log_output']
+                $this->lengowLog->encodeMessage('log.export.start'),
+                $exportArgs['log_output']
             );
-            // Write body
+            $this->lengowLog->write(
+                LengowLog::CODE_EXPORT,
+                $this->lengowLog->encodeMessage('log.export.start_for_sales_channel', [
+                    'sales_channel_name' => $salesChannelName,
+                    'sales_channel_id' => $exportArgs['sales_channel_id'],
+                ]),
+                $exportArgs['log_output']
+            );
+            // get fields to export
+            $fields = $this->getHeaderFields($exportArgs['sales_channel_id']);
+            $this->lengowFeed->init($exportArgs['sales_channel_id'], $exportArgs['stream'], $exportArgs['format']);
+            // write headers
+            $this->lengowFeed->write(LengowFeed::HEADER, $fields);
+            $this->init($exportArgs['sales_channel_id'], $exportArgs);
+            // write body
             $this->writeFieldsData($fields);
-            // Write footer
+            // write footer
             if (!$this->lengowFeed->end()) {
                 $this->lengowLog->write(
                     LengowLog::CODE_EXPORT,
                     $this->lengowLog->encodeMessage('log.export.error_folder_not_created_or_writable'),
-                    $this->exportConfiguration['log_output']
+                    $exportArgs['log_output']
                 );
             } elseif (!$exportArgs['stream']) {
                 $this->lengowLog->write(
@@ -788,7 +771,7 @@ class LengowExport
                         'sales_channel_name' => $salesChannelName,
                         'link_file_export' => $this->lengowFeed->getExportFilePath(),
                     ]),
-                    $this->exportConfiguration['log_output']
+                    $exportArgs['log_output']
                 );
             }
             if ($exportArgs['update_export_date']) {
@@ -798,14 +781,25 @@ class LengowExport
                     $exportArgs['sales_channel_id']
                 );
             }
+            $this->lengowLog->write(
+                LengowLog::CODE_EXPORT,
+                $this->lengowLog->encodeMessage('log.export.end'),
+                $exportArgs['log_output']
+            );
             return true;
+        } catch (LengowException $e) {
+            $errorMessage = $e->getMessage();
         } catch (Exception $e) {
+            $errorMessage = '[Shopware error]: "' . $e->getMessage() . '" ' . $e->getFile() . ' | ' . $e->getLine();
+        }
+        if (isset($errorMessage)) {
+            $decodedMessage = $this->lengowLog->decodeMessage($errorMessage, LengowTranslation::DEFAULT_ISO_CODE);
             $this->lengowLog->write(
                 LengowLog::CODE_EXPORT,
                 $this->lengowLog->encodeMessage('log.export.export_failed', [
-                    'fail_reason' => $e->getMessage(),
+                    'decoded_message' => $decodedMessage,
                 ]),
-                $this->exportConfiguration['log_output']
+                $exportArgs['log_output']
             );
             return false;
         }
@@ -854,7 +848,13 @@ class LengowExport
         if (($result->getEntities()->count() > 0) && $result->getEntities()->first()->getLanguages()->count() > 0) {
             $language = $result->getEntities()->first()->getLanguages()->first();
         }
-        if (!$this->exportConfiguration['currency'] || !$this->exportConfiguration['shipping']) {
+        // get currency and shipping method for export
+        $currency = $this->getExportCurrency(
+            $this->exportConfiguration['sales_channel_id'],
+            $this->exportConfiguration['currency']
+        );
+        $shippingMethod = $this->getExportShippingMethod($this->exportConfiguration['sales_channel_id']);
+        if ($currency === null || $shippingMethod === null) {
             $this->lengowLog->write(
                 LengowLog::CODE_EXPORT,
                 $this->lengowLog->encodeMessage('log.export.specify_shipping_and_currency', [
@@ -873,6 +873,15 @@ class LengowExport
             $this->exportConfiguration['log_output']
         );
         $productIds = $this->getProductIdsExport();
+        $this->lengowLog->write(
+            LengowLog::CODE_EXPORT,
+            $this->lengowLog->encodeMessage('log.export.total_product_exported', [
+                'nb_products' => count($productIds),
+                'nb_products_children' => $this->childProductCounter,
+                'nb_products_parent' => $this->parentProductCounter,
+            ]),
+            $this->exportConfiguration['log_output']
+        );
         foreach ($productIds as $productId) {
             // if offset specified in params
             if ($this->exportConfiguration['offset'] !== 0
@@ -889,8 +898,8 @@ class LengowExport
             $fieldsData = $this->lengowProduct->getData(
                 $productId,
                 $headerFields,
-                $this->exportConfiguration['currency'],
-                $this->exportConfiguration['shipping'],
+                $currency,
+                $shippingMethod,
                 $language
             );
             $this->lengowFeed->write(LengowFeed::BODY, $fieldsData, $isFirst);
@@ -1047,9 +1056,11 @@ class LengowExport
      * Get all properties fields
      * Format is 'prop'_'fieldName'
      *
+     * @param string $salesChannelId sales channel id
+     *
      * @return array
      */
-    private function getAllPropertiesHeaderField($salesChannelId) : array
+    private function getAllPropertiesHeaderField(string $salesChannelId) : array
     {
         $fields = [];
         $salesChannelCriteria = new Criteria();

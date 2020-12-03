@@ -106,8 +106,6 @@ class LengowLog
         $this->lengowConfiguration = $lengowConfiguration;
         $this->environmentInfoProvider = $environmentInfoProvider;
         $this->lengowFileFactory = $lengowFileFactory;
-        // init new LengowFile for logging
-        $this->lengowFile = $this->lengowFileFactory->create(self::LOG_FOLDER_NAME, 'logs-' . date('Y-m-d') . '.txt');
     }
 
     /**
@@ -177,6 +175,13 @@ class LengowLog
         if ($display) {
             echo $log . '<br />';
             flush();
+        }
+        // init new LengowFile for logging
+        if ($this->lengowFile === null) {
+            $this->lengowFile = $this->lengowFileFactory->create(
+                self::LOG_FOLDER_NAME,
+                'logs-' . date('Y-m-d') . '.txt'
+            );
         }
         $this->lengowFile->write($log);
     }
