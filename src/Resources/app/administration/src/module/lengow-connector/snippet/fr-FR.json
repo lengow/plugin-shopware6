@@ -51,7 +51,7 @@
         },
         "footer": {
             "link": "https:\/\/www.lengow.com\/fr",
-            "plugin_name": "Lengow Shopware 6 Module"
+            "lengow_plugin_name": "Lengow Shopware 6 Module"
         },
         "contact": {
             "title": "Demandez de l'aide à notre équipe Support !",
@@ -266,24 +266,25 @@
                     "label": "Exporter uniquement la sélection de produits",
                     "description": "Activez cette option si vous ne voulez pas exporter tous vos produits disponibles. Sélectionnez ensuite les produits un par un."
                 },
-                "dispatcher": {
-                    "label": "Transporteur par défaut",
-                    "description": "Sélectionnez un transporteur par défaut pour calculer les frais de livraison"
+                "shipping": {
+                    "label": "Méthode de livraison par défaut",
+                    "description": "Sélectionnez une méthode de livraison par défaut pour calculer les frais de livraison"
                 }
             },
             "lengow_import_setting": {
                 "label": "Paramètres d'import",
                 "description": "Toutes vos commandes sont centralisées sur votre plateforme Lengow : choisissez ici si vous voulez synchroniser et importer vos commandes dans votre backoffice Shopware. Vos stocks seront ainsi mis à jour dans votre backoffice Shopware.",
                 "ship_mp_enabled": {
-                    "label": "Importer les commandes expédiées par les marketplaces"
+                    "label": "Importer les commandes expédiées par les marketplaces",
+                    "description": "Utilisez cette option pour importer les commandes expédiées par les marketplaces "
                 },
                 "decrease_stock": {
                     "label": "Diminuer mon stock avec les commandes expédiées par les marketplaces",
                     "description": "Activez cette option pour prendre en compte les commandes des marketplaces sur les stocks de votre backoffice Shopware."
                 },
-                "dispatcher": {
-                    "label": "Transporteur par défaut",
-                    "description": "Sélectionnez le transporteur par défaut à appliquer à vos commandes."
+                "shipping": {
+                    "label": "Méthode de livraison par défaut",
+                    "description": "Sélectionnez le transporteur par défaut à appliquer à vos commandes"
                 },
                 "import_days": {
                     "label": "Synchroniser toutes les commandes mises à jour depuis",

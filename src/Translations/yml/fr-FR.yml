@@ -44,7 +44,7 @@ fr:
           help_center: "pour plus d'informations sur la configuration de votre plugin Shopware"
       footer:
         link: 'https://www.lengow.com/fr'
-        plugin_name: 'Lengow Shopware 6 Module'
+        lengow_plugin_name: 'Lengow Shopware 6 Module'
       contact:
         title: "Demandez de l'aide à notre équipe Support !"
         contain_text_support: "Des questions, un feedback sur Lengow... transmettez vos demandes au"
@@ -229,20 +229,21 @@ fr:
           lengow_selection:
             label: "Exporter uniquement la sélection de produits"
             description: "Activez cette option si vous ne voulez pas exporter tous vos produits disponibles. Sélectionnez ensuite les produits un par un."
-          dispatcher:
-            label: "Transporteur par défaut"
-            description: "Sélectionnez un transporteur par défaut pour calculer les frais de livraison"
+          shipping:
+            label: "Méthode de livraison par défaut"
+            description: "Sélectionnez une méthode de livraison par défaut pour calculer les frais de livraison"
         lengow_import_setting:
           label: "Paramètres d'import"
           description: "Toutes vos commandes sont centralisées sur votre plateforme Lengow : choisissez ici si vous voulez synchroniser et importer vos commandes dans votre backoffice Shopware. Vos stocks seront ainsi mis à jour dans votre backoffice Shopware."
           ship_mp_enabled:
             label: "Importer les commandes expédiées par les marketplaces"
+            description: "Utilisez cette option pour importer les commandes expédiées par les marketplaces "
           decrease_stock:
             label: "Diminuer mon stock avec les commandes expédiées par les marketplaces"
             description: "Activez cette option pour prendre en compte les commandes des marketplaces sur les stocks de votre backoffice Shopware."
-          dispatcher:
-            label: "Transporteur par défaut"
-            description: "Sélectionnez le transporteur par défaut à appliquer à vos commandes."
+          shipping:
+            label: "Méthode de livraison par défaut"
+            description: "Sélectionnez le transporteur par défaut à appliquer à vos commandes"
           import_days:
             label: "Synchroniser toutes les commandes mises à jour depuis"
             description: "Choisissez le nombre de jours (Max 10 jours)"
@@ -343,6 +344,8 @@ fr:
         no_country_for_billing_address: "Erreur Lengow : l'adresse de facturation ne contient pas de pays"
         no_country_for_delivery_address: "Erreur Lengow : l'adresse de livraison ne contient pas de pays"
       exception:
+        no_connection_webservice: "la connexion ne se fait pas avec Lengow pour le sales channel %{sales_channel_name} (%{sales_channel_id})"
+        error_lengow_webservice: "l'API Lengow : %{error_code} - \"%{error_message}\" pour le sales channel %{sales_channel_name} (%{sales_channel_id})"
         marketplace_not_present: "Erreur Lengow : la marketplace %{marketplace_name} n’apparaît pas dans la liste des marketplaces"
         order_line_required: "numéro de la ligne de commande requis, non trouvé dans la commande"
         action_not_valid: "l'action %{action} n'est pas valide"
@@ -353,8 +356,6 @@ fr:
         action_not_created: "création d'action impossible : %{error_message}"
         action_not_created_api: "création d'action impossible car l'API Lengow n'est pas disponible. Réessayez de nouveau"
         action_is_too_old: "l'action est trop ancienne. Réessayez de nouveau"
-        no_connection_webservice: "la connexion ne se fait pas avec Lengow pour le sales channel %{sales_channel_name} (%{sales_channel_id})"
-        error_lengow_webservice: "l'API Lengow : %{error_code} - \"%{error_message}\" pour le sales channel %{sales_channel_name} (%{sales_channel_id})"
         no_product_to_cart: "il n'y a pas de produit ajouté au panier"
         product_is_a_parent: "le produit %{product_number} (%{product_id}) est un parent. Une variation du produit est nécessaire"
         no_quantity_for_product: "le produit %{product_number} (%{product_id}) ne peut être ajouté au panier. Vérifiez qu'il est bien disponible à la commande ou qu'il y a assez de stock"
@@ -363,3 +364,7 @@ fr:
         salutation_not_found: "Aucune salutation trouvée dans votre système. Merci de l'ajouter dans votre configuration Shopware"
         shopware_customer_not_saved: "ATTENTION ! Le client n'a pas pu être sauvegardé dans la table user de Shopware"
         shopware_order_not_saved: "ATTENTION ! La commande n'a pas pu être sauvegardée dans la table order de Shopware"
+      mail_report:
+        subject_report_mail: "Erreur de l'import Lengow"
+        order: "Commande %{marketplace_sku}"
+        no_error_in_report_mail: "Pas de message d'erreur, contacter le support via https://supportlengow.zendesk.com/agent/"

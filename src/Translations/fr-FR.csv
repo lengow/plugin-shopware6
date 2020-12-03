@@ -16,6 +16,8 @@ lengow_log.error.currency_not_available|la devise %{currency_iso} n'est pas disp
 lengow_log.error.no_billing_address|Erreur Lengow : pas d'adresse de facturation dans cette commande
 lengow_log.error.no_country_for_billing_address|Erreur Lengow : l'adresse de facturation ne contient pas de pays
 lengow_log.error.no_country_for_delivery_address|Erreur Lengow : l'adresse de livraison ne contient pas de pays
+lengow_log.exception.no_connection_webservice|la connexion ne se fait pas avec Lengow pour le sales channel %{sales_channel_name} (%{sales_channel_id})
+lengow_log.exception.error_lengow_webservice|l'API Lengow : %{error_code} - "%{error_message}" pour le sales channel %{sales_channel_name} (%{sales_channel_id})
 lengow_log.exception.marketplace_not_present|Erreur Lengow : la marketplace %{marketplace_name} n’apparaît pas dans la liste des marketplaces
 lengow_log.exception.order_line_required|numéro de la ligne de commande requis, non trouvé dans la commande
 lengow_log.exception.action_not_valid|l'action %{action} n'est pas valide
@@ -26,8 +28,6 @@ lengow_log.exception.arg_is_required|envoi d'action impossible : %{arg_name} est
 lengow_log.exception.action_not_created|création d'action impossible : %{error_message}
 lengow_log.exception.action_not_created_api|création d'action impossible car l'API Lengow n'est pas disponible. Réessayez de nouveau
 lengow_log.exception.action_is_too_old|l'action est trop ancienne. Réessayez de nouveau
-lengow_log.exception.no_connection_webservice|la connexion ne se fait pas avec Lengow pour le sales channel %{sales_channel_name} (%{sales_channel_id})
-lengow_log.exception.error_lengow_webservice|l'API Lengow : %{error_code} - "%{error_message}" pour le sales channel %{sales_channel_name} (%{sales_channel_id})
 lengow_log.exception.no_product_to_cart|il n'y a pas de produit ajouté au panier
 lengow_log.exception.product_is_a_parent|le produit %{product_number} (%{product_id}) est un parent. Une variation du produit est nécessaire
 lengow_log.exception.no_quantity_for_product|le produit %{product_number} (%{product_id}) ne peut être ajouté au panier. Vérifiez qu'il est bien disponible à la commande ou qu'il y a assez de stock
@@ -36,3 +36,6 @@ lengow_log.exception.country_not_found|Aucun pays trouvé pour l'iso code %{iso_
 lengow_log.exception.salutation_not_found|Aucune salutation trouvée dans votre système. Merci de l'ajouter dans votre configuration Shopware
 lengow_log.exception.shopware_customer_not_saved|ATTENTION ! Le client n'a pas pu être sauvegardé dans la table user de Shopware
 lengow_log.exception.shopware_order_not_saved|ATTENTION ! La commande n'a pas pu être sauvegardée dans la table order de Shopware
+lengow_log.mail_report.subject_report_mail|Erreur de l'import Lengow
+lengow_log.mail_report.order|Commande %{marketplace_sku}
+lengow_log.mail_report.no_error_in_report_mail|Pas de message d'erreur, contacter le support via https://supportlengow.zendesk.com/agent/
