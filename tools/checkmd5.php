@@ -18,7 +18,9 @@ $listFolders = [
     '/src/Exception',
     '/src/Factory',
     '/src/Migration',
-    '/src/Resources',
+    '/src/Resources/app',
+    '/src/Resources/config',
+    '/src/Resources/public/flag',
     '/src/Service',
     '/src/Storefront',
     '/src/Subscriber',
@@ -29,6 +31,14 @@ $listFolders = [
 $filePaths = [
     $base.'/composer.json',
     $base.'/src/Connector.php',
+    $base.'/src/Resources/public/bag.png',
+    $base.'/src/Resources/public/clock.png',
+    $base.'/src/Resources/public/home-orders.png',
+    $base.'/src/Resources/public/home-products.png',
+    $base.'/src/Resources/public/home-settings.png',
+    $base.'/src/Resources/public/lengow-blue.png',
+    $base.'/src/Resources/public/lengow-white-big.png',
+    $base.'/src/Resources/public/plane.png',
 ];
 
 foreach ($listFolders as $folder) {
