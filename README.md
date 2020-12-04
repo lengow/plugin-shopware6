@@ -4,8 +4,8 @@
 - **Tested up to:** Shopware 6.2
 - **Requires PHP:** 7.3.11
 - **Stable tag:** 1.0.0
-- **License:** GPLv3
-- **License URI:** https://www.gnu.org/licenses/gpl-3.0
+- **License:** MIT
+- **License URI:** https://opensource.org/licenses/MIT
 
 ## Overview
 

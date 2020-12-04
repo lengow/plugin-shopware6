@@ -2,6 +2,7 @@
     "name": "lengow/connector",
     "description": "Lengow allows you to easily export your product catalogue from your Shopware store and sell on Amazon, Cdiscount, Google Shopping, Criteo, LeGuide.com, Ebay, Rakuten, Priceminister. Choose from our 1,800 available marketing channels!",
     "version": "v1.0.0",
+    "type": "shopware-platform-plugin",
     "license": "MIT",
     "authors": [
         {
@@ -9,29 +10,35 @@
             "role": "Manufacturer"
         }
     ],
-    "type": "shopware-platform-plugin",
-    "autoload": {
-        "psr-4": {
-            "Lengow\\Connector\\": "src/"
-        }
+    "require": {
+        "shopware/core": "*",
+        "php": ">=7.2.0",
+        "ext-curl": "*",
+        "ext-json": "*"
     },
     "extra": {
         "shopware-plugin-class": "Lengow\\Connector\\Connector",
         "copyright": "(c) by Lengow SAS",
-        "manufacturerLink": "https://www.lengow.com",
-        "supportLink": "https://support.lengow.com",
         "label": {
             "de-DE": "Lengow Für Shopware",
             "en-GB": "Lengow For Shopware"
         },
         "description": {
-            "de-DE": "Lengow allows you to easily export your product catalogue from your Shopware store and sell on Amazon, Cdiscount, Google Shopping, Criteo, LeGuide.com, Ebay, Rakuten, Priceminister. Choose from our 1,800 available marketing channels!",
-            "en-GB": "Lengow allows you to easily export your product catalogue from your Shopware store and sell on Amazon, Cdiscount, Google Shopping, Criteo, LeGuide.com, Ebay, Rakuten, Priceminister. Choose from our 1,800 available marketing channels!"
+            "de-DE": "Verkaufen Sie die Produkte aus Ihrem Shopware-Shop auf Amazon, Otto, real.de, Ebay, Zalando etc.! Managen Sie alle Ihre Produktbestellungen direkt von Ihrem Lengow-Dashboard aus und ste",
+            "en-GB": "Sell on Google Shopping, Amazon, Facebook, Idealo, Real.de, etc. with your Shopware store! Manage all your product orders right from your Lengow interface and keep your clients up-to-da"
+        },
+        "manufacturerLink": {
+            "de-DE": "https://www.lengow.com/de",
+            "en-GB": "https://www.lengow.com/"
+        },
+        "supportLink": {
+            "de-DE": "https://support.lengow.com/",
+            "en-GB": "https://support.lengow.com/"
         }
     },
-    "require": {
-        "php": ">=7.2.0",
-        "ext-curl": "*",
-        "ext-json": "*"
+    "autoload": {
+        "psr-4": {
+            "Lengow\\Connector\\": "src/"
+        }
     }
 }

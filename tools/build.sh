@@ -44,15 +44,15 @@ else
 fi
 
 # variables
-FOLDER_TMP="/tmp/Lengow"
-FOLDER_LOGS="/tmp/Lengow/src/Logs"
-FOLDER_EXPORT="/tmp/Lengow/src/Export"
-FOLDER_TOOLS="/tmp/Lengow/tools"
-FOLDER_TEST="/tmp/Lengow/tests"
-FOLDER_NODE="/tmp/Lengow/node_modules"
-FOLDER_BIN="/tmp/Lengow/bin"
-FOLDER_CONFIG="/tmp/Lengow/src/Config"
-FOLDER_TRANSLATION="/tmp/Lengow/src/Translations/yml"
+FOLDER_TMP="/tmp/Connector"
+FOLDER_LOGS="/tmp/Connector/src/Logs"
+FOLDER_EXPORT="/tmp/Connector/src/Export"
+FOLDER_TOOLS="/tmp/Connector/tools"
+FOLDER_TEST="/tmp/Connector/tests"
+FOLDER_NODE="/tmp/Connector/node_modules"
+FOLDER_BIN="/tmp/Connector/bin"
+FOLDER_CONFIG="/tmp/Connector/src/Config"
+FOLDER_TRANSLATION="/tmp/Connector/src/Translations/yml"
 
 VERT="\\033[1;32m"
 ROUGE="\\033[1;31m"
@@ -134,6 +134,6 @@ remove_directory $FOLDER_BIN
 echo "- Remove bin folder : ""$VERT""DONE""$NORMAL"""
 # make zip
 cd /tmp
-zip "-r" $ARCHIVE_NAME "Lengow"
+zip "-r" $ARCHIVE_NAME "Connector"
 echo "- Build archive : ""$VERT""DONE""$NORMAL"""
 mv $ARCHIVE_NAME ~/Bureau
