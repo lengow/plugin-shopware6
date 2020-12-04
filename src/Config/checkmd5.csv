@@ -134,8 +134,8 @@
 /src/Resources/app/administration/src/module/lengow-connector/page/lgw-toolbox/index.js|8a842f4d8e48959d3583decbc38f06a7
 /src/Resources/app/administration/src/module/lengow-connector/page/lgw-toolbox/state.js|2d06db34fc3159c387761a97d3c5d3ff
 /src/Resources/app/administration/src/module/lengow-connector/snippet/en-GB.json|5a46b72c83869b3f91edef885c9b93b0
-/src/Resources/app/administration/src/module/lengow-connector/snippet/fr-FR.json|3e6bca05d0075786534edf2a96522f05
-/src/Resources/app/administration/src/module/lengow-connector/snippet/de-DE.json|608d03ca62535d41dbd7014c954655d4
+/src/Resources/app/administration/src/module/lengow-connector/snippet/fr-FR.json|7e258e723a8732c3dc3e6481f8ebd5c7
+/src/Resources/app/administration/src/module/lengow-connector/snippet/de-DE.json|e109fa12ff93858cf5435a020c2725bf
 /src/Resources/app/administration/src/module/lengow-connector/extension/sw-order-detail/index.js|b827c09cd1332b1e1ebbd2d53ed2d998
 /src/Resources/app/administration/src/module/lengow-connector/extension/sw-order-detail/sw-order-detail.html.twig|9dd8de1eea91c1d94109e780575d3b9b
 /src/Resources/app/administration/src/main.js|e61c8b2686c83657420bfed7ed544f4c
@@ -428,11 +428,11 @@
 /src/Subscriber/LengowSettingUpdateSubscriber.php|5dd2760693208bbbb08d56ad46bc85a3
 /src/Subscriber/ProductExtensionSubscriber.php|7eb8527b3cd5331aa8b39d2e0c7e5115
 /src/Translations/en-GB.csv|ff4708742f2e2c59e066618d67c24b4a
-/src/Translations/yml/de-DE.yml|7aa27094101c115a0cfb5d795a352138
-/src/Translations/yml/fr-FR.yml|37555754a20ddc2dd3bc9bedc475fe5c
+/src/Translations/yml/de-DE.yml|3ef610c32e467d6ae382f94bcfbe8612
+/src/Translations/yml/fr-FR.yml|8f5c3e35f6657b21ce997ed87cbf1801
 /src/Translations/yml/en-GB.yml|efa9d68f059850b69831ac22946acbb2
 /src/Translations/yml/log.yml|1704290133f9027cf055a72e1f014793
 /src/Translations/fr-FR.csv|30e67e9a80bc2a8175733fda075a22e6
-/src/Translations/de-DE.csv|0c5095953fe7656d9b1491f4f00a8126
+/src/Translations/de-DE.csv|50aa56fa701799a45711a6e3e76f613c
 /src/Util/StringCleaner.php|6842e4e36db4cdbcab89e8228139bc55
 /src/Util/EnvironmentInfoProvider.php|ad1064f23b5654b3ee4516d8889b54b8

@@ -56,7 +56,7 @@ fr:
         link_magento_guide: "notre guide dédié à Shopware 6"
         knowledge_link_url: "https://support.lengow.com/kb/guide/fr/shopware-6-1KEHaAuucG/Steps/98507"
       legals:
-        title: "Mentions Légales"
+        title: "Mentions légales"
         simplified_company: "Société par actions simplifiés"
         social_capital: "Capital social :"
         cnil_declaration: "Déclaration CNIL :"
@@ -69,7 +69,7 @@ fr:
         activate_selection_label: "Activer la selection produit"
         mass_action_select: "Sélectionner tout"
         mass_action_publish: "Publier sur lengow"
-        mass_action_unpublish: "Dépublier sur lengow"
+        mass_action_unpublish: "Dépublier sur Lengow"
         total_selected: "Total sélectionné"
         data:
           nb_product_export_label: "Total produits exportés :"
@@ -79,7 +79,7 @@ fr:
           stock_filter_label: "Avec stock / Sans stock"
           search_filter_label: "Recherche par id / nom / reference"
         column:
-          active_in_lengow: "Actif dans lengow"
+          active_in_lengow: "Actif dans Lengow"
       order:
         title: "Commandes"
         order_with_error: "en erreur"
@@ -93,10 +93,10 @@ fr:
         mass_action_reimport: "Réimporter les commandes sélectionnées"
         mass_action_resend: "Renvoyer les commandes sélectionnées"
         nb_product: "produit(s)"
-        no_order_title: "Le meilleur est encore à venir !"
+        no_order_title: "Le meilleur est à venir !"
         no_order_description: "Vos produits sont bien visibles, vos ventes sont sur le point de décoller"
-        sync_modal_title_order: "Synchronisation des commandes terminée"
-        sync_modal_title_action: "Synchronisation des actions terminée"
+        sync_modal_title_order: "Synchronisation des commandes terminées"
+        sync_modal_title_action: "Synchronisation des actions terminées"
         debug_warning_message: "Vous êtes en Debug Mode. Vous pouvez importer vos commandes mais les interactions avec Lengow ne sont pas possibles"
         state:
           accepted: "Accepté"
@@ -184,14 +184,14 @@ fr:
           security: "Securité & tracker"
           timezone: "Timezone"
           exclusions: "Exclusions"
-          shipping: "Methode de transport par defaut"
+          shipping: "Méthode de transport par defaut"
           marketplaces: "Marketplaces"
           others: "Autres"
         lengow_main_setting:
           label: "Paramètres principaux"
           description: "Vous trouverez ci-dessous vos identifiants de connexion à Lengow.\nLes ID Lengow, Access Token et Secret Token sont automatiquement complétés lors de votre première connexion : veuillez à ne pas les modifier."
           saved_message_1: "Paramètre"
-          saved_message_2: "sauvegardé"
+          saved_message_2: "enregistré"
           account:
             label: "ID du compte"
             description: "Votre ID de compte Lengow. Veuillez ne pas le modifier."
