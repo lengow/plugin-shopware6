@@ -2,6 +2,7 @@
 **/.DS_Store
 src/Resources/public/administration
 src/Logs/*.txt
+.eslintrc.js
 .eslintrc.json
 node_modules
 package-lock.json

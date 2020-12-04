@@ -11,7 +11,7 @@ Component.register('lgw-dashboard-free-trial', {
 
     data() {
         return {
-            lengow_url: LENGOW_URL,
+            lengow_url: LENGOW_URL
         };
     },
 
@@ -22,6 +22,6 @@ Component.register('lgw-dashboard-free-trial', {
                     window.location.reload();
                 }
             });
-        },
-    },
+        }
+    }
 });

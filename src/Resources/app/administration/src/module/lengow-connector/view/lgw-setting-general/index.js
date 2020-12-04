@@ -3,7 +3,7 @@ import './lgw-setting-general.scss';
 
 const {
     Component,
-    Data: { Criteria },
+    Data: { Criteria }
 } = Shopware;
 
 Component.register('lgw-setting-general', {
@@ -15,17 +15,17 @@ Component.register('lgw-setting-general', {
         locked: {
             type: Boolean,
             required: false,
-            default: true,
+            default: true
         },
         config: {
             type: Object,
             required: true,
-            default: {},
+            default: {}
         },
         onSaveSettings: {
             type: Object,
-            required: true,
-        },
+            required: true
+        }
     },
 
     data() {
@@ -40,24 +40,24 @@ Component.register('lgw-setting-general', {
             lengowTrackingId: '',
             lengowTimezone: '',
             credentialLocked: true,
-            render: false,
-        }
+            render: false
+        };
     },
 
     created() {
         const salesChannelCriteria = new Criteria();
         salesChannelCriteria.addAssociation('domains');
         this.salesChannelRepository.search(salesChannelCriteria, Shopware.Context.api).then(result => {
-                result.forEach(salesChannel => {
-                    this.salesChannels = [...this.salesChannels,  {
-                        salesChannelId: salesChannel.id,
-                        label: salesChannel.name,
-                        value: salesChannel.id,
-                        enabled: this.getConfigSalesChannelEnabledValue(salesChannel.id),
-                        catalogId: this.getConfigCatalogIdValue(salesChannel.id),
-                    }];
-                });
-                this.render = true;
+            result.forEach(salesChannel => {
+                this.salesChannels = [...this.salesChannels, {
+                    salesChannelId: salesChannel.id,
+                    label: salesChannel.name,
+                    value: salesChannel.id,
+                    enabled: this.getConfigSalesChannelEnabledValue(salesChannel.id),
+                    catalogId: this.getConfigCatalogIdValue(salesChannel.id)
+                }];
+            });
+            this.render = true;
         });
         this.lengowAccountId = this.config.lengowAccountId.value;
         this.lengowAccessToken = this.config.lengowAccessToken.value;
@@ -81,14 +81,12 @@ Component.register('lgw-setting-general', {
 
         salesChannelRepository() {
             return this.repositoryFactory.create('sales_channel');
-        },
+        }
     },
 
     methods: {
         getConfigCatalogIdValue(salesChannelId) {
-            const catalogIdValue = this.config.lengowCatalogId.find(elem =>
-                elem.salesChannel.id === salesChannelId
-            );
+            const catalogIdValue = this.config.lengowCatalogId.find(elem => elem.salesChannel.id === salesChannelId);
             if (catalogIdValue !== 'undefined') {
                 return catalogIdValue.value;
             }
@@ -100,6 +98,5 @@ Component.register('lgw-setting-general', {
                 elem => elem.salesChannel.id === salesChannelId && elem.value === '1'
             );
         }
-    },
-
+    }
 });

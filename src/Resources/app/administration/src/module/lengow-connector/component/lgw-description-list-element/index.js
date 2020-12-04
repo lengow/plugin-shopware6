@@ -13,22 +13,22 @@ Component.register('lgw-description-list-element', {
     props: {
         title: {
             type: String,
-            required: true,
+            required: true
         },
         value: {
             type: String,
-            required: true,
+            required: true
         },
         type: {
             type: String,
             required: false,
-            default: '',
+            default: ''
         },
         helpText: {
             type: String,
             required: false,
-            default: '',
-        },
+            default: ''
+        }
     },
 
     data() {
@@ -39,7 +39,7 @@ Component.register('lgw-description-list-element', {
             content: '',
             isDate: false,
             isArray: false,
-            isLoading: false,
+            isLoading: false
         };
     },
 
@@ -49,7 +49,7 @@ Component.register('lgw-description-list-element', {
 
     metaInfo() {
         return {
-            title: this.$createTitle(),
+            title: this.$createTitle()
         };
     },
 
@@ -65,14 +65,12 @@ Component.register('lgw-description-list-element', {
                         this.showIcon = true;
                         this.iconName = 'small-default-checkmark-line-medium';
                         this.iconClass = 'is--active lgw-check-green';
+                    } else if (this.helpText !== '') {
+                        this.content = this.helpText;
                     } else {
-                        if (this.helpText !== '') {
-                            this.content = this.helpText;
-                        } else {
-                            this.showIcon = true;
-                            this.iconName = 'small-default-x-line-medium';
-                            this.iconClass = 'is--inactive lgw-check-red';
-                        }
+                        this.showIcon = true;
+                        this.iconName = 'small-default-x-line-medium';
+                        this.iconClass = 'is--inactive lgw-check-red';
                     }
                     break;
                 case 'date':
@@ -96,6 +94,6 @@ Component.register('lgw-description-list-element', {
                     break;
             }
             this.isLoading = false;
-        },
-    },
+        }
+    }
 });

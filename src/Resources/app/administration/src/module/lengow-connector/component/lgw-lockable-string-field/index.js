@@ -9,31 +9,31 @@ Component.register('lgw-lockable-string-field', {
         fieldContent: {
             type: String,
             required: false,
-            default: '',
+            default: ''
         },
         locked: {
             type: Boolean,
             required: false,
-            default: true,
+            default: true
         },
         fieldPlaceholder: {
             type: String,
             required: false,
-            default: '',
+            default: ''
         },
         fieldLabel: {
             type: String,
             required: false,
-            default: '',
+            default: ''
         },
         onSaveSettings: {
             type: Object,
-            required: true,
+            required: true
         },
         settingsKey: {
             type: String,
             required: false,
-            default: '',
+            default: ''
         },
         helpText: {
             type: String,
@@ -43,14 +43,14 @@ Component.register('lgw-lockable-string-field', {
         settingsSalesChannelId: {
             type: String,
             required: false,
-            default: '',
-        },
+            default: ''
+        }
     },
 
     methods: {
         handleChange(value) {
-          this.fieldContent = value;
-          this.onSaveSettings(value, this.settingsKey, this.settingsSalesChannelId);
-        },
+            this.fieldContent = value;
+            this.onSaveSettings(value, this.settingsKey, this.settingsSalesChannelId);
+        }
     }
 });

@@ -3,7 +3,7 @@ import './lgw-setting-export.scss';
 
 const {
     Component,
-    Data: { Criteria },
+    Data: { Criteria }
 } = Shopware;
 
 Component.register('lgw-setting-export', {
@@ -15,20 +15,20 @@ Component.register('lgw-setting-export', {
         config: {
             type: Object,
             required: true,
-            default: {},
+            default: {}
         },
         onSaveSettings: {
             type: Object,
-            required: true,
-        },
+            required: true
+        }
     },
 
     data() {
         return {
             salesChannels: [],
             shippingMethods: [],
-            render: false,
-        }
+            render: false
+        };
     },
 
     async created() {
@@ -38,7 +38,7 @@ Component.register('lgw-setting-export', {
             result.forEach(salesChannel => {
                 this.getShippingMethod(salesChannel).then(() => {
                     this.getConfigExportDefaultShippingMethod(salesChannel.id).then(defaultShippingMethod => {
-                        this.salesChannels = [ ...this.salesChannels, {
+                        this.salesChannels = [...this.salesChannels, {
                             salesChannelId: salesChannel.id,
                             name: salesChannel.name,
                             value: salesChannel.id,
@@ -48,7 +48,7 @@ Component.register('lgw-setting-export', {
                         }
                         ];
                         this.render = true;
-                    })
+                    });
                 });
             });
         });
@@ -64,8 +64,8 @@ Component.register('lgw-setting-export', {
         },
 
         salesChannelShippingMethodRepository() {
-          return this.repositoryFactory.create('sales_channel_shipping_method');
-        },
+            return this.repositoryFactory.create('sales_channel_shipping_method');
+        }
     },
 
     methods: {
@@ -113,7 +113,6 @@ Component.register('lgw-setting-export', {
                         }];
                 });
             });
-        },
-    },
-
+        }
+    }
 });

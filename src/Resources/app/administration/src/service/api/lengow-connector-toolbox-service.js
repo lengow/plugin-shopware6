@@ -60,7 +60,7 @@ class LengowConnectorToolboxService extends ApiService {
                 {
                     headers: headers
                 }
-            )
+            );
     }
 }
 

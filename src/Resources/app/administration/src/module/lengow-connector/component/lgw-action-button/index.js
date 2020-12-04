@@ -12,16 +12,16 @@ Component.register('lgw-action-button', {
     props: {
         lengowOrderId: {
             type: String,
-            required: true,
+            required: true
         },
         orderProcessState: {
             type: Number,
-            required: true,
+            required: true
         },
         onRefresh: {
             type: Object,
-            required: true,
-        },
+            required: true
+        }
     },
 
     data() {
@@ -30,7 +30,7 @@ Component.register('lgw-action-button', {
             buttonContent: '',
             buttonAction: '',
             tooltipTitle: '',
-            isLoading: false,
+            isLoading: false
         };
     },
 
@@ -64,7 +64,7 @@ Component.register('lgw-action-button', {
         getLengowOrderErrors() {
             return this.LengowConnectorOrderService.getOrderErrorMessages({
                 lengowOrderId: this.lengowOrderId,
-                orderErrorType: this.orderProcessState === 0 ? ERROR_TYPE.import : ERROR_TYPE.send,
+                orderErrorType: this.orderProcessState === 0 ? ERROR_TYPE.import : ERROR_TYPE.send
             });
         },
 
@@ -79,7 +79,7 @@ Component.register('lgw-action-button', {
         reImportOrder() {
             this.isLoading = true;
             this.LengowConnectorOrderService.reImportOrder({
-                lengowOrderId: this.lengowOrderId,
+                lengowOrderId: this.lengowOrderId
             }).then(response => {
                 if (response.success) {
                     this.onRefresh();
@@ -95,7 +95,7 @@ Component.register('lgw-action-button', {
         reSendAction() {
             this.isLoading = true;
             this.LengowConnectorOrderService.reSendAction({
-                lengowOrderId: this.lengowOrderId,
+                lengowOrderId: this.lengowOrderId
             }).then(response => {
                 if (response.success) {
                     this.onRefresh();
@@ -106,6 +106,6 @@ Component.register('lgw-action-button', {
                     });
                 }
             });
-        },
-    },
+        }
+    }
 });

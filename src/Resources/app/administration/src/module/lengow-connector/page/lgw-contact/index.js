@@ -4,5 +4,5 @@ import './lgw-contact.scss';
 const { Component } = Shopware;
 
 Component.register('lgw-contact', {
-    template,
+    template
 });

@@ -10,12 +10,12 @@ Component.register('lgw-order-type-icon', {
     props: {
         type: {
             type: String,
-            required: true,
+            required: true
         },
         label: {
             type: String,
-            required: true,
-        },
+            required: true
+        }
     },
 
     data() {
@@ -23,7 +23,7 @@ Component.register('lgw-order-type-icon', {
             iconColorClass: '',
             iconModClass: '',
             iconLabel: '',
-            isLoading: false,
+            isLoading: false
         };
     },
 
@@ -52,6 +52,6 @@ Component.register('lgw-order-type-icon', {
             this.iconModClass = iconModClass;
             this.iconLabel = this.label;
             this.isLoading = false;
-        },
-    },
+        }
+    }
 });

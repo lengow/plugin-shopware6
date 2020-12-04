@@ -16,17 +16,11 @@ Component.register('lgw-toolbox-base', {
 
     created() {},
 
-    metaInfo() {
-        return {
-            title: this.$createTitle(),
-        };
-    },
-
     computed: {
         ...mapState('lgwToolbox', ['overviewData', 'loading']),
 
-        ...mapGetters('lgwToolbox', ['isLoading']),
+        ...mapGetters('lgwToolbox', ['isLoading'])
     },
 
-    methods: {},
+    methods: {}
 });

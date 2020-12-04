@@ -4,7 +4,7 @@ import './lgw-setting.scss';
 const {
     Component,
     Mixin,
-    Data: { Criteria },
+    Data: { Criteria }
 } = Shopware;
 
 Component.register('lgw-setting', {
@@ -23,12 +23,13 @@ Component.register('lgw-setting', {
             selectedTabImport: false,
             configLoaded: false,
             config: {},
-            generalSettingsKey: 0,
+            generalSettingsKey: 0
         };
     },
 
     // when created, retrieve all settings and pass them to child components via props
     async created() {
+        // eslint-disable-next-line no-return-await
         return await this.loadConfig();
     },
 
@@ -43,7 +44,7 @@ Component.register('lgw-setting', {
 
         shippingMethodRepository() {
             return this.repositoryFactory.create('shipping_method');
-        },
+        }
     },
 
     methods: {
@@ -73,40 +74,42 @@ Component.register('lgw-setting', {
                 lengowConfigCriteria.addFilter(Criteria.equals('salesChannelId', salesChannelId));
             }
             lengowConfigCriteria.addFilter(Criteria.equals('name', key));
+            // eslint-disable-next-line consistent-return
             this.lengowConfigRepository.search(lengowConfigCriteria, Shopware.Context.api).then(result => {
                 if (result.total > 0) {
                     const lengowConfig = result.first();
-                    if (typeof event === "boolean") {
+                    if (typeof event === 'boolean') {
                         lengowConfig.value = event ? '1' : '0';
                     } else {
                         lengowConfig.value = String(event);
                     }
-                    if (key === "lengowDebugEnabled") { // activate debug mode need to reload config data
+                    if (key === 'lengowDebugEnabled') { // activate debug mode need to reload config data
                         reload = true;
                     }
+                    // eslint-disable-next-line no-shadow,consistent-return,no-unused-vars
                     return this.lengowConfigRepository.sync([lengowConfig], Shopware.Context.api).then(result => {
                         if (reload) {
                             this.generalSettingsKey += 1;
                             this.configLoaded = false;
                             return this.loadConfig();
                         }
-                    })
+                    });
                 }
             }).finally(() => {
                 this.createNotificationInfo({
-                    message: this.$tc('lengow-connector.setting.lengow_main_setting.saved_message_1')
-                        + ' ' + key + ' '
-                        + this.$tc('lengow-connector.setting.lengow_main_setting.saved_message_2'),
+                    message: `${this.$tc('lengow-connector.setting.lengow_main_setting.saved_message_1')
+                    } ${key} ${this.$tc('lengow-connector.setting.lengow_main_setting.saved_message_2')}`
                 });
             });
         },
 
         async loadConfig() {
             const lengowConfigCriteria = new Criteria(1, 500);
+            // eslint-disable-next-line no-return-await
             return await this.lengowConfigRepository.search(lengowConfigCriteria, Shopware.Context.api).then(result => {
                 result.forEach(config => {
                     if (config.salesChannel) {
-                        if (typeof this.config[config.name] === "undefined") {
+                        if (typeof this.config[config.name] === 'undefined') {
                             this.config[config.name] = [];
                         }
                         this.config[config.name].push({
@@ -124,7 +127,6 @@ Component.register('lgw-setting', {
                 });
                 this.configLoaded = true;
             });
-        },
+        }
     }
-
 });

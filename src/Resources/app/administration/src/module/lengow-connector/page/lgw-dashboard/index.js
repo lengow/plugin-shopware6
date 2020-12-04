@@ -3,7 +3,7 @@ import { envMixin, LENGOW_URL } from '../../../const';
 
 const {
     Component,
-    Data: { Criteria },
+    Data: { Criteria }
 } = Shopware;
 
 Component.register('lgw-dashboard', {
@@ -19,14 +19,14 @@ Component.register('lgw-dashboard', {
             isNew: false,
             isLoading: true,
             trialLoading: true,
-            trialExpired: false,
+            trialExpired: false
         };
     },
 
     computed: {
         lengowSettingsRepository() {
             return this.repositoryFactory.create('lengow_settings');
-        },
+        }
     },
 
     created() {
@@ -40,7 +40,7 @@ Component.register('lgw-dashboard', {
             criteria.addFilter(Criteria.equalsAny('name', [
                 'lengowAccountId',
                 'lengowAccessToken',
-                'lengowSecretToken',
+                'lengowSecretToken'
             ]));
             this.lengowSettingsRepository.search(criteria, Shopware.Context.api).then(response => {
                 const settings = [];
@@ -49,7 +49,7 @@ Component.register('lgw-dashboard', {
                         settings[setting.name] = setting.value;
                     });
                 }
-                if (!settings['lengowAccountId'] || !settings['lengowAccessToken'] || !settings['lengowSecretToken']) {
+                if (!settings.lengowAccountId || !settings.lengowAccessToken || !settings.lengowSecretToken) {
                     this.isNew = true;
                 }
             }).finally(() => {
@@ -67,6 +67,6 @@ Component.register('lgw-dashboard', {
                     this.trialLoading = false;
                 }
             });
-        },
+        }
     }
 });

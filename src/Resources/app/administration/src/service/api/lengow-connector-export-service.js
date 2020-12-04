@@ -12,7 +12,7 @@ class LengowConnectorExportService extends ApiService {
                 `_action/${this.getApiBasePath()}/export/get-export-count`,
                 {
                     headers: headers,
-                    params: {salesChannelId: salesChannelId}
+                    params: { salesChannelId: salesChannelId }
                 }
             )
             .then((response) => {
@@ -27,7 +27,7 @@ class LengowConnectorExportService extends ApiService {
                 `_action/${this.getApiBasePath()}/export/get-product-count`,
                 {
                     headers: headers,
-                    params: {productId: productId, salesChannelId: salesChannelId}
+                    params: { productId: productId, salesChannelId: salesChannelId }
                 }
             )
             .then((response) => {
@@ -42,7 +42,7 @@ class LengowConnectorExportService extends ApiService {
                 `_action/${this.getApiBasePath()}/export/get-product-list`,
                 {
                     headers: headers,
-                    params: {salesChannelId: salesChannelId}
+                    params: { salesChannelId: salesChannelId }
                 }
             )
             .then((response) => {

@@ -3,7 +3,7 @@ import './lgw-setting-import.scss';
 
 const {
     Component,
-    Data: { Criteria },
+    Data: { Criteria }
 } = Shopware;
 
 Component.register('lgw-setting-import', {
@@ -15,12 +15,12 @@ Component.register('lgw-setting-import', {
         config: {
             type: Object,
             required: true,
-            default: {},
+            default: {}
         },
         onSaveSettings: {
             type: Object,
-            required: true,
-        },
+            required: true
+        }
     },
 
     data() {
@@ -35,8 +35,8 @@ Component.register('lgw-setting-import', {
             lengowDebugEnabled: false,
             salesChannels: [],
             shippingMethods: [],
-            render: false,
-        }
+            render: false
+        };
     },
 
     created() {
@@ -47,6 +47,7 @@ Component.register('lgw-setting-import', {
                 const shippingMethodCriteria = new Criteria();
                 shippingMethodCriteria.getAssociation('salesChannels');
                 shippingMethodCriteria.addFilter(Criteria.equals('salesChannels.id', salesChannel.id));
+                // eslint-disable-next-line no-shadow
                 this.shippingMethodRepository.search(shippingMethodCriteria, Shopware.Context.api).then(result => {
                     result.forEach(shippingMethod => {
                         this.shippingMethods = [...this.shippingMethods, {
@@ -62,10 +63,10 @@ Component.register('lgw-setting-import', {
                         salesChannelId: salesChannel.id,
                         label: salesChannel.name,
                         value: salesChannel.id,
-                        defaultShippingMethod: defaultShippingMethod,
+                        defaultShippingMethod: defaultShippingMethod
                     }];
                     this.render = true;
-                })
+                });
             });
         });
         this.lengowImportShipMpEnabled = this.config.lengowImportShipMpEnabled.value === '1';
@@ -97,7 +98,7 @@ Component.register('lgw-setting-import', {
 
         salesChannelShippingMethodRepository() {
             return this.repositoryFactory.create('sales_channel_shipping_method');
-        },
+        }
     },
 
     methods: {
@@ -116,7 +117,6 @@ Component.register('lgw-setting-import', {
             return this.shippingMethodRepository.search(shippingMethodCriteria, Shopware.Context.api).then(result => {
                 return result.total !== 0 ? result.first().id : 'Not found';
             });
-        },
-    },
-
+        }
+    }
 });

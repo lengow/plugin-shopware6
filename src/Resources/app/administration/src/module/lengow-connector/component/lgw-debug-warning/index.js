@@ -3,7 +3,7 @@ import './lgw-debug-warning.scss';
 
 const {
     Component,
-    Data: { Criteria },
+    Data: { Criteria }
 } = Shopware;
 
 Component.register('lgw-debug-warning', {
@@ -13,14 +13,14 @@ Component.register('lgw-debug-warning', {
 
     data() {
         return {
-            debugMode: false,
+            debugMode: false
         };
     },
 
     computed: {
         lengowSettingsRepository() {
             return this.repositoryFactory.create('lengow_settings');
-        },
+        }
     },
 
     created() {
@@ -31,5 +31,5 @@ Component.register('lgw-debug-warning', {
                 this.debugMode = response.first().value === '1';
             }
         });
-    },
+    }
 });

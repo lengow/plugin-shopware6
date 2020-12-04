@@ -9,45 +9,45 @@ Component.register('lgw-conditional-string-field', {
         fieldContent: {
             type: String,
             required: false,
-            default: '',
+            default: ''
         },
         locked: {
             type: Boolean,
             required: false,
-            default: true,
+            default: true
         },
         switchLabel: {
             type: String,
-            required: true,
+            required: true
         },
         fieldPlaceholder: {
             type: String,
             required: false,
-            default: '',
+            default: ''
         },
         fieldLabel: {
             type: String,
             required: false,
-            default: '',
+            default: ''
         },
         onSaveSettings: {
             type: Object,
-            required: true,
+            required: true
         },
         switchSettingsKey: {
             type: String,
             required: false,
-            default: '',
+            default: ''
         },
         fieldSettingsKey: {
             type: String,
             required: false,
-            default: '',
+            default: ''
         },
         settingsSalesChannelId: {
             type: String,
             required: false,
-            default: '',
+            default: ''
         },
         helpText: {
             type: String,
@@ -58,12 +58,12 @@ Component.register('lgw-conditional-string-field', {
             type: String,
             required: false,
             default: ''
-        },
+        }
     },
 
     computed: {
-      isLocked() {
-          return !this.locked;
-      },
-    },
+        isLocked() {
+            return !this.locked;
+        }
+    }
 });

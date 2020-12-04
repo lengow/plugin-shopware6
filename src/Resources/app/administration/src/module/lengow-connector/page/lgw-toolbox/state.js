@@ -9,8 +9,8 @@ export default {
             loading: {
                 overview: false,
                 checksum: false,
-                log: false,
-            },
+                log: false
+            }
         };
     },
 
@@ -29,7 +29,7 @@ export default {
 
         logData(state) {
             return state.logData;
-        },
+        }
     },
 
     mutations: {
@@ -58,6 +58,6 @@ export default {
 
         setLogData(state, logData) {
             state.logData = logData;
-        },
-    },
+        }
+    }
 };

@@ -4,11 +4,11 @@ import {
     ACTION_STATE,
     ORDER_PROCESS_STATE,
     SHOPWARE_ORDER_DELIVERY_STATE,
-    SHOPWARE_ORDER_STATE,
+    SHOPWARE_ORDER_STATE
 } from '../../../const';
 
 const {
-    Data: { Criteria },
+    Data: { Criteria }
 } = Shopware;
 
 Shopware.Component.register('lgw-order-detail-extension', {
@@ -18,7 +18,7 @@ Shopware.Component.register('lgw-order-detail-extension', {
 
     metaInfo() {
         return {
-            title: 'Custom',
+            title: 'Custom'
         };
     },
 
@@ -57,7 +57,7 @@ Shopware.Component.register('lgw-order-detail-extension', {
             orderDate: '',
             importedAt: '',
             message: '',
-            extra: '',
+            extra: ''
         };
     },
 
@@ -76,7 +76,7 @@ Shopware.Component.register('lgw-order-detail-extension', {
 
         lengowActionRepository() {
             return this.repositoryFactory.create('lengow_action');
-        },
+        }
     },
 
     created() {
@@ -89,7 +89,7 @@ Shopware.Component.register('lgw-order-detail-extension', {
 
     methods: {
         loadOrderData() {
-            this.orderId = this.$route.params.id
+            this.orderId = this.$route.params.id;
             const lengowOrderCriteria = new Criteria();
             lengowOrderCriteria.addFilter(Criteria.equals('orderId', this.orderId));
             return this.lengowOrderRepository.search(lengowOrderCriteria, Shopware.Context.api).then(result => {
@@ -167,7 +167,7 @@ Shopware.Component.register('lgw-order-detail-extension', {
                     return;
                 }
                 const order = result.first();
-                let orderDeliveryState = this.getOrderDeliveryState(order);
+                const orderDeliveryState = this.getOrderDeliveryState(order);
                 let orderState = '';
                 if (order.stateMachineState && order.stateMachineState.technicalName) {
                     orderState = result.first().stateMachineState.technicalName;
@@ -203,7 +203,7 @@ Shopware.Component.register('lgw-order-detail-extension', {
 
         reSynchronizeOrder() {
             this.btnSynchroLoading = true;
-            this.LengowConnectorOrderService.reSynchroniseOrder({'orderId': this.orderId}).then(() => {
+            this.LengowConnectorOrderService.reSynchroniseOrder({ orderId: this.orderId }).then(() => {
                 this.btnSynchroLoading = false;
             });
         },
@@ -223,7 +223,7 @@ Shopware.Component.register('lgw-order-detail-extension', {
             }).finally(() => {
                 this.btnReimportLoading = false;
                 this.modalLoading = false;
-                this.$router.push({ name: 'sw.order.detail', params: { id: this.orderId } })
+                this.$router.push({ name: 'sw.order.detail', params: { id: this.orderId } });
                 if (this.modalDisplay === true) {
                     this.toggleModal();
                 }
@@ -233,10 +233,10 @@ Shopware.Component.register('lgw-order-detail-extension', {
         reSendAction() {
             this.btnActionLoading = true;
             this.LengowConnectorOrderService.reSendAction({
-                lengowOrderId: this.lengowOrderId,
+                lengowOrderId: this.lengowOrderId
             }).then(() => {
                 this.btnActionLoading = false;
-            })
+            });
         }
-    },
+    }
 });

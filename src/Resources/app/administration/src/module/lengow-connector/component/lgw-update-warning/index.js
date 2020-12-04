@@ -14,7 +14,7 @@ Component.register('lgw-update-warning', {
         return {
             display: false,
             newVersion: null,
-            link: '',
+            link: ''
         };
     },
 
@@ -28,5 +28,5 @@ Component.register('lgw-update-warning', {
                 this.link = LENGOW_URL + data.plugin_data.download_link;
             }
         });
-    },
+    }
 });

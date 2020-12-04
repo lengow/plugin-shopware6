@@ -4,7 +4,7 @@ import './lgw-product-list.scss';
 const {
     Component,
     Mixin,
-    Data: { Criteria },
+    Data: { Criteria }
 } = Shopware;
 
 Component.register('lgw-product-list', {
@@ -15,15 +15,15 @@ Component.register('lgw-product-list', {
     mixins: [
         Mixin.getByName('notification'),
         Mixin.getByName('listing'),
-        Mixin.getByName('placeholder'),
+        Mixin.getByName('placeholder')
     ],
 
     props: {
         salesChannelId: {
             type: String,
             required: false,
-            default: null,
-        },
+            default: null
+        }
     },
 
     data() {
@@ -49,7 +49,7 @@ Component.register('lgw-product-list', {
             filters: {
                 stock: null,
                 active: null,
-                search: null,
+                search: null
             },
             productSelection: false,
             productSelectionSelectAll: false,
@@ -62,7 +62,7 @@ Component.register('lgw-product-list', {
             salesChannelDomain: '',
             tempListActivated: [],
             downloadLink: '',
-            exportToken: '',
+            exportToken: ''
         };
     },
 
@@ -81,7 +81,7 @@ Component.register('lgw-product-list', {
 
     metaInfo() {
         return {
-            title: this.$createTitle(),
+            title: this.$createTitle()
         };
     },
 
@@ -130,7 +130,7 @@ Component.register('lgw-product-list', {
                     currencyId: item.id,
                     visible: item.isSystemDefault,
                     align: 'right',
-                    useCustomSort: true,
+                    useCustomSort: true
                 }));
         },
 
@@ -138,7 +138,7 @@ Component.register('lgw-product-list', {
             return [
                 { label: 'All', value: 'all' },
                 { label: 'Active only', value: 'active' },
-                { label: 'Inactive only', value: 'inactive' },
+                { label: 'Inactive only', value: 'inactive' }
             ];
         },
 
@@ -146,9 +146,9 @@ Component.register('lgw-product-list', {
             return [
                 { label: 'All', value: 'all' },
                 { label: 'With stock only', value: 'stock' },
-                { label: 'Without stock only', value: 'nostock' },
+                { label: 'Without stock only', value: 'nostock' }
             ];
-        },
+        }
     },
 
     filters: {
@@ -160,7 +160,7 @@ Component.register('lgw-product-list', {
                 return 'warning';
             }
             return 'error';
-        },
+        }
     },
 
     methods: {
@@ -183,9 +183,7 @@ Component.register('lgw-product-list', {
                 this.filters.active = null;
                 return products;
             }
-            return products.filter(product =>
-                value === 'active' ? product.active === true : product.active === false,
-            );
+            return products.filter(product => (value === 'active' ? product.active === true : product.active === false));
         },
 
         stockFilter(products, value) {
@@ -193,9 +191,8 @@ Component.register('lgw-product-list', {
                 this.filters.stock = null;
                 return products;
             }
-            return products.filter(product =>
-                value === 'stock' ? product.availableStock > 0 : product.availableStock <= 0,
-            );
+            // eslint-disable-next-line max-len
+            return products.filter(product => (value === 'stock' ? product.availableStock > 0 : product.availableStock <= 0));
         },
 
         searchFilter(products, value) {
@@ -204,10 +201,9 @@ Component.register('lgw-product-list', {
                 return products;
             }
             return products.filter(
-                product =>
-                    product.id.toLowerCase().includes(value.toLowerCase()) ||
+                product => product.id.toLowerCase().includes(value.toLowerCase()) ||
                     product.productNumber.toLowerCase().includes(value.toLowerCase()) ||
-                    product.name.toLowerCase().includes(value.toLowerCase()),
+                    product.name.toLowerCase().includes(value.toLowerCase())
             );
         },
 
@@ -268,14 +264,14 @@ Component.register('lgw-product-list', {
                 .search(lengowSettingsCriteria, Shopware.Context.api)
                 .then(result => {
                     if (result.total > 0) {
-                        this.exportToken = result.first().value
+                        this.exportToken = result.first().value;
                         this.downloadLink =
-                            window.location.origin
-                            + '/lengow/export?token='
-                            + this.exportToken
-                            + '&sales_channel_id='
-                            + salesChannelId
-                            + '&stream=1&update_export_date=0&format=csv'
+                            `${window.location.origin
+                            }/lengow/export?token=${
+                                this.exportToken
+                            }&sales_channel_id=${
+                                salesChannelId
+                            }&stream=1&update_export_date=0&format=csv`;
                     }
                 });
         },
@@ -321,7 +317,6 @@ Component.register('lgw-product-list', {
             }).finally(() => {
                 this.isLoading = false;
             });
-
         },
 
         updateProductList() {
@@ -330,7 +325,7 @@ Component.register('lgw-product-list', {
             this.naturalSorting = this.sortBy === 'productNumber';
             productCriteria.addFilter(Criteria.equalsAny('product.id', this.productIds));
             productCriteria.addSorting(
-                Criteria.sort(this.sortBy, this.sortDirection, this.naturalSorting),
+                Criteria.sort(this.sortBy, this.sortDirection, this.naturalSorting)
             );
             productCriteria.addAssociation('cover');
             productCriteria.addAssociation('manufacturer');
@@ -338,7 +333,7 @@ Component.register('lgw-product-list', {
             const currencyCriteria = new Criteria(1, 500);
             return Promise.all([
                 this.productRepository.search(productCriteria, Shopware.Context.api),
-                this.currencyRepository.search(currencyCriteria, Shopware.Context.api),
+                this.currencyRepository.search(currencyCriteria, Shopware.Context.api)
             ])
                 .then(result => {
                     const [products, currencies] = result;
@@ -405,7 +400,7 @@ Component.register('lgw-product-list', {
                     });
                     const toPublish = this.selection.filter(x => !ids.includes(x));
                     toPublish.forEach(productId => {
-                        const lengowProduct = this.lengowProductRepository.create(Shopware.Context.api); // todo passer cette partie dans le php
+                        const lengowProduct = this.lengowProductRepository.create(Shopware.Context.api);
                         lengowProduct.productId = productId;
                         lengowProduct.salesChannelId = this.currentSalesChannelId;
                         this.lengowProductRepository.save(lengowProduct, Shopware.Context.api);
@@ -436,12 +431,14 @@ Component.register('lgw-product-list', {
                 lengowProduct.salesChannelId = this.currentSalesChannelId;
                 this.lengowProductRepository.save(lengowProduct, Shopware.Context.api);
                 this.countLoading = true;
-                this.LengowConnectorExportService.getProductCountValue(selectedItem.id, this.currentSalesChannelId).then(response => {
-                    if (response.success) {
-                        this.exportedCount += response.countValue;
-                    }
-                    this.countLoading = false;
-                });
+                this.LengowConnectorExportService
+                    .getProductCountValue(selectedItem.id, this.currentSalesChannelId)
+                    .then(response => {
+                        if (response.success) {
+                            this.exportedCount += response.countValue;
+                        }
+                        this.countLoading = false;
+                    });
                 return;
             }
             const lengowProductCriteria = new Criteria();
@@ -449,16 +446,16 @@ Component.register('lgw-product-list', {
             lengowProductCriteria.addFilter(Criteria.equals('salesChannelId', this.currentSalesChannelId));
             this.lengowProductRepository
                 .searchIds(lengowProductCriteria, Shopware.Context.api)
-                .then(result =>
-                    this.lengowProductRepository.delete(result.data[0], Shopware.Context.api),
-                );
+                .then(result => this.lengowProductRepository.delete(result.data[0], Shopware.Context.api));
             this.countLoading = true;
-            this.LengowConnectorExportService.getProductCountValue(selectedItem.id, this.currentSalesChannelId).then(response => {
-                if (response.success) {
-                    this.exportedCount -= response.countValue;
-                }
-                this.countLoading = false;
-            });
+            this.LengowConnectorExportService
+                .getProductCountValue(selectedItem.id, this.currentSalesChannelId)
+                .then(response => {
+                    if (response.success) {
+                        this.exportedCount -= response.countValue;
+                    }
+                    this.countLoading = false;
+                });
         },
 
         getCurrencyPriceByCurrencyId(currencyId, prices) {
@@ -470,7 +467,7 @@ Component.register('lgw-product-list', {
                 currencyId: null,
                 gross: null,
                 linked: true,
-                net: null,
+                net: null
             };
         },
 
@@ -482,7 +479,7 @@ Component.register('lgw-product-list', {
                     inlineEdit: 'boolean',
                     align: 'center',
                     allowResize: false,
-                    sortable: false,
+                    sortable: false
                 },
                 {
                     property: 'name',
@@ -490,34 +487,34 @@ Component.register('lgw-product-list', {
                     routerLink: 'sw.product.detail',
                     inlineEdit: 'string',
                     allowResize: true,
-                    primary: true,
+                    primary: true
                 },
                 {
                     property: 'productNumber',
                     naturalSorting: true,
                     label: this.$tc('sw-product.list.columnProductNumber'),
                     align: 'right',
-                    allowResize: true,
+                    allowResize: true
                 },
                 {
                     property: 'manufacturer.name',
                     label: this.$tc('sw-product.list.columnManufacturer'),
-                    allowResize: true,
+                    allowResize: true
                 },
                 {
                     property: 'active',
                     label: `${this.$tc('sw-product.list.columnActive')}`,
                     inlineEdit: 'boolean',
                     allowResize: true,
-                    align: 'center',
+                    align: 'center'
                 },
                 ...this.currenciesColumns,
                 {
                     property: 'availableStock',
                     label: this.$tc('sw-product.list.columnAvailableStock'),
                     allowResize: true,
-                    align: 'right',
-                },
+                    align: 'right'
+                }
             ];
         },
 
@@ -531,7 +528,7 @@ Component.register('lgw-product-list', {
             });
         },
 
-        onColumnSort(column) {
+        onColumnSort() {
             this.$refs.swProductGrid.records.forEach(item => {
                 if (this.$refs.swProductGrid.isSelected(item.id) !== true &&
                     this.tempListActivated.includes(item.id)
@@ -542,6 +539,6 @@ Component.register('lgw-product-list', {
                         typeof item.extensions.activeInLengow.activeArray[this.currentSalesChannelId] !== 'undefined';
                 }
             });
-        },
-    },
+        }
+    }
 });

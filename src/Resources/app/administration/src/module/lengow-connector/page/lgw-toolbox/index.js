@@ -30,12 +30,12 @@ Component.register('lgw-toolbox', {
 
     metaInfo() {
         return {
-            title: this.$createTitle(),
+            title: this.$createTitle()
         };
     },
 
     computed: {
-        ...mapGetters('lgwToolbox', ['isLoading']),
+        ...mapGetters('lgwToolbox', ['isLoading'])
     },
 
     methods: {
@@ -76,6 +76,6 @@ Component.register('lgw-toolbox', {
                 .finally(() => {
                     Shopware.State.commit('lgwToolbox/setLoading', ['log', false]);
                 });
-        },
-    },
+        }
+    }
 });

@@ -10,8 +10,7 @@ Component.register('lgw-dashboard-home', {
     data() {
         return {
             lengow_url: LENGOW_URL,
-            isLoading: true,
+            isLoading: true
         };
-    },
-
+    }
 });

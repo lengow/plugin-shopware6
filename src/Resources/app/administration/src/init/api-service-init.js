@@ -3,21 +3,22 @@ import LengowConnectorSyncService from '../service/api/lengow-connector-sync-ser
 import LengowConnectorToolboxService from '../service/api/lengow-connector-toolbox-service';
 import LengowConnectorExportService from '../service/api/lengow-connector-export-service';
 
+// eslint-disable-next-line no-undef
 const { Application } = Shopware;
 
 Application.addServiceProvider('LengowConnectorOrderService', container => {
-  const initContainer = Application.getContainer('init');
-  return new LengowConnectorOrderService(initContainer.httpClient, container.loginService);
+    const initContainer = Application.getContainer('init');
+    return new LengowConnectorOrderService(initContainer.httpClient, container.loginService);
 });
 
 Application.addServiceProvider('LengowConnectorSyncService', container => {
-  const initContainer = Application.getContainer('init');
-  return new LengowConnectorSyncService(initContainer.httpClient, container.loginService);
+    const initContainer = Application.getContainer('init');
+    return new LengowConnectorSyncService(initContainer.httpClient, container.loginService);
 });
 
 Application.addServiceProvider('LengowConnectorToolboxService', container => {
-  const initContainer = Application.getContainer('init');
-  return new LengowConnectorToolboxService(initContainer.httpClient, container.loginService);
+    const initContainer = Application.getContainer('init');
+    return new LengowConnectorToolboxService(initContainer.httpClient, container.loginService);
 });
 
 Application.addServiceProvider('LengowConnectorExportService', container => {

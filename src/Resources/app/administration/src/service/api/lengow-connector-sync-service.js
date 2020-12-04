@@ -42,7 +42,7 @@ class LengowConnectorSyncService extends ApiService {
                 `_action/${this.getApiBasePath()}/sync/get-account-status`,
                 {
                     headers: headers,
-                    params: {force: shouldForce}
+                    params: { force: shouldForce }
                 }
             )
             .then((response) => {

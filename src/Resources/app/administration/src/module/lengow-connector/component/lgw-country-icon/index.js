@@ -3,7 +3,7 @@ import './lgw-country-icon.scss';
 
 const {
     Component,
-    Data: { Criteria },
+    Data: { Criteria }
 } = Shopware;
 
 Component.register('lgw-country-icon', {
@@ -18,22 +18,22 @@ Component.register('lgw-country-icon', {
         codeIsoA2: {
             type: String,
             required: true,
-            default: '',
-        },
+            default: ''
+        }
     },
 
     data() {
         return {
             isLoading: true,
             countryName: '',
-            countryIso: '',
+            countryIso: ''
         };
     },
 
     computed: {
         countryRepository() {
             return this.repositoryFactory.create('country');
-        },
+        }
     },
 
     created() {
@@ -64,6 +64,6 @@ Component.register('lgw-country-icon', {
 
         loaded() {
             this.isLoading = false;
-        },
-    },
+        }
+    }
 });

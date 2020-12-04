@@ -25,7 +25,7 @@ Component.register('lgw-toolbox-checksum', {
             fileModifiedCounterValue: true,
             fileDeletedCounterLabel: '',
             fileDeletedCounterValue: true,
-            isLoading: true,
+            isLoading: true
         };
     },
 
@@ -37,8 +37,8 @@ Component.register('lgw-toolbox-checksum', {
         ...mapState('lgwToolbox', ['checksumData']),
 
         ...mapGetters('lgwToolbox', {
-            isToolboxLoading: 'isLoading',
-        }),
+            isToolboxLoading: 'isLoading'
+        })
     },
 
     watch: {
@@ -47,8 +47,8 @@ Component.register('lgw-toolbox-checksum', {
                 if (!this.isToolboxLoading) {
                     this.loadData();
                 }
-            },
-        },
+            }
+        }
     },
 
     methods: {
@@ -78,6 +78,6 @@ Component.register('lgw-toolbox-checksum', {
                     ${this.$tc('lengow-connector.toolbox.checksum.file_deleted')}`;
                 this.isLoading = false;
             }
-        },
-    },
+        }
+    }
 });

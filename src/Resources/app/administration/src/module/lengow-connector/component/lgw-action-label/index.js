@@ -4,7 +4,7 @@ import { ACTION_STATE, ACTION_TYPE } from '../../../const';
 
 const {
     Component,
-    Data: { Criteria },
+    Data: { Criteria }
 } = Shopware;
 
 Component.register('lgw-action-label', {
@@ -15,8 +15,8 @@ Component.register('lgw-action-label', {
     props: {
         orderId: {
             type: String,
-            required: true,
-        },
+            required: true
+        }
     },
 
     data() {
@@ -24,14 +24,14 @@ Component.register('lgw-action-label', {
             isLoading: false,
             hasActiveAction: false,
             labelContent: '',
-            labelTitle: '',
+            labelTitle: ''
         };
     },
 
     computed: {
         lengowActionRepository() {
             return this.repositoryFactory.create('lengow_action');
-        },
+        }
     },
 
     created() {
@@ -46,8 +46,8 @@ Component.register('lgw-action-label', {
             criteria.addFilter(
                 Criteria.multi('AND', [
                     Criteria.equals('order.id', this.orderId),
-                    Criteria.equals('state', ACTION_STATE.new),
-                ]),
+                    Criteria.equals('state', ACTION_STATE.new)
+                ])
             );
             this.lengowActionRepository
                 .search(criteria, Shopware.Context.api)
@@ -59,16 +59,16 @@ Component.register('lgw-action-label', {
                             action.actionType === ACTION_TYPE.ship
                                 ? this.$tc('lengow-connector.order.action_label.action_ship_sent')
                                 : this.$tc(
-                                      'lengow-connector.order.action_label.action_cancel_sent',
-                                  );
+                                    'lengow-connector.order.action_label.action_cancel_sent'
+                                );
                         this.labelTitle = this.$tc(
-                            'lengow-connector.order.action_label.action_waiting_return',
+                            'lengow-connector.order.action_label.action_waiting_return'
                         );
                     }
                 })
                 .finally(() => {
                     this.isLoading = false;
                 });
-        },
-    },
+        }
+    }
 });

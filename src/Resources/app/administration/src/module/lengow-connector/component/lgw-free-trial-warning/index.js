@@ -14,7 +14,7 @@ Component.register('lgw-free-trial-warning', {
             freeTrialEnabled: false,
             dayLeft: '',
             isExpired: false,
-            link: LENGOW_URL,
+            link: LENGOW_URL
         };
     },
 
@@ -26,5 +26,5 @@ Component.register('lgw-free-trial-warning', {
                 this.isExpired = result.expired;
             }
         });
-    },
+    }
 });

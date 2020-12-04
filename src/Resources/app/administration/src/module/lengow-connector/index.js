@@ -38,42 +38,42 @@ Shopware.Module.register('lengow-connector', {
     routes: {
         dashboard: {
             component: 'lgw-dashboard',
-            path: 'dashboard',
+            path: 'dashboard'
         },
         product: {
             component: 'lgw-product-list',
             path: 'product',
             meta: {
-                parentPath: 'lengow.connector.dashboard',
-            },
+                parentPath: 'lengow.connector.dashboard'
+            }
         },
         order: {
             component: 'lgw-order-list',
             path: 'order',
             meta: {
-                parentPath: 'lengow.connector.dashboard',
-            },
+                parentPath: 'lengow.connector.dashboard'
+            }
         },
         setting: {
             component: 'lgw-setting',
             path: 'setting',
             meta: {
-                parentPath: 'lengow.connector.dashboard',
-            },
+                parentPath: 'lengow.connector.dashboard'
+            }
         },
         legal: {
             component: 'lgw-legal-notices',
             path: 'legal',
             meta: {
-                parentPath: 'lengow.connector.dashboard',
-            },
+                parentPath: 'lengow.connector.dashboard'
+            }
         },
         contact: {
             component: 'lgw-contact',
             path: 'contact',
             meta: {
-                parentPath: 'lengow.connector.dashboard',
-            },
+                parentPath: 'lengow.connector.dashboard'
+            }
         },
         toolbox: {
             component: 'lgw-toolbox',
@@ -86,25 +86,25 @@ Shopware.Module.register('lengow-connector', {
                     component: 'lgw-toolbox-base',
                     path: 'base',
                     meta: {
-                        parentPath: 'lengow.connector.dashboard',
+                        parentPath: 'lengow.connector.dashboard'
                     }
                 },
                 checksum: {
                     component: 'lgw-toolbox-checksum',
                     path: 'checksum',
                     meta: {
-                        parentPath: 'lengow.connector.dashboard',
+                        parentPath: 'lengow.connector.dashboard'
                     }
                 },
                 log: {
                     component: 'lgw-toolbox-log',
                     path: 'log',
                     meta: {
-                        parentPath: 'lengow.connector.dashboard',
+                        parentPath: 'lengow.connector.dashboard'
                     }
                 }
             }
-        },
+        }
     },
 
     routeMiddleware(next, currentRoute) {
@@ -114,7 +114,7 @@ Shopware.Module.register('lengow-connector', {
                 path: '/sw/order/detail/:id/lengow',
                 component: 'lgw-order-detail-extension',
                 meta: {
-                    parentPath: "sw.order.index"
+                    parentPath: 'sw.order.index'
                 }
             });
         }
@@ -127,7 +127,7 @@ Shopware.Module.register('lengow-connector', {
             color: '#ff3d58',
             path: 'lengow.connector.dashboard',
             icon: 'default-shopping-paper-bag-product',
-            position: 100,
-        },
-    ],
+            position: 100
+        }
+    ]
 });

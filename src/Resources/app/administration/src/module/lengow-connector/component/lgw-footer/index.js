@@ -14,7 +14,7 @@ Component.register('lgw-footer', {
             lengowUrl: LENGOW_URL,
             moduleVersion: MODULE_VERSION,
             currentYear: new Date().getFullYear(),
-            preprod: false,
+            preprod: false
         };
     },
 
@@ -22,5 +22,5 @@ Component.register('lgw-footer', {
         if (this.lengowUrl === 'https://my.lengow.net') {
             this.preprod = true;
         }
-    },
+    }
 });

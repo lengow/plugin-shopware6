@@ -4,7 +4,7 @@ import { envMixin, LENGOW_CMS_URL } from '../../../const';
 
 const {
     Component,
-    Data: { Criteria },
+    Data: { Criteria }
 } = Shopware;
 
 Component.register('lgw-dashboard-connexion', {
@@ -17,14 +17,14 @@ Component.register('lgw-dashboard-connexion', {
     data() {
         return {
             iframeSource: '',
-            syncData: null,
+            syncData: null
         };
     },
 
     computed: {
         lengowConfigRepository() {
             return this.repositoryFactory.create('lengow_settings');
-        },
+        }
     },
 
     created() {
@@ -33,8 +33,8 @@ Component.register('lgw-dashboard-connexion', {
 
     methods: {
         setupIframe() {
-            this.iframeSource = LENGOW_CMS_URL + '?lang=en&clientType=shopware';
-            window.addEventListener("message", message => {
+            this.iframeSource = `${LENGOW_CMS_URL}?lang=en&clientType=shopware`;
+            window.addEventListener('message', message => {
                 switch (message.data.function) {
                     case 'sync':
                         this.saveSyncData('lengowAccountId', message.data.parameters.account_id, false);
@@ -45,11 +45,14 @@ Component.register('lgw-dashboard-connexion', {
                         this.saveSyncData('lengowAccountId', message.data.parameters.account_id, false);
                         this.saveSyncData('lengowAccessToken', message.data.parameters.access_token, false);
                         this.saveSyncData('lengowSecretToken', message.data.parameters.secret_token, true);
+                        // eslint-disable-next-line no-restricted-globals
                         location.reload();
                         break;
                     case 'reload':
                     case 'cancel':
+                        // eslint-disable-next-line no-restricted-globals
                         location.reload();
+                    // eslint-disable-next-line no-fallthrough
                     default:
                         console.log(message);
                 }
@@ -62,9 +65,10 @@ Component.register('lgw-dashboard-connexion', {
             });
         },
 
+        // eslint-disable-next-line consistent-return
         saveSyncData(key, data, reload) {
             if (data !== undefined) {
-                let lengowConfigCriteria = new Criteria();
+                const lengowConfigCriteria = new Criteria();
                 lengowConfigCriteria.addFilter(Criteria.equals('name', key));
                 return this.lengowConfigRepository.search(lengowConfigCriteria, Shopware.Context.api).then(result => {
                     if (result.total > 0) {
@@ -78,8 +82,7 @@ Component.register('lgw-dashboard-connexion', {
                     }
                 });
             }
-
         }
-    },
+    }
 
 });

@@ -11,15 +11,15 @@ Component.register('lgw-order-state-label', {
         orderLengowState: {
             type: String,
             required: true,
-            default: '',
-        },
+            default: ''
+        }
     },
 
     data() {
         return {
             orderStateClass: '',
             orderStateTranslation: '',
-            isLoading: false,
+            isLoading: false
         };
     },
 
@@ -30,7 +30,8 @@ Component.register('lgw-order-state-label', {
     methods: {
         createdComponent() {
             this.isLoading = true;
-            let translationKey, orderStateClass;
+            let translationKey;
+            let orderStateClass;
             switch (this.orderLengowState) {
                 case ORDER_LENGOW_STATES.accepted:
                     translationKey = 'lengow-connector.order.state.accepted';
@@ -64,6 +65,6 @@ Component.register('lgw-order-state-label', {
             this.orderStateClass = orderStateClass;
             this.orderStateTranslation = this.$tc(translationKey);
             this.isLoading = false;
-        },
-    },
+        }
+    }
 });
