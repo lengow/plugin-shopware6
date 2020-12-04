@@ -560,6 +560,7 @@ class LengowImportOrder
                 'orderLengowState' => $this->orderStateLengow,
                 'isInError' => false,
                 'isReimported' => false,
+                'importedAt' => $this->lengowConfiguration->gmtDate(null, Defaults::STORAGE_DATE_TIME_FORMAT),
             ]);
             $this->lengowLog->write(
                 LengowLog::CODE_IMPORT,

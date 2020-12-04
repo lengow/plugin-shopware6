@@ -73,7 +73,7 @@
 /src/Resources/app/administration/src/module/lengow-connector/view/lgw-dashboard-home/index.js|9faa50c8254595aad810f5b4c1571370
 /src/Resources/app/administration/src/module/lengow-connector/view/lgw-order-detail-extension/lgw-order-detail-extension.scss|26970eb2381683a6df512bb92dcedae7
 /src/Resources/app/administration/src/module/lengow-connector/view/lgw-order-detail-extension/lgw-order-detail-extension.html.twig|45b684f2e9ab73a56dd84a507062534a
-/src/Resources/app/administration/src/module/lengow-connector/view/lgw-order-detail-extension/index.js|c04bbc5b9adc9e5c35a54152412cf5ba
+/src/Resources/app/administration/src/module/lengow-connector/view/lgw-order-detail-extension/index.js|94d59f63da64129d6388ee21877c6e55
 /src/Resources/app/administration/src/module/lengow-connector/view/lgw-setting-export/lgw-setting-export.scss|00ff90d8aca5ac3b9c38731c2c56f73b
 /src/Resources/app/administration/src/module/lengow-connector/view/lgw-setting-export/lgw-setting-export.html.twig|3108f803854a7b153d084bb37d4e3e2f
 /src/Resources/app/administration/src/module/lengow-connector/view/lgw-setting-export/index.js|56ca4342195f15e78b40c1024e457d75
@@ -418,7 +418,7 @@
 /src/Service/LengowLog.php|eddf70d114115255a97dd97a70e267d3
 /src/Service/LengowOrderLine.php|e266c25585122c73fb81d66200f392cc
 /src/Service/LengowImport.php|0dd20325bc6f299eb512afa5a9bf3452
-/src/Service/LengowImportOrder.php|479eb3c4095ef989a5c03ec0bb947081
+/src/Service/LengowImportOrder.php|a77dea938c5aa8f5cb510946793a124d
 /src/Service/LengowConfiguration.php|94af48e5b2595ef95ec1c06102fc9c66
 /src/Storefront/Controller/LengowAbstractFrontController.php|1de8af825bf09037c95c81f2daedb70a
 /src/Storefront/Controller/LengowExportController.php|b4425009da84223d648f3ccbf501a48a

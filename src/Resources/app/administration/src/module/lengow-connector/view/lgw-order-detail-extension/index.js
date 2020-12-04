@@ -116,7 +116,7 @@ Shopware.Component.register('lgw-order-detail-extension', {
                         ? new Date(lengowOrder.orderDate).toLocaleString()
                         : '-';
                     this.importedAt = lengowOrder.importedAt != null
-                        ? new Date(lengowOrder.importDate).toLocaleString()
+                        ? new Date(lengowOrder.importedAt).toLocaleString()
                         : '-';
                     this.message = lengowOrder.message || '-';
                     this.extra = lengowOrder.extra != null ? JSON.stringify(lengowOrder.extra) : '-';
