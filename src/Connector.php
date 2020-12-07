@@ -12,8 +12,11 @@ use Shopware\Core\Framework\Plugin\Context\InstallContext;
 use Shopware\Core\Framework\Plugin\Context\UninstallContext;
 use Shopware\Core\Framework\Plugin\Util\PluginIdProvider;
 use Shopware\Core\Framework\Plugin\Context\ActivateContext;
+use Shopware\Core\Framework\Uuid\Uuid;
 use Symfony\Component\Config\FileLocator;
 use Symfony\Component\DependencyInjection\ContainerBuilder;
+use Symfony\Component\DependencyInjection\Exception\ServiceCircularReferenceException;
+use Symfony\Component\DependencyInjection\Exception\ServiceNotFoundException;
 use Symfony\Component\DependencyInjection\Loader\XmlFileLoader;
 use Lengow\Connector\Service\LengowPayment;
 use Lengow\Connector\Entity\Settings;
@@ -43,18 +46,12 @@ class Connector extends Plugin
         $loader->load('extension.xml');
     }
 
-    /**
-     * @param InstallContext $context
-     */
-    public function install(InstallContext $context): void
+    public function install(InstallContext $installContext): void
     {
-        parent::Install($context);
-        $this->addPaymentMethod($context->getContext());
+        parent::Install($installContext);
+        $this->addPaymentMethod($installContext->getContext());
     }
 
-    /**
-     * @param ActivateContext $activateContext
-     */
     public function activate(ActivateContext $activateContext): void
     {
         LengowConfiguration::createDefaultSalesChannelConfig(
@@ -65,29 +62,26 @@ class Connector extends Plugin
         parent::activate($activateContext);
     }
 
-    /**
-     * @param UninstallContext $context
-     */
-    public function uninstall(UninstallContext $context): void
+    public function uninstall(UninstallContext $uninstallContext): void
     {
-        $this->setPaymentMethodIsActive(false, $context->getContext());
-        // todo drop table lengow_settings
+        $this->setPaymentMethodIsActive(false, $uninstallContext->getContext());
     }
 
     /**
-     * @param Context $context
+     * Add Lengow payment method
+     *
+     * @param Context $context Shopware context
+     *
+     * @throws serviceCircularReferenceException|ServiceNotFoundException
      */
     private function addPaymentMethod(Context $context): void
     {
-        $paymentMethodExists = $this->getPaymentMethodId();
-        // Payment method exists already, no need to continue here
-        if ($paymentMethodExists) {
-            return;
-        }
+        $paymentMethodId = $this->getPaymentMethodId();
         /** @var PluginIdProvider $pluginIdProvider */
         $pluginIdProvider = $this->container->get(PluginIdProvider::class);
         $pluginId = $pluginIdProvider->getPluginIdByBaseClass(get_class($this), $context);
         $lengowPaymentData = [
+            'id' => $paymentMethodId ?? Uuid::randomHex(),
             // payment handler will be selected by the identifier
             'handlerIdentifier' => LengowPayment::class,
             'name' => 'Lengow payment',
@@ -97,15 +91,23 @@ class Connector extends Plugin
         ];
         /** @var EntityRepositoryInterface $paymentRepository */
         $paymentRepository = $this->container->get('payment_method.repository');
-        $paymentRepository->create([$lengowPaymentData], $context);
+        $paymentRepository->upsert([$lengowPaymentData], $context);
         // Without this workaround, paymentMethod is activated by default
         $connection = $this->container->get(Connection::class);
-        $connection->exec("UPDATE `payment_method` SET `active` = 0 WHERE `id` = UNHEX('{$this->getPaymentMethodId()}');");
+        if ($connection) {
+            $connection->exec(
+                "UPDATE `payment_method` SET `active` = 0 WHERE `id` = UNHEX('{$this->getPaymentMethodId()}');"
+            );
+        }
     }
 
     /**
-     * @param bool $active
-     * @param Context $context
+     * Set active for Lengow payment method
+     *
+     * @param bool $active active or not Lengow payment method
+     * @param Context $context Shopware context
+     *
+     * @throws serviceCircularReferenceException|ServiceNotFoundException
      */
     private function setPaymentMethodIsActive(bool $active, Context $context): void
     {
@@ -124,7 +126,11 @@ class Connector extends Plugin
     }
 
     /**
+     * Get Lengow payment method id
+     *
      * @return string|null
+     *
+     * @throws serviceCircularReferenceException|ServiceNotFoundException
      */
     private function getPaymentMethodId(): ?string
     {
