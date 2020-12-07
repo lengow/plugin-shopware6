@@ -66,15 +66,18 @@ class LengowAccess
     public function __construct(
         LengowConfiguration $lengowConfiguration,
         EntityRepositoryInterface $salesChannelRepository
-    ) {
+    )
+    {
         $this->lengowConfiguration = $lengowConfiguration;
         $this->salesChannelRepository = $salesChannelRepository;
     }
 
     /**
+     * Check if sales channel id exist
+     *
      * @param string|null $salesChannelId sales channel id
      *
-     * @return string|null sales channel name
+     * @return string|null
      */
     public function checkSalesChannel(string $salesChannelId = null): ?string
     {
@@ -95,6 +98,8 @@ class LengowAccess
     }
 
     /**
+     * Check webservice access by token or ip
+     *
      * @param string|null $token Authorization token
      * @param string|null $salesChannelId sales channel id
      *
@@ -102,17 +107,16 @@ class LengowAccess
      */
     public function checkWebserviceAccess(string $token = null, string $salesChannelId = null): bool
     {
-        if ($this->checkIp($_SERVER['REMOTE_ADDR'])
+        return $this->checkIp($_SERVER['REMOTE_ADDR'])
             || ($token
                 && !$this->lengowConfiguration->get(LengowConfiguration::LENGOW_IP_ENABLED)
-                && $this->checkToken($token, $salesChannelId))
-        ) {
-            return true;
-        }
-        return false;
+                && $this->checkToken($token, $salesChannelId)
+            );
     }
 
     /**
+     * Check if server ip is authorised
+     *
      * @param string $ip ip to check
      *
      * @return bool
@@ -123,7 +127,9 @@ class LengowAccess
     }
 
     /**
-     * @return array authorized ip
+     * Get all authorized ips
+     *
+     * @return array
      */
     public function getAuthorizedIps(): array
     {
@@ -139,6 +145,8 @@ class LengowAccess
     }
 
     /**
+     * Check token access
+     *
      * @param string $token client token
      * @param string|null $salesChannelId sales channel id
      *

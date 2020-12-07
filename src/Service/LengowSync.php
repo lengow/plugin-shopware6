@@ -378,6 +378,7 @@ class LengowSync
      *
      * @param bool $force force call if it has been less than a day
      * @param false $logOutput should log output
+     *
      * @return array|null
      */
     public function getPluginData(bool $force = false, bool $logOutput = false): ?array
@@ -416,12 +417,12 @@ class LengowSync
         return null;
     }
 
-
     /**
      * Get account status from api once a day
      *
      * @param bool $force force call if it has been less than a day
      * @param bool $logOutput should log output
+     *
      * @return array|null
      */
     public function getAccountStatus(bool $force = false, bool $logOutput = false): ?array

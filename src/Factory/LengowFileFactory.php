@@ -2,7 +2,6 @@
 
 namespace Lengow\Connector\Factory;
 
-
 use Lengow\Connector\Components\LengowFile;
 use Lengow\Connector\Util\EnvironmentInfoProvider;
 

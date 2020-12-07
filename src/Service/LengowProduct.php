@@ -13,11 +13,7 @@ use Shopware\Core\System\Language\LanguageEntity;
 use Shopware\Core\Checkout\Shipping\ShippingMethodEntity;
 use Shopware\Core\Framework\DataAbstractionLayer\Search\Filter\MultiFilter;
 use Shopware\Core\Checkout\Shipping\Aggregate\ShippingMethodPrice\ShippingMethodPriceEntity;
-use Shopware\Core\Checkout\Shipping\Aggregate\ShippingMethodPrice\ShippingMethodPriceCollection;
-use Shopware\Core\Framework\DataAbstractionLayer\Pricing\Price;
-use Shopware\Core\Framework\DataAbstractionLayer\Pricing\PriceCollection;
 use Shopware\Core\Framework\Uuid\Uuid;
-use Lengow\Connector\Exception\LengowException;
 use Lengow\Connector\Util\EnvironmentInfoProvider;
 
 /**
@@ -65,6 +61,30 @@ class LengowProduct
      * @var string shipping price range quantity max
      */
     private const SHIPPING_PRICE_RANGE_MAX = 100000;
+
+    /**
+     * Callback for shopware ProductEntity getter
+     */
+    private const LINK = [
+        'id' => 'getId',
+        'sku' => 'getProductNumber',
+        'sku_supplier' => 'getManufacturerNumber',
+        'ean' => 'getEan',
+        'name' => 'getName',
+        'quantity' => 'getAvailableStock',
+        'weight' => 'getWeight',
+        'width' => 'getWidth',
+        'height' => 'getHeight',
+        'length' => 'getLength',
+        'parent_id' => 'getParentId',
+        'status' => 'getActive',
+        'description' => 'getDescription',
+        'description_html' => 'getDescription',
+        'meta_title' => 'getMetaTitle',
+        'minimal_quantity' => 'getMinPurchase',
+        'meta_keyword' => 'getKeywords',
+        'url' => 'getSeoUrls',
+    ];
 
     /**
      * @var EntityRepositoryInterface product repository
@@ -249,6 +269,7 @@ class LengowProduct
      * Get product to export with right association
      *
      * @param string $productId
+     *
      * @return ProductEntity|null
      */
     public function getProductForExportById(string $productId) : ?ProductEntity
@@ -271,30 +292,6 @@ class LengowProduct
     }
 
     /**
-     * Callback for shopware ProductEntity getter
-     */
-    private const LINK = [
-        'id' => 'getId',
-        'sku' => 'getProductNumber',
-        'sku_supplier' => 'getManufacturerNumber',
-        'ean' => 'getEan',
-        'name' => 'getName',
-        'quantity' => 'getAvailableStock',
-        'weight' => 'getWeight',
-        'width' => 'getWidth',
-        'height' => 'getHeight',
-        'length' => 'getLength',
-        'parent_id' => 'getParentId',
-        'status' => 'getActive',
-        'description' => 'getDescription',
-        'description_html' => 'getDescription',
-        'meta_title' => 'getMetaTitle',
-        'minimal_quantity' => 'getMinPurchase',
-        'meta_keyword' => 'getKeywords',
-        'url' => 'getSeoUrls',
-    ];
-
-    /**
      * Get all exportable data from a product
      *
      * @param string $productId the product Id
@@ -302,6 +299,7 @@ class LengowProduct
      * @param CurrencyEntity $currency currency to ise
      * @param ShippingMethodEntity $shipping shipping method to use
      * @param LanguageEntity|null $language language to use
+     *
      * @return array
      */
     public function getData(
@@ -430,15 +428,15 @@ class LengowProduct
                 case LengowExport::$defaultFields['shipping_delay']:
                     $productData[$headerField] = $shipping->getDeliveryTime()->getName();
                     break;
-//                case LengowExport::$defaultFields['discount_percent']: // todo discount voir toutes les table promotions_
-//                    $productData[$headerField] = '';
-//                    break;
-//                case LengowExport::$defaultFields['discount_start_date']:
-//                    $productData[$headerField] = '';
-//                    break;
-//                case LengowExport::$defaultFields['discount_end_date']:
-//                    $productData[$headerField] = '';
-//                    break;
+                // case LengowExport::$defaultFields['discount_percent']:
+                //     $productData[$headerField] = '';
+                //     break;
+                // case LengowExport::$defaultFields['discount_start_date']:
+                //     $productData[$headerField] = '';
+                //     break;
+                // case LengowExport::$defaultFields['discount_end_date']:
+                //     $productData[$headerField] = '';
+                //     break;
                 case LengowExport::$defaultFields['image_url_1']:
                 case LengowExport::$defaultFields['image_url_2']:
                 case LengowExport::$defaultFields['image_url_3']:
@@ -477,6 +475,7 @@ class LengowProduct
      *
      * @param ProductEntity $product the product
      * @param bool $isChild is the product a children
+     *
      * @return string
      */
     public function getProductIdentifier(ProductEntity $product, bool $isChild) : string
@@ -492,6 +491,7 @@ class LengowProduct
      *
      * @param ProductEntity $product the product
      * @param string $productTranslatedName  the product translated name
+     *
      * @return string
      */
     public function getProductUrl(ProductEntity $product, string $productTranslatedName) : string
@@ -508,6 +508,7 @@ class LengowProduct
      * @param ProductEntity $product the product
      * @param bool $isChild is the product a child
      * @param ProductEntity|null $parent the parent product
+     *
      * @return string
      */
     public function getManufacturer(ProductEntity $product, bool $isChild, ProductEntity $parent = null) : string
@@ -529,6 +530,7 @@ class LengowProduct
      * @param string $headerField the field to retrieve
      * @param bool $isChild is the product a children
      * @param ProductEntity|null $parent the parent product
+     *
      * @return string
      */
     public function getSizeField(
@@ -552,6 +554,7 @@ class LengowProduct
      * @param string $headerField the field to retrieve
      * @param bool $isChild is the product a children
      * @param ProductEntity|null $parent the parent product
+     *
      * @return string
      */
     public function getTranslatedField(
@@ -575,6 +578,7 @@ class LengowProduct
      * @param string $headerField the field to retrieve
      * @param bool $isChild is the product a children product ?
      * @param ProductEntity|null $parent the parent
+     *
      * @return string
      */
     public function getUntranslatedField(
@@ -597,6 +601,7 @@ class LengowProduct
      * @param string $headerField the field to retrieve
      * @param bool $isChild is the product a children product ?
      * @param ProductEntity|null $parent the parent
+     *
      * @return string
      */
     public function getDescription(
@@ -629,6 +634,7 @@ class LengowProduct
      * @param string $headerField the field to retrieve
      * @param bool $isChild is the product a children product ?
      * @param ProductEntity|null $parent the parent
+     *
      * @return string
      */
     public function getDescriptionHtml(
@@ -647,7 +653,6 @@ class LengowProduct
                 $product->{self::LINK[$headerField]}() ?? ''
             );
         }
-
         return (string)($value ?? '');
     }
 
@@ -656,6 +661,7 @@ class LengowProduct
      *
      * @param string $headerField the field to retrieve
      * @param ProductEntity $product the product
+     *
      * @return string
      */
     public function getPropertiesAndCustomField(string $headerField, ProductEntity $product) : string
@@ -674,6 +680,7 @@ class LengowProduct
      *
      * @param string $headerField the field to retrieve
      * @param ProductEntity $product the product
+     *
      * @return string
      */
     public function getPropertiesData(string $headerField, ProductEntity $product) : string
@@ -692,6 +699,7 @@ class LengowProduct
      * Get all variation properties name in one string separated by ';'
      *
      * @param ProductEntity $product the product
+     *
      * @return string
      */
     public function getVariationPropertiesNames(ProductEntity $product) : string
@@ -722,6 +730,7 @@ class LengowProduct
      *
      * @param string $headerField the field to retrieve
      * @param ProductEntity $product the product
+     *
      * @return string
      */
     public function getCustomFieldData(string $headerField, ProductEntity $product) :string
@@ -735,6 +744,7 @@ class LengowProduct
      * @param ShippingMethodEntity $shipping the shipping method
      * @param CurrencyEntity $currency the currency
      * @param ProductEntity $product the product
+     *
      * @return string
      */
     public function getShippingPrice(
@@ -766,6 +776,7 @@ class LengowProduct
      * @param CurrencyEntity $currency the currency to use
      * @param float $weight product weight
      * @param float $size product size
+     *
      * @return string
      */
     public function getAppliedShippingRule(
@@ -820,7 +831,8 @@ class LengowProduct
      *
      * @param ShippingMethodPriceEntity $shippingCost
      * @param CurrencyEntity $currency
-     * @return string1
+     *
+     * @return string
      */
     public function getCurrencyPriceFromShippingCost(
         ShippingMethodPriceEntity $shippingCost,
@@ -842,6 +854,7 @@ class LengowProduct
      *
      * @param ShippingMethodPriceEntity $shippingPrice shipping price entity
      * @param float $value value to check
+     *
      * @return bool
      */
     public function inShippingPriceRange(ShippingMethodPriceEntity $shippingPrice, float $value): bool
@@ -861,6 +874,7 @@ class LengowProduct
      * @param CurrencyEntity $currency the currency to use
      * @param bool $isChild product is a child
      * @param ProductEntity|null $parent the parent product
+     *
      * @return string|null
      */
     public function getCalculatedPrice(
@@ -869,10 +883,13 @@ class LengowProduct
         CurrencyEntity $currency,
         bool $isChild = false,
         ProductEntity $parent = null
-    ): ?string {
+    ): ?string
+    {
         $productPrice = null;
         foreach ($product->getPrices() as $price) {
-            if ($price->getPrice()->count() > 0 && $price->getPrice()->first()->getCurrencyId() === $currency->getId()) {
+            if ($price->getPrice()->count() > 0
+                && $price->getPrice()->first()->getCurrencyId() === $currency->getId()
+            ) {
                 $productPrice = $price->getPrice()->first();
                 break;
             }
@@ -889,8 +906,8 @@ class LengowProduct
                 return (string) $productPrice->getNet();
             case LengowExport::$defaultFields['price_incl_tax']:
                 return (string) $productPrice->getGross();
-//            case LengowExport::$defaultFields['price_before_discount_excl_tax']:
-//            case LengowExport::$defaultFields['price_before_discount_incl_tax']:
+            // case LengowExport::$defaultFields['price_before_discount_excl_tax']:
+            // case LengowExport::$defaultFields['price_before_discount_incl_tax']:
             default:
                 return '0';
         }
@@ -904,6 +921,7 @@ class LengowProduct
      * @param string $headerFields the field to retrieve
      * @param bool $isChild is the product a child of another product
      * @param ProductEntity|null $parent the parent product
+     *
      * @return string
      */
     public function getProductImgUrl(
@@ -940,6 +958,7 @@ class LengowProduct
      * @param ProductEntity|null $product the product
      * @param ProductEntity|null $parent the parent product
      * @param bool $isChild the product is a children
+     *
      * @return string the breadcrumb
      */
     public function getProductCategory(ProductEntity $product, $isChild = false, $parent = null): string
@@ -961,4 +980,3 @@ class LengowProduct
         return $breadcrumb;
     }
 }
-

@@ -53,6 +53,7 @@ abstract class LengowAbstractFrontController extends StorefrontController
      * @param Request $request Http request
      * @param SalesChannelContext $context Shopware context
      * @param bool $import is call for import or export
+     *
      * @return string|null
      */
     public function checkAccess(Request $request, SalesChannelContext $context, $import = true): ?string

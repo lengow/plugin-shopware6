@@ -14,7 +14,6 @@ use Shopware\Core\System\SalesChannel\Aggregate\SalesChannelDomain\SalesChannelD
 use Shopware\Core\System\User\UserCollection;
 use Shopware\Core\System\User\UserEntity;
 use Lengow\Connector\Connector;
-use Lengow\Connector\Service\LengowConfiguration;
 
 /**
  * Class EnvironmentInfoProvider
@@ -241,6 +240,7 @@ class EnvironmentInfoProvider
      *
      * @param string $salesChannelId shopware sales channel id
      * @param EntityRepositoryInterface $shippingMethodRepository shopware shipping method repository
+     *
      * @return string
      */
     public static function getShippingMethodDefaultValue(

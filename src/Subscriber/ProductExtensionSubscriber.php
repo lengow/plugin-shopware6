@@ -11,14 +11,12 @@ use Shopware\Core\Framework\Context;
 use Symfony\Component\EventDispatcher\EventSubscriberInterface;
 use Lengow\Connector\EntityExtension\ExtensionStructure\ProductExtensionStructure;
 
-
 /**
  * Class ProductExtensionSubscriber
  * @package Lengow\Connector\Subscriber
  */
 class ProductExtensionSubscriber implements EventSubscriberInterface
 {
-
     /**
      * @var EntityRepositoryInterface $lengowProductRepository shopware product repository
      */

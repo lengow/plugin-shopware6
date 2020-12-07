@@ -2,7 +2,6 @@
 
 namespace Lengow\Connector\Subscriber;
 
-use Shopware\Core\System\SalesChannel\SalesChannelEntity;
 use Symfony\Component\EventDispatcher\EventSubscriberInterface;
 use Shopware\Core\Framework\DataAbstractionLayer\EntityRepositoryInterface;
 use Shopware\Core\Framework\DataAbstractionLayer\Event\EntityWrittenEvent;
@@ -13,7 +12,6 @@ use Shopware\Core\Framework\DataAbstractionLayer\Search\Filter\EqualsFilter;
 use Shopware\Core\Framework\Context;
 use Lengow\Connector\Util\EnvironmentInfoProvider;
 use Lengow\Connector\Service\LengowConfiguration;
-use Lengow\Connector\Connector;
 
 /**
  * Class SalesChannelWrittenSubscriber
@@ -21,7 +19,6 @@ use Lengow\Connector\Connector;
  */
 class SalesChannelWrittenSubscriber implements EventSubscriberInterface
 {
-
     /**
      * @var EntityRepositoryInterface lengow settings repository
      */

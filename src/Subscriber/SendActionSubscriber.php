@@ -29,11 +29,6 @@ class SendActionSubscriber implements EventSubscriberInterface
     private $lengowOrder;
 
     /**
-     * @var array
-     */
-    private static $trackingCodes;
-
-    /**
      * SendActionSubscriber constructor
      * @param LengowAction $lengowAction Lengow action service
      * @param LengowOrder $lengowOrder Lengow order service

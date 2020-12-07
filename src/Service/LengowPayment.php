@@ -38,6 +38,7 @@ class LengowPayment implements SynchronousPaymentHandlerInterface
         SyncPaymentTransactionStruct $transaction,
         RequestDataBag $dataBag,
         SalesChannelContext $salesChannelContext
-    ): void {
+    ): void
+    {
     }
 }

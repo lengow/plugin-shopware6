@@ -784,8 +784,9 @@ class LengowImportOrder
     /**
      * Create a lengow order in lengow orders table
      *
-     * @return LengowOrderEntity|null
      * @throws Exception
+     *
+     * @return LengowOrderEntity|null
      */
     private function createLengowOrder(): ?LengowOrderEntity
     {

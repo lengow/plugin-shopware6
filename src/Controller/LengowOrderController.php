@@ -163,7 +163,7 @@ class LengowOrderController extends AbstractController
         $orderId = $request->get('orderId');
         $lengowOrder = $lengowOrderId ? $this->lengowOrder->getLengowOrderById($lengowOrderId) : null;
         $order = $orderId ? $this->lengowOrder->getOrderById($orderId) : null;
-        if (!$this->lengowOrder->setAsReImported($lengowOrder)) {
+        if ($lengowOrder && !$this->lengowOrder->setAsReImported($lengowOrder)) {
             $lengowOrder = null;
         }
         if ($lengowOrder && $order) {

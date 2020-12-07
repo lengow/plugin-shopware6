@@ -36,7 +36,8 @@ class LengowExportController extends LengowAbstractFrontController
         LengowConfiguration $lengowConfiguration,
         LengowLog $lengowLog,
         LengowExport $lengowExport
-    ) {
+    )
+    {
         parent::__construct($lengowAccess, $lengowConfiguration, $lengowLog);
         $this->lengowExport = $lengowExport;
     }
@@ -46,6 +47,7 @@ class LengowExportController extends LengowAbstractFrontController
      * @param SalesChannelContext $context SalesChannel context
      *
      * @Route("/lengow/export", name="frontend.lengow.export", methods={"GET"})
+     *
      * @return Response
      */
     public function export(Request $request, SalesChannelContext $context): Response
@@ -111,7 +113,8 @@ class LengowExportController extends LengowAbstractFrontController
     /**
      * @param string $mode size mode
      * @param string $salesChannelId sales channel id to size
-     * @return int size
+     *
+     * @return int
      */
     protected function modeSize(string $mode, string $salesChannelId): int
     {

@@ -189,7 +189,8 @@ class LengowExport
         LengowLog $lengowLog,
         LengowFeed $lengowFeed,
         LengowProduct $lengowProduct
-    ) {
+    )
+    {
         $this->lengowConfiguration = $lengowConfiguration;
         $this->productRepository = $productRepository;
         $this->salesChannelRepository = $salesChannelRepository;
@@ -283,6 +284,7 @@ class LengowExport
      * Validate requested format
      *
      * @param string $format requested format
+     *
      * @return string
      */
     private function validateFormat(string $format): string
@@ -304,6 +306,7 @@ class LengowExport
      * Get total export size
      *
      * @param string|null $salesChannelId sales channel id to count
+     *
      * @return int total export number
      */
     public function getTotalProduct(string $salesChannelId = null): int
@@ -338,7 +341,7 @@ class LengowExport
      *
      * @return int
      */
-    public function getTotalExportedProduct() : int
+    public function getTotalExportedProduct(): int
     {
         return count($this->getProductIdsExport());
     }
@@ -391,6 +394,7 @@ class LengowExport
      * retrieve all parent products for saleChannelId
      *
      * @param string $salesChannelId
+     *
      * @return array
      */
     public function getAllProductIdForSalesChannel(string $salesChannelId) : array
@@ -423,6 +427,7 @@ class LengowExport
      * Get product id to export if selection or product_ids get argument are active
      *
      * @param string $salesChannelId the sales channel id
+     *
      * @return array
      */
     public function getLengowProductIdsToExport(string $salesChannelId) : array
@@ -455,6 +460,7 @@ class LengowExport
      * Get product to export and order them by parent->children if selection or product_ids get argument are active
      *
      * @param array $productIds product ids
+     *
      * @return array
      */
     public function getSelectionProductIdsExport(array $productIds) : array
@@ -491,6 +497,7 @@ class LengowExport
      * Get all exportable children products
      *
      * @param ProductCollection $childrenCollection All children products
+     *
      * @return array
      */
     public function getExportableChild(ProductCollection $childrenCollection) : array
@@ -508,6 +515,7 @@ class LengowExport
      * check if product is exportable depending on get param and configuration
      *
      * @param ProductEntity $product the product
+     *
      * @return bool
      */
     public function isExportable(ProductEntity $product) : bool
@@ -558,6 +566,7 @@ class LengowExport
      * Get salesChannel master category
      *
      * @param string|null $categoryEntryPoint
+     *
      * @return string|null
      */
     private function getMasterCategory(?string $categoryEntryPoint = null): ?string
@@ -809,6 +818,7 @@ class LengowExport
      * Get all field's headers
      *
      * @param string $salesChannelId sales channel id
+     *
      * @return array
      */
     private function getHeaderFields(string $salesChannelId) : array
@@ -827,6 +837,7 @@ class LengowExport
 
     /**
      * @param array $headerFields all header field
+     *
      * @return bool
      */
     public function writeFieldsData(array $headerFields) : bool
@@ -932,6 +943,7 @@ class LengowExport
      *
      * @param string $salesChannelId the sales channel id
      * @param null $currencyIso search for a specific currency
+     *
      * @return CurrencyEntity|null
      */
     public function getExportCurrency(string $salesChannelId, $currencyIso = null) : ?CurrencyEntity
@@ -980,6 +992,7 @@ class LengowExport
      * get shipping method to use for export
      *
      * @param string $salesChannelId the sales channel Id
+     *
      * @return ShippingMethodEntity|null
      */
     public function getExportShippingMethod(string $salesChannelId) : ?ShippingMethodEntity
@@ -1080,5 +1093,4 @@ class LengowExport
         }
         return $fields;
     }
-
 }

@@ -3,14 +3,11 @@
 namespace Lengow\Connector\Controller;
 
 use Shopware\Core\Framework\Routing\Annotation\RouteScope;
-use Shopware\Core\Framework\Context;
-use Shopware\Core\Framework\DataAbstractionLayer\Search\Criteria;
 use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\Routing\Annotation\Route;
 use Symfony\Component\HttpFoundation\JsonResponse;
 use Lengow\Connector\Service\LengowExport;
-use Lengow\Connector\Util\EnvironmentInfoProvider;
 
 /**
  * Class LengowExportController
@@ -19,16 +16,15 @@ use Lengow\Connector\Util\EnvironmentInfoProvider;
  */
 class LengowExportController extends AbstractController
 {
-
     /**
      * @var LengowExport lengow export service
      */
     private $lengowExport;
 
     /**
-     * @param LengowExport $lengowExport
-     *
      * LengowOrderController constructor
+     *
+     * @param LengowExport $lengowExport
      */
     public function __construct(LengowExport $lengowExport)
     {
