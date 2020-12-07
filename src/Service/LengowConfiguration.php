@@ -840,9 +840,12 @@ class LengowConfiguration
         foreach(self::$lengowSettings as $key => $lengowSetting) {
             if (isset($lengowSetting['channel'])) {
                 foreach ($salesChannels as $salesChannel) {
+                    if (self::lengowSettingExist($settingsRepository, $key, $salesChannel->getId())) {
+                        continue;
+                    }
                     // special case
-                    if ($key === 'lengowImportDefaultShippingMethod'
-                        || $key === 'lengowExportDefaultShippingMethod') {
+                    if ($key === self::LENGOW_IMPORT_DEFAULT_SHIPPING_METHOD
+                        || $key === self::LENGOW_EXPORT_DEFAULT_SHIPPING_METHOD) {
                         $config[] = [
                             'salesChannelId' => $salesChannel->getId(),
                             'name' => $key,
@@ -860,6 +863,9 @@ class LengowConfiguration
                     ];
                 }
             } else {
+                if (self::lengowSettingExist($settingsRepository, $key)) {
+                    continue;
+                }
                 $config[] = [
                     'salesChannelId' => null,
                     'name' => $key,
@@ -867,7 +873,35 @@ class LengowConfiguration
                 ];
             }
         }
-        $settingsRepository->create($config, Context::createDefaultContext());
+        if (!empty($config)) {
+            $settingsRepository->create($config, Context::createDefaultContext());
+        }
+    }
+
+    /**
+     * Check if lengow setting already created
+     *
+     * @param EntityRepositoryInterface $settingsRepository lengow settings repository
+     * @param string $key config name
+     * @param string|null $salesChannelId sales channel
+     *
+     * @return bool
+     */
+    public static function lengowSettingExist(
+        EntityRepositoryInterface $settingsRepository,
+        string $key,
+        string $salesChannelId = null
+    ): bool
+    {
+        $criteria = new Criteria();
+        $criteria->addFilter(new EqualsFilter('name', $key));
+        if ($salesChannelId) {
+            $criteria->addFilter(new EqualsFilter('salesChannelId', $salesChannelId));
+        }
+        $settingsCollection = $settingsRepository
+            ->search($criteria, Context::createDefaultContext())
+            ->getEntities();
+        return $settingsCollection->count() !== 0;
     }
 
     /**

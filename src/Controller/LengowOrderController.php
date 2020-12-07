@@ -149,7 +149,7 @@ class LengowOrderController extends AbstractController
      *
      * @Route("/api/v{version}/_action/lengow/order/reimport-failed-order",
      *     defaults={"auth_enabled"=true},
-     *     name="api.action.lengow.order.reimport-order",
+     *     name="api.action.lengow.order.reimport-failed-order",
      *     methods={"POST"})
      *
      * @param Request $request

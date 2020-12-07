@@ -24,21 +24,23 @@ $listFolders = [
     '/src/Service',
     '/src/Storefront',
     '/src/Subscriber',
-    '/src/Translations',
     '/src/Util',
 ];
 
 $filePaths = [
-    $base.'/composer.json',
-    $base.'/src/Connector.php',
-    $base.'/src/Resources/public/bag.png',
-    $base.'/src/Resources/public/clock.png',
-    $base.'/src/Resources/public/home-orders.png',
-    $base.'/src/Resources/public/home-products.png',
-    $base.'/src/Resources/public/home-settings.png',
-    $base.'/src/Resources/public/lengow-blue.png',
-    $base.'/src/Resources/public/lengow-white-big.png',
-    $base.'/src/Resources/public/plane.png',
+    $base . '/composer.json',
+    $base . '/src/Connector.php',
+    $base . '/src/Resources/public/bag.png',
+    $base . '/src/Resources/public/clock.png',
+    $base . '/src/Resources/public/home-orders.png',
+    $base . '/src/Resources/public/home-products.png',
+    $base . '/src/Resources/public/home-settings.png',
+    $base . '/src/Resources/public/lengow-blue.png',
+    $base . '/src/Resources/public/lengow-white-big.png',
+    $base . '/src/Resources/public/plane.png',
+    $base . '/src/Translations/de-DE.csv',
+    $base . '/src/Translations/en-GB.csv',
+    $base . '/src/Translations/fr-FR.csv',
 ];
 
 foreach ($listFolders as $folder) {

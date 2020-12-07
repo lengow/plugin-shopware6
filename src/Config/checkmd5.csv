@@ -8,12 +8,15 @@
 /src/Resources/public/lengow-blue.png|20c05b7249c00f126861223ecc5b6ce9
 /src/Resources/public/lengow-white-big.png|6e6178f2db21104a157aebb27f9a5ca2
 /src/Resources/public/plane.png|7d27896af3e0f3cf6e353cccef8f8267
+/src/Translations/de-DE.csv|50aa56fa701799a45711a6e3e76f613c
+/src/Translations/en-GB.csv|ff4708742f2e2c59e066618d67c24b4a
+/src/Translations/fr-FR.csv|30e67e9a80bc2a8175733fda075a22e6
 /src/Components/LengowMarketplace.php|0355f9211110102fa729490e7bee257d
 /src/Components/LengowFile.php|e4b6c843ee022d8397481ad1467032c7
 /src/Controller/LengowToolboxController.php|4132b6561515f232968ccb7740ad36c6
 /src/Controller/LengowExportController.php|7dbb59d61a7e3115668d62eaba2b5b27
 /src/Controller/LengowSyncController.php|c2ece809e191bf3235a090b2c8b04447
-/src/Controller/LengowOrderController.php|601c9934b0ac7b903fb20a960ba49f6e
+/src/Controller/LengowOrderController.php|ac5da724bbc6d34bead7f6d2d9ccd48a
 /src/DependencyInjection/service.xml|cd5de3888c563b5d21287e85757f601b
 /src/DependencyInjection/entity.xml|ad9ae9476355be71e3446aff28ab6189
 /src/DependencyInjection/util.xml|4f70a2ee0a67540f2dc9c5aa890bd263
@@ -22,7 +25,7 @@
 /src/DependencyInjection/subscriber.xml|e50ef3feeb098bafdd0cabd892633088
 /src/DependencyInjection/controller.xml|a577dc436678806a64b4c634fb47539f
 /src/DependencyInjection/front_controller.xml|624a7538cfe3a03b505ccf0dd2943025
-/src/Entity/Shopware/.gitignore|aab39e92ffe254319a73ebf43158c256
+/src/Entity/Shopware/index.php|8f9b37e592c52a914e031592d38fd12e
 /src/Entity/Lengow/Action/ActionCollection.php|3bcac1566c364a20a44cdad4e6dc4f46
 /src/Entity/Lengow/Action/ActionEntity.php|540ec6eefe3b47c9293cf28a9b2e6e1b
 /src/Entity/Lengow/Action/ActionDefinition.php|c9d19aed4d62d0604261699defea321c
@@ -401,7 +404,7 @@
 /src/Resources/public/flag/PG.png|e13e005b63bc30978dc3e4232623e8d1
 /src/Resources/public/flag/GP.png|cc1fc719aa70170cf59aa97989f32fca
 /src/Service/LengowToolbox.php|aa089c672fd44468ddc4a0158ae80667
-/src/Service/LengowConnector.php|7da8c8fb8546cbb026b0551b325dba9f
+/src/Service/LengowConnector.php|29feae76a0a9f0acd56b88dea81b1459
 /src/Service/LengowSync.php|1439f827ebeac7c03a87d2edcf652f92
 /src/Service/LengowProduct.php|9e6571683aabf5878f2a187a6e2d21b9
 /src/Service/LengowOrder.php|23f5740de5f9264344420a1159377e05
@@ -419,7 +422,7 @@
 /src/Service/LengowOrderLine.php|e266c25585122c73fb81d66200f392cc
 /src/Service/LengowImport.php|0dd20325bc6f299eb512afa5a9bf3452
 /src/Service/LengowImportOrder.php|a77dea938c5aa8f5cb510946793a124d
-/src/Service/LengowConfiguration.php|94af48e5b2595ef95ec1c06102fc9c66
+/src/Service/LengowConfiguration.php|5a3394e21224c12849bca6896d78d4a7
 /src/Storefront/Controller/LengowAbstractFrontController.php|1de8af825bf09037c95c81f2daedb70a
 /src/Storefront/Controller/LengowExportController.php|b4425009da84223d648f3ccbf501a48a
 /src/Storefront/Controller/LengowCronController.php|893198ea135b38ea5ddd7a7c1e313e5c
@@ -427,12 +430,5 @@
 /src/Subscriber/SendActionSubscriber.php|8b2d893a3339a31a66e9cb2202a2836d
 /src/Subscriber/LengowSettingUpdateSubscriber.php|5dd2760693208bbbb08d56ad46bc85a3
 /src/Subscriber/ProductExtensionSubscriber.php|7eb8527b3cd5331aa8b39d2e0c7e5115
-/src/Translations/en-GB.csv|ff4708742f2e2c59e066618d67c24b4a
-/src/Translations/yml/de-DE.yml|3ef610c32e467d6ae382f94bcfbe8612
-/src/Translations/yml/fr-FR.yml|8f5c3e35f6657b21ce997ed87cbf1801
-/src/Translations/yml/en-GB.yml|efa9d68f059850b69831ac22946acbb2
-/src/Translations/yml/log.yml|1704290133f9027cf055a72e1f014793
-/src/Translations/fr-FR.csv|30e67e9a80bc2a8175733fda075a22e6
-/src/Translations/de-DE.csv|50aa56fa701799a45711a6e3e76f613c
 /src/Util/StringCleaner.php|6842e4e36db4cdbcab89e8228139bc55
 /src/Util/EnvironmentInfoProvider.php|ad1064f23b5654b3ee4516d8889b54b8

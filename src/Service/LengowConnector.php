@@ -14,14 +14,14 @@ class LengowConnector
     /**
      * @var string url of Lengow solution
      */
-    public const LENGOW_URL = 'lengow.io';
-    //public const LENGOW_URL = 'lengow.net';
+    // public const LENGOW_URL = 'lengow.io';
+    public const LENGOW_URL = 'lengow.net';
 
     /**
      * @var string url of the Lengow API
      */
-    private const LENGOW_API_URL = 'https://api.lengow.io';
-    //private const LENGOW_API_URL = 'https://api.lengow.net';
+    // private const LENGOW_API_URL = 'https://api.lengow.io';
+    private const LENGOW_API_URL = 'https://api.lengow.net';
 
     /**
      * @var string url of access token API
