@@ -1,2 +1,19 @@
 # v1.0.0
-* specs here
+- Feature: Lengow Dashboard (contact, helper center and quick links)
+- Feature: Product page with product selection by sales channel
+- Feature: Direct retrieval of the Shopware catalog in Lengow
+- Feature: Implementation of the Lengow order management screen
+- Feature: Automatic synchronization of marketplace orders between Lengow and Shopware
+- Feature: Management of orders sent by marketplaces
+- Feature: Display of order types (express, B2B, delivered by marketplace)
+- Feature: Quick fix import or send action error using refresh button
+- Feature: Management of ship and cancel actions on orders
+- Feature: Automatic verification of actions sent to the marketplace
+- Feature: Automatic sending of action if the first shipment was a failure
+- Feature: Sending a report email with order import and action upload errors
+- Feature: Viewing all Lengow order Information on the Shopware order detail
+- Feature: Help page with all necessary support links
+- Feature: Toolbox with all Lengow information for support
+- Feature: Download maintenance logs globally or per day
+- Feature: Direct management of settings in the plugin interface
+- Feature: Lengow account creation and synchronisation directly from the plugin
