@@ -59,13 +59,11 @@ Component.register('lgw-dashboard', {
 
         isTrialExpired() {
             this.LengowConnectorSyncService.getAccountStatus(false).then(result => {
-                if (result.success) {
+                if (result.success && result.type === 'free_trial') {
                     this.trialExpired = result.expired;
-                    this.trialLoading = false;
-                } else {
-                    this.trialExpired = true;
-                    this.trialLoading = false;
                 }
+            }).finally(() => {
+                this.trialLoading = false;
             });
         }
     }
