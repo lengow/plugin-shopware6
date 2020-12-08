@@ -380,32 +380,27 @@ Component.register('lgw-order-list', {
 
         getLastSynchronisationDate(timestampCron, timestampManual) {
             if (timestampCron && timestampManual) {
-                // eslint-disable-next-line radix
-                if (parseInt(timestampCron) > parseInt(timestampManual)) {
+                if (parseInt(timestampCron, 10) > parseInt(timestampManual, 10)) {
                     return {
                         type: ORDER_SYNCHRONISATION.cron,
-                        // eslint-disable-next-line radix
-                        date: new Date(parseInt(timestampCron) * 1000)
+                        date: new Date(parseInt(timestampCron, 10) * 1000)
                     };
                 }
                 return {
                     type: ORDER_SYNCHRONISATION.manual,
-                    // eslint-disable-next-line radix
-                    date: new Date(parseInt(timestampManual) * 1000)
+                    date: new Date(parseInt(timestampManual, 10) * 1000)
                 };
             }
             if (timestampCron && !timestampManual) {
                 return {
                     type: ORDER_SYNCHRONISATION.cron,
-                    // eslint-disable-next-line radix
-                    date: new Date(parseInt(timestampCron) * 1000)
+                    date: new Date(parseInt(timestampCron,10) * 1000)
                 };
             }
             if (timestampManual && !timestampCron) {
                 return {
                     type: ORDER_SYNCHRONISATION.manual,
-                    // eslint-disable-next-line radix
-                    date: new Date(parseInt(timestampManual) * 1000)
+                    date: new Date(parseInt(timestampManual, 10) * 1000)
                 };
             }
             return {};
@@ -439,8 +434,7 @@ Component.register('lgw-order-list', {
             this.lengowOrderRepository
                 .search(criteria, Shopware.Context.api)
                 .then(response => {
-                    // eslint-disable-next-line radix
-                    this.orderWithError = parseInt(response.total);
+                    this.orderWithError = parseInt(response.total, 10);
                 })
                 .finally(() => {
                     this.orderWithErrorLoading = false;
@@ -454,8 +448,7 @@ Component.register('lgw-order-list', {
             this.lengowOrderRepository
                 .search(criteria, Shopware.Context.api)
                 .then(response => {
-                    // eslint-disable-next-line radix
-                    this.orderWaitingToBeSent = parseInt(response.total);
+                    this.orderWaitingToBeSent = parseInt(response.total, 10);
                 })
                 .finally(() => {
                     this.orderWaitingToBeSentLoading = false;

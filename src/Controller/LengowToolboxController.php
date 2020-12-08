@@ -5,6 +5,7 @@ namespace Lengow\Connector\Controller;
 use Shopware\Core\Framework\Routing\Annotation\RouteScope;
 use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
 use Symfony\Component\HttpFoundation\Request;
+use Symfony\Component\HttpFoundation\Response;
 use Symfony\Component\Routing\Annotation\Route;
 use Symfony\Component\HttpFoundation\JsonResponse;
 use Lengow\Connector\Service\LengowToolbox;
@@ -88,10 +89,13 @@ class LengowToolboxController extends AbstractController
      *     methods={"POST"})
      *
      * @param Request $request
+     *
+     * @return Response
      */
-    public function downloadLog(Request $request): void
+    public function downloadLog(Request $request): Response
     {
         $fileName = $request->get('fileName');
         $this->lengowToolbox->downloadLog($fileName === 'logs' ? null : $fileName);
+        return new Response();
     }
 }

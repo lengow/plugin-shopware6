@@ -6,6 +6,7 @@ use Shopware\Core\Framework\Context;
 use Shopware\Core\Framework\DataAbstractionLayer\Search\Criteria;
 use Shopware\Core\Framework\DataAbstractionLayer\Search\Filter\EqualsFilter;
 use Shopware\Core\Framework\DataAbstractionLayer\EntityRepositoryInterface;
+use Shopware\Core\Framework\Uuid\Uuid;
 
 /**
  * Class LengowAccess
@@ -17,7 +18,6 @@ class LengowAccess
      * @var array Lengow Authorized IPs
      */
     protected static $ipsLengow = [
-        '127.0.0.1',
         '10.0.4.150',
         '46.19.183.204',
         '46.19.183.217',
@@ -81,7 +81,7 @@ class LengowAccess
      */
     public function checkSalesChannel(string $salesChannelId = null): ?string
     {
-        if ($salesChannelId === null) {
+        if ($salesChannelId === null || !Uuid::isValid($salesChannelId)) {
             return null;
         }
         $criteria = new Criteria();

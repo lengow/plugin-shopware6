@@ -78,6 +78,8 @@ class LengowCronController extends LengowAbstractFrontController
     }
 
     /**
+     * Cron Process (Import orders, check actions and send stats)
+     *
      * @param Request $request Http Request
      * @param SalesChannelContext $context SalesChannel context
      *
@@ -87,7 +89,10 @@ class LengowCronController extends LengowAbstractFrontController
      */
     public function cron(Request $request, SalesChannelContext $context): Response
     {
-        $this->checkAccess($request, $context);
+        $accessErrorMessage = $this->checkAccess($request);
+        if ($accessErrorMessage !== null) {
+            return new Response($accessErrorMessage, Response::HTTP_FORBIDDEN);
+        }
         $cronArgs = $this->createGetArgArray($request);
         if ($cronArgs['get_sync'] === null || $cronArgs['get_sync']) {
             return new Response(json_encode($this->lengowSync->getSyncData()));
@@ -131,13 +136,14 @@ class LengowCronController extends LengowAbstractFrontController
                     'action' => $cronArgs['sync'],
                 ]
             );
-            header('HTTP/1.1 400 Bad Request');
-            die($errorMessage);
+            return new Response($errorMessage, Response::HTTP_BAD_REQUEST);
         }
         return new Response();
     }
 
     /**
+     * Get all parameters from request
+     *
      * @param Request $request Http request
      *
      * @return array

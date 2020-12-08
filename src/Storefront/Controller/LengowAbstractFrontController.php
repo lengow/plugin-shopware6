@@ -3,7 +3,6 @@
 namespace Lengow\Connector\Storefront\Controller;
 
 use Shopware\Storefront\Controller\StorefrontController;
-use Shopware\Core\System\SalesChannel\SalesChannelContext;
 use Symfony\Component\HttpFoundation\Request;
 use Lengow\Connector\Service\LengowAccess;
 use Lengow\Connector\Service\LengowConfiguration;
@@ -50,30 +49,17 @@ abstract class LengowAbstractFrontController extends StorefrontController
     }
 
     /**
+     * Check access by token or ip
+     *
      * @param Request $request Http request
-     * @param SalesChannelContext $context Shopware context
-     * @param bool $import is call for import or export
      *
      * @return string|null
      */
-    public function checkAccess(Request $request, SalesChannelContext $context, $import = true): ?string
+    public function checkAccess(Request $request): ?string
     {
+        $errorMessage = null;
         $token = $request->query->get('token');
         $salesChannelId = $request->query->get('sales_channel_id');
-        if ($import || !$salesChannelId || strlen($salesChannelId) <= 1) {
-            $salesChannelId = null;
-        }
-        $salesChannelName = $this->lengowAccessService->checkSalesChannel($salesChannelId);
-        if (!$import && !$salesChannelName) {
-            header('HTTP/1.1 400 Bad Request');
-            die(
-                $this->lengowLog->decodeMessage(
-                    'log.export.specify_sales_channel',
-                    LengowTranslation::DEFAULT_ISO_CODE
-                )
-            );
-        }
-
         if (!$this->lengowAccessService->checkWebserviceAccess($token, $salesChannelId)) {
             if ($this->lengowConfiguration->get(LengowConfiguration::LENGOW_IP_ENABLED)) {
                 $errorMessage = $this->lengowLog->decodeMessage(
@@ -93,16 +79,30 @@ abstract class LengowAbstractFrontController extends StorefrontController
                         LengowTranslation::DEFAULT_ISO_CODE
                     );
             }
-            header('HTTP/1.1 403 Forbidden');
-            die($errorMessage);
         }
-        return $salesChannelName;
+        return $errorMessage;
+    }
+
+    /**
+     * Get sale channel name from sales channel id
+     *
+     * @param Request $request Http request
+     *
+     * @return string|null
+     */
+    public function getSalesChannelName(Request $request): ?string
+    {
+        $salesChannelId = $request->query->get('sales_channel_id');
+        if (!$salesChannelId || strlen($salesChannelId) <= 1) {
+            $salesChannelId = null;
+        }
+        return $this->lengowAccessService->checkSalesChannel($salesChannelId);
     }
 
     /**
      * @param Request $request Http request
      *
-     * @return array All get parameters in an array
+     * @return array
      */
     abstract protected function createGetArgArray(Request $request): array;
 }

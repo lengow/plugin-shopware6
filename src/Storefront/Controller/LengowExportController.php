@@ -2,6 +2,7 @@
 
 namespace Lengow\Connector\Storefront\Controller;
 
+use Lengow\Connector\Service\LengowTranslation;
 use Shopware\Core\Framework\Routing\Annotation\RouteScope;
 use Shopware\Core\System\SalesChannel\SalesChannelContext;
 use Symfony\Component\Routing\Annotation\Route;
@@ -25,7 +26,8 @@ class LengowExportController extends LengowAbstractFrontController
     private $lengowExport;
 
     /**
-     * LengowExportController constructor.
+     * LengowExportController constructor
+     *
      * @param LengowAccess $lengowAccess lengow access service
      * @param LengowConfiguration $lengowConfiguration lengow configuration service
      * @param LengowLog $lengowLog lengow log service
@@ -43,6 +45,8 @@ class LengowExportController extends LengowAbstractFrontController
     }
 
     /**
+     * Export Process
+     *
      * @param Request $request Http request
      * @param SalesChannelContext $context SalesChannel context
      *
@@ -52,7 +56,18 @@ class LengowExportController extends LengowAbstractFrontController
      */
     public function export(Request $request, SalesChannelContext $context): Response
     {
-        $salesChannelName = $this->checkAccess($request, $context, false);
+        $salesChannelName = $this->getSalesChannelName($request);
+        if ($salesChannelName === null) {
+            $errorMessage =  $this->lengowLog->decodeMessage(
+                'log.export.specify_sales_channel',
+                LengowTranslation::DEFAULT_ISO_CODE
+            );
+            return new Response($errorMessage, Response::HTTP_BAD_REQUEST);
+        }
+        $accessErrorMessage = $this->checkAccess($request);
+        if ($accessErrorMessage !== null) {
+            return new Response($accessErrorMessage, Response::HTTP_FORBIDDEN);
+        }
         $exportArgs = $this->createGetArgArray($request);
         if ($exportArgs['get_params']) {
             return new Response($this->lengowExport->getExportParams());
@@ -65,9 +80,11 @@ class LengowExportController extends LengowAbstractFrontController
     }
 
     /**
+     * Get all parameters from request
+     *
      * @param Request $request Http request
      *
-     * @return array all get args
+     * @return array
      */
     protected function createGetArgArray(Request $request): array
     {
@@ -111,6 +128,8 @@ class LengowExportController extends LengowAbstractFrontController
     }
 
     /**
+     * Get mode size
+     *
      * @param string $mode size mode
      * @param string $salesChannelId sales channel id to size
      *

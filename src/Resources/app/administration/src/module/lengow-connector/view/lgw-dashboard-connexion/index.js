@@ -61,7 +61,8 @@ Component.register('lgw-dashboard-connexion', {
 
         onLoadIframe() {
             this.LengowConnectorSyncService.getSyncData().then(syncData => {
-                document.getElementById('lgw-sync-iframe').contentWindow.postMessage(syncData, '*');
+                const content = document.getElementById('lgw-sync-iframe').contentWindow;
+                content.postMessage(syncData, '*');
             });
         },
 
