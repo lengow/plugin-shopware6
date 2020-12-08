@@ -1,5 +1,6 @@
-Copyright (c) 2020 Lengow SAS
 Licence Free MIT
+
+Copyright (c) 2020 Lengow SAS
 
 Permission is hereby granted, free of charge, to any person obtaining a copy
 of this software and associated documentation files (the « Software »), to deal

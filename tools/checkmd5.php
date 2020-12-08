@@ -29,7 +29,7 @@ $listFolders = [
 
 $filePaths = [
     $base . '/composer.json',
-    $base . '/src/Connector.php',
+    $base . '/src/LengowConnector.php',
     $base . '/src/Resources/public/bag.png',
     $base . '/src/Resources/public/clock.png',
     $base . '/src/Resources/public/home-orders.png',

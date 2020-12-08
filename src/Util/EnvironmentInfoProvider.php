@@ -13,7 +13,7 @@ use Shopware\Core\Framework\DataAbstractionLayer\Search\Filter\EqualsFilter;
 use Shopware\Core\System\SalesChannel\Aggregate\SalesChannelDomain\SalesChannelDomainCollection;
 use Shopware\Core\System\User\UserCollection;
 use Shopware\Core\System\User\UserEntity;
-use Lengow\Connector\Connector;
+use Lengow\Connector\LengowConnector;
 
 /**
  * Class EnvironmentInfoProvider
@@ -29,7 +29,7 @@ class EnvironmentInfoProvider
     /**
      * @var string plugin name
      */
-    public const PLUGIN_NAME = 'Connector';
+    public const PLUGIN_NAME = 'LengowConnector';
 
     /**
      * @var string plugin version
@@ -114,8 +114,8 @@ class EnvironmentInfoProvider
      */
     public function getPluginPath(): string
     {
-        if ($this->kernel->getPluginLoader()->getPluginInstance(Connector::class)) {
-            return $this->kernel->getPluginLoader()->getPluginInstance(Connector::class)->getPath();
+        if ($this->kernel->getPluginLoader()->getPluginInstance(LengowConnector::class)) {
+            return $this->kernel->getPluginLoader()->getPluginInstance(LengowConnector::class)->getPath();
         }
         return '';
     }
@@ -127,7 +127,7 @@ class EnvironmentInfoProvider
      */
     public function getPluginBasePath(): string
     {
-        return $this->kernel->getPluginLoader()->getPluginInstance(Connector::class)->getBasePath();
+        return $this->kernel->getPluginLoader()->getPluginInstance(LengowConnector::class)->getBasePath();
     }
 
     /**

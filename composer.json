@@ -3,7 +3,7 @@
     "description": "Lengow allows you to easily export your product catalogue from your Shopware store and sell on Amazon, Cdiscount, Google Shopping, Criteo, LeGuide.com, Ebay, Rakuten, Priceminister. Choose from our 1,800 available marketing channels!",
     "version": "v1.0.0",
     "type": "shopware-platform-plugin",
-    "license": "MIT",
+    "license": "proprietary",
     "authors": [
         {
             "name": "Lengow SAS",
@@ -17,7 +17,7 @@
         "ext-json": "*"
     },
     "extra": {
-        "shopware-plugin-class": "Lengow\\Connector\\Connector",
+        "shopware-plugin-class": "Lengow\\Connector\\LengowConnector",
         "copyright": "(c) by Lengow SAS",
         "label": {
             "de-DE": "Lengow Für Shopware",

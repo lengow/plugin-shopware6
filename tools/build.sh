@@ -44,15 +44,15 @@ else
 fi
 
 # variables
-FOLDER_TMP="/tmp/Connector"
-FOLDER_LOGS="/tmp/Connector/src/Logs"
-FOLDER_EXPORT="/tmp/Connector/src/Export"
-FOLDER_TOOLS="/tmp/Connector/tools"
-FOLDER_TEST="/tmp/Connector/tests"
-FOLDER_NODE="/tmp/Connector/node_modules"
-FOLDER_BIN="/tmp/Connector/bin"
-FOLDER_CONFIG="/tmp/Connector/src/Config"
-FOLDER_TRANSLATION="/tmp/Connector/src/Translations/yml"
+FOLDER_TMP="/tmp/LengowConnector"
+FOLDER_LOGS="/tmp/LengowConnector/src/Logs"
+FOLDER_EXPORT="/tmp/LengowConnector/src/Export"
+FOLDER_TOOLS="/tmp/LengowConnector/tools"
+FOLDER_TEST="/tmp/LengowConnector/tests"
+FOLDER_NODE="/tmp/LengowConnector/node_modules"
+FOLDER_BIN="/tmp/LengowConnector/bin"
+FOLDER_CONFIG="/tmp/LengowConnector/src/Config"
+FOLDER_TRANSLATION="/tmp/LengowConnector/src/Translations/yml"
 
 VERT="\\033[1;32m"
 ROUGE="\\033[1;31m"
@@ -91,6 +91,8 @@ remove_files $FOLDER_TMP ".gitkeep"
 remove_files $FOLDER_TMP "dod.md"
 # remove Readme
 remove_files $FOLDER_TMP "README.md"
+# remove licence
+remove_files $FOLDER_TMP "LICENCE.md"
 # remove .git
 remove_files $FOLDER_TMP ".git"
 # remove .gitignore
@@ -134,6 +136,6 @@ remove_directory $FOLDER_BIN
 echo "- Remove bin folder : ""$VERT""DONE""$NORMAL"""
 # make zip
 cd /tmp
-zip "-r" $ARCHIVE_NAME "Connector"
+zip "-r" $ARCHIVE_NAME "LengowConnector"
 echo "- Build archive : ""$VERT""DONE""$NORMAL"""
 mv $ARCHIVE_NAME ~/Bureau

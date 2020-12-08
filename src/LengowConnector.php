@@ -23,10 +23,10 @@ use Lengow\Connector\Entity\Settings;
 use Lengow\Connector\Service\LengowConfiguration;
 
 /**
- * Class Connector
+ * Class LengowConnector
  * @package Lengow\Connector
  */
-class Connector extends Plugin
+class LengowConnector extends Plugin
 {
     /**
      * {@inheritdoc}
