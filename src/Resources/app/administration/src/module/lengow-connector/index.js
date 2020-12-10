@@ -126,8 +126,8 @@ Shopware.Module.register('lengow-connector', {
             label: 'Lengow',
             color: '#ff3d58',
             path: 'lengow.connector.dashboard',
-            icon: 'default-shopping-paper-bag-product',
-            position: 100
+            id: 'lengow-connector',
+            parent: 'sw-order',
         }
     ]
 });

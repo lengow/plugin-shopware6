@@ -1,20 +1,6 @@
-<sw-page class="lgw-dashboard-home" :showSearchBar="false">
-    {% block lgw_dashboard_smart_bar_header %}
-        <template #smart-bar-header>
-            {% block lgw_dashboard_smart_bar_header_title %}
-                <h2>
-                    {% block lgw_dashboard_smart_bar_header_title_text %}
-                        {{ $tc('lengow-connector.page.dashboard') }}
-                        <lgw-debug-warning></lgw-debug-warning>
-                        <lgw-update-warning></lgw-update-warning>
-                        <lgw-free-trial-warning></lgw-free-trial-warning>
-                    {% endblock %}
-                </h2>
-            {% endblock %}
-        </template>
-    {% endblock %}
-    {% block lgw_dashboard_content %}
-        <template #content>
+{% block lgw_dashboard_home %}
+    <template>
+        <div class="lgw-dashboard-home">
             <div class="lgw-container">
                 <div class="lgw-row">
                     <div class="lgw-box lgw-dashboard-home-header text-center">
@@ -80,6 +66,6 @@
                 <lgw-footer>
                 </lgw-footer>
             </div>
-        </template>
-    {% endblock %}
-</sw-page>
+        </div>
+    </template>
+{% endblock %}
