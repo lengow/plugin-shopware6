@@ -18,19 +18,19 @@
                 {% block lgw_setting_content_tabs %}
                     <sw-tabs v-if="configLoaded">
                         {% block lgw_toolbox_content_tabs_general %}
-                            <sw-tabs-item title="$tc('lengow-connector.setting.nav_bar.general')"
+                            <sw-tabs-item :title="$tc('lengow-connector.setting.nav_bar.general')"
                                           @click="onChangeSelectedTab('general')">
                                 {{ $tc('lengow-connector.setting.nav_bar.general') }}
                             </sw-tabs-item>
                         {% endblock %}
                         {% block lgw_setting_content_tabs_export %}
-                            <sw-tabs-item title="{{ $tc('lengow-connector.setting.nav_bar.export') }}"
+                            <sw-tabs-item :title="$tc('lengow-connector.setting.nav_bar.export')"
                                           @click="onChangeSelectedTab('export')">
                                 {{ $tc('lengow-connector.setting.nav_bar.export') }}
                             </sw-tabs-item>
                         {% endblock %}
                         {% block lgw_setting_content_tabs_import %}
-                            <sw-tabs-item title="{{ $tc('lengow-connector.setting.nav_bar.import') }}"
+                            <sw-tabs-item :title="$tc('lengow-connector.setting.nav_bar.import')"
                                           @click="onChangeSelectedTab('import')">
                                 {{ $tc('lengow-connector.setting.nav_bar.import') }}
                             </sw-tabs-item>

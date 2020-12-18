@@ -129,11 +129,11 @@
 /src/Resources/app/administration/src/module/lengow-connector/page/lgw-product-list/lgw-product-list.scss|ea10f24f09567b92035644a01f4c7ede
 /src/Resources/app/administration/src/module/lengow-connector/page/lgw-setting/lgw-setting.scss|f15ebf034327c371d576c9b6ec18adcf
 /src/Resources/app/administration/src/module/lengow-connector/page/lgw-setting/index.js|06c1853059b70a419dea392292b64859
-/src/Resources/app/administration/src/module/lengow-connector/page/lgw-setting/lgw-setting.html.twig|1b7669be365a56c5399b59e1b276848f
+/src/Resources/app/administration/src/module/lengow-connector/page/lgw-setting/lgw-setting.html.twig|e3d30845b7e11b7ee1c72fc6e6c4b620
 /src/Resources/app/administration/src/module/lengow-connector/page/lgw-dashboard/index.js|6e54229ff8dc02ba04bc49afcbf98d50
 /src/Resources/app/administration/src/module/lengow-connector/page/lgw-dashboard/lgw-dashboard.html.twig|97164d1add7005e0ed944d52d1c07b2e
 /src/Resources/app/administration/src/module/lengow-connector/page/lgw-toolbox/lgw-toolbox.scss|d0a2377b5805f87c64fd7fdc0f5f81bf
-/src/Resources/app/administration/src/module/lengow-connector/page/lgw-toolbox/lgw-toolbox.html.twig|e807c5a22e3e1e054b942396b65b151c
+/src/Resources/app/administration/src/module/lengow-connector/page/lgw-toolbox/lgw-toolbox.html.twig|36493529c2fb7746534c8cc1ffde9cdc
 /src/Resources/app/administration/src/module/lengow-connector/page/lgw-toolbox/index.js|8a842f4d8e48959d3583decbc38f06a7
 /src/Resources/app/administration/src/module/lengow-connector/page/lgw-toolbox/state.js|2d06db34fc3159c387761a97d3c5d3ff
 /src/Resources/app/administration/src/module/lengow-connector/snippet/en-GB.json|5a46b72c83869b3f91edef885c9b93b0
