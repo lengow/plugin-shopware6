@@ -77,7 +77,7 @@ en:
         filter:
           active_filter_label: "Active / Inactive"
           stock_filter_label: "With stock / Without stock"
-          search_filter_label: "Search by id / name / reference"
+          search_filter_label: "Search by id / name / product number"
         column:
           active_in_lengow: "Active in Lengow"
       order:

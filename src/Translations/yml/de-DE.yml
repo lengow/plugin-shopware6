@@ -77,7 +77,7 @@ de:
         filter:
           active_filter_label: "Aktiv / Inaktiv"
           stock_filter_label: "Mit Lager / Ohne Lager"
-          search_filter_label: "Suche nach ID / Name / Referenz"
+          search_filter_label: "Suche nach ID / Name / Produktnummer"
         column:
           active_in_lengow: "In Lengow aktiv"
       order:

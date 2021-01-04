@@ -362,7 +362,9 @@ class LengowImport
                         );
                     }
                     if ($totalOrders <= 0 && $this->importOneOrder) {
-                        throw new LengowException('lengow_log.error.order_not_found');
+                        throw new LengowException(
+                            $this->lengowLog->encodeMessage('lengow_log.error.order_not_found')
+                        );
                     }
                     if ($totalOrders <= 0) {
                         continue;

@@ -88,7 +88,7 @@
             "filter": {
                 "active_filter_label": "Actif \/ Inactif",
                 "stock_filter_label": "Avec stock \/ Sans stock",
-                "search_filter_label": "Recherche par id \/ nom \/ reference"
+                "search_filter_label": "Recherche par id \/ nom \/ référence produit"
             },
             "column": {
                 "active_in_lengow": "Actif dans Lengow"

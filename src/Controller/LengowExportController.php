@@ -45,7 +45,9 @@ class LengowExportController extends AbstractController
     {
         if ($request->get('salesChannelId')) {
             $salesChannelId = $request->get('salesChannelId');
-            $this->lengowExport->init($salesChannelId);
+            $this->lengowExport->init([
+                'sales_channel_id' => $salesChannelId,
+            ]);
             $response = [
                 'success' => true,
                 'total' => $this->lengowExport->getTotalProduct(),
@@ -69,7 +71,10 @@ class LengowExportController extends AbstractController
     public function getProductCount(Request $request) : JsonResponse
     {
         if ($request->get('productId') && $request->get('salesChannelId')) {
-            $this->lengowExport->init($request->get('salesChannelId'));
+            $salesChannelId = $request->get('salesChannelId');
+            $this->lengowExport->init([
+                'sales_channel_id' => $salesChannelId,
+            ]);
             $response = [
                 'success' => true,
                 'countValue' => count($this->lengowExport->getSelectionProductIdsExport([$request->get('productId')])),
@@ -95,10 +100,13 @@ class LengowExportController extends AbstractController
     public function getProductList(Request $request) : JsonResponse
     {
         if ($request->get('salesChannelId')) {
-            $this->lengowExport->init($request->get('salesChannelId'));
+            $salesChannelId = $request->get('salesChannelId');
+            $this->lengowExport->init([
+                'sales_channel_id' => $salesChannelId,
+            ]);
             $response = [
                 'success' => true,
-                'productList' => $this->lengowExport->getAllProductIdForSalesChannel($request->get('salesChannelId')),
+                'productList' => $this->lengowExport->getAllProductIdForSalesChannel(),
             ];
         } else {
             $response = [

@@ -153,7 +153,9 @@ class LengowToolbox
         }
         foreach ($salesChannels as $salesChannel) {
             $salesChannelId = $salesChannel->getId();
-            $this->lengowExport->init($salesChannelId);
+            $this->lengowExport->init([
+                'sales_channel_id' => $salesChannelId,
+            ]);
             $lastExport = $this->lengowConfiguration->get(LengowConfiguration::LENGOW_LAST_EXPORT, $salesChannelId);
             $exportData[] = [
                 'shop_id' => $salesChannelId,

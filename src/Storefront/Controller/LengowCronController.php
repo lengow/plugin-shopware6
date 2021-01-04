@@ -143,6 +143,20 @@ class LengowCronController extends LengowAbstractFrontController
 
     /**
      * Get all parameters from request
+     * List params
+     * string sync                Number of products exported
+     * bool   debug_mode          Activate debug mode
+     * bool   log_output          See logs (1) or not (0)
+     * int    days                Import period
+     * string created_from        import of orders since
+     * string created_to          import of orders until
+     * int    limit               Number of orders to import
+     * string marketplace_sku     Lengow marketplace order id to import
+     * string marketplace_name    Lengow marketplace name to import
+     * int    sales_channel_id    Sales channel id to import
+     * int    delivery_address_id Lengow delivery address id to import
+     * bool   get_sync            See synchronisation parameters in json format (1) or not (0)
+     * bool   force               Force synchronisation (1) or not (0)
      *
      * @param Request $request Http request
      *

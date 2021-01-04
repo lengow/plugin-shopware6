@@ -455,8 +455,11 @@ class LengowProduct
                 case LengowExport::$defaultFields['variation']:
                     $productData[$headerField] = $this->getVariationPropertiesNames($product);
                     break;
-                case LengowExport::$defaultFields['language']:;
-                        if ($language && $language->getTranslationCode() && $language->getTranslationCode()->getCode()) {
+                case LengowExport::$defaultFields['language']:
+                        if ($language
+                            && $language->getTranslationCode()
+                            && $language->getTranslationCode()->getCode()
+                        ) {
                             $productData[$headerField] = $language->getTranslationCode()->getCode();
                         } else {
                             $productData[$headerField] = '';
@@ -564,6 +567,7 @@ class LengowProduct
         bool $isChild = false,
         ProductEntity $parent = null
     ): string {
+        // TODO get translation for a specific language > use product_translation table
         $value = $product->getTranslated()[$translatedName] ?? $product->{self::LINK[$headerField]}();
         if (!$value && $parent && $isChild) {
             $value = $parent->getTranslated()[$translatedName] ?? $parent->{self::LINK[$headerField]}();

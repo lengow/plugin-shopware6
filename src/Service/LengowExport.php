@@ -3,15 +3,21 @@
 namespace Lengow\Connector\Service;
 
 use \Exception;
-use Shopware\Core\Framework\Context;
-use Shopware\Core\Framework\DataAbstractionLayer\EntityRepositoryInterface;
-use Shopware\Core\Framework\DataAbstractionLayer\Search\Criteria;
-use Shopware\Core\System\Currency\CurrencyEntity;
+use Shopware\Core\Checkout\Shipping\ShippingMethodEntity;
 use Shopware\Core\Content\Product\ProductEntity;
 use Shopware\Core\Content\Product\ProductCollection;
-use Shopware\Core\Checkout\Shipping\ShippingMethodEntity;
+use Shopware\Core\Framework\Context;
+use Shopware\Core\Framework\DataAbstractionLayer\EntityCollection;
+use Shopware\Core\Framework\DataAbstractionLayer\EntityRepositoryInterface;
+use Shopware\Core\Framework\DataAbstractionLayer\Search\Criteria;
 use Shopware\Core\Framework\DataAbstractionLayer\Search\Filter\EqualsFilter;
 use Shopware\Core\Framework\DataAbstractionLayer\Search\Filter\ContainsFilter;
+use Shopware\Core\Framework\Uuid\Uuid;
+use Shopware\Core\System\Currency\CurrencyEntity;
+use Shopware\Core\System\Language\LanguageCollection;
+use Shopware\Core\System\Language\LanguageEntity;
+use Shopware\Core\System\SalesChannel\SalesChannelCollection;
+use Shopware\Core\System\SalesChannel\SalesChannelEntity;
 use Lengow\Connector\Exception\LengowException;
 
 /**
@@ -20,6 +26,16 @@ use Lengow\Connector\Exception\LengowException;
  */
 class LengowExport
 {
+    /**
+     * @var string manual export type
+     */
+    public const TYPE_MANUAL = 'manual';
+
+    /**
+     * @var string cron export type
+     */
+    public const TYPE_CRON = 'cron';
+
     /**
      * @var LengowConfiguration Lengow configuration service
      */
@@ -86,6 +102,28 @@ class LengowExport
     private $lengowLog;
 
     /**
+     * @var array all available params for export
+     */
+    public static $exportParams = [
+        'mode',
+        'format',
+        'stream',
+        'offset',
+        'limit',
+        'selection',
+        'out_of_stock',
+        'product_ids',
+        'variation',
+        'inactive',
+        'sales_channel_id',
+        'currency',
+        //'language',
+        'log_output',
+        'update_export_date',
+        'get_params',
+    ];
+
+    /**
      * @var array default fields
      */
     public static $defaultFields = [
@@ -138,14 +176,17 @@ class LengowExport
     ];
 
     /**
-     * all export configuration parameters :
-     * @var array [
-     *  bool 'selection'
-     *  bool 'out_of_stock'
-     *  bool 'variation'
-     *  bool 'inactive'
-     *  string 'product_ids'
-     * ]
+     * @var SalesChannelEntity Shopware sales channel entity
+     */
+    private $salesChannel;
+
+    /**
+     * @var bool see log or not
+     */
+    private $logOutput = false;
+
+    /**
+     * @var array all export configuration parameters
      */
     private $exportConfiguration;
 
@@ -210,125 +251,74 @@ class LengowExport
     /**
      * Init LengowExport class
      *
-     * @param string $salesChannelId
-     * @param array|null $exportArgs
+     * @param array $params optional options
+     * List params
+     * string format           Export Format (csv|yaml|xml|json)
+     * bool   stream           Display file when call script (1) | Save File (0)
+     * int    offset           From what product export
+     * int    limit            The number of product to be exported
+     * bool   selection        Export selected product (1) | Export all products (0)
+     * bool   out_of_stock     Export product in stock and out stock (1) | Export Only in stock product (0)
+     * bool   inactive         Export disabled products (1) | Export only enabled products (0)
+     * bool   variation        Export product variations (1) | Export only parent product (0)
+     * string product_ids      Ids product to export
+     * int    sales_channel_id Id of sales channel
+     * string currency         Currency for export
+     * bool   log_output       See logs (only when stream = 0) (1) | no logs (0)
      */
-    public function init(string $salesChannelId, array $exportArgs = null): void
+    public function init(array $params = []): void
     {
-        if ($exportArgs) {
-            $this->getParamsInit($exportArgs);
-        } elseif ($salesChannelId) {
-            $this->standaloneInit($salesChannelId);
-        }
-    }
-
-    /**
-     * Init export service only using module configuration
-     *
-     * @param string $salesChannelId sales channel id
-     */
-    public function standaloneInit(string $salesChannelId) : void
-    {
-        $this->exportConfiguration['log_output'] = false;
-        $this->exportConfiguration['stream'] = false;
-        $this->exportConfiguration = array_merge($this->exportConfiguration, [
-            'sales_channel_id' => $salesChannelId,
-            'out_of_stock' => $this->lengowConfiguration->get(
-                    LengowConfiguration::LENGOW_EXPORT_OUT_OF_STOCK_ENABLED,
-                    $salesChannelId
-                ) ?? false,
-            'variation' => $this->lengowConfiguration->get(
-                    LengowConfiguration::LENGOW_EXPORT_VARIATION_ENABLED,
-                    $salesChannelId
-                ) ?? true,
-            'inactive' => $this->lengowConfiguration->get(
-                    LengowConfiguration::LENGOW_EXPORT_DISABLED_PRODUCT,
-                    $salesChannelId
-                ) ?? false,
-            'selection' =>  $this->lengowConfiguration->get(
+        $salesChannelId = $params['sales_channel_id'] ?? '';
+        $this->salesChannel = $this->getExportSalesChannel($salesChannelId);
+        $stream = $params['stream'] ?? true;
+        $this->logOutput = $stream ? false : ($params['log_output'] ?? false);
+        $updateExportDate = $params['update_export_date'] ?? true;
+        $this->exportConfiguration = [
+            'format' => $this->setFormat($params['format'] ?? ''),
+            'stream' => $stream,
+            'type' => $updateExportDate ? self::TYPE_CRON : self::TYPE_MANUAL,
+            'update_export_date' => $updateExportDate,
+            'offset' => $params['offset'] ?? 0,
+            'limit' => $params['limit'] ?? 0,
+            'selection' => $params['selection'] ?? $this->lengowConfiguration->get(
                     LengowConfiguration::LENGOW_EXPORT_SELECTION_ENABLED,
                     $salesChannelId
-                ) ?? false,
-            'product_ids' => '',
-            'offset' => 0,
-            'limit' => 0,
-            'format' => LengowFeed::FORMAT_CSV,
-            'currency' => null,
-        ]);
-    }
-
-    /**
-     * Init export service using export get params
-     *
-     * @param array $exportArgs export get params
-     */
-    public function getParamsInit(array $exportArgs) : void
-    {
-        $this->exportConfiguration['log_output'] = $exportArgs['log_output'] ?? false;
-        $this->exportConfiguration['stream'] = $exportArgs['log_output'] ?? false;
-        $this->exportConfiguration = array_merge($this->exportConfiguration, [
-            'selection' => $exportArgs['selection'],
-            'out_of_stock' => $exportArgs['out_of_stock'] ?? false,
-            'variation' => $exportArgs['variation'] ?? true,
-            'inactive' => $exportArgs['inactive'] ?? false,
-            'format' => $this->validateFormat($exportArgs['format'] ?? ''),
-            'product_ids' => $exportArgs['product_ids'] ?? '',
-            'sales_channel_id' => $exportArgs['sales_channel_id'],
-            'offset' => $exportArgs['offset'] ?? 0,
-            'limit' => $exportArgs['limit'] ?? 0,
-            'currency' => $exportArgs['currency'] ?? null,
-        ]);
-    }
-
-    /**
-     * Validate requested format
-     *
-     * @param string $format requested format
-     *
-     * @return string
-     */
-    private function validateFormat(string $format): string
-    {
-        if ($format && in_array($format, LengowFeed::$availableFormats, true)) {
-            return $format;
-        }
-        $this->lengowLog->write(
-            LengowLog::CODE_EXPORT,
-            $this->lengowLog->encodeMessage('log.export.default_format_used', [
-                'format_name' => LengowFeed::FORMAT_CSV,
-            ]),
-            $this->exportConfiguration['log_output']
-        );
-        return LengowFeed::FORMAT_CSV;
+                ),
+            'out_of_stock' => $params['out_of_stock'] ?? $this->lengowConfiguration->get(
+                    LengowConfiguration::LENGOW_EXPORT_OUT_OF_STOCK_ENABLED,
+                    $salesChannelId
+                ),
+            'inactive' => $params['inactive'] ?? $this->lengowConfiguration->get(
+                    LengowConfiguration::LENGOW_EXPORT_DISABLED_PRODUCT,
+                    $salesChannelId
+                ),
+            'variation' => $params['variation'] ?? $this->lengowConfiguration->get(
+                    LengowConfiguration::LENGOW_EXPORT_VARIATION_ENABLED,
+                    $salesChannelId
+                ),
+            'product_ids' => $this->setProductIds($params['product_ids'] ?? false),
+            'currency' => $params['currency'] ?? null,
+        ];
     }
 
     /**
      * Get total export size
      *
-     * @param string|null $salesChannelId sales channel id to count
-     *
      * @return int total export number
      */
-    public function getTotalProduct(string $salesChannelId = null): int
+    public function getTotalProduct(): int
     {
-        if (!$salesChannelId && $this->exportConfiguration['sales_channel_id']) {
-            $salesChannelId = $this->exportConfiguration['sales_channel_id'];
-        }
-        $categoryEntryPoint = $this->getCategoryEntryPoint($salesChannelId);
-        $masterCategoryId = $this->getMasterCategory($categoryEntryPoint);
-        if (!$masterCategoryId) {
+        $categoryCollection = $this->getSalesChannelCategoryCollection();
+        if ($categoryCollection === null) {
             return 0;
         }
-        $categoryCriteria = new Criteria();
-        $categoryCriteria->addFilter(new ContainsFilter('path', $masterCategoryId))->addAssociation('products');
-        $categoryCollection = $this->categoryRepository->search($categoryCriteria, Context::createDefaultContext());
         $parentProductCounter = 0;
         $childProductCounter = 0;
         foreach ($categoryCollection as $category) {
             foreach ($category->getProducts() as $product) {
                 if ($product->getParentId() === null) {
                     $parentProductCounter++;
-                    $children = $this->getChild($product);
+                    $children = $this->getChildren($product);
                     $childProductCounter += count($children);
                 }
             }
@@ -347,31 +337,105 @@ class LengowExport
     }
 
     /**
-     * Get all product ID in export (all exportable products) // todo Refacto this method to use Raw sql (performance improvment)
+     * execute export
+     *
+     * @return bool
+     */
+    public function exec(): bool
+    {
+        try {
+            $this->lengowLog->write(
+                LengowLog::CODE_EXPORT,
+                $this->lengowLog->encodeMessage('log.export.start', [
+                    'type' => $this->exportConfiguration['type'],
+                ]),
+                $this->logOutput
+            );
+            if ($this->salesChannel === null) {
+                throw new LengowException(
+                    $this->lengowLog->encodeMessage('log.export.specify_sales_channel')
+                );
+            }
+            $this->lengowLog->write(
+                LengowLog::CODE_EXPORT,
+                $this->lengowLog->encodeMessage('log.export.start_for_sales_channel', [
+                    'sales_channel_name' => $this->salesChannel->getName(),
+                    'sales_channel_id' => $this->salesChannel->getId(),
+                ]),
+                $this->logOutput
+            );
+            // get fields to export
+            $fields = $this->getHeaderFields();
+            $this->lengowFeed->init(
+                $this->salesChannel->getId(),
+                $this->exportConfiguration['stream'],
+                $this->exportConfiguration['format']
+            );
+            // write headers
+            $this->lengowFeed->write(LengowFeed::HEADER, $fields);
+            // write body
+            $this->writeFieldsData($fields);
+            // write footer
+            if (!$this->lengowFeed->end()) {
+                throw new LengowException(
+                    $this->lengowLog->encodeMessage('log.export.error_folder_not_created_or_writable')
+                );
+            }
+            if (!$this->exportConfiguration['stream']) {
+                $this->lengowLog->write(
+                    LengowLog::CODE_EXPORT,
+                    $this->lengowLog->encodeMessage('log.export.generate_feed_available_here', [
+                        'sales_channel_name' => $this->salesChannel->getName(),
+                        'link_file_export' => $this->lengowFeed->getExportFilePath(),
+                    ]),
+                    $this->logOutput
+                );
+            }
+            if ($this->exportConfiguration['update_export_date']) {
+                $this->lengowConfiguration->set('lengowLastExport', (string) time(), $this->salesChannel->getId());
+            }
+            $this->lengowLog->write(
+                LengowLog::CODE_EXPORT,
+                $this->lengowLog->encodeMessage('log.export.end', [
+                    'type' => $this->exportConfiguration['type'],
+                ]),
+                $this->logOutput
+            );
+            return true;
+        } catch (LengowException $e) {
+            $errorMessage = $e->getMessage();
+        } catch (Exception $e) {
+            $errorMessage = '[Shopware error]: "' . $e->getMessage() . '" ' . $e->getFile() . ' | ' . $e->getLine();
+        }
+        if (isset($errorMessage)) {
+            $decodedMessage = $this->lengowLog->decodeMessage($errorMessage, LengowTranslation::DEFAULT_ISO_CODE);
+            $this->lengowLog->write(
+                LengowLog::CODE_EXPORT,
+                $this->lengowLog->encodeMessage('log.export.export_failed', [
+                    'decoded_message' => $decodedMessage,
+                ]),
+                $this->logOutput
+            );
+            return false;
+        }
+    }
+
+    /**
+     * Get all product ID in export (all exportable products) // todo change this method to use Raw sql
      *
      * @return array products ids
      */
-    public function getProductIdsExport() : array
+    public function getProductIdsExport(): array
     {
-        $salesChannelId = $this->exportConfiguration['sales_channel_id'];
         // if selection is activated or product_ids get argument is used
-        if ($this->exportConfiguration['selection'] || $this->exportConfiguration['product_ids']) {
-            return $this->getSelectionProductIdsExport($this->getLengowProductIdsToExport($salesChannelId));
+        if ($this->exportConfiguration['selection'] || !empty($this->exportConfiguration['product_ids'])) {
+            return $this->getSelectionProductIdsExport($this->getLengowProductIdsToExport());
         }
-        // else retrieve all products for saleChannelId
-        $categoryEntryPoint = $this->getCategoryEntryPoint($salesChannelId);
-        $masterCategoryId = $this->getMasterCategory($categoryEntryPoint);
-        if (!$masterCategoryId) {
-            $this->lengowLog->write(
-                LengowLog::CODE_EXPORT,
-                $this->lengowLog->encodeMessage('log.export.category_not_found'),
-                $this->exportConfiguration['log_output']
-            );
+        // else retrieve all products for sales channel
+        $categoryCollection = $this->getSalesChannelCategoryCollection();
+        if ($categoryCollection === null) {
             return [];
         }
-        $categoryCriteria = new Criteria();
-        $categoryCriteria->addFilter(new ContainsFilter('path', $masterCategoryId))->addAssociation('products');
-        $categoryCollection = $this->categoryRepository->search($categoryCriteria, Context::createDefaultContext());
         $productIdArray = [];
         foreach ($categoryCollection as $category) {
             foreach ($category->getProducts() as $product) {
@@ -380,38 +444,28 @@ class LengowExport
                         $productIdArray[] = $product->getId();
                         $this->parentProductCounter++;
                     }
-                    $children = $this->getChild($product);
-                    $this->childProductCounter += count($this->getExportableChild($children));
-                    $productIdArray = array_merge($productIdArray, $this->getExportableChild($children));
+                    /** @var ProductCollection $children */
+                    $children = $this->getChildren($product);
+                    $exportableChildren = $this->getExportableChildren($children);
+                    $this->childProductCounter += count($exportableChildren);
+                    $productIdArray = array_merge($productIdArray, $exportableChildren);
                 }
             }
         }
-
         return $productIdArray;
     }
 
     /**
-     * retrieve all parent products for saleChannelId
-     *
-     * @param string $salesChannelId
+     * retrieve all parent products for sales channel
      *
      * @return array
      */
-    public function getAllProductIdForSalesChannel(string $salesChannelId) : array
+    public function getAllProductIdForSalesChannel(): array
     {
-        $categoryEntryPoint = $this->getCategoryEntryPoint($salesChannelId);
-        $masterCategoryId = $this->getMasterCategory($categoryEntryPoint);
-        if (!$masterCategoryId) {
-            $this->lengowLog->write(
-                LengowLog::CODE_EXPORT,
-                $this->lengowLog->encodeMessage('log.export.category_not_found'),
-                $this->exportConfiguration['log_output']
-            );
+        $categoryCollection = $this->getSalesChannelCategoryCollection();
+        if ($categoryCollection === null) {
             return [];
         }
-        $categoryCriteria = new Criteria();
-        $categoryCriteria->addFilter(new ContainsFilter('path', $masterCategoryId))->addAssociation('products');
-        $categoryCollection = $this->categoryRepository->search($categoryCriteria, Context::createDefaultContext());
         $productIdArray = [];
         foreach ($categoryCollection as $category) {
             foreach ($category->getProducts() as $product) {
@@ -424,46 +478,13 @@ class LengowExport
     }
 
     /**
-     * Get product id to export if selection or product_ids get argument are active
-     *
-     * @param string $salesChannelId the sales channel id
-     *
-     * @return array
-     */
-    public function getLengowProductIdsToExport(string $salesChannelId) : array
-    {
-        $lengowProductIds = [];
-        if ($this->exportConfiguration['selection']) {
-            $lengowProductCriteria = new Criteria();
-            $lengowProductCriteria->addFilter(new EqualsFilter('salesChannelId', $salesChannelId));
-            $lengowProductArray = $this->lengowProductRepository
-                ->search($lengowProductCriteria, Context::createDefaultContext())
-                ->getEntities()
-                ->getElements();
-            foreach($lengowProductArray as $id => $product) {
-                $lengowProductIds[] = $product->getProductId();
-            }
-            if ($this->exportConfiguration['product_ids']) {
-                // search for specific product ids
-                $lengowProductIds = array_intersect(
-                    $lengowProductIds,
-                    explode(',', $this->exportConfiguration['product_ids'])
-                );
-            }
-        } else if ($this->exportConfiguration['product_ids']) { // search for specific product ids
-            $lengowProductIds = explode(',', $this->exportConfiguration['product_ids']);
-        }
-        return $lengowProductIds;
-    }
-
-    /**
      * Get product to export and order them by parent->children if selection or product_ids get argument are active
      *
      * @param array $productIds product ids
      *
      * @return array
      */
-    public function getSelectionProductIdsExport(array $productIds) : array
+    public function getSelectionProductIdsExport(array $productIds): array
     {
         $selectionProductIdsExport = [];
         if (empty($productIds)) {
@@ -482,15 +503,213 @@ class LengowExport
                     $selectionProductIdsExport[] = $product->getId();
                     $this->parentProductCounter++;
                 }
-                $children = $this->getChild($product);
-                $this->childProductCounter += count($this->getExportableChild($children));
-                $selectionProductIdsExport = array_merge(
-                    $selectionProductIdsExport,
-                    $this->getExportableChild($children)
-                );
+                /** @var ProductCollection $children */
+                $children = $this->getChildren($product);
+                $exportableChildren = $this->getExportableChildren($children);
+                $this->childProductCounter += count($exportableChildren);
+                $selectionProductIdsExport = array_merge($selectionProductIdsExport, $exportableChildren);
             }
         }
         return $selectionProductIdsExport;
+    }
+
+    /**
+     * return json encoded string with all export parameters
+     *
+     * @return mixed All export params with example
+     */
+    public function getExportParams()
+    {
+        $params = [];
+        foreach (self::$exportParams as $param) {
+            switch ($param) {
+                case 'mode':
+                    $authorizedValue = ['size', 'total'];
+                    $type = 'string';
+                    $example = 'size';
+                    break;
+                case 'format':
+                    $authorizedValue = LengowFeed::$availableFormats;
+                    $type = 'string';
+                    $example = LengowFeed::FORMAT_CSV;
+                    break;
+                case 'sales_channel_id':
+                    $authorizedValue = $this->getAllSalesChannelAvailableId();
+                    $type = 'string';
+                    $example = '98432def39fc4624b33213a56b8c944d';
+                    break;
+                case 'currency':
+                    $authorizedValue = $this->getAllCurrenciesAvailable();
+                    $type = 'string';
+                    $example = 'EUR';
+                    break;
+                case 'language':
+                    $authorizedValue = $this->getAllLanguages();
+                    $type = 'string';
+                    $example = 'en-GB';
+                    break;
+                case 'offset':
+                case 'limit':
+                    $authorizedValue = 'all integers';
+                    $type = 'integer';
+                    $example = 100;
+                    break;
+                case 'product_ids':
+                    $authorizedValue = 'all strings';
+                    $type = 'string';
+                    $example = '98432def39fc4624b33213a56b8c944d,98329ef39fc4624b33213r87ds56gh9';
+                    break;
+                default:
+                    $authorizedValue = [0, 1];
+                    $type = 'integer';
+                    $example = 1;
+                    break;
+            }
+            $params[$param] = [
+                'authorized_values' => $authorizedValue,
+                'type' => $type,
+                'example' => $example,
+            ];
+        }
+        return json_encode($params);
+    }
+
+    /**
+     * Get sales channel to init export
+     *
+     * @param string $salesChannelId sales channel id
+     *
+     * @return SalesChannelEntity|null
+     */
+    private function getExportSalesChannel(string $salesChannelId): ?SalesChannelEntity
+    {
+        $context = Context::createDefaultContext();
+        $criteria = new Criteria();
+        // Use a default sales channel if sales channel id is not valid
+        if (Uuid::isValid($salesChannelId)) {
+            $criteria->addFilter(new EqualsFilter('id', $salesChannelId));
+        }
+        $criteria
+            ->addAssociation('currency')
+            ->addAssociation('shippingMethod')
+            ->addAssociation('shippingMethod.prices')
+            ->addAssociation('shippingMethod.prices.rule')
+            ->addAssociation('shippingMethod.prices.rules.shippingMethodPriceCalculations')
+            ->addAssociation('languages')
+            ->addAssociation('languages.translationCode');
+        /** @var SalesChannelCollection $salesChannelCollection */
+        $salesChannelCollection = $this->salesChannelRepository->search($criteria, $context)->getEntities();
+        return $salesChannelCollection->count() > 0 ? $salesChannelCollection->first() : null;
+    }
+
+    /**
+     * Get sales channel language to init export
+     *
+     * @return LanguageEntity|null
+     */
+    private function getExportLanguage(): ?LanguageEntity
+    {
+        $context = Context::createDefaultContext();
+        $criteria = new Criteria();
+        $criteria->setIds([$this->salesChannel->getLanguageId()]);
+        $criteria->addAssociation('translationCode');
+        /** @var LanguageCollection $languageCollection */
+        $languageCollection = $this->languageRepository->search($criteria, $context)->getEntities();
+        return $languageCollection->count() > 0 ? $languageCollection->first() : null;
+    }
+
+    /**
+     * Set format feed to export
+     *
+     * @param string $format requested format
+     *
+     * @return string
+     */
+    private function setFormat(string $format): string
+    {
+        if ($format && in_array($format, LengowFeed::$availableFormats, true)) {
+            return $format;
+        }
+        return LengowFeed::FORMAT_CSV;
+    }
+
+    /**
+     * Set product ids to export
+     *
+     * @param bool|array $productIds product ids to export
+     *
+     * @return array
+     */
+    private function setProductIds($productIds): array
+    {
+        $ids = [];
+        if ($productIds) {
+            $exportedIds = explode(',', $productIds);
+            $ids = array_filter($exportedIds, function($id) {
+                return Uuid::isValid($id);
+            });
+        }
+        return $ids;
+    }
+
+    /**
+     * Get sales channel category collection
+     *
+     * @return EntityCollection|null
+     */
+    private function getSalesChannelCategoryCollection(): ?EntityCollection
+    {
+        $categoryCriteria = new Criteria();
+        if ($this->salesChannel === null) {
+            return null;
+        }
+        $categoryCriteria->setIds([$this->salesChannel->getNavigationCategoryId()]);
+        $categoryArray = $this->categoryRepository
+            ->search($categoryCriteria, Context::createDefaultContext())
+            ->getEntities()
+            ->getElements();
+        if (!isset($categoryArray[array_key_first($categoryArray)])) {
+            $this->lengowLog->write(
+                LengowLog::CODE_EXPORT,
+                $this->lengowLog->encodeMessage('log.export.category_not_found'),
+                $this->logOutput
+            );
+            return null;
+        }
+        $masterCategoryId = (string) $categoryArray[array_key_first($categoryArray)]->getId();
+        $categoryCriteria = new Criteria();
+        $categoryCriteria->addFilter(new ContainsFilter('path', $masterCategoryId))
+            ->addAssociation('products');
+        $categoryCollection = $this->categoryRepository->search($categoryCriteria, Context::createDefaultContext());
+        return $categoryCollection->count() > 0 ? $categoryCollection : null;
+    }
+
+    /**
+     * Get product id to export if selection or product_ids get argument are active
+     *
+     * @return array
+     */
+    private function getLengowProductIdsToExport(): array
+    {
+        $lengowProductIds = [];
+        if ($this->exportConfiguration['selection']) {
+            $lengowProductCriteria = new Criteria();
+            $lengowProductCriteria->addFilter(new EqualsFilter('salesChannelId', $this->salesChannel->getId()));
+            $lengowProductArray = $this->lengowProductRepository
+                ->search($lengowProductCriteria, Context::createDefaultContext())
+                ->getEntities()
+                ->getElements();
+            foreach($lengowProductArray as $id => $product) {
+                $lengowProductIds[] = $product->getProductId();
+            }
+            if ($this->exportConfiguration['product_ids']) {
+                // search for specific product ids
+                $lengowProductIds = array_intersect($lengowProductIds, $this->exportConfiguration['product_ids']);
+            }
+        } else if (!empty($this->exportConfiguration['product_ids'])) { // search for specific product ids
+            $lengowProductIds = $this->exportConfiguration['product_ids'];
+        }
+        return $lengowProductIds;
     }
 
     /**
@@ -500,7 +719,7 @@ class LengowExport
      *
      * @return array
      */
-    public function getExportableChild(ProductCollection $childrenCollection) : array
+    private function getExportableChildren(ProductCollection $childrenCollection): array
     {
         $exportableChildren = [];
         foreach ($childrenCollection as $product) {
@@ -518,182 +737,47 @@ class LengowExport
      *
      * @return bool
      */
-    public function isExportable(ProductEntity $product) : bool
+    private function isExportable(ProductEntity $product): bool
     {
-        return !(!$this->exportConfiguration['variation']
-                || (!$this->exportConfiguration['out_of_stock'] && $product->getAvailableStock() <= 0)
-                || (!$this->exportConfiguration['inactive'] && $product->getActive() !== true)
+        return !(
+            (!$this->exportConfiguration['variation'] && $product->getParentId() !== null)
+            || (!$this->exportConfiguration['out_of_stock'] && $product->getAvailableStock() <= 0)
+            || (!$this->exportConfiguration['inactive'] && $product->getActive() !== true)
         );
     }
 
     /**
-     * Get child id from a parent product
+     * Get children id from a parent product
      *
      * @param ProductEntity $parentProduct the parent product
      *
-     * @return ProductCollection
+     * @return EntityCollection
      */
-    public function getChild(ProductEntity $parentProduct): ProductCollection
+    private function getChildren(ProductEntity $parentProduct): EntityCollection
     {
         $productCriteria = new Criteria();
         $productCriteria->addFilter(new EqualsFilter('parentId', $parentProduct->getId()));
         return $this->productRepository->search($productCriteria, Context::createDefaultContext())->getEntities();
     }
 
-    /**
-     * Get sales channel category entry point
-     *
-     * @param string $salesChannelId sales channel id
-     *
-     * @return string|null
-     */
-    private function getCategoryEntryPoint(string $salesChannelId): ?string
-    {
-        $salesChannelCriteria = new Criteria();
-        $salesChannelCriteria->setIds([$salesChannelId]);
-        $salesChannelArray = $this->salesChannelRepository
-            ->search($salesChannelCriteria, Context::createDefaultContext())
-            ->getEntities()
-            ->getElements();
-        if (isset($salesChannelArray[$salesChannelId])) {
-            $salesChannel = $salesChannelArray[$salesChannelId];
-            return ($salesChannel->getNavigationCategoryId());
-        }
-        return null;
-    }
-
-    /**
-     * Get salesChannel master category
-     *
-     * @param string|null $categoryEntryPoint
-     *
-     * @return string|null
-     */
-    private function getMasterCategory(?string $categoryEntryPoint = null): ?string
-    {
-        if (!$categoryEntryPoint) {
-            return null;
-        }
-        $categoryCriteria = new Criteria();
-        $categoryCriteria->setIds([$categoryEntryPoint]);
-        $categoryArray = $this->categoryRepository
-            ->search($categoryCriteria, Context::createDefaultContext())
-            ->getEntities()
-            ->getElements();
-        if (!isset($categoryArray[array_key_first($categoryArray)])) {
-            return null;
-        }
-        return (string) $categoryArray[array_key_first($categoryArray)]->getId();
-    }
-
-    /**
-     * return json encoded string with all export parameters
-     *
-     * @return mixed All export params with example
-     */
-    public function getExportParams()
-    {
-        $exportParams = [];
-        $exportParams['mode'] = [
-            'Authorized Value' => ['size', 'total'],
-            'type' => 'string',
-            'example' => 'mode=size'
-        ];
-        $exportParams['format'] = [
-            'Authorized Value' => ['csv', 'json'],
-            'type' => 'string',
-            'example' => 'format=csv'
-        ];
-        $exportParams['limit'] = [
-            'Authorized Value' => ['0-999999'],
-            'type' => 'signed integer',
-            'example' => 'limit=100'
-        ];
-        $exportParams['offset'] = [
-            'Authorized Value' => ['0-999999'],
-            'type' => 'signed integer',
-            'example' => 'offset=100'
-        ];
-        $exportParams['product_ids'] = [
-            'Authorized Value' => ['all integers'],
-            'type' => 'integer',
-            'example' => 'product_ids=101,102,103'
-        ];
-        $exportParams['sales_channel_id'] = [
-            'Authorized Value' => [$this->getAllSalesChannelAvailableId()],
-            'type' => 'Binary',
-            'example' => '98432def39fc4624b33213a56b8c944d'
-        ];
-        $exportParams['stream'] = [
-            'Authorized Value' => ['0', '1'],
-            'type' => 'Bool',
-            'example' => 'stream=1'
-        ];
-        $exportParams['out_of_stock'] = [
-            'Authorized Value' => ['0', '1'],
-            'type' => 'Bool',
-            'example' => 'out_of_stock=1'
-        ];
-        $exportParams['variation'] = [
-            'Authorized Value' => ['0', '1'],
-            'type' => 'Bool',
-            'example' => 'variation=1'
-        ];
-        $exportParams['inactive'] = [
-            'Authorized Value' => ['0', '1'],
-            'type' => 'Bool',
-            'example' => 'inactive=1'
-        ];
-        $exportParams['selection'] = [
-            'Authorized Value' => ['0', '1'],
-            'type' => 'Bool',
-            'example' => 'selection=1'
-        ];
-        $exportParams['log_output'] = [
-            'Authorized Value' => ['0', '1'],
-            'type' => 'Bool',
-            'example' => 'log_output=1'
-        ];
-        $exportParams['update_export_date'] = [
-            'Authorized Value' => ['0', '1'],
-            'type' => 'Bool',
-            'example' => 'update_export_date=1'
-        ];
-        $exportParams['currency'] = [
-            'Authorized Value' => [$this->getAllCurrenciesAvailable()],
-            'type' => 'string',
-            'example' => 'currency=EUR'
-        ];
-        $exportParams['language'] = [
-            'Authorized Value' => $this->getAllLanguages(),
-            'type' => 'string',
-            'example' => 'language=english'
-        ];
-        $exportParams['get_params'] = [
-            'Authorized Value' => ['0', '1'],
-            'type' => 'bool',
-            'example' => 'get_params=1'
-        ];
-        return json_encode($exportParams);
-    }
 
     /**
      * Get all sales channels
      *
      * @return array all sales channel ids
      */
-    private function getAllSalesChannelAvailableId() : array
+    private function getAllSalesChannelAvailableId(): array
     {
         $result = $this->salesChannelRepository->search(
             new Criteria(),
             Context::createDefaultContext()
         );
-        $salesChannels = $result->getEntities()->getElements();
-        $ids = [];
-        foreach ($salesChannels as $salesChannel) {
-            $ids[] = $salesChannel->getId();
+        $salesChannelCollection = $result->getEntities()->getElements();
+        $salesChannels = [];
+        foreach ($salesChannelCollection as $salesChannel) {
+            $salesChannels[] = $salesChannel->getId();
         }
-        return $ids;
+        return $salesChannels;
     }
 
     /**
@@ -701,18 +785,18 @@ class LengowExport
      *
      * @return array all available currencies
      */
-    private function getAllCurrenciesAvailable() : array
+    private function getAllCurrenciesAvailable(): array
     {
         $result = $this->currencyRepository->search(
             new Criteria(),
             Context::createDefaultContext()
         );
-        $currencies = $result->getEntities()->getElements();
-        $iso = [];
-        foreach ($currencies as $currency) {
-            $iso[] = $currency->getIsoCode();
+        $currencyCollection = $result->getEntities()->getElements();
+        $currencies = [];
+        foreach ($currencyCollection as $currency) {
+            $currencies[] = $currency->getIsoCode();
         }
-        return $iso;
+        return $currencies;
     }
 
     /**
@@ -720,108 +804,27 @@ class LengowExport
      *
      * @return array
      */
-    private function getAllLanguages() : array
+    private function getAllLanguages(): array
     {
-        $result = $this->languageRepository->search(
-            new Criteria(),
-            Context::createDefaultContext()
-        );
-        $langs = $result->getEntities()->getElements();
+        $criteria = new Criteria();
+        $criteria->addAssociation('translationCode');
+        $result = $this->languageRepository->search($criteria, Context::createDefaultContext());
+        $languageCollection = $result->getEntities()->getElements();
         $languages = [];
-        foreach ($langs as $language) {
-            $languages[] = $language->getName();
+        foreach ($languageCollection as $language) {
+            if ($language->getTranslationCode() && $language->getTranslationCode()->getCode()) {
+                $languages[] = $language->getTranslationCode()->getCode();
+            }
         }
         return $languages;
     }
 
     /**
-     * execute export
-     *
-     * @param string $salesChannelName the sales channel name for logging export
-     * @param array $exportArgs the export arguments to init export
-     *
-     * @return bool
-     */
-    public function exec(string $salesChannelName, array $exportArgs) : bool
-    {
-        try {
-            $this->lengowLog->write(
-                LengowLog::CODE_EXPORT,
-                $this->lengowLog->encodeMessage('log.export.start'),
-                $exportArgs['log_output']
-            );
-            $this->lengowLog->write(
-                LengowLog::CODE_EXPORT,
-                $this->lengowLog->encodeMessage('log.export.start_for_sales_channel', [
-                    'sales_channel_name' => $salesChannelName,
-                    'sales_channel_id' => $exportArgs['sales_channel_id'],
-                ]),
-                $exportArgs['log_output']
-            );
-            // get fields to export
-            $fields = $this->getHeaderFields($exportArgs['sales_channel_id']);
-            $this->lengowFeed->init($exportArgs['sales_channel_id'], $exportArgs['stream'], $exportArgs['format']);
-            // write headers
-            $this->lengowFeed->write(LengowFeed::HEADER, $fields);
-            $this->init($exportArgs['sales_channel_id'], $exportArgs);
-            // write body
-            $this->writeFieldsData($fields);
-            // write footer
-            if (!$this->lengowFeed->end()) {
-                $this->lengowLog->write(
-                    LengowLog::CODE_EXPORT,
-                    $this->lengowLog->encodeMessage('log.export.error_folder_not_created_or_writable'),
-                    $exportArgs['log_output']
-                );
-            } elseif (!$exportArgs['stream']) {
-                $this->lengowLog->write(
-                    LengowLog::CODE_EXPORT,
-                    $this->lengowLog->encodeMessage('log.export.generate_feed_available_here', [
-                        'sales_channel_name' => $salesChannelName,
-                        'link_file_export' => $this->lengowFeed->getExportFilePath(),
-                    ]),
-                    $exportArgs['log_output']
-                );
-            }
-            if ($exportArgs['update_export_date']) {
-                $this->lengowConfiguration->set(
-                    'lengowLastExport',
-                    (string) time(),
-                    $exportArgs['sales_channel_id']
-                );
-            }
-            $this->lengowLog->write(
-                LengowLog::CODE_EXPORT,
-                $this->lengowLog->encodeMessage('log.export.end'),
-                $exportArgs['log_output']
-            );
-            return true;
-        } catch (LengowException $e) {
-            $errorMessage = $e->getMessage();
-        } catch (Exception $e) {
-            $errorMessage = '[Shopware error]: "' . $e->getMessage() . '" ' . $e->getFile() . ' | ' . $e->getLine();
-        }
-        if (isset($errorMessage)) {
-            $decodedMessage = $this->lengowLog->decodeMessage($errorMessage, LengowTranslation::DEFAULT_ISO_CODE);
-            $this->lengowLog->write(
-                LengowLog::CODE_EXPORT,
-                $this->lengowLog->encodeMessage('log.export.export_failed', [
-                    'decoded_message' => $decodedMessage,
-                ]),
-                $exportArgs['log_output']
-            );
-            return false;
-        }
-    }
-
-    /**
      * Get all field's headers
-     *
-     * @param string $salesChannelId sales channel id
      *
      * @return array
      */
-    private function getHeaderFields(string $salesChannelId) : array
+    private function getHeaderFields(): array
     {
         $fields = [];
         foreach (self::$defaultFields as $key => $value) {
@@ -830,7 +833,7 @@ class LengowExport
         $fields = array_merge(
             $fields,
             $this->getAllCustomHeaderField(),
-            $this->getAllPropertiesHeaderField($salesChannelId)
+            $this->getAllPropertiesHeaderField()
         );
         return $fields;
     }
@@ -838,42 +841,23 @@ class LengowExport
     /**
      * @param array $headerFields all header field
      *
+     * @throws LengowException
+     *
      * @return bool
      */
-    public function writeFieldsData(array $headerFields) : bool
+    private function writeFieldsData(array $headerFields): bool
     {
         $numberOfProducts = $displayedProducts = 0;
-        $language = null;
-        $salesChannelCriteria = new Criteria();
-        $salesChannelCriteria
-            ->addFilter(new EqualsFilter('id', $this->exportConfiguration['sales_channel_id']))
-            ->addAssociation('currency')
-            ->addAssociation('shippingMethod')
-            ->addAssociation('shippingMethod.prices')
-            ->addAssociation('languages')
-            ->addAssociation('languages.translationCode');
-        $result = $this->salesChannelRepository->search(
-            $salesChannelCriteria,
-            Context::createDefaultContext()
-        );
-        if (($result->getEntities()->count() > 0) && $result->getEntities()->first()->getLanguages()->count() > 0) {
-            $language = $result->getEntities()->first()->getLanguages()->first();
-        }
-        // get currency and shipping method for export
-        $currency = $this->getExportCurrency(
-            $this->exportConfiguration['sales_channel_id'],
-            $this->exportConfiguration['currency']
-        );
-        $shippingMethod = $this->getExportShippingMethod($this->exportConfiguration['sales_channel_id']);
-        if ($currency === null || $shippingMethod === null) {
-            $this->lengowLog->write(
-                LengowLog::CODE_EXPORT,
-                $this->lengowLog->encodeMessage('log.export.specify_shipping_and_currency', [
-                    'sales_channel_name' => $result->getName(),
-                ]),
-                $this->exportConfiguration['log_output']
+        // get language, currency and shipping method for export
+        $language = $this->getExportLanguage(); // TODO add GET parameter language for translations
+        $currency = $this->getExportCurrency($this->exportConfiguration['currency']);
+        $shippingMethod = $this->getExportShippingMethod();
+        if ($language === null || $currency === null || $shippingMethod === null) {
+            throw new LengowException(
+                $this->lengowLog->encodeMessage('log.export.specify_language_shipping_and_currency', [
+                    'sales_channel_name' => $this->salesChannel->getName(),
+                ])
             );
-            return false;
         }
         $isFirst = true;
         $this->lengowLog->write(
@@ -881,7 +865,7 @@ class LengowExport
             $this->lengowLog->encodeMessage('log.export.memory_usage', [
                 'memory' => round(memory_get_usage() / 1000000, 2),
             ]),
-            $this->exportConfiguration['log_output']
+            $this->logOutput
         );
         $productIds = $this->getProductIdsExport();
         $this->lengowLog->write(
@@ -891,7 +875,7 @@ class LengowExport
                 'nb_products_children' => $this->childProductCounter,
                 'nb_products_parent' => $this->parentProductCounter,
             ]),
-            $this->exportConfiguration['log_output']
+            $this->logOutput
         );
         foreach ($productIds as $productId) {
             // if offset specified in params
@@ -923,7 +907,7 @@ class LengowExport
                     $this->lengowLog->encodeMessage('log.export.count_product', [
                         'nb_products' => $displayedProducts,
                     ]),
-                    $this->exportConfiguration['log_output']
+                    $this->logOutput
                 );
             }
             gc_collect_cycles();
@@ -931,9 +915,9 @@ class LengowExport
         $this->lengowLog->write(
             LengowLog::CODE_EXPORT,
             $this->lengowLog->encodeMessage('log.export.memory_usage', [
-                'memory' => round(memory_get_usage() / 1000000, 2)
+                'memory' => round(memory_get_usage() / 1000000, 2),
             ]),
-            $this->exportConfiguration['log_output']
+            $this->logOutput
         );
         return true;
     }
@@ -941,12 +925,11 @@ class LengowExport
     /**
      * Get export currency
      *
-     * @param string $salesChannelId the sales channel id
      * @param null $currencyIso search for a specific currency
      *
      * @return CurrencyEntity|null
      */
-    public function getExportCurrency(string $salesChannelId, $currencyIso = null) : ?CurrencyEntity
+    private function getExportCurrency($currencyIso = null): ?CurrencyEntity
     {
         // if currency is specified, check if it exist and retrieve it
         if ($currencyIso) {
@@ -962,28 +945,21 @@ class LengowExport
                     $this->lengowLog->encodeMessage('log.export.currency_used', [
                         'currency_name' => $currenciesCollection->first()->getIsoCode(),
                     ]),
-                    $this->exportConfiguration['log_output']
+                    $this->logOutput
                 );
                 return $currenciesCollection->first();
             }
         }
         // if no currency specified, get sales channel's default one
-        $salesChannelCriteria = new Criteria();
-        $salesChannelCriteria->addFilter(new EqualsFilter('id', $salesChannelId))
-            ->addAssociation('currency');
-        $result = $this->salesChannelRepository->search(
-            $salesChannelCriteria,
-            Context::createDefaultContext()
-        );
-        if ($result->getEntities()->count() > 0 && $result->getEntities()->first()->getCurrency()) {
+        if ($this->salesChannel->getCurrency()) {
             $this->lengowLog->write(
                 LengowLog::CODE_EXPORT,
                 $this->lengowLog->encodeMessage('log.export.default_currency_used', [
-                    'currency_name' => $result->getEntities()->first()->getCurrency()->getIsoCode(),
+                    'currency_name' => $this->salesChannel->getCurrency()->getIsoCode(),
                 ]),
-                $this->exportConfiguration['log_output']
+                $this->logOutput
             );
-            return $result->getEntities()->first()->getCurrency();
+            return $this->salesChannel->getCurrency();
         }
         return null;
     }
@@ -991,16 +967,14 @@ class LengowExport
     /**
      * get shipping method to use for export
      *
-     * @param string $salesChannelId the sales channel Id
-     *
      * @return ShippingMethodEntity|null
      */
-    public function getExportShippingMethod(string $salesChannelId) : ?ShippingMethodEntity
+    private function getExportShippingMethod(): ?ShippingMethodEntity
     {
         // get shipping method from lengow configuration
         $shippingMethodId = $this->lengowConfiguration->get(
             LengowConfiguration::LENGOW_EXPORT_DEFAULT_SHIPPING_METHOD,
-            $salesChannelId
+            $this->salesChannel->getId()
         );
         $shippingMethodCriteria = new Criteria();
         $shippingMethodCriteria->addFilter(new EqualsFilter('id', $shippingMethodId))
@@ -1016,30 +990,20 @@ class LengowExport
                 $this->lengowLog->encodeMessage('log.export.shipping_method_used', [
                     'shipping_method_name' => $shippingMethodCollection->first()->getName(),
                 ]),
-                $this->exportConfiguration['log_output']
+                $this->logOutput
             );
             return $shippingMethodCollection->first();
         }
         // if shipping method selected in configuration is not found, use sales channel default one
-        $salesChannelCriteria = new Criteria();
-        $salesChannelCriteria->addFilter(new EqualsFilter('id', $salesChannelId))
-            ->addAssociation('shippingMethod')
-            ->addAssociation('shippingMethod.prices')
-            ->addAssociation('shippingMethod.prices.rules')
-            ->addAssociation('shippingMethod.prices.rules.shippingMethodPriceCalculations');
-        $salesChannelCollection = $this->salesChannelRepository->search(
-            $salesChannelCriteria,
-            Context::createDefaultContext()
-        )->getEntities();
-        if ($salesChannelCollection->count() > 0) {
+        if ($this->salesChannel->getShippingMethod()) {
             $this->lengowLog->write(
                 LengowLog::CODE_EXPORT,
                 $this->lengowLog->encodeMessage('log.export.default_shipping_method_used', [
-                    'shipping_method_name' => $salesChannelCollection->first()->getShippingMethod()->getName()
+                    'shipping_method_name' => $this->salesChannel->getShippingMethod()->getName(),
                 ]),
-                $this->exportConfiguration['log_output']
+                $this->logOutput
             );
-            return $salesChannelCollection->first()->getShippingMethod();
+            return $this->salesChannel->getShippingMethod();
         }
         return null;
     }
@@ -1050,7 +1014,7 @@ class LengowExport
      *
      * @return array
      */
-    private function getAllCustomHeaderField() : array
+    private function getAllCustomHeaderField(): array
     {
         $fields = [];
         $customFieldSetCriteria = new Criteria();
@@ -1069,26 +1033,20 @@ class LengowExport
      * Get all properties fields
      * Format is 'prop'_'fieldName'
      *
-     * @param string $salesChannelId sales channel id
-     *
      * @return array
      */
-    private function getAllPropertiesHeaderField(string $salesChannelId) : array
+    private function getAllPropertiesHeaderField(): array
     {
         $fields = [];
-        $salesChannelCriteria = new Criteria();
-        $salesChannelCriteria->addFilter(new EqualsFilter('id', $salesChannelId));
-        $salesChannel = $this->salesChannelRepository->search($salesChannelCriteria, Context::createDefaultContext());
-        if ($salesChannel->count() > 0) {
-            $languageId = $salesChannel->first()->getLanguageId();
-            $propertyGroupTranslationCriteria = new Criteria();
-            $propertyGroupTranslationCriteria->addFilter(new EqualsFilter('languageId', $languageId));
-            $searchResult = $this->propertyGroupTranslationRepository
-                ->search($propertyGroupTranslationCriteria, Context::createDefaultContext());
-            if ($searchResult->count() > 0) {
-                foreach ($searchResult as $propertiesField) {
-                    $fields[] = 'prop_' . $propertiesField->getName();
-                }
+        // Always use default sales channel language to create properties headers
+        $languageId = $this->salesChannel->getLanguageId();
+        $propertyGroupTranslationCriteria = new Criteria();
+        $propertyGroupTranslationCriteria->addFilter(new EqualsFilter('languageId', $languageId));
+        $searchResult = $this->propertyGroupTranslationRepository
+            ->search($propertyGroupTranslationCriteria, Context::createDefaultContext());
+        if ($searchResult->count() > 0) {
+            foreach ($searchResult as $propertiesField) {
+                $fields[] = 'prop_' . $propertiesField->getName();
             }
         }
         return $fields;

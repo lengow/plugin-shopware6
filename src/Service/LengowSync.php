@@ -182,7 +182,9 @@ class LengowSync
         if ($salesChannels->count() !== 0) {
             foreach ($salesChannels as $salesChannel) {
                 $salesChannelId = $salesChannel->getId();
-                $this->lengowExport->init($salesChannelId);
+                $this->lengowExport->init([
+                    'sales_channel_id' => $salesChannelId,
+                ]);
                 $syncData['shops'][$salesChannelId] = [
                     'token' => $this->lengowConfiguration->getToken($salesChannelId),
                     'shop_name' => $salesChannel->getName(),
@@ -265,7 +267,9 @@ class LengowSync
         if ($salesChannels->count() !== 0) {
             foreach ($salesChannels as $salesChannel) {
                 $salesChannelId = $salesChannel->getId();
-                $this->lengowExport->init($salesChannelId);
+                $this->lengowExport->init([
+                    'sales_channel_id' => $salesChannelId,
+                ]);
                 $data['shops'][] = [
                     'token' => $this->lengowConfiguration->getToken($salesChannelId),
                     'enabled' => $this->lengowConfiguration->salesChannelIsActive($salesChannelId),

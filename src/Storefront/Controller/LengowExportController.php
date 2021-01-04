@@ -69,18 +69,35 @@ class LengowExportController extends LengowAbstractFrontController
             return new Response($accessErrorMessage, Response::HTTP_FORBIDDEN);
         }
         $exportArgs = $this->createGetArgArray($request);
+        $this->lengowExport->init($exportArgs);
         if ($exportArgs['get_params']) {
             return new Response($this->lengowExport->getExportParams());
         }
         if ($exportArgs['mode']) {
-            return new Response($this->modeSize($exportArgs['mode'], $exportArgs['sales_channel_id'] ));
+            return new Response($this->modeSize($exportArgs['mode']));
         }
-        $this->lengowExport->exec($salesChannelName, $exportArgs);
+        $this->lengowExport->exec();
         return new Response();
     }
 
     /**
      * Get all parameters from request
+     * List params
+     * string mode               Number of products exported
+     * string format             Format of exported files ('csv','yaml','xml','json')
+     * bool   stream             Stream file (1) or generate a file on server (0)
+     * int    offset             Offset of total product
+     * int    limit              Limit number of exported product
+     * bool   selection          Export product selection (1) or all products (0)
+     * bool   out_of_stock       Export out of stock product (1) Export only product in stock (0)
+     * bool   inactive           Export inactive product (1) or not (0)
+     * bool   variation          Export product variation (1) or not (0)
+     * string product_ids        List of product id separate with comma (1,2,3)
+     * int    sales_channel_id   Export a specific store with store id
+     * string currency           Convert prices with a specific currency
+     * bool   log_output         See logs (1) or not (0)
+     * bool   update_export_date Change last export date in data base (1) or not (0)
+     * bool   get_params         See export parameters and authorized values in json format (1) or not (0)
      *
      * @param Request $request Http request
      *
@@ -89,41 +106,37 @@ class LengowExportController extends LengowAbstractFrontController
     protected function createGetArgArray(Request $request): array
     {
         return [
-            'sales_channel_id' => $request->query->get('sales_channel_id'),
-            'format' => $request->query->get('format') ?? 'csv',
             'mode' => $request->query->get('mode'),
-            'stream' => $request->query->get('stream') !== '0',
+            'format' => $request->query->get('format'),
+            'stream' => $request->query->get('stream') !== null
+                ? $request->query->get('stream') === '1'
+                : null,
+            'offset' => $request->query->get('offset') !== null ? (int) $request->query->get('offset') : null,
+            'limit' => $request->query->get('limit') !== null ? (int) $request->query->get('limit') : null,
+            'selection' => $request->query->get('selection') !== null
+                ? $request->query->get('selection') === '1'
+                : null,
+            'out_of_stock' => $request->query->get('out_of_stock') !== null
+                ? $request->query->get('out_of_stock') === '1'
+                : null,
+            'variation' => $request->query->get('variation') !== null
+                ? $request->query->get('variation') === '1'
+                : null,
+            'inactive' => $request->query->get('inactive') !== null
+                ? $request->query->get('inactive') === '1'
+                : null,
             'product_ids' => $request->query->get('product_ids'),
-            'limit' => (int) $request->query->get('limit'),
-            'offset' => (int) $request->query->get('offset'),
-            'out_of_stock' => (null !== $request->query->get('out_of_stock'))
-                ? ($request->query->get('out_of_stock') === '1')
-                : $this->lengowConfiguration->get(
-                    LengowConfiguration::LENGOW_EXPORT_OUT_OF_STOCK_ENABLED,
-                    $request->query->get('sales_channel_id')
-                ) ?? false,
-            'variation' => (null !== $request->query->get('variation'))
-                ? ($request->query->get('variation') === '1')
-                : $this->lengowConfiguration->get(
-                    LengowConfiguration::LENGOW_EXPORT_VARIATION_ENABLED,
-                    $request->query->get('sales_channel_id')
-                ) ?? true,
-            'inactive' => (null !== $request->query->get('inactive'))
-                ? ($request->query->get('inactive') === '1')
-                : $this->lengowConfiguration->get(
-                    LengowConfiguration::LENGOW_EXPORT_DISABLED_PRODUCT,
-                    $request->query->get('sales_channel_id')
-                ) ?? false,
-            'selection' => (null !== $request->query->get('selection'))
-                ? ($request->query->get('selection') === '1')
-                : $this->lengowConfiguration->get(
-                    LengowConfiguration::LENGOW_EXPORT_SELECTION_ENABLED,
-                    $request->query->get('sales_channel_id')
-                ) ?? false,
-            'log_output' => $request->query->get('log_output') === '1',
-            'update_export_date' => $request->query->get('update_export_date') === '1',
+            'sales_channel_id' => $request->query->get('sales_channel_id'),
             'currency' => $request->query->get('currency'),
-            'get_params' => $request->query->get('get_params') === '1',
+            'log_output' => $request->query->get('log_output') !== null
+                ? $request->query->get('log_output') === '1'
+                : null,
+            'update_export_date' => $request->query->get('update_export_date') !== null
+                ? $request->query->get('update_export_date') === '1'
+                : null,
+            'get_params' => $request->query->get('get_params') !== null
+                ? $request->query->get('get_params') === '1'
+                : null,
         ];
     }
 
@@ -131,16 +144,15 @@ class LengowExportController extends LengowAbstractFrontController
      * Get mode size
      *
      * @param string $mode size mode
-     * @param string $salesChannelId sales channel id to size
      *
      * @return int
      */
-    protected function modeSize(string $mode, string $salesChannelId): int
+    protected function modeSize(string $mode): int
     {
-        $this->lengowExport->init($salesChannelId);
         if ($mode === 'size') {
             return $this->lengowExport->getTotalExportedProduct();
-        } else if ($mode === 'total') {
+        }
+        if ($mode === 'total') {
             return $this->lengowExport->getTotalProduct();
         }
         return 0;
