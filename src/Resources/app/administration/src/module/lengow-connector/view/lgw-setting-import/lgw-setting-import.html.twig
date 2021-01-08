@@ -82,7 +82,7 @@
                                  v-model="lengowCurrencyConversion"
                                  @change="onSaveSettings($event, 'lengowCurrencyConversion')">
                 </sw-switch-field>
-                {#<sw-help-text class="lgw-help-text"
+                <sw-help-text class="lgw-help-text"
                               :text="$tc('lengow-connector.setting.lengow_import_setting.import_btob.description')"
                               :width="200"
                               tooltipPosition="right"/>
@@ -90,7 +90,7 @@
                                  :label="$tc('lengow-connector.setting.lengow_import_setting.import_btob.label')"
                                  v-model="lengowImportB2b"
                                  @change="onSaveSettings($event, 'lengowImportB2b')">
-                </sw-switch-field>#}
+                </sw-switch-field>
                 <sw-help-text class="lgw-help-text"
                               :text="$tc('lengow-connector.setting.lengow_import_setting.debug_mode.description')"
                               :width="200"

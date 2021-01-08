@@ -13,6 +13,8 @@ use Shopware\Core\Checkout\Cart\Price\QuantityPriceCalculator;
 use Shopware\Core\Checkout\Cart\Price\Struct\CartPrice;
 use Shopware\Core\Checkout\Cart\Price\Struct\QuantityPriceDefinition;
 use Shopware\Core\Checkout\Cart\SalesChannel\CartService;
+use Shopware\Core\Checkout\Cart\Tax\Struct\CalculatedTaxCollection;
+use Shopware\Core\Checkout\Cart\Tax\Struct\TaxRuleCollection;
 use Shopware\Core\Checkout\Customer\CustomerEntity;
 use Shopware\Core\Checkout\Order\Aggregate\OrderDelivery\OrderDeliveryStates;
 use Shopware\Core\Checkout\Order\Aggregate\OrderTransaction\OrderTransactionStates;
@@ -1142,6 +1144,8 @@ class LengowImportOrder
      */
     private function getOrderData(Cart $cart, array $products, SalesChannelContext $salesChannelContext): array
     {
+        // set cart vat mode for taxes
+        $cart = $this->setOrderVatMode($cart);
         // convert cart to order
         $orderData = $this->orderConverter->convertToOrder($cart, $salesChannelContext, new OrderConversionContext());
         // change the price of the product with the price from the marketplace
@@ -1156,6 +1160,34 @@ class LengowImportOrder
         $orderData['orderDateTime'] = $this->getOrderDate();
         $orderData['customerComment'] = $this->getMessage();
         return $orderData;
+    }
+
+    /**
+     * Set cart vat mode (free for b2b, normal for other)
+     *
+     * @param Cart $cart Shopware order cart
+     *
+     * @return Cart
+     */
+    private function setOrderVatMode(Cart $cart): Cart
+    {
+        // if b2b import is activated and order is b2b type : set order as vat free
+        if (isset($this->orderTypes[LengowOrder::TYPE_BUSINESS])
+            && $this->orderTypes[LengowOrder::TYPE_BUSINESS]
+            && $this->lengowConfiguration->get('lengowImportB2b')
+        ) {
+            $cart->setPrice(
+                new CartPrice(
+                    0,
+                    0,
+                    0,
+                    new CalculatedTaxCollection(),
+                    new TaxRuleCollection(),
+                    CartPrice::TAX_STATE_FREE
+                )
+            );
+        }
+        return $cart;
     }
 
     /**
