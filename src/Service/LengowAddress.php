@@ -68,11 +68,6 @@ class LengowAddress
     private $lengowLog;
 
     /**
-     * @var StringCleaner Lengow string cleaner utility
-     */
-    private $stringCleaner;
-
-    /**
      * @var EntityRepositoryInterface Shopware country repository
      */
     private $countryRepository;
@@ -411,7 +406,6 @@ class LengowAddress
      * LengowAddress constructor
      *
      * @param LengowLog $lengowLog Lengow Log service
-     * @param StringCleaner $stringCleaner Lengow string cleaner utility
      * @param EntityRepositoryInterface $countryRepository Shopware country repository
      * @param EntityRepositoryInterface $countryStateRepository Shopware country state repository
      * @param EntityRepositoryInterface $salutationRepository Shopware salutation repository
@@ -419,14 +413,12 @@ class LengowAddress
      */
     public function __construct(
         LengowLog $lengowLog,
-        StringCleaner $stringCleaner,
         EntityRepositoryInterface $countryRepository,
         EntityRepositoryInterface $countryStateRepository,
         EntityRepositoryInterface $salutationRepository
     )
     {
         $this->lengowLog = $lengowLog;
-        $this->stringCleaner = $stringCleaner;
         $this->countryRepository = $countryRepository;
         $this->countryStateRepository = $countryStateRepository;
         $this->salutationRepository = $salutationRepository;
@@ -731,7 +723,7 @@ class LengowAddress
     protected function cleanString(string $string): string
     {
         $string = strtolower(str_replace([' ', '-', '_', '.'], '', trim($string)));
-        return $this->stringCleaner->replaceAccentedChars(html_entity_decode($string));
+        return StringCleaner::replaceAccentedChars(html_entity_decode($string));
     }
 
     /**

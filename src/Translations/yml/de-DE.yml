@@ -57,11 +57,11 @@ de:
         knowledge_link_url: "https://support.lengow.com/kb/guide/de/shopware-6-1KEHaAuucG/Steps/98507"
       legals:
         title: "Rechtshinweise"
-        simplified_company: "Gesellschaft mit einfacher Haftungsbeschränkung"
+        simplified_company: "Vereinfachte Aktiengesellschaft"
         social_capital: "Soziales Kapital:"
         cnil_declaration: "CNIL-Erklärung:"
         company_registration_number: "Firmenregistrierungsnummer (Nantes):"
-        vat_identification_number: "MwSt.-Identifikationsnummer:"
+        vat_identification_number: "Umsatzsteuer-Identifikationsnummer:"
         address: "Adresse"
         contact: "Vertrag"
         hosting: "Hosting"

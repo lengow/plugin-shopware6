@@ -49,13 +49,15 @@ log.export.end|## end %{type} export ##
 log.export.start_for_sales_channel|Start export for sales channel %{sales_channel_name} (%{sales_channel_id})
 log.export.feed_already_launch|feed already launched
 log.export.nb_product_found|%{nb_products} product(s) found
-log.export.currency_used|Currency used for export : %{currency_name}
-log.export.default_currency_used|Requested currency was not found, sales channel default currency used for export : %{currency_name}
-log.export.shipping_method_used|Shipping method used for export : %{shipping_method_name}
-log.export.default_shipping_method_used|Requested shipping method not found, sales channel default shipping method used for export : %{shipping_method_name}
+log.export.language_used|Language used for export: %{language_name}
+log.export.default_language_used|Requested Language was not found, sales channel default language used for export: %{language_name}
+log.export.currency_used|Currency used for export: %{currency_name}
+log.export.default_currency_used|Requested currency was not found, sales channel default currency used for export: %{currency_name}
+log.export.shipping_method_used|Shipping method used for export: %{shipping_method_name}
+log.export.default_shipping_method_used|Requested shipping method not found, sales channel default shipping method used for export: %{shipping_method_name}
 log.export.category_not_found|No main entry point category found for sales channel
 log.export.count_product|%{nb_products} product(s) exported
-log.export.total_product_exported|%{nb_products} product(s) to export, %{nb_products_children} children product(s), %{nb_products_parent} parent product(s)
+log.export.total_product_exported|%{nb_products} product(s) to export, %{nb_products_children} children product(s), %{nb_products_parent} parent product(s) and %{nb_products_simple} simple product(s)
 log.export.export_failed|export failed - %{decoded_message}
 log.export.memory_usage|memory usage: %{memory} Mb
 log.export.execution_time|execution time: %{time} seconds

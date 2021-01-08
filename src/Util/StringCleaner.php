@@ -15,7 +15,7 @@ class StringCleaner
      *
      * @return string
      */
-    public function cleanData(string $str): string
+    public static function cleanData(string $str): string
     {
         $str = preg_replace(
             '/[\x00-\x08\x10\x0B\x0C\x0E-\x19\x7F]
@@ -80,7 +80,7 @@ class StringCleaner
      *
      * @return string
      */
-    public function cleanHtml(string $str): string
+    public static function cleanHtml(string $str): string
     {
         $str = str_replace('<br />', ' ', nl2br($str));
         $str = trim(strip_tags(htmlspecialchars_decode($str)));

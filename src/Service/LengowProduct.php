@@ -2,19 +2,29 @@
 
 namespace Lengow\Connector\Service;
 
-use Shopware\Core\Framework\Context;
-use Shopware\Core\Framework\DataAbstractionLayer\EntityRepositoryInterface;
-use Shopware\Core\Framework\DataAbstractionLayer\Search\Criteria;
-use Shopware\Core\Framework\DataAbstractionLayer\Search\Filter\EqualsFilter;
+use Shopware\Core\Content\Product\Aggregate\ProductMedia\ProductMediaEntity;
+use Shopware\Core\Content\Product\Aggregate\ProductTranslation\ProductTranslationEntity;
 use Shopware\Core\Content\Product\ProductCollection;
 use Shopware\Core\Content\Product\ProductEntity;
+use Shopware\Core\Content\Property\Aggregate\PropertyGroupOption\PropertyGroupOptionCollection;
+use Shopware\Core\Content\Property\Aggregate\PropertyGroupOption\PropertyGroupOptionEntity;
+use Shopware\Core\Content\Property\PropertyGroupEntity;
+use Shopware\Core\Content\Seo\SeoUrl\SeoUrlEntity;
+use Shopware\Core\Checkout\Shipping\Aggregate\ShippingMethodPrice\ShippingMethodPriceEntity;
+use Shopware\Core\Checkout\Shipping\ShippingMethodEntity;
+use Shopware\Core\Defaults;
+use Shopware\Core\Framework\Context;
+use Shopware\Core\Framework\DataAbstractionLayer\EntityRepositoryInterface;
+use Shopware\Core\Framework\DataAbstractionLayer\Pricing\Price;
+use Shopware\Core\Framework\DataAbstractionLayer\Search\Criteria;
+use Shopware\Core\Framework\DataAbstractionLayer\Search\Filter\EqualsFilter;
+use Shopware\Core\Framework\DataAbstractionLayer\Search\Filter\MultiFilter;
+use Shopware\Core\Framework\Uuid\Uuid;
 use Shopware\Core\System\Currency\CurrencyEntity;
 use Shopware\Core\System\Language\LanguageEntity;
-use Shopware\Core\Checkout\Shipping\ShippingMethodEntity;
-use Shopware\Core\Framework\DataAbstractionLayer\Search\Filter\MultiFilter;
-use Shopware\Core\Checkout\Shipping\Aggregate\ShippingMethodPrice\ShippingMethodPriceEntity;
-use Shopware\Core\Framework\Uuid\Uuid;
+use Shopware\Core\System\SalesChannel\SalesChannelEntity;
 use Lengow\Connector\Util\EnvironmentInfoProvider;
+use Lengow\Connector\Util\StringCleaner;
 
 /**
  * Class LengowProduct
@@ -53,14 +63,14 @@ class LengowProduct
     private const PRODUCT_SIZE_UNIT = 'mm';
 
     /**
-     * @var string shipping price range quantity min
+     * @var float shipping price range quantity min
      */
     private const SHIPPING_PRICE_RANGE_MIN = 0;
 
     /**
-     * @var string shipping price range quantity max
+     * @var float shipping price range quantity max
      */
-    private const SHIPPING_PRICE_RANGE_MAX = 100000;
+    private const SHIPPING_PRICE_RANGE_MAX = 10000000000;
 
     /**
      * Callback for shopware ProductEntity getter
@@ -78,6 +88,7 @@ class LengowProduct
         'length' => 'getLength',
         'parent_id' => 'getParentId',
         'status' => 'getActive',
+        'description_short' => 'getMetaDescription',
         'description' => 'getDescription',
         'description_html' => 'getDescription',
         'meta_title' => 'getMetaTitle',
@@ -90,11 +101,6 @@ class LengowProduct
      * @var EntityRepositoryInterface product repository
      */
     private $productRepository;
-
-    /**
-     * @var EntityRepositoryInterface product repository
-     */
-    private $propertyGroupRepository;
 
     /**
      * @var LengowLog Lengow log service
@@ -128,24 +134,101 @@ class LengowProduct
     private $environmentInfoProvider;
 
     /**
+     * @var SalesChannelEntity Shopware sales channel instance
+     */
+    private $salesChannel;
+
+    /**
+     * @var CurrencyEntity Shopware currency instance
+     */
+    private $currency;
+
+    /**
+     * @var LanguageEntity Shopware language instance
+     */
+    private $language;
+
+    /**
+     * @var ShippingMethodEntity Shopware shipping method instance
+     */
+    private $shippingMethod;
+
+    /**
+     * @var string Product type (simple, parent or child)
+     */
+    private $type;
+
+    /**
+     * @var ProductEntity Shopware product instance
+     */
+    private $product;
+
+    /**
+     * @var ProductTranslationEntity Shopware product translation instance
+     */
+    private $translation;
+
+    /**
+     * @var array All product option (only for child)
+     */
+    private $options;
+
+    /**
+     * @var array All product custom fields
+     */
+    private $customFields;
+
+    /**
+     * @var array All product properties
+     */
+    private $properties;
+
+    /**
+     * @var array All product images
+     */
+    private $images;
+
+    /**
+     * @var array All product prices
+     */
+    private $prices;
+
+    /**
+     * @var ProductEntity Shopware product instance
+     */
+    private static $parentProduct;
+
+    /**
+     * @var ProductTranslationEntity Shopware product translation instance
+     */
+    private static $parentTranslation;
+
+    /**
+     * @var array All product parent custom fields
+     */
+    private static $parentCustomFields;
+
+    /**
+     * @var array All product parent properties
+     */
+    private static $parentProperties;
+
+    /**
      * LengowProduct Construct
      *
      * @param EntityRepositoryInterface $productRepository product repository
      * @param LengowLog $lengowLog Lengow log service
      * @param EnvironmentInfoProvider $environmentInfoProvider lengow environmentInfoProvider
-     * @param EntityRepositoryInterface $propertyGroupRepository shopware sales channel context factory
      */
     public function __construct(
         EntityRepositoryInterface $productRepository,
         LengowLog $lengowLog,
-        EnvironmentInfoProvider $environmentInfoProvider,
-        EntityRepositoryInterface $propertyGroupRepository
+        EnvironmentInfoProvider $environmentInfoProvider
     )
     {
         $this->productRepository = $productRepository;
         $this->lengowLog = $lengowLog;
         $this->environmentInfoProvider = $environmentInfoProvider;
-        $this->propertyGroupRepository = $propertyGroupRepository;
     }
 
     /**
@@ -266,137 +349,102 @@ class LengowProduct
     }
 
     /**
-     * Get product to export with right association
+     * Init LengowProduct class
      *
-     * @param string $productId
-     *
-     * @return ProductEntity|null
+     * @param array $params optional options
      */
-    public function getProductForExportById(string $productId) : ?ProductEntity
+    public function init(array $params = []): void
     {
-        $productCriteria = new Criteria();
-        $productCriteria->setIds([$productId])
-            ->addAssociation('categories')
-            ->addAssociation('prices')
-            ->addAssociation('properties')
-            ->addAssociation('manufacturer')
-            ->addAssociation('media')
-            ->addAssociation('productMedia.media')
-            ->addAssociation('options')
-            ->addAssociation('customFields');
-        $productCollection = $this->productRepository->search($productCriteria, Context::createDefaultContext())->getEntities();
-        if ($productCollection->count() < 0) {
-            return null;
+        $this->salesChannel = $params['sales_channel'];
+        $this->language = $params['language'];
+        $this->currency = $params['currency'];
+        $this->shippingMethod = $params['shipping_method'];
+    }
+
+    /**
+     * Load a new product
+     *
+     * @param string $productId Shopware product id
+     * @param string $productType Product type (simple, parent or child)
+     */
+    public function load(string $productId, string $productType): void
+    {
+        $this->type = $productType;
+        $this->product = $this->getProductForExportById($productId);
+        $this->translation = $this->getProductTranslation($this->product);
+        $this->options = $this->getOptionsData();
+        $this->customFields = $this->getCustomFieldData($this->product);
+        $this->properties = $this->getPropertiesData($this->product);
+        if ($this->product && $this->product->getParentId()) {
+            if (!self::$parentProduct || self::$parentProduct->getId() !== $this->product->getParentId()) {
+                self::$parentProduct = $this->getProductForExportById($this->product->getParentId());
+                self::$parentTranslation = $this->getProductTranslation(self::$parentProduct);
+                self::$parentCustomFields = $this->getCustomFieldData(self::$parentProduct);
+                self::$parentProperties = $this->getPropertiesData(self::$parentProduct);
+            }
+        } else {
+            self::$parentProduct = null;
+            self::$parentTranslation = null;
+            self::$parentCustomFields = null;
+            self::$parentProperties = null;
         }
-        return $productCollection->first();
+        $this->images = $this->getImages();
+        $this->prices = $this->getPrices();
     }
 
     /**
      * Get all exportable data from a product
      *
-     * @param string $productId the product Id
      * @param array $headerFields the headers fields
-     * @param CurrencyEntity $currency currency to ise
-     * @param ShippingMethodEntity $shipping shipping method to use
-     * @param LanguageEntity|null $language language to use
      *
      * @return array
      */
-    public function getData(
-        string $productId,
-        array $headerFields,
-        CurrencyEntity $currency,
-        ShippingMethodEntity $shipping,
-        LanguageEntity $language = null
-    ): array {
+    public function getData(array $headerFields): array
+    {
         $productData = [];
-        $isChild = false;
-        static $parent = null;
-        $product = $this->getProductForExportById($productId);
-        // if product is not found
-        if (!$product) {
+        if (!$this->product) {
             return $productData;
-        }
-        // Don't reload parent if it's same from previous item
-        if ($product->getParentId()) {
-            if (!$parent || $parent->getId() !== $product->getParentId()) {
-                $parent = $this->getProductForExportById($product->getParentId());
-            }
-            // if product is child and parent is not found
-            if (!$parent) {
-                return $productData;
-            }
-            $isChild = true;
-        } else {
-            $parent = null;
         }
         foreach ($headerFields as $headerField) {
             switch ($headerField) {
                 case LengowExport::$defaultFields['id']:
-                    $productData[$headerField] = $this->getProductIdentifier($product, $isChild);
+                    $productData[$headerField] = $this->getProductIdentifier();
                     break;
                 case LengowExport::$defaultFields['name']:
-                    $productData[$headerField] = $this->getTranslatedField(
-                        'name',
-                        $product,
-                        $headerField,
-                        $isChild,
-                        $parent
-                    );
+                case LengowExport::$defaultFields['description_short']:
+                case LengowExport::$defaultFields['meta_title']:
+                case LengowExport::$defaultFields['meta_keyword']:
+                    $productData[$headerField] = $this->getTranslatedField($headerField);
                     break;
                 case LengowExport::$defaultFields['description']:
-                    $productData[$headerField] = $this->getDescription($product, $headerField, $isChild, $parent);
+                    $productData[$headerField] = $this->getDescription();
                     break;
                 case LengowExport::$defaultFields['description_html']:
-                    $productData[$headerField] = $this->getDescriptionHtml($product, $headerField, $isChild, $parent);
-                    break;
-                case LengowExport::$defaultFields['meta_title']:
-                    $productData[$headerField] = $this->getTranslatedField(
-                        'metaTitle',
-                        $product,
-                        $headerField,
-                        $isChild,
-                        $parent
-                    );
-                    break;
-                case LengowExport::$defaultFields['meta_keyword']:
-                    $productData[$headerField] = $this->getTranslatedField(
-                        'keywords',
-                        $product,
-                        $headerField,
-                        $isChild,
-                        $parent
-                    );
+                    $productData[$headerField] = $this->getDescription(false);
                     break;
                 case LengowExport::$defaultFields['supplier']:
-                    $productData[$headerField] = $this->getManufacturer($product, $isChild);
+                    $productData[$headerField] = $this->getManufacturer();
                     break;
                 case LengowExport::$defaultFields['url']:
-                    $productData[$headerField] = $this->getProductUrl(
-                        $product,
-                        $this->getTranslatedField(
-                            'name',
-                            $product,
-                            LengowExport::$defaultFields['name'],
-                            $isChild,
-                            $parent
-                        )
-                    );
+                    $productData[$headerField] = $this->getProductUrl();
                     break;
                 case LengowExport::$defaultFields['sku']:
                 case LengowExport::$defaultFields['sku_supplier']:
                 case LengowExport::$defaultFields['ean']:
                 case LengowExport::$defaultFields['quantity']:
                 case LengowExport::$defaultFields['parent_id']:
-                case LengowExport::$defaultFields['status']:
                 case LengowExport::$defaultFields['minimal_quantity']:
-                    $productData[$headerField] = $this->getUntranslatedField($product, $headerField, $isChild, $parent);
+                    $productData[$headerField] = $this->getUntranslatedField($headerField);
+                    break;
+                case LengowExport::$defaultFields['status']:
+                    $value = $this->getUntranslatedField($headerField);
+                    $productData[$headerField] = $value === '1' ? 'Enabled' : 'Disabled';
                     break;
                 case LengowExport::$defaultFields['weight']:
                 case LengowExport::$defaultFields['width']:
                 case LengowExport::$defaultFields['height']:
                 case LengowExport::$defaultFields['length']:
-                    $productData[$headerField] = $this->getSizeField($product, $headerField, $isChild, $parent);
+                    $productData[$headerField] = $this->getSizeField($headerField);
                     break;
                 case LengowExport::$defaultFields['size_unit']:
                     $productData[$headerField] = self::PRODUCT_SIZE_UNIT;
@@ -405,68 +453,61 @@ class LengowProduct
                     $productData[$headerField] = self::PRODUCT_WEIGHT_UNIT;
                     break;
                 case LengowExport::$defaultFields['category']:
-                    $productData[$headerField] = $this->getProductCategory($product, $isChild, $parent);
+                    $productData[$headerField] = $this->getProductCategory($this->product, self::$parentProduct);
                     break;
                 case LengowExport::$defaultFields['price_excl_tax']:
                 case LengowExport::$defaultFields['price_incl_tax']:
                 case LengowExport::$defaultFields['price_before_discount_excl_tax']:
                 case LengowExport::$defaultFields['price_before_discount_incl_tax']:
-                    $productData[$headerField] = $this->getCalculatedPrice(
-                        $product,
-                        $headerField,
-                        $currency,
-                        $isChild,
-                        $parent
-                    );
+                case LengowExport::$defaultFields['discount_amount']:
+                case LengowExport::$defaultFields['discount_percent']:
+                case LengowExport::$defaultFields['discount_start_date']:
+                case LengowExport::$defaultFields['discount_end_date']:
+                    $productData[$headerField] = $this->prices[$headerField];
                     break;
                 case LengowExport::$defaultFields['currency']:
-                    $productData[$headerField] = $currency->getIsoCode();
+                    $productData[$headerField] = $this->currency->getIsoCode();
+                    break;
+                case LengowExport::$defaultFields['shipping_method']:
+                    $productData[$headerField] = StringCleaner::cleanData((string) $this->shippingMethod->getName());
                     break;
                 case LengowExport::$defaultFields['shipping_cost']:
-                    $productData[$headerField] = $this->getShippingPrice($shipping, $currency, $product);
+                    $productData[$headerField] = $this->getShippingPrice();
                     break;
                 case LengowExport::$defaultFields['shipping_delay']:
-                    $productData[$headerField] = $shipping->getDeliveryTime()->getName();
+                    $productData[$headerField] = $this->shippingMethod->getDeliveryTime() !== null
+                        ? $this->shippingMethod->getDeliveryTime()->getName()
+                        : '';
                     break;
-                // case LengowExport::$defaultFields['discount_percent']:
-                //     $productData[$headerField] = '';
-                //     break;
-                // case LengowExport::$defaultFields['discount_start_date']:
-                //     $productData[$headerField] = '';
-                //     break;
-                // case LengowExport::$defaultFields['discount_end_date']:
-                //     $productData[$headerField] = '';
-                //     break;
-                case LengowExport::$defaultFields['image_url_1']:
-                case LengowExport::$defaultFields['image_url_2']:
-                case LengowExport::$defaultFields['image_url_3']:
-                case LengowExport::$defaultFields['image_url_4']:
-                case LengowExport::$defaultFields['image_url_5']:
-                case LengowExport::$defaultFields['image_url_6']:
-                case LengowExport::$defaultFields['image_url_7']:
-                case LengowExport::$defaultFields['image_url_8']:
-                case LengowExport::$defaultFields['image_url_9']:
-                case LengowExport::$defaultFields['image_url_10']:
-                    $productData[$headerField] = $this->getProductImgUrl($product, $headerField, $isChild, $parent);
+                case (preg_match('`image_url_([0-9]+)`', $headerField) ? true : false):
+                    $productData[$headerField] = $this->images[$headerField];
                     break;
                 case LengowExport::$defaultFields['type']:
-                    $productData[$headerField] = $product->getParentId() ? 'simple' : 'parent';
+                    $productData[$headerField] = $this->type;
                     break;
                 case LengowExport::$defaultFields['variation']:
-                    $productData[$headerField] = $this->getVariationPropertiesNames($product);
+                    $productData[$headerField] = $this->getVariation();
                     break;
                 case LengowExport::$defaultFields['language']:
-                        if ($language
-                            && $language->getTranslationCode()
-                            && $language->getTranslationCode()->getCode()
-                        ) {
-                            $productData[$headerField] = $language->getTranslationCode()->getCode();
+                        if ($this->language->getTranslationCode() && $this->language->getTranslationCode()->getCode()) {
+                            $productData[$headerField] = $this->language->getTranslationCode()->getCode();
                         } else {
                             $productData[$headerField] = '';
                         }
                     break;
                 default:
-                    $productData[$headerField] = $this->getPropertiesAndCustomField($headerField, $product);
+                    $value = '';
+                    if (strncmp($headerField, 'opt_', 4) === 0) {
+                        $optionName = substr($headerField, 4);
+                        $value = $this->options[$optionName] ?? '';
+                    } elseif (strncmp($headerField, 'prop_', 5) === 0) {
+                        $propertyName = substr($headerField, 5);
+                        $value = $this->properties[$propertyName] ?? (self::$parentProperties[$propertyName] ?? '');
+                    } elseif (strncmp($headerField, 'custom_', 7) === 0) {
+                        $fieldName = substr($headerField, 7);
+                        $value = $this->customFields[$fieldName] ?? (self::$parentCustomFields[$fieldName] ?? '');
+                    }
+                    $productData[$headerField] = StringCleaner::cleanData((string) $value);
             }
         }
         unset($product);
@@ -474,383 +515,505 @@ class LengowProduct
     }
 
     /**
-     * Get product id ex 750 for parent and 750_101,750_102... for children
+     * Get product to export with right association
      *
-     * @param ProductEntity $product the product
-     * @param bool $isChild is the product a children
+     * @param string $productId
+     *
+     * @return ProductEntity|null
+     */
+    private function getProductForExportById(string $productId) : ?ProductEntity
+    {
+        $context = Context::createDefaultContext();
+        $productCriteria = new Criteria();
+        $productCriteria->setIds([$productId])
+            ->addAssociation('mainCategories')
+            ->addAssociation('mainCategories.category')
+            ->addAssociation('categories')
+            ->addAssociation('seoUrls')
+            ->addAssociation('configuratorSettings')
+            ->addAssociation('configuratorSettings.option')
+            ->addAssociation('configuratorSettings.option.group')
+            ->addAssociation('prices')
+            ->addAssociation('properties')
+            ->addAssociation('properties.group')
+            ->addAssociation('properties.translations')
+            ->addAssociation('manufacturer')
+            ->addAssociation('media')
+            ->addAssociation('productMedia.media')
+            ->addAssociation('options')
+            ->addAssociation('options.group')
+            ->addAssociation('options.translations')
+            ->addAssociation('translations')
+            ->addAssociation('customFields');
+        $productCollection = $this->productRepository->search($productCriteria, $context)->getEntities();
+        return $productCollection->count() > 0 ? $productCollection->first() : null;
+    }
+
+    /**
+     * Get product translation for a specific language
+     *
+     * @param ProductEntity $product Shopware product instance
+     *
+     * @return ProductTranslationEntity|null
+     */
+    private function getProductTranslation(ProductEntity $product) : ?ProductTranslationEntity
+    {
+        $productTranslation = null;
+        if ($this->language && $product && $product->getTranslations()) {
+            $productTranslation = $product->getTranslations()->filterByLanguageId($this->language->getId())->first();
+        }
+        return $productTranslation;
+    }
+
+    /**
+     * Get product id ex 750 for parent and 750_101,750_102... for children
      *
      * @return string
      */
-    public function getProductIdentifier(ProductEntity $product, bool $isChild) : string
+    private function getProductIdentifier() : string
     {
-        if ($isChild) {
-            return $product->getParentId() . '_' . $product->getId();
+        if (self::$parentProduct) {
+            return self::$parentProduct->getId() . '_' . $this->product->getId();
         }
-        return $product->getId();
+        return $this->product->getId();
     }
 
     /**
      * Construct product url
      *
-     * @param ProductEntity $product the product
-     * @param string $productTranslatedName  the product translated name
-     *
      * @return string
      */
-    public function getProductUrl(ProductEntity $product, string $productTranslatedName) : string
+    private function getProductUrl() : string
     {
-        $url = $this->environmentInfoProvider->getBaseUrl();
-        $url .= DIRECTORY_SEPARATOR .  str_replace(' ', '-', $productTranslatedName);
-        $url .= DIRECTORY_SEPARATOR . $product->getProductNumber();
-        return $url;
+        $seoUrls = [];
+        if ($this->product->getSeoUrls()) {
+            $seoUrls = $this->product->getSeoUrls()
+                ->filterBySalesChannelId($this->salesChannel->getId())
+                ->getElements();
+        }
+        $seoPathInfo = '';
+        /** @var SeoUrlEntity $seoUrl */
+        foreach ($seoUrls as $seoUrl) {
+            $seoPathInfo = $seoUrl->getSeoPathInfo();
+            if ($seoUrl->getIsCanonical()) {
+                break;
+            }
+        }
+        return $this->environmentInfoProvider->getBaseUrl() . DIRECTORY_SEPARATOR . $seoPathInfo;
+
     }
 
     /**
      * Get the product manufacturer if it exist or the parent product manufacturer
      *
-     * @param ProductEntity $product the product
-     * @param bool $isChild is the product a child
-     * @param ProductEntity|null $parent the parent product
-     *
      * @return string
      */
-    public function getManufacturer(ProductEntity $product, bool $isChild, ProductEntity $parent = null) : string
+    private function getManufacturer() : string
     {
         $manufacturer = '';
-        if ($product->getManufacturer()) {
-            $manufacturer = $product->getManufacturer()->getName();
-            if ($manufacturer === '' && $isChild && $parent->getManufacturer()) {
-                $manufacturer = $parent->getManufacturer()->getName();
-            }
+        if ($this->product->getManufacturer() !== null) {
+            $manufacturer = $this->product->getManufacturer()->getName();
         }
-        return $manufacturer;
-    }
-
-    /**
-     * Get a field related to size and add unit of measurement
-     *
-     * @param ProductEntity $product the product
-     * @param string $headerField the field to retrieve
-     * @param bool $isChild is the product a children
-     * @param ProductEntity|null $parent the parent product
-     *
-     * @return string
-     */
-    public function getSizeField(
-        ProductEntity $product,
-        string $headerField,
-        bool $isChild = false,
-        ProductEntity $parent = null
-    ): string {
-        $value = $product->{self::LINK[$headerField]}();
-        if (!$value && $parent && $isChild) {
-            $value = $parent->{self::LINK[$headerField]}();
+        if ($manufacturer === '' && self::$parentProduct && self::$parentProduct->getManufacturer()) {
+            $manufacturer = self::$parentProduct->getManufacturer()->getName();
         }
-        return (string) ($value ?? '0');
+        return StringCleaner::cleanData((string) $manufacturer);
     }
 
     /**
      * Get a translatable generic field
      *
-     * @param string $translatedName name of the translated field
-     * @param ProductEntity $product the product
      * @param string $headerField the field to retrieve
-     * @param bool $isChild is the product a children
-     * @param ProductEntity|null $parent the parent product
      *
      * @return string
      */
-    public function getTranslatedField(
-        string $translatedName,
-        ProductEntity $product,
-        string $headerField,
-        bool $isChild = false,
-        ProductEntity $parent = null
-    ): string {
-        // TODO get translation for a specific language > use product_translation table
-        $value = $product->getTranslated()[$translatedName] ?? $product->{self::LINK[$headerField]}();
-        if (!$value && $parent && $isChild) {
-            $value = $parent->getTranslated()[$translatedName] ?? $parent->{self::LINK[$headerField]}();
+    private function getTranslatedField(string $headerField): string
+    {
+        $value = null;
+        if ($this->translation) {
+            $value = $this->translation->{self::LINK[$headerField]}();
         }
-        return (string) ($value ?? '');
+        // if the field does not contain any translation, we take the default value
+        if (!$value) {
+            $value = $this->product->{self::LINK[$headerField]}();
+        }
+        // if the field does not contain any value, we take the parent value
+        if (!$value && self::$parentProduct) {
+            if (self::$parentTranslation) {
+                $value = self::$parentTranslation->{self::LINK[$headerField]}();
+            }
+            if (!$value) {
+                $value = self::$parentProduct->{self::LINK[$headerField]}();
+            }
+        }
+        return $value ? StringCleaner::cleanData((string) $value) : '';
     }
 
     /**
      * Get generic field that are not translated
      *
-     * @param ProductEntity $product the product
      * @param string $headerField the field to retrieve
-     * @param bool $isChild is the product a children product ?
-     * @param ProductEntity|null $parent the parent
      *
      * @return string
      */
-    public function getUntranslatedField(
-        ProductEntity $product,
-        string $headerField,
-        bool $isChild = false,
-        ProductEntity $parent = null
-    ): string {
-        $value = $product->{self::LINK[$headerField]}();
-        if (!$value && $parent && $isChild) {
-            $value = $parent->{self::LINK[$headerField]}();
+    private function getUntranslatedField(string $headerField): string
+    {
+        $value = $this->product->{self::LINK[$headerField]}();
+        if (!$value && self::$parentProduct) {
+            $value = self::$parentProduct->{self::LINK[$headerField]}();
         }
         return (string) ($value ?? '');
     }
 
     /**
-     * Get description without html tag
+     * Get a field related to size and add unit of measurement
      *
-     * @param ProductEntity $product the product
      * @param string $headerField the field to retrieve
-     * @param bool $isChild is the product a children product ?
-     * @param ProductEntity|null $parent the parent
      *
      * @return string
      */
-    public function getDescription(
-        ProductEntity $product,
-        string $headerField,
-        bool $isChild = false,
-        ProductEntity $parent = null
-    ): string {
-        $value = strip_tags(
-            html_entity_decode(
-                $product->getTranslated()['description'] ??
-                $product->{self::LINK[$headerField]}() ?? ''
-            )
-        );
-        if (!$value && $parent && $isChild) {
-            $value = strip_tags(
-                html_entity_decode(
-                    $parent->getTranslated()['description'] ??
-                    $parent->{self::LINK[$headerField]}() ?? ''
-                )
-            );
-        }
-        return (string) ($value ?? '');
-    }
-
-    /**
-     * Get description with html tag
-     *
-     * @param ProductEntity $product the product
-     * @param string $headerField the field to retrieve
-     * @param bool $isChild is the product a children product ?
-     * @param ProductEntity|null $parent the parent
-     *
-     * @return string
-     */
-    public function getDescriptionHtml(
-        ProductEntity $product,
-        string $headerField,
-        bool $isChild = false,
-        ProductEntity $parent = null
-    ): string {
-        $value = html_entity_decode(
-            $product->getTranslated()['description'] ??
-            $product->{self::LINK[$headerField]}() ?? ''
-        );
-        if (!$value && $isChild) {
-            $value = html_entity_decode(
-                $parent->getTranslated()['description'] ??
-                $product->{self::LINK[$headerField]}() ?? ''
-            );
-        }
-        return (string)($value ?? '');
-    }
-
-    /**
-     * Check if headerField is a property or a customField and call the according method
-     *
-     * @param string $headerField the field to retrieve
-     * @param ProductEntity $product the product
-     *
-     * @return string
-     */
-    public function getPropertiesAndCustomField(string $headerField, ProductEntity $product) : string
+    private function getSizeField(string $headerField): string
     {
-        if (strncmp($headerField, 'prop_', 5) === 0) {
-            return $this->getPropertiesData(substr($headerField, 5), $product);
-        }
-        if (strncmp($headerField, 'custom_', 7) === 0) {
-            return $this->getCustomFieldData(substr($headerField, 7), $product);
-        }
-        return '';
+        $value = $this->getUntranslatedField($headerField);
+        return $value !== '' ? $value : '0';
     }
 
     /**
-     * Get variation properties data
+     * Get description with or without html tag
      *
-     * @param string $headerField the field to retrieve
-     * @param ProductEntity $product the product
+     * @param bool $cleanHtml Clean html characters or not
      *
      * @return string
      */
-    public function getPropertiesData(string $headerField, ProductEntity $product) : string
+    private function getDescription(bool $cleanHtml = true): string
     {
-        if ($product->getOptions()->count() > 0) {
-            foreach ($product->getOptions() as $productOption) {
-                if ($productOption->getGroup() && $productOption->getGroup()->getName() === $headerField) {
-                    return $productOption->getName();
+        $value = $this->getTranslatedField(LengowExport::$defaultFields['description']);
+        $value = html_entity_decode($value);
+        if ($cleanHtml) {
+            $value = StringCleaner::cleanHtml($value);
+        }
+        return $value ?? '';
+    }
+
+    /**
+     * Get all variation name in one string separated by ','
+     *
+     * @return string
+     */
+    private function getVariation() : string
+    {
+        $variation = '';
+        if (self::$parentProduct === null && $this->product->getConfiguratorSettings()) {
+            $groupedOptions = $this->product->getConfiguratorSettings()->getGroupedOptions();
+            /** @var PropertyGroupEntity $propertyGroup */
+            foreach ($groupedOptions as $propertyGroup) {
+                $variation .= 'opt_' . $propertyGroup->getName() . ', ';
+            }
+        }
+        return rtrim($variation, ', ');
+    }
+
+    /**
+     * Get option data only for child product
+     *
+     * @return array
+     */
+    private function getOptionsData(): array
+    {
+        $options = [];
+        if ($this->product && $this->product->getOptions() === null) {
+            return $options;
+        }
+        return $this->getAllPropertiesValues($this->product->getOptions());
+    }
+
+    /**
+     * Get properties data
+     *
+     * @param ProductEntity $product Shopware product instance
+     *
+     * @return array
+     */
+    private function getPropertiesData(ProductEntity $product): array
+    {
+        $properties = [];
+        if ($product && $product->getProperties() === null) {
+            return $properties;
+        }
+        return $this->getAllPropertiesValues($product->getProperties());
+    }
+
+    /**
+     * Get property value when translation exist
+     *
+     * @param PropertyGroupOptionCollection $propertyGroupOptionCollection Shopware property group option collection
+     *
+     * @return array
+     */
+    private function getAllPropertiesValues(PropertyGroupOptionCollection $propertyGroupOptionCollection): array
+    {
+        $properties = [];
+        if ($propertyGroupOptionCollection->count() === 0){
+            return $properties;
+        }
+        /** @var PropertyGroupOptionEntity $propertyGroupOption */
+        foreach ($propertyGroupOptionCollection as $propertyGroupOption) {
+            if ($propertyGroupOption->getGroup() === null) {
+                continue;
+            }
+            $value = null;
+            $translation = null;
+            if ($this->language && $propertyGroupOption->getTranslations()) {
+                $translation = $propertyGroupOption->getTranslations()
+                    ->filterByLanguageId($this->language->getId())
+                    ->first();
+                if ($translation) {
+                    $value = $translation->getName();
+                }
+            }
+            $value = $value ?? $propertyGroupOption->getName();
+            if ($value) {
+                $groupName = $propertyGroupOption->getGroup()->getName();
+                if (isset($properties[$groupName])) {
+                    $properties[$groupName] .= ', ' . $value;
+                } else {
+                    $properties[$groupName] = $value;
                 }
             }
         }
-        return '';
+        return $properties;
     }
 
     /**
-     * Get all variation properties name in one string separated by ';'
+     * Get a custom field data
      *
-     * @param ProductEntity $product the product
+     * @param ProductEntity $product Shopware product instance
      *
-     * @return string
+     * @return array
      */
-    public function getVariationPropertiesNames(ProductEntity $product) : string
+    private function getCustomFieldData(ProductEntity $product): array
     {
-        if ($product->getParentId()) { // if product is a child, no variation name
-            return '';
+        $customFields = [];
+        if ($product && $product->getCustomFields() === null) {
+            return $customFields;
         }
-        $propertiesGroupIds = [];
-        if ($product->getProperties() && $product->getProperties()->count() > 0) {
-            foreach ($product->getProperties() as $properties) {
-                $propertiesGroupIds[] = $properties->getGroupId();
+        $translationCustomFields = [];
+        if ($this->language && $product->getTranslations()) {
+            /** @var ProductTranslationEntity $translation */
+            $translation = $product->getTranslations()
+                ->filterByLanguageId($this->language->getId())
+                ->first();
+            if ($translation) {
+                $translationCustomFields = $translation->getCustomFields() ?? [];
             }
-            $propertiesGroupIds = array_unique($propertiesGroupIds);
-            $propertyGroupCriteria = new Criteria();
-            $propertyGroupCriteria->setIds($propertiesGroupIds);
-            $result = $this->propertyGroupRepository->search($propertyGroupCriteria, Context::createDefaultContext())->getEntities();
-            $variationPropertiesName = '';
-            foreach ($result as $propertyGroup) {
-                $variationPropertiesName .= $propertyGroup->getName();
-            }
-            return $variationPropertiesName;
         }
-        return '';
+        $defaultCustomFields = $product->getCustomFields();
+        if (!empty($defaultCustomFields) && empty($translationCustomFields)) {
+            $customFields = $defaultCustomFields;
+        } elseif (!empty($defaultCustomFields) && !empty($translationCustomFields)) {
+            $customFields = array_merge($defaultCustomFields, $translationCustomFields);
+        }
+        return $customFields;
     }
 
     /**
-     * Get custom field data
+     * Get images for a product
      *
-     * @param string $headerField the field to retrieve
-     * @param ProductEntity $product the product
-     *
-     * @return string
+     * @return array
      */
-    public function getCustomFieldData(string $headerField, ProductEntity $product) :string
+    private function getImages(): array
     {
-        return (string) ($product->getTranslated()['customFields'][$headerField] ?? '');
+        $urls = [];
+        $imageUrls = [];
+        $coverUrl = null;
+        // get variation or parent images
+        $productMedia = $this->product->getMedia();
+        $coverId = $this->product->getCoverId();
+        if (self::$parentProduct && ($productMedia === null || $productMedia->count() === 0)) {
+            $productMedia = self::$parentProduct->getMedia();
+            $coverId = self::$parentProduct->getCoverId();
+        }
+        // get all product image urls
+        if ($productMedia && $productMedia->count() > 0) {
+            /** @var ProductMediaEntity $media */
+            foreach ($productMedia as $media) {
+                if ($media->getMedia()) {
+                    if ($coverId && $media->getId() === $coverId) {
+                        $coverUrl = $media->getMedia()->getUrl();
+                    } else {
+                        $urls[] = $media->getMedia()->getUrl();
+                    }
+                }
+            }
+        }
+        // get cover image url to always put it first
+        if ($coverUrl) {
+            array_unshift($urls, $coverUrl);
+        }
+        // retrieves up to 10 images per product
+        for ($i = 1; $i < 11; $i++) {
+            $imageUrls['image_url_' . $i] = $urls[$i - 1] ?? '';
+        }
+        return $imageUrls;
+    }
+
+    /**
+     * Get prices for a product
+     *
+     * @return array
+     */
+    private function getPrices(): array
+    {
+        $price = $this->product->getCurrencyPrice($this->currency->getId());
+        if (self::$parentProduct && $price === null) {
+            $price = self::$parentProduct->getCurrencyPrice($this->currency->getId());
+        }
+        // get original price before discount
+        // the list price greater than the price indicates that the product is in reduction
+        $listPrice = $price->getListPrice();
+        if ($listPrice && $listPrice->getNet() > $price->getNet()) {
+            $priceExclTax = $listPrice->getNet();
+            $priceInclTax = $listPrice->getGross();
+        } else {
+            $priceExclTax = $price->getNet();
+            $priceInclTax = $price->getGross();
+        }
+        // get price with discount
+        $discountPriceExclTax = $price->getNet();
+        $discountPriceInclTax = $price->getGross();
+        $discountAmount = $priceInclTax - $discountPriceInclTax;
+        $discountPercent = $discountAmount > 0 ? round((($discountAmount * 100) / $priceInclTax), 2) : 0;
+        return [
+            'price_excl_tax' => round($discountPriceExclTax, 2),
+            'price_incl_tax' => round($discountPriceInclTax, 2),
+            'price_before_discount_excl_tax' => round($priceExclTax, 2),
+            'price_before_discount_incl_tax' => round($priceInclTax, 2),
+            'discount_amount' => $discountAmount,
+            'discount_percent' => $discountPercent,
+            'discount_start_date' => '',
+            'discount_end_date' => '',
+        ];
     }
 
     /**
      * Get Shipping price by currency from shipping method
      *
-     * @param ShippingMethodEntity $shipping the shipping method
-     * @param CurrencyEntity $currency the currency
-     * @param ProductEntity $product the product
-     *
-     * @return string
+     * @return float
      */
-    public function getShippingPrice(
-        ShippingMethodEntity $shipping,
-        CurrencyEntity $currency,
-        ProductEntity $product
-    ): string {
-        $weight = $product->getWeight() ?: 1;
-        $size = ($product->getHeight() ?: 1) * ($product->getLength() ?: 1) * ($product->getWidth() ?: 1);
-        $price = $this->getAppliedShippingRule($shipping, $currency, $weight, $size);
-        if (($price === '') && $shipping->getPrices()->count() > 0) {
-            foreach ($shipping->getPrices() as $shippingPrices) {
-                if ($shippingPrices->getCurrencyPrice()->count() > 0) {
-                    foreach ($shippingPrices->getCurrencyPrice() as $shippingCurrencyPrice) {
-                        if ($shippingCurrencyPrice->getCurrencyId() === $currency->getId()) {
-                            return (string)$shippingCurrencyPrice->getNet();
-                        }
-                    }
-                }
-            }
+    private function getShippingPrice(): float
+    {
+        // check is free shipping option is set
+        if ($this->product->getShippingFree()
+            || ($this->product->getShippingFree() === null
+                && self::$parentProduct
+                && self::$parentProduct->getShippingFree()
+            )
+        ) {
+            return 0.00;
         }
-        return $price;
+        // get product price if the shipping method is based on the cart price
+        $price = $this->prices['price_incl_tax'];
+        // get product weight if the shipping method is based on the product weight
+        $weight = null;
+        if ($this->product->getWeight()) {
+            $weight = $this->product->getWeight();
+        } elseif (self::$parentProduct && self::$parentProduct->getWeight()) {
+            $weight = self::$parentProduct->getWeight();
+        }
+        // get product volume if the shipping method is based on the product volume
+        $volume = null;
+        if ($this->product->getHeight()) {
+            $volume = $this->product->getHeight() * $this->product->getLength() * $this->product->getWidth();
+        } elseif (self::$parentProduct
+            && self::$parentProduct->getWeight()
+            && self::$parentProduct->getLength()
+            && self::$parentProduct->getWidth()
+        ) {
+            $volume = self::$parentProduct->getHeight()
+                * self::$parentProduct->getLength()
+                * self::$parentProduct->getWidth();
+        }
+        // recovery of shipping costs if one and only one rule has priority
+        $shippingCost = $this->getAppliedShippingRule($price, $weight, $volume);
+        // recovery of the first shipping costs available by default
+        if ($shippingCost === null && $this->shippingMethod->getPrices()->count() > 0) {
+            $shippingCost = $this->getCurrencyPriceFromShippingCost($this->shippingMethod->getPrices()->first());
+        }
+        return $shippingCost ?? 0.00;
     }
 
     /**
      * Get applied shipping rule and return shippingCosts
      *
-     * @param ShippingMethodEntity $shipping the shipping method
-     * @param CurrencyEntity $currency the currency to use
-     * @param float $weight product weight
-     * @param float $size product size
+     * @param float|null $price product price
+     * @param float|null $weight product weight
+     * @param float|null $volume product volume
      *
-     * @return string
+     * @return float|null
      */
-    public function getAppliedShippingRule(
-        ShippingMethodEntity $shipping,
-        CurrencyEntity $currency,
-        float $weight,
-        float $size
-    ): string
+    private function getAppliedShippingRule(float $price = null, float $weight = null, float $volume = null): ?float
     {
-        $weightCosts = null;
-        $sizeCosts = null;
-        if ($shipping->getPrices()->count() > 0) {
-            foreach ($shipping->getPrices() as $shippingPrices) {
-                if ($shippingPrices->getCalculation() === 3
+        $costsByPriority = [];
+        if ($this->shippingMethod->getPrices()->count() > 0) {
+            /** @var ShippingMethodPriceEntity $shippingPrices */
+            foreach ($this->shippingMethod->getPrices() as $shippingPrices) {
+                if ($price
+                    && $shippingPrices->getCalculation() === 2 // shipping method is based on the cart price
                     && $shippingPrices->getRule()
-                    && $this->inShippingPriceRange($shippingPrices, $weight))
-                {
-                    $weightCosts = $shippingPrices;
+                    && $this->inShippingPriceRange($shippingPrices, $price)
+                ) {
+                    $costsByPriority[$shippingPrices->getRule()->getPriority()][] = $shippingPrices;
                 }
-                if ($shippingPrices->getCalculation() === 4
+                if ($weight
+                    && $shippingPrices->getCalculation() === 3 // shipping method is based on the product weight
                     && $shippingPrices->getRule()
-                    && $this->inShippingPriceRange($shippingPrices, $size))
-                {
-                    $sizeCosts = $shippingPrices;
+                    && $this->inShippingPriceRange($shippingPrices, $weight)
+                ) {
+                    $costsByPriority[$shippingPrices->getRule()->getPriority()][] = $shippingPrices;
+                }
+                if ($volume
+                    && $shippingPrices->getCalculation() === 4 // shipping method is based on the product volume
+                    && $shippingPrices->getRule()
+                    && $this->inShippingPriceRange($shippingPrices, $volume)
+                ) {
+                    $costsByPriority[$shippingPrices->getRule()->getPriority()][] = $shippingPrices;
                 }
             }
         }
-        if (!$weightCosts && !$sizeCosts) {
-            return '';
+        ksort($costsByPriority);
+        if (empty($costsByPriority)) {
+            return null;
         }
-        $sizePriority = (!$weightCosts && $sizeCosts) || (
-                $weightCosts && $sizeCosts && (
-                    $weightCosts->getRule()->getPriority() < $sizeCosts->getRule()->getPriority()
-                )
-            );
-        $weightPriority = (!$sizeCosts && $weightCosts) || (
-                $weightCosts && $sizeCosts && (
-                    $weightCosts->getRule()->getPriority() > $sizeCosts->getRule()->getPriority()
-                )
-            );
-        if ($sizePriority) {
-            return $this->getCurrencyPriceFromShippingCost($sizeCosts, $currency);
+        $firstPriority = current($costsByPriority);
+        if (count($firstPriority) === 1) {
+            return $this->getCurrencyPriceFromShippingCost(current($firstPriority));
         }
-        if ($weightPriority) {
-            return $this->getCurrencyPriceFromShippingCost($weightCosts, $currency);
-        }
-        return '';
+        return null;
     }
 
     /**
      * Get price from shipping cost corresponding to current currency
      *
      * @param ShippingMethodPriceEntity $shippingCost
-     * @param CurrencyEntity $currency
      *
-     * @return string
+     * @return float|null
      */
-    public function getCurrencyPriceFromShippingCost(
-        ShippingMethodPriceEntity $shippingCost,
-        CurrencyEntity $currency
-    ): string
+    private function getCurrencyPriceFromShippingCost(ShippingMethodPriceEntity $shippingCost): ?float
     {
-        if ($shippingCost->getCurrencyPrice()->count() > 0) {
-            foreach ($shippingCost->getCurrencyPrice() as $shippingCurrencyPrice) {
-                if ($shippingCurrencyPrice->getCurrencyId() === $currency->getId()) {
-                    return (string)$shippingCurrencyPrice->getNet();
+        $currencyPrice = null;
+        $defaultPrice = null;
+        if ($shippingCost->getCurrencyPrice() && $shippingCost->getCurrencyPrice()->count() > 0) {
+            /** @var Price $price */
+            foreach ($shippingCost->getCurrencyPrice() as $price) {
+                if ($price->getCurrencyId() === $this->currency->getId()) {
+                    $currencyPrice = $price->getGross();
+                }
+                if ($price->getCurrencyId() === Defaults::CURRENCY) {
+                    $defaultPrice = $price->getGross();
                 }
             }
         }
-        return '';
+        return $currencyPrice ?? $defaultPrice;
     }
 
     /**
@@ -861,115 +1024,38 @@ class LengowProduct
      *
      * @return bool
      */
-    public function inShippingPriceRange(ShippingMethodPriceEntity $shippingPrice, float $value): bool
+    private function inShippingPriceRange(ShippingMethodPriceEntity $shippingPrice, float $value): bool
     {
         /** @var float $from */
         $from = $shippingPrice->getQuantityStart() ?? self::SHIPPING_PRICE_RANGE_MIN;
         /** @var float $to */
-        $to = $shippingPrice->getQuantityEnd() ??  self::SHIPPING_PRICE_RANGE_MAX;
+        $to = $shippingPrice->getQuantityEnd() ?? self::SHIPPING_PRICE_RANGE_MAX;
         return ($value >= $from && $value <= $to);
-    }
-
-    /**
-     * Get a product price by currency (Net or Gross depending on the headerField)
-     *
-     * @param ProductEntity $product the product
-     * @param string $headerField the field to retrieve
-     * @param CurrencyEntity $currency the currency to use
-     * @param bool $isChild product is a child
-     * @param ProductEntity|null $parent the parent product
-     *
-     * @return string|null
-     */
-    public function getCalculatedPrice(
-        ProductEntity $product,
-        string $headerField,
-        CurrencyEntity $currency,
-        bool $isChild = false,
-        ProductEntity $parent = null
-    ): ?string
-    {
-        $productPrice = null;
-        foreach ($product->getPrices() as $price) {
-            if ($price->getPrice()->count() > 0
-                && $price->getPrice()->first()->getCurrencyId() === $currency->getId()
-            ) {
-                $productPrice = $price->getPrice()->first();
-                break;
-            }
-        }
-        if (!$productPrice) {
-            // if price not found and product is a children, get price from parent product
-            if ($isChild && $parent) {
-                return $this->getCalculatedPrice($parent, $headerField, $currency);
-            }
-            return '0';
-        }
-        switch ($headerField) {
-            case LengowExport::$defaultFields['price_excl_tax']:
-                return (string) $productPrice->getNet();
-            case LengowExport::$defaultFields['price_incl_tax']:
-                return (string) $productPrice->getGross();
-            // case LengowExport::$defaultFields['price_before_discount_excl_tax']:
-            // case LengowExport::$defaultFields['price_before_discount_incl_tax']:
-            default:
-                return '0';
-        }
-    }
-
-    /**
-     * This method retrieve image url associated to product,
-     * if none could be found, the method get them from the parent if it exist
-     *
-     * @param ProductEntity $product the product
-     * @param string $headerFields the field to retrieve
-     * @param bool $isChild is the product a child of another product
-     * @param ProductEntity|null $parent the parent product
-     *
-     * @return string
-     */
-    public function getProductImgUrl(
-        ProductEntity $product,
-        string $headerFields,
-        bool $isChild = false,
-        ProductEntity $parent = null
-    ): string {
-        $nb = (int) preg_replace("~^image_url_(\d+)$~", "$1", $headerFields);
-        if (!is_numeric($nb)) {
-            return '';
-        }
-        $nb = $nb > 0 ? $nb - 1 : $nb;
-        if ($product->getMedia()->count() > $nb) {
-            $productMedia = array_values($product->getMedia()->getElements())[$nb];
-            if ($productMedia->getMedia()) {
-                $url = $productMedia->getMedia()->getUrl();
-                if ($url !== '') {
-                    return $url;
-                }
-            }
-        }
-        // if children don't have image url, recall this method to get image url from parent
-        if ($parent && $isChild ){
-            return $this->getProductImgUrl($parent, $headerFields);
-        }
-        // no url found for product or parent if exist
-        return '';
     }
 
     /**
      * Get a product category breadcrumb
      *
-     * @param ProductEntity|null $product the product
-     * @param ProductEntity|null $parent the parent product
-     * @param bool $isChild the product is a children
+     * @param ProductEntity $product the product
+     * @param ProductEntity|null $parentProduct the product
      *
      * @return string the breadcrumb
      */
-    public function getProductCategory(ProductEntity $product, $isChild = false, $parent = null): string
+    private function getProductCategory(ProductEntity $product, ProductEntity $parentProduct = null): string
     {
+        $mainCategory = null;
         $breadcrumb = '';
-        if ($product->getCategories() && $product->getCategories()->count() > 0) {
-            $breadcrumbArray = $product->getCategories()->first()->getBreadcrumb();
+        // get main category if exist
+        if ($product->getMainCategories() && $product->getMainCategories()->count() > 0) {
+            $mainCategory = $product->getMainCategories()->first()->getCategory();
+        }
+        // get first category by default
+        if ($mainCategory === null && $product->getCategories() && $product->getCategories()->count() > 0) {
+            $mainCategory = $product->getCategories()->first();
+        }
+        // create breadcrumb
+        if ($mainCategory) {
+            $breadcrumbArray = $mainCategory->getBreadcrumb();
             foreach ($breadcrumbArray as $catName) {
                 $breadcrumb .= $catName;
                 if (end($breadcrumbArray) !== $catName) {
@@ -978,8 +1064,8 @@ class LengowProduct
             }
         }
         // if children don't have breadcrumb, recall this method to get breadcrumb from parent
-        if (empty($breadcrumb) && $parent && $isChild) {
-            return $this->getProductCategory($parent);
+        if (empty($breadcrumb) && $parentProduct) {
+            return $this->getProductCategory($parentProduct);
         }
         return $breadcrumb;
     }

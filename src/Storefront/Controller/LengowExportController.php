@@ -95,6 +95,7 @@ class LengowExportController extends LengowAbstractFrontController
      * string product_ids        List of product id separate with comma (1,2,3)
      * int    sales_channel_id   Export a specific store with store id
      * string currency           Convert prices with a specific currency
+     * string language           Translate content with a specific language
      * bool   log_output         See logs (1) or not (0)
      * bool   update_export_date Change last export date in data base (1) or not (0)
      * bool   get_params         See export parameters and authorized values in json format (1) or not (0)
@@ -128,6 +129,7 @@ class LengowExportController extends LengowAbstractFrontController
             'product_ids' => $request->query->get('product_ids'),
             'sales_channel_id' => $request->query->get('sales_channel_id'),
             'currency' => $request->query->get('currency'),
+            'language' => $request->query->get('language'),
             'log_output' => $request->query->get('log_output') !== null
                 ? $request->query->get('log_output') === '1'
                 : null,

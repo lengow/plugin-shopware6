@@ -29,7 +29,6 @@
 
         <service id="Lengow\Connector\Service\LengowAddress">
             <argument type="service" id="Lengow\Connector\Service\LengowLog"/>
-            <argument type="service" id="Lengow\Connector\Util\StringCleaner"/>
             <argument type="service" id="country.repository"/>
             <argument type="service" id="country_state.repository"/>
             <argument type="service" id="salutation.repository"/>
@@ -94,8 +93,9 @@
             <argument type="service" id="lengow_product.repository"/>
             <argument type="service" id="currency.repository"/>
             <argument type="service" id="language.repository"/>
+            <argument type="service" id="product_configurator_setting.repository"/>
             <argument type="service" id="custom_field.repository"/>
-            <argument type="service" id="property_group_translation.repository"/>
+            <argument type="service" id="property_group.repository"/>
             <argument type="service" id="Lengow\Connector\Service\LengowLog"/>
             <argument type="service" id="Lengow\Connector\Service\LengowFeed"/>
             <argument type="service" id="Lengow\Connector\Service\LengowProduct"/>
@@ -148,7 +148,6 @@
             <argument type="service" id="product.repository"/>
             <argument type="service" id="Lengow\Connector\Service\LengowLog"/>
             <argument type="service" id="Lengow\Connector\Util\EnvironmentInfoProvider"/>
-            <argument type="service" id="property_group.repository"/>
         </service>
 
         <service id="Lengow\Connector\Service\LengowSync">
