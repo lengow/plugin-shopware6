@@ -127,3 +127,11 @@
   visibility: visible;
   opacity: 1;
 }
+
+.lengow-filter-sidebar_item {
+    padding: 0 25px 0 25px;
+}
+
+.lengow-filter-sidebar .sw-sidebar-item .sw-sidebar-item__scrollable-container {
+    width: 100% !important;
+}

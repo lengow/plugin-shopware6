@@ -241,6 +241,8 @@ Component.register('lgw-product-list', {
             this.searchFilterText = '';
             this.stockFilterText = 'all';
             this.activeFilterText = 'all';
+            this.onActiveFilter('all');
+            this.onStockFilter('all');
         },
 
         setupSelectionActivated() {

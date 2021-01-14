@@ -1,0 +1,13 @@
+{% sw_extends '@Storefront/storefront/page/checkout/finish/finish-details.html.twig' %}
+
+{% block page_checkout_finish_order %}
+    {{ parent() }}
+    {% block lengow_tracker %}
+        {% if page.extensions.lengow %}
+            <img
+                src="https://trk.lgw.io/lead?account_id={{ page.extensions.lengow.data.accountId|e }}&order_ref={{ page.extensions.lengow.data.orderReference|e }}&amount={{ page.extensions.lengow.data.orderAmount|e }}&currency={{ page.extensions.lengow.data.currency|e }}&payment_method={{ page.extensions.lengow.data.paymentMethod|e }}&cart={{ page.extensions.lengow.data.cart|e }}&cart_number={{ page.extensions.lengow.data.cartNumber|e }}&newbiz={{ page.extensions.lengow.data.newBiz|e }}" alt="" style="width: 1px; height: 1px; border: none;" />
+            <img
+                src="https://trk.lgw.io/validation?account_id={{ page.extensions.lengow.data.accountId|e }}&order_ref={{ page.extensions.lengow.data.orderReference|e }}&payment_method={{ page.extensions.lengow.data.paymentMethod|e }}&valid={{ page.extensions.lengow.data.valid|e }}" alt="" style="width: 1px; height: 1px; border: none;" />
+        {% endif %}
+    {% endblock %}
+{% endblock %}

@@ -252,6 +252,10 @@
                     "label": "Tracker ID produit",
                     "description": "Le nom de l'identifiant unique indiqué dans Lengow"
                 },
+                "tracking_value": {
+                    "traking_id": "Id produit",
+                    "traking_reference": "Numéro produit"
+                },
                 "timezone": {
                     "label": "Timezone",
                     "description": "Choix de la Timezone. Attention, ce paramètre est utilisé lors de l'import de vos commandes depuis l'API Lengow"

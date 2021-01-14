@@ -1,5 +1,13 @@
 {% block lgw_product_list %}
-    <sw-page class="lgw-product-list" :showSearchBar="false">
+    <sw-page class="lgw-product-list">
+        {% block lgw_product_list_search_bar %}
+            <template #search-bar>
+                <sw-search-bar initialSearchType="lengow_product"
+                               :placeholder="$tc('lengow-connector.product.filter.search_filter_label')"
+                               @search="onSearchFilter">
+                </sw-search-bar>
+            </template>
+        {% endblock %}
         {% block lgw_product_list_smart_bar_header %}
             <template #smart-bar-header>
                 {% block lgw_product_list_smart_bar_header_title %}
@@ -64,33 +72,6 @@
                                 </sw-switch-field>
                             </div>
                             <hr /><br/>
-                            <div class="lgw-row" v-if="productSelection">
-                                <div class="lgw-col-4">
-                                    <sw-single-select
-                                            v-model="activeFilterText"
-                                            :options="isActiveOptions"
-                                            :label="$tc('lengow-connector.product.filter.active_filter_label')"
-                                            @change="onActiveFilter"
-                                            class="">
-                                    </sw-single-select>
-                                </div>
-                                <div class="lgw-col-4">
-                                    <sw-single-select
-                                            v-model="stockFilterText"
-                                            :options="isWithStockOptions"
-                                            :label="$tc('lengow-connector.product.filter.stock_filter_label')"
-                                            @change="onStockFilter"
-                                            class="">
-                                    </sw-single-select>
-                                </div>
-                                <div class="lgw-col-4">
-                                    <sw-text-field
-                                            v-model="searchFilterText"
-                                            :label="$tc('lengow-connector.product.filter.search_filter_label')"
-                                            @input="onSearchFilter">
-                                    </sw-text-field>
-                                </div>
-                            </div>
                         </div>
                     {% endblock %}
                     {% block lgw_product_list_content_section %}
@@ -185,6 +166,43 @@
                     {% endblock %}
                 </div>
             </template>
+            {% block lgw_product_list_sidebar %}
+                <template #sidebar>
+                    <sw-sidebar v-if="productSelection" class="sw-order-list__sidebar lengow-filter-sidebar">
+                        {% block lgw_product_list_sidebar_refresh %}
+                            <sw-sidebar-item
+                                icon="default-arrow-360-left"
+                                :title="$tc('sw-order.list.titleSidebarItemRefresh')"
+                                @click="resetFilters">
+                            </sw-sidebar-item>
+                        {% endblock %}
+                        {% block lgw_product_list_sidebar_filter %}
+                            <sw-sidebar-item icon="default-action-filter"
+                                             :title="$tc('sw-order.list.titleSidebarItemFilter')"
+                                             class="lengow-filter-sidebar_item">
+                                {% block lgw_product_list_sidebar_filter_items %}
+                                    {% block lgw_product_list_sidebar_filter_active %}
+                                        <sw-single-select
+                                            v-model="activeFilterText"
+                                            :options="isActiveOptions"
+                                            :label="$tc('lengow-connector.product.filter.active_filter_label')"
+                                            @change="onActiveFilter">
+                                        </sw-single-select>
+                                    {% endblock %}
+                                    {% block lgw_product_list_sidebar_filter_stock %}
+                                        <sw-single-select
+                                            v-model="stockFilterText"
+                                            :options="isWithStockOptions"
+                                            :label="$tc('lengow-connector.product.filter.stock_filter_label')"
+                                            @change="onStockFilter">
+                                        </sw-single-select>
+                                    {% endblock %}
+                                {% endblock %}
+                            </sw-sidebar-item>
+                        {% endblock %}
+                    </sw-sidebar>
+                </template>
+            {% endblock %}
         {% endblock %}
     </sw-page>
 {% endblock %}

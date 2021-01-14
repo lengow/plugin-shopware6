@@ -219,6 +219,9 @@ en:
           tracking_id:
             label: "Tracker Product ID"
             description: "The name of the unique identifier entered in the Lengow"
+          tracking_value:
+              traking_id: "Product Id"
+              traking_reference: "Product number"
           timezone:
             label: "Timezone"
             description: "Choose your corresponding timezone, please choose wisely as this timezone is used when importing orders from Lengow API"
