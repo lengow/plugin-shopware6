@@ -99,6 +99,7 @@
             <argument type="service" id="Lengow\Connector\Service\LengowLog"/>
             <argument type="service" id="Lengow\Connector\Service\LengowFeed"/>
             <argument type="service" id="Lengow\Connector\Service\LengowProduct"/>
+            <argument type="service" id="Doctrine\DBAL\Connection"/>
         </service>
 
         <service id="Lengow\Connector\Service\LengowFeed">

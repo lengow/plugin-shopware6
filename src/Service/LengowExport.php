@@ -3,6 +3,7 @@
 namespace Lengow\Connector\Service;
 
 use \Exception;
+use Doctrine\DBAL\Connection as DatabaseConnexion;
 use Shopware\Core\Checkout\Shipping\ShippingMethodEntity;
 use Shopware\Core\Content\Product\Aggregate\ProductConfiguratorSetting\ProductConfiguratorSettingCollection;
 use Shopware\Core\Content\Product\ProductEntity;
@@ -23,6 +24,7 @@ use Shopware\Core\System\Language\LanguageCollection;
 use Shopware\Core\System\Language\LanguageEntity;
 use Shopware\Core\System\SalesChannel\SalesChannelCollection;
 use Shopware\Core\System\SalesChannel\SalesChannelEntity;
+use Symfony\Component\DependencyInjection\ContainerBuilder;
 use Lengow\Connector\Exception\LengowException;
 
 /**
@@ -110,6 +112,11 @@ class LengowExport
      * @var LengowLog Lengow log service
      */
     private $lengowLog;
+
+    /**
+     * @var DatabaseConnexion Doctrine database connexion service
+     */
+    private $connexion;
 
     /**
      * @var array all available params for export
@@ -233,6 +240,7 @@ class LengowExport
      * @param LengowLog $lengowLog Lengow log service
      * @param LengowFeed $lengowFeed lengow feed service
      * @param LengowProduct $lengowProduct lengow product service
+     * @param DatabaseConnexion $connexion doctrine database connexion service
      */
     public function __construct(
         LengowConfiguration $lengowConfiguration,
@@ -248,7 +256,8 @@ class LengowExport
         EntityRepositoryInterface $propertyGroupRepository,
         LengowLog $lengowLog,
         LengowFeed $lengowFeed,
-        LengowProduct $lengowProduct
+        LengowProduct $lengowProduct,
+        DatabaseConnexion $connexion
     )
     {
         $this->lengowConfiguration = $lengowConfiguration;
@@ -266,6 +275,7 @@ class LengowExport
         $this->lengowFeed = $lengowFeed;
         $this->lengowProduct = $lengowProduct;
         $this->lengowLog = $lengowLog;
+        $this->connexion = $connexion;
     }
 
     /**
@@ -443,50 +453,122 @@ class LengowExport
     }
 
     /**
-     * Get all product ID in export (all exportable products) // todo change this method to use Raw sql
+     * Get all product ID in export (all exportable products)
      *
+     * @param array $LengowSelectionProductIds can be used to narrow the function scope to specific products
      * @return array products ids
      */
-    public function getProductIdsExport(): array
+    public function getProductIdsExport(array $LengowSelectionProductIds = []): array
     {
-        // if selection is activated or product_ids get argument is used
-        if ($this->exportConfiguration['selection'] || !empty($this->exportConfiguration['product_ids'])) {
-            return $this->getSelectionProductIdsExport($this->getLengowProductIdsToExport());
+        $lengowProductIds = [];
+        // function can be use to retrieve specific product
+        if ($LengowSelectionProductIds) {
+            $lengowProductIds = array_merge($lengowProductIds, $LengowSelectionProductIds);
+        } else if ($this->exportConfiguration['selection'] || !empty($this->exportConfiguration['product_ids'])) {
+            // if selection is activated or product_ids get argument is used
+            $lengowProductIds = $this->getLengowProductIdsToExport();
         }
-        // else retrieve all products for sales channel
-        $categoryCollection = $this->getSalesChannelCategoryCollection();
-        if ($categoryCollection === null) {
+        $entryPoint = $this->salesChannel->getNavigationCategoryId();
+        // if no entry point is found, we can't retrieve the products
+        if (!$entryPoint) {
             return [];
         }
-        $productIdArray = [];
-        foreach ($categoryCollection as $category) {
-            foreach ($category->getProducts() as $product) {
-                if ($product->getParentId()) { // skip product if it's a child
-                    continue;
-                }
-                if ($this->isExportable($product)) {
-                    /** @var ProductCollection $children */
-                    $children = $this->getChildren($product);
-                    if ($children->count() > 0) {
-                        $this->parentProductCounter++;
-                        $productIdArray[] = [
-                            'id' => $product->getId(),
-                            'type' => 'parent',
-                        ];
-                        $exportableChildren = $this->getExportableChildren($children);
-                        $this->childProductCounter += count($exportableChildren);
-                        $productIdArray = array_merge($productIdArray, $exportableChildren);
-                    } else {
-                        $this->simpleProductCounter++;
-                        $productIdArray[] = [
-                            'id' => $product->getId(),
-                            'type' => 'simple',
-                        ];
-                    }
+        $products = $this->connexion->fetchAll('
+            SELECT DISTINCT id, available_stock, active, parent_id
+            FROM product AS p
+            JOIN product_category_tree as pct
+            ON p.id = pct.product_id
+            WHERE pct.category_id = "' . hex2bin($entryPoint) . '"
+        ');
+        // clean result from db before sorting
+        foreach ($products as &$product) {
+            $product['id'] = (string) bin2hex($product['id']);
+            if ($product['parent_id']) {
+                $product['parent_id'] = (string) bin2hex($product['parent_id']);
+            }
+        }
+        // unset foreach ref for garbage collector
+        unset($product);
+        $sortedProductIds = [];
+        foreach ($products as $product) {
+            // if selection is active and product is not selected or if product is a child / skip it
+            if ($product['parent_id'] || ($lengowProductIds && !in_array($product['id'], $lengowProductIds, false))) {
+                continue;
+            }
+            if ($this->isExportableFromSqlResult($product)) {
+                $sortedProductIds[] = [
+                    'id' => $product['id'],
+                    'type' => '',
+                ];
+                // save product key to add type after attempting children recuperation
+                $parentArrayEntry = array_key_last($sortedProductIds);
+                // get child count and add child to array
+                $nbChildren = $this->getChildProductIdFromSqlResult($product, $products, $sortedProductIds);
+                if ($nbChildren > 0) {
+                    // product is a parent
+                    $this->parentProductCounter++;
+                    $sortedProductIds[$parentArrayEntry] = [
+                        'id' => $product['id'],
+                        'type' => 'parent',
+                    ];
+                    $this->childProductCounter += $nbChildren;
+                } else {
+                    // product is a simple
+                    $this->simpleProductCounter++;
+                    $sortedProductIds[$parentArrayEntry] = [
+                        'id' => $product['id'],
+                        'type' => 'simple',
+                    ];
                 }
             }
         }
-        return $productIdArray;
+        return $sortedProductIds;
+    }
+
+    /**
+     * return child count and add all child to array $sortedProductIds from sql result
+     *
+     * @param array $parent the sql result of parent products query
+     * @param array $products the sql result of all products query
+     * @param array $sortedProductIds array of sorted products
+     * @return int the number of child for the given parent products
+     */
+    private function getChildProductIdFromSqlResult(array $parent, array $products, array &$sortedProductIds): int
+    {
+        $childCounter = 0;
+        foreach ($products as $product) {
+            if ($product['parent_id'] === $parent['id'] && $this->isExportableFromSqlResult($product, $parent)) {
+                $childCounter++;
+                $sortedProductIds[] = [
+                    'id' => $product['id'],
+                    'type' => 'child',
+                ];
+            }
+        }
+        return $childCounter;
+    }
+
+    /**
+     * Check if product is exportable from sql query result
+     *
+     * @param array $productData the sql result of the product query
+     * @param array $parentData if the product is a child, active check must be on the parent
+     * @return bool
+     */
+    private function isExportableFromSqlResult(array $productData, array $parentData = []): bool
+    {
+        if ($parentData) {
+            return !(
+                (!$this->exportConfiguration['variation'] && $productData['parent_id'] !== null)
+                || (!$this->exportConfiguration['out_of_stock'] && $productData['available_stock'] <= 0)
+                || (!$this->exportConfiguration['inactive'] && $parentData['active'] !== 1)
+            );
+        }
+        return !(
+            (!$this->exportConfiguration['variation'] && $productData['parent_id'] !== null)
+            || (!$this->exportConfiguration['out_of_stock'] && $productData['available_stock'] <= 0)
+            || (!$this->exportConfiguration['inactive'] && $productData['active'] !== 1)
+        );
     }
 
     /**
@@ -509,53 +591,6 @@ class LengowExport
             }
         }
         return $productIdArray;
-    }
-
-    /**
-     * Get product to export and order them by parent->children if selection or product_ids get argument are active
-     *
-     * @param array $productIds product ids
-     *
-     * @return array
-     */
-    public function getSelectionProductIdsExport(array $productIds): array
-    {
-        $selectionProductIdsExport = [];
-        if (empty($productIds)) {
-            return $selectionProductIdsExport;
-        }
-        $productCriteria = new Criteria();
-        $productCriteria->setIds($productIds);
-        $productCollection = $this->productRepository->search($productCriteria, Context::createDefaultContext())
-            ->getEntities();
-        if ($productCollection->count() > 0) {
-            foreach ($productCollection as $product) {
-                if ($product->getParentId()) { // skip product if it's a child
-                    continue;
-                }
-                if ($this->isExportable($product)) {
-                    /** @var ProductCollection $children */
-                    $children = $this->getChildren($product);
-                    if ($children->count() > 0) {
-                        $this->parentProductCounter++;
-                        $selectionProductIdsExport[] = [
-                            'id' => $product->getId(),
-                            'type' => 'parent',
-                        ];
-                        $exportableChildren = $this->getExportableChildren($children);
-                        $this->childProductCounter += count($exportableChildren);
-                        $selectionProductIdsExport = array_merge($selectionProductIdsExport, $exportableChildren);
-                    } else {
-                        $this->simpleProductCounter++;
-                        $selectionProductIdsExport[] = [
-                            'id' => $product->getId(),
-                            'type' => 'simple',
-                        ];
-                    }
-                }
-            }
-        }
-        return $selectionProductIdsExport;
     }
 
     /**

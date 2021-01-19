@@ -77,7 +77,7 @@ class LengowExportController extends AbstractController
             ]);
             $response = [
                 'success' => true,
-                'countValue' => count($this->lengowExport->getSelectionProductIdsExport([$request->get('productId')])),
+                'countValue' => count($this->lengowExport->getProductIdsExport([$request->get('productId')])),
             ];
         } else {
             $response = [

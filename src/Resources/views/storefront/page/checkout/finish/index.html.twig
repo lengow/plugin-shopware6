@@ -1,6 +1,6 @@
-{% sw_extends '@Storefront/storefront/page/checkout/finish/finish-details.html.twig' %}
+{% sw_extends '@Storefront/storefront/page/checkout/finish/index.html.twig' %}
 
-{% block page_checkout_finish_order %}
+{% block page_checkout_finish %}
     {{ parent() }}
     {% block lengow_tracker %}
         {% if page.extensions.lengow %}
