@@ -1,5 +1,6 @@
 import './component/lgw-action-button';
 import './component/lgw-action-label';
+import './component/lgw-catalog-select';
 import './component/lgw-conditional-string-field';
 import './component/lgw-country-icon';
 import './component/lgw-debug-warning';
@@ -11,6 +12,7 @@ import './component/lgw-order-state-label';
 import './component/lgw-order-type-icon';
 import './component/lgw-update-warning';
 import './extension/sw-order-detail';
+import './page/lgw-connection';
 import './page/lgw-contact';
 import './page/lgw-dashboard';
 import './page/lgw-legal-notices';
@@ -18,7 +20,9 @@ import './page/lgw-order-list';
 import './page/lgw-product-list';
 import './page/lgw-setting';
 import './page/lgw-toolbox';
-import './view/lgw-dashboard-connexion';
+import './view/lgw-connection-catalog';
+import './view/lgw-connection-cms';
+import './view/lgw-connection-home';
 import './view/lgw-dashboard-free-trial';
 import './view/lgw-dashboard-home';
 import './view/lgw-order-detail-extension';
@@ -36,6 +40,27 @@ Shopware.Module.register('lengow-connector', {
     description: 'Lengow',
 
     routes: {
+        connection: {
+            component: 'lgw-connection',
+            path: 'connection',
+            redirect: {
+                name: 'lengow.connector.connection.home'
+            },
+            children: {
+                home: {
+                    component: 'lgw-connection-home',
+                    path: 'home'
+                },
+                cms: {
+                    component: 'lgw-connection-cms',
+                    path: 'cms'
+                },
+                catalog: {
+                    component: 'lgw-connection-catalog',
+                    path: 'catalog'
+                }
+            }
+        },
         dashboard: {
             component: 'lgw-dashboard',
             path: 'dashboard'
@@ -125,9 +150,9 @@ Shopware.Module.register('lengow-connector', {
         {
             label: 'Lengow',
             color: '#ff3d58',
-            path: 'lengow.connector.dashboard',
+            path: 'lengow.connector.connection',
             id: 'lengow-connector',
-            parent: 'sw-order',
+            parent: 'sw-order'
         }
     ]
 });

@@ -1,6 +1,13 @@
 en:
   backend:
     log:
+      connection:
+        cms_creation_success: "CMS successfully created with Lengow webservice (CMS token %{cms_token})"
+        cms_creation_failed: "WARNING! CMS could NOT be created with Lengow webservice (CMS token %{cms_token})"
+        cms_already_exist: "CMS already created in Lengow (CMS token %{cms_token})"
+        try_link_catalog: "try to associate catalogue IDs %{catalog_ids} to the shop (SHOP token %{shop_token}) for the sales channel ID %{sales_channel_id}"
+        link_catalog_success: "catalogues successfully linked with Lengow webservice"
+        link_catalog_failed: "WARNING! catalogues could NOT be linked with Lengow webservice"
       export:
         unauthorised_ip: "Unauthorized access for IP: %{ip}"
         unauthorised_token: "Unauthorised access for this token: %{token}"

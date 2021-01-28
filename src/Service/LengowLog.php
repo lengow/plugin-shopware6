@@ -18,6 +18,11 @@ class LengowLog
     public const CODE_INSTALL = 'Install';
 
     /**
+     * @var string connection log code
+     */
+    public const CODE_CONNECTION = 'Connection';
+
+    /**
      * @var string setting log code
      */
     public const CODE_SETTING = 'Setting';

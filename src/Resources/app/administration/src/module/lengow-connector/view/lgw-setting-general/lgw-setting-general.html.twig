@@ -56,7 +56,8 @@
                 <sw-help-text class="lgw-help-text"
                               :text="$tc('lengow-connector.setting.lengow_main_setting.ip_enable.description')"
                               :width="200"
-                              tooltipPosition="right"></sw-help-text>
+                              tooltipPosition="right">
+                </sw-help-text>
                 <sw-switch-field class="text-center"
                                  :label="$tc('lengow-connector.setting.lengow_main_setting.ip_enable.label')"
                                  v-model="lengowIpEnabled"
@@ -82,12 +83,11 @@
                 <sw-help-text class="lgw-help-text"
                               :text="$tc('lengow-connector.setting.lengow_main_setting.tracking_id.description')"
                               :width="200"
-                              v-show="lengowTrackingEnabled"
                               tooltipPosition="right">
                 </sw-help-text>
                 <sw-select-field :label="$tc('lengow-connector.setting.lengow_main_setting.tracking_id.label')"
                                  v-model="lengowTrackingId"
-                                 v-show="lengowTrackingEnabled"
+                                 :disabled="!lengowTrackingEnabled"
                                  @change="onSaveSettings($event, 'lengowTrackingId')">
                     <option value="productId">{{ $tc('lengow-connector.setting.lengow_main_setting.tracking_value.traking_id') }}</option>
                     <option value="productNumber">{{ $tc('lengow-connector.setting.lengow_main_setting.tracking_value.traking_reference') }}</option>

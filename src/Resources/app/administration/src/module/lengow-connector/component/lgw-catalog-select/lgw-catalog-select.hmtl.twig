@@ -1,0 +1,14 @@
+{% block lgw_catalog_select %}
+    <template>
+        <div class="lgw-catalog-select">
+            <h4>{{ salesChannel.name }}</h4>
+            <sw-multi-select
+                    :options="options"
+                    :value="filter"
+                    :disabled="disabled"
+                    :placeholder="$tc('lengow-connector.connection.catalog.link_placeholder_catalog')"
+                    @change="onChange">
+            </sw-multi-select>
+        </div>
+    </template>
+{% endblock %}

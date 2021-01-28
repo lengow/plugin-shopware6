@@ -22,7 +22,7 @@ class LengowExportController extends AbstractController
     private $lengowExport;
 
     /**
-     * LengowOrderController constructor
+     * LengowExportController constructor
      *
      * @param LengowExport $lengowExport
      */

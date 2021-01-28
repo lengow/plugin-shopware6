@@ -136,17 +136,35 @@ Component.register('lgw-product-list', {
 
         isActiveOptions() {
             return [
-                { label: 'All', value: 'all' },
-                { label: 'Active only', value: 'active' },
-                { label: 'Inactive only', value: 'inactive' }
+                {
+                    label: this.$tc('lengow-connector.product.filter.option_all'),
+                    value: 'all'
+                },
+                {
+                    label: this.$tc('lengow-connector.product.filter.active_option_active'),
+                    value: 'active'
+                },
+                {
+                    label: this.$tc('lengow-connector.product.filter.active_option_inactive'),
+                    value: 'inactive'
+                }
             ];
         },
 
         isWithStockOptions() {
             return [
-                { label: 'All', value: 'all' },
-                { label: 'With stock only', value: 'stock' },
-                { label: 'Without stock only', value: 'nostock' }
+                {
+                    label: this.$tc('lengow-connector.product.filter.option_all'),
+                    value: 'all'
+                },
+                {
+                    label: this.$tc('lengow-connector.product.filter.stock_option_with_stock'),
+                    value: 'stock'
+                },
+                {
+                    label: this.$tc('lengow-connector.product.filter.stock_option_without_stock'),
+                    value: 'nostock'
+                }
             ];
         }
     },

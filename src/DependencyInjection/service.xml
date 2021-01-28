@@ -34,6 +34,12 @@
             <argument type="service" id="salutation.repository"/>
         </service>
 
+        <service id="Lengow\Connector\Service\LengowCatalog">
+            <argument type="service" id="Lengow\Connector\Service\LengowConfiguration"/>
+            <argument type="service" id="Lengow\Connector\Service\LengowConnector"/>
+            <argument type="service" id="Lengow\Connector\Service\LengowLog"/>
+        </service>
+
         <service id="Lengow\Connector\Service\LengowConfiguration">
             <argument type="service" id="lengow_settings.repository"/>
             <argument type="service" id="Shopware\Core\System\SystemConfig\SystemConfigService" />
@@ -86,9 +92,7 @@
 
         <service id="Lengow\Connector\Service\LengowExport">
             <argument type="service" id="Lengow\Connector\Service\LengowConfiguration"/>
-            <argument type="service" id="product.repository"/>
             <argument type="service" id="sales_channel.repository"/>
-            <argument type="service" id="category.repository"/>
             <argument type="service" id="shipping_method.repository"/>
             <argument type="service" id="lengow_product.repository"/>
             <argument type="service" id="currency.repository"/>

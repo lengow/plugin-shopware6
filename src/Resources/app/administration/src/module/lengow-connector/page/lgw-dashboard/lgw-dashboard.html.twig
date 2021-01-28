@@ -6,7 +6,7 @@
                     <h2>
                         {% block lgw_dashboard_smart_bar_header_title_text %}
                             {{ $tc('lengow-connector.page.dashboard') }}
-                            <template v-if="!isNew && !trialExpired && !trialLoading && !isLoading">
+                            <template v-if="!trialExpired && !isLoading">
                                 <lgw-debug-warning></lgw-debug-warning>
                                 <lgw-update-warning></lgw-update-warning>
                                 <lgw-free-trial-warning></lgw-free-trial-warning>
@@ -18,13 +18,10 @@
         {% endblock %}
         {% block lgw_dashboard_content %}
             <template #content>
-                <template v-if="!isNew && !trialExpired && !trialLoading && !isLoading">
+                <template v-if="!trialExpired && !isLoading">
                     <lgw-dashboard-home></lgw-dashboard-home>
                 </template>
-                <template v-else-if="isNew && !trialLoading && !isLoading">
-                    <lgw-dashboard-connexion></lgw-dashboard-connexion>
-                </template>
-                <template v-else-if="trialExpired && !trialLoading && !isLoading">
+                <template v-else-if="trialExpired && !isLoading">
                     <lgw-dashboard-free-trial></lgw-dashboard-free-trial>
                 </template>
                 <template v-else>

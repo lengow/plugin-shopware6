@@ -51,17 +51,7 @@ class LengowExport
     /**
      * @var EntityRepositoryInterface productRepository
      */
-    private $productRepository;
-
-    /**
-     * @var EntityRepositoryInterface productRepository
-     */
     private $salesChannelRepository;
-
-    /**
-     * @var EntityRepositoryInterface productRepository
-     */
-    private $categoryRepository;
 
     /**
      * @var EntityRepositoryInterface productRepository
@@ -227,9 +217,7 @@ class LengowExport
     /**
      * LengowExport constructor
      * @param LengowConfiguration $lengowConfiguration lengow config access
-     * @param EntityRepositoryInterface $productRepository product repository
      * @param EntityRepositoryInterface $salesChannelRepository sales channel repository
-     * @param EntityRepositoryInterface $categoryRepository category repository
      * @param EntityRepositoryInterface $shippingMethodRepository, shipping method repository
      * @param EntityRepositoryInterface $lengowProductRepository lengow product repository
      * @param EntityRepositoryInterface $currencyRepository currency repository
@@ -244,9 +232,7 @@ class LengowExport
      */
     public function __construct(
         LengowConfiguration $lengowConfiguration,
-        EntityRepositoryInterface $productRepository,
         EntityRepositoryInterface $salesChannelRepository,
-        EntityRepositoryInterface $categoryRepository,
         EntityRepositoryInterface $shippingMethodRepository,
         EntityRepositoryInterface $lengowProductRepository,
         EntityRepositoryInterface $currencyRepository,
@@ -261,9 +247,7 @@ class LengowExport
     )
     {
         $this->lengowConfiguration = $lengowConfiguration;
-        $this->productRepository = $productRepository;
         $this->salesChannelRepository = $salesChannelRepository;
-        $this->categoryRepository = $categoryRepository;
         $this->lengowProductRepository = $lengowProductRepository;
         $this->currencyRepository = $currencyRepository;
         $this->languageRepository = $languageRepository;
@@ -340,22 +324,17 @@ class LengowExport
      */
     public function getTotalProduct(): int
     {
-        $categoryCollection = $this->getSalesChannelCategoryCollection();
-        if ($categoryCollection === null) {
+        $entryPoint = $this->salesChannel->getNavigationCategoryId();
+        // if no entry point is found, we can't retrieve the products
+        if (!$entryPoint) {
             return 0;
         }
-        $parentProductCounter = 0;
-        $childProductCounter = 0;
-        foreach ($categoryCollection as $category) {
-            foreach ($category->getProducts() as $product) {
-                if ($product->getParentId() === null) {
-                    $parentProductCounter++;
-                    $children = $this->getChildren($product);
-                    $childProductCounter += count($children);
-                }
-            }
-        }
-        return $parentProductCounter + $childProductCounter;
+        $products = $this->connexion->fetchAll('
+            SELECT DISTINCT id FROM product AS p
+            JOIN product_category_tree as pct ON p.id = pct.product_id
+            WHERE pct.category_id = "' . hex2bin($entryPoint) . '"
+        ');
+        return count($products);
     }
 
     /**
@@ -433,7 +412,6 @@ class LengowExport
                 ]),
                 $this->logOutput
             );
-            return true;
         } catch (LengowException $e) {
             $errorMessage = $e->getMessage();
         } catch (Exception $e) {
@@ -450,6 +428,7 @@ class LengowExport
             );
             return false;
         }
+        return true;
     }
 
     /**
@@ -526,71 +505,28 @@ class LengowExport
     }
 
     /**
-     * return child count and add all child to array $sortedProductIds from sql result
-     *
-     * @param array $parent the sql result of parent products query
-     * @param array $products the sql result of all products query
-     * @param array $sortedProductIds array of sorted products
-     * @return int the number of child for the given parent products
-     */
-    private function getChildProductIdFromSqlResult(array $parent, array $products, array &$sortedProductIds): int
-    {
-        $childCounter = 0;
-        foreach ($products as $product) {
-            if ($product['parent_id'] === $parent['id'] && $this->isExportableFromSqlResult($product, $parent)) {
-                $childCounter++;
-                $sortedProductIds[] = [
-                    'id' => $product['id'],
-                    'type' => 'child',
-                ];
-            }
-        }
-        return $childCounter;
-    }
-
-    /**
-     * Check if product is exportable from sql query result
-     *
-     * @param array $productData the sql result of the product query
-     * @param array $parentData if the product is a child, active check must be on the parent
-     * @return bool
-     */
-    private function isExportableFromSqlResult(array $productData, array $parentData = []): bool
-    {
-        if ($parentData) {
-            return !(
-                (!$this->exportConfiguration['variation'] && $productData['parent_id'] !== null)
-                || (!$this->exportConfiguration['out_of_stock'] && $productData['available_stock'] <= 0)
-                || (!$this->exportConfiguration['inactive'] && $parentData['active'] !== 1)
-            );
-        }
-        return !(
-            (!$this->exportConfiguration['variation'] && $productData['parent_id'] !== null)
-            || (!$this->exportConfiguration['out_of_stock'] && $productData['available_stock'] <= 0)
-            || (!$this->exportConfiguration['inactive'] && $productData['active'] !== 1)
-        );
-    }
-
-    /**
      * retrieve all parent products for sales channel
      *
      * @return array
      */
     public function getAllProductIdForSalesChannel(): array
     {
-        $categoryCollection = $this->getSalesChannelCategoryCollection();
-        if ($categoryCollection === null) {
+        $entryPoint = $this->salesChannel->getNavigationCategoryId();
+        // if no entry point is found, we can't retrieve the products
+        if (!$entryPoint) {
             return [];
         }
-        $productIdArray = [];
-        foreach ($categoryCollection as $category) {
-            foreach ($category->getProducts() as $product) {
-                if ($product->getParentId() === null) {
-                    $productIdArray[] = $product->getId();
-                }
-            }
+        $productIds = [];
+        $products = $this->connexion->fetchAll('
+            SELECT DISTINCT id FROM product AS p
+            JOIN product_category_tree as pct ON p.id = pct.product_id
+            WHERE pct.category_id = "' . hex2bin($entryPoint) . '" AND p.parent_id IS NULL
+        ');
+        // clean result from db before sorting
+        foreach ($products as $product) {
+            $productIds[] = (string) bin2hex($product['id']);
         }
-        return $productIdArray;
+        return $productIds;
     }
 
     /**
@@ -717,35 +653,49 @@ class LengowExport
     }
 
     /**
-     * Get sales channel category collection
+     * return child count and add all child to array $sortedProductIds from sql result
      *
-     * @return EntityCollection|null
+     * @param array $parent the sql result of parent products query
+     * @param array $products the sql result of all products query
+     * @param array $sortedProductIds array of sorted products
+     * @return int the number of child for the given parent products
      */
-    private function getSalesChannelCategoryCollection(): ?EntityCollection
+    private function getChildProductIdFromSqlResult(array $parent, array $products, array &$sortedProductIds): int
     {
-        $categoryCriteria = new Criteria();
-        if ($this->salesChannel === null) {
-            return null;
+        $childCounter = 0;
+        foreach ($products as $product) {
+            if ($product['parent_id'] === $parent['id'] && $this->isExportableFromSqlResult($product, $parent)) {
+                $childCounter++;
+                $sortedProductIds[] = [
+                    'id' => $product['id'],
+                    'type' => 'child',
+                ];
+            }
         }
-        $categoryCriteria->setIds([$this->salesChannel->getNavigationCategoryId()]);
-        $categoryArray = $this->categoryRepository
-            ->search($categoryCriteria, Context::createDefaultContext())
-            ->getEntities()
-            ->getElements();
-        if (!isset($categoryArray[array_key_first($categoryArray)])) {
-            $this->lengowLog->write(
-                LengowLog::CODE_EXPORT,
-                $this->lengowLog->encodeMessage('log.export.category_not_found'),
-                $this->logOutput
+        return $childCounter;
+    }
+
+    /**
+     * Check if product is exportable from sql query result
+     *
+     * @param array $productData the sql result of the product query
+     * @param array $parentData if the product is a child, active check must be on the parent
+     * @return bool
+     */
+    private function isExportableFromSqlResult(array $productData, array $parentData = []): bool
+    {
+        if ($parentData) {
+            return !(
+                (!$this->exportConfiguration['variation'] && !empty($productData['parent_id']))
+                || (!$this->exportConfiguration['out_of_stock'] && (int) $productData['available_stock'] <= 0)
+                || (!$this->exportConfiguration['inactive'] && !((bool) $parentData['active']))
             );
-            return null;
         }
-        $masterCategoryId = (string) $categoryArray[array_key_first($categoryArray)]->getId();
-        $categoryCriteria = new Criteria();
-        $categoryCriteria->addFilter(new ContainsFilter('path', $masterCategoryId))
-            ->addAssociation('products');
-        $categoryCollection = $this->categoryRepository->search($categoryCriteria, Context::createDefaultContext());
-        return $categoryCollection->count() > 0 ? $categoryCollection : null;
+        return !(
+            (!$this->exportConfiguration['variation'] && !empty($productData['parent_id']))
+            || (!$this->exportConfiguration['out_of_stock'] && (int) $productData['available_stock'] <= 0)
+            || (!$this->exportConfiguration['inactive'] && !((bool) $productData['active']))
+        );
     }
 
     /**
@@ -775,58 +725,6 @@ class LengowExport
         }
         return $lengowProductIds;
     }
-
-    /**
-     * Get all exportable children products
-     *
-     * @param ProductCollection $childrenCollection All children products
-     *
-     * @return array
-     */
-    private function getExportableChildren(ProductCollection $childrenCollection): array
-    {
-        $exportableChildren = [];
-        foreach ($childrenCollection as $product) {
-            if ($this->isExportable($product)) {
-                $exportableChildren[] = [
-                    'id' => $product->getId(),
-                    'type' => 'child',
-                ];
-            }
-        }
-        return $exportableChildren;
-    }
-
-    /**
-     * check if product is exportable depending on get param and configuration
-     *
-     * @param ProductEntity $product the product
-     *
-     * @return bool
-     */
-    private function isExportable(ProductEntity $product): bool
-    {
-        return !(
-            (!$this->exportConfiguration['variation'] && $product->getParentId() !== null)
-            || (!$this->exportConfiguration['out_of_stock'] && $product->getAvailableStock() <= 0)
-            || (!$this->exportConfiguration['inactive'] && $product->getActive() !== true)
-        );
-    }
-
-    /**
-     * Get children id from a parent product
-     *
-     * @param ProductEntity $parentProduct the parent product
-     *
-     * @return EntityCollection
-     */
-    private function getChildren(ProductEntity $parentProduct): EntityCollection
-    {
-        $productCriteria = new Criteria();
-        $productCriteria->addFilter(new EqualsFilter('parentId', $parentProduct->getId()));
-        return $this->productRepository->search($productCriteria, Context::createDefaultContext())->getEntities();
-    }
-
 
     /**
      * Get all sales channels

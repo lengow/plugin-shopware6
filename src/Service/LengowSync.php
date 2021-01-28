@@ -2,7 +2,7 @@
 
 namespace Lengow\Connector\Service;
 
-use Lengow\Connector\Exception\LengowException;
+use \Exception;
 use Lengow\Connector\Factory\LengowFileFactory;
 use Lengow\Connector\Util\EnvironmentInfoProvider;
 
@@ -100,13 +100,13 @@ class LengowSync
     /**
      * @var array cache time for catalog, account status, cms options and marketplace synchronisation
      */
-    private $cacheTimes = array(
+    private $cacheTimes = [
         self::SYNC_CATALOG => 21600,
         self::SYNC_CMS_OPTION => 86400,
         self::SYNC_STATUS_ACCOUNT => 86400,
         self::SYNC_MARKETPLACE => 43200,
         self::SYNC_PLUGIN_DATA => 86400,
-    );
+    ];
 
     /**
      * @var array valid sync actions
@@ -175,7 +175,6 @@ class LengowSync
             'plugin_version' => $this->environmentInfoProvider->getPluginVersion(),
             'email' => $this->lengowConfiguration->get('core.basicInformation.email'),
             'cron_url' => $this->lengowConfiguration->getCronUrl(),
-            'return_url' => $this->environmentInfoProvider->getBaseUrl() . '/admin/lengow/connector/dashboard',
             'shops' => [],
         ];
         $salesChannels = $this->environmentInfoProvider->getActiveSalesChannels();
@@ -185,7 +184,7 @@ class LengowSync
                 $this->lengowExport->init([
                     'sales_channel_id' => $salesChannelId,
                 ]);
-                $syncData['shops'][$salesChannelId] = [
+                $syncData['shops'][] = [
                     'token' => $this->lengowConfiguration->getToken($salesChannelId),
                     'shop_name' => $salesChannel->getName(),
                     'domain_url' => $this->environmentInfoProvider->getBaseUrl($salesChannelId),
@@ -209,14 +208,15 @@ class LengowSync
      */
     public function syncCatalog(bool $force = false, bool $logOutput = false): bool
     {
+        $success = false;
         $settingUpdated = false;
         if ($this->lengowConfiguration->isNewMerchant()) {
-            return false;
+            return $success;
         }
         if (!$force) {
             $updatedAt = $this->lengowConfiguration->get(LengowConfiguration::LENGOW_CATALOG_UPDATE);
             if ($updatedAt !== null && (time() - (int) $updatedAt) < $this->cacheTimes[self::SYNC_CATALOG]) {
-                return false;
+                return $success;
             }
         }
         $result = $this->lengowConnector->queryApi(LengowConnector::GET, LengowConnector::API_CMS, [], '', $logOutput);
@@ -228,7 +228,7 @@ class LengowSync
                 }
                 foreach ($cms->shops as $cmsShop) {
                     $salesChannel = $this->lengowConfiguration->getSalesChannelByToken($cmsShop->token);
-                    if ($salesChannel === null) {
+                    if ($salesChannel === null || !isset($cmsShop->catalog_ids)) {
                         continue;
                     }
                     $salesChannelId = $salesChannel->getId();
@@ -238,6 +238,7 @@ class LengowSync
                         $settingUpdated = true;
                     }
                 }
+                $success = true;
                 break;
             }
         }
@@ -246,7 +247,7 @@ class LengowSync
             $this->lengowConfiguration->set(LengowConfiguration::LENGOW_LAST_SETTING_UPDATE, (string) time());
         }
         $this->lengowConfiguration->set(LengowConfiguration::LENGOW_CATALOG_UPDATE, (string) time());
-        return true;
+        return $success;
     }
 
     /**
@@ -352,7 +353,7 @@ class LengowSync
                 $marketplaceFile->write(json_encode($result));
                 $marketplaceFile->close();
                 $this->lengowConfiguration->set(LengowConfiguration::LENGOW_MARKETPLACE_UPDATE, (string) time());
-            } catch (LengowException $e) {
+            } catch (Exception $e) {
                 $decodedMessage = $this->lengowLog->decodeMessage(
                     $e->getMessage(),
                     LengowTranslation::DEFAULT_ISO_CODE

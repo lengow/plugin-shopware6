@@ -1,13 +1,11 @@
 import template from './lgw-footer.html.twig';
 import './lgw-footer.css';
-import { envMixin, LENGOW_URL, MODULE_VERSION } from '../../../const';
+import { LENGOW_URL, MODULE_VERSION } from '../../../const';
 
 const { Component } = Shopware;
 
 Component.register('lgw-footer', {
     template,
-
-    mixins: [envMixin],
 
     data() {
         return {

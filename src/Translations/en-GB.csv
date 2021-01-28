@@ -7,7 +7,7 @@ lengow_log.error.nb_action_success|%{nb_action} action(s) successfully sent
 lengow_log.error.nb_action_error|%{nb_action} action(s) blocked by an error
 lengow_log.error.rest_time_to_import|Please wait %{rest_time} seconds before syncing your orders again
 lengow_log.error.credentials_not_valid|Account ID, token access or secret token are not valid
-lengow_log.error.no_catalog_for_sales_channel|No catalog ID valid for the sales channel %{sales_channel_name} (%{sales_channel_id})
+lengow_log.error.no_catalog_for_sales_channel|No catalogue ID valid for the sales channel %{sales_channel_name} (%{sales_channel_id})
 lengow_log.error.order_not_found|Lengow error: order cannot be found in Lengow feed
 lengow_log.error.no_product|Lengow error: no product in the order
 lengow_log.error.no_change_rate|Lengow error: no exchange rates available for order prices
@@ -39,6 +39,16 @@ lengow_log.exception.shopware_order_not_saved|WARNING! Order could NOT be saved 
 lengow_log.mail_report.subject_report_mail|Lengow imports errors
 lengow_log.mail_report.order|Order %{marketplace_sku}
 lengow_log.mail_report.no_error_in_report_mail|no error message, contact support via https://supportlengow.zendesk.com/agent/
+lengow_log.connection.status_draft|Draft
+lengow_log.connection.status_active|Active
+lengow_log.connection.catalog|Catalogue %{catalog_id}
+lengow_log.connection.catalog_label|%{catalog_id} - %{catalog_name} - %{nb_products} products - %{catalog_status}
+log.connection.cms_creation_success|CMS successfully created with Lengow webservice (CMS token %{cms_token})
+log.connection.cms_creation_failed|WARNING! CMS could NOT be created with Lengow webservice (CMS token %{cms_token})
+log.connection.cms_already_exist|CMS already created in Lengow (CMS token %{cms_token})
+log.connection.try_link_catalog|try to associate catalogue IDs %{catalog_ids} to the shop (SHOP token %{shop_token}) for the sales channel ID %{sales_channel_id}
+log.connection.link_catalog_success|catalogues successfully linked with Lengow webservice
+log.connection.link_catalog_failed|WARNING! catalogues could NOT be linked with Lengow webservice
 log.export.unauthorised_ip|Unauthorized access for IP: %{ip}
 log.export.unauthorised_token|Unauthorised access for this token: %{token}
 log.export.empty_token|Unauthorised access: token parameter is empty

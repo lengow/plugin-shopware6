@@ -5,21 +5,6 @@ class LengowConnectorSyncService extends ApiService {
         super(httpClient, loginService, apiEndpoint);
     }
 
-    getSyncData() {
-        const headers = this.getBasicHeaders();
-
-        return this.httpClient
-            .get(
-                `_action/${this.getApiBasePath()}/sync/get-sync-data`,
-                {
-                    headers: headers
-                }
-            )
-            .then((response) => {
-                return ApiService.handleResponse(response);
-            });
-    }
-
     getPluginData() {
         const headers = this.getBasicHeaders();
 

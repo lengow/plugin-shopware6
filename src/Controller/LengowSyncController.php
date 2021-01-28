@@ -33,24 +33,6 @@ class LengowSyncController extends AbstractController
     }
 
     /**
-     * Get all sync data
-     *
-     * @Route("/api/v{version}/_action/lengow/sync/get-sync-data",
-     *      name="api.action.lengow.sync.get-sync-data",
-     *      methods={"GET"})
-     *
-     * @return JsonResponse
-     */
-    public function getSyncData(): JsonResponse
-    {
-        $response = [
-            'function' => 'sync',
-            'parameters' => $this->lengowSync->getSyncData(),
-        ];
-        return new JsonResponse($response);
-    }
-
-    /**
      * Get plugin data
      *
      * @Route("/api/v{version}/_action/lengow/sync/get-plugin-data",

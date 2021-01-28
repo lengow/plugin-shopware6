@@ -39,3 +39,7 @@ lengow_log.exception.shopware_order_not_saved|ATTENTION ! La commande n'a pas pu
 lengow_log.mail_report.subject_report_mail|Erreur de l'import Lengow
 lengow_log.mail_report.order|Commande %{marketplace_sku}
 lengow_log.mail_report.no_error_in_report_mail|Pas de message d'erreur, contacter le support via https://supportlengow.zendesk.com/agent/
+lengow_log.connection.status_draft|Incomplet
+lengow_log.connection.status_active|Actif
+lengow_log.connection.catalog|Catalogue %{catalog_id}
+lengow_log.connection.catalog_label|%{catalog_id} - %{catalog_name} - %{nb_products} produits - %{catalog_status}

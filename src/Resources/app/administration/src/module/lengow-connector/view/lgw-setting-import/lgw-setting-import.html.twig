@@ -17,6 +17,7 @@
                               tooltipPosition="right"/>
                 <sw-switch-field class="text-center"
                                  :label="$tc('lengow-connector.setting.lengow_import_setting.decrease_stock.label')"
+                                 :disabled="!lengowImportShipMpEnabled"
                                  v-model="lengowImportStockShipMp"
                                  @change="onSaveSettings($event, 'lengowImportStockShipMp')">
                 </sw-switch-field>

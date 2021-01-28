@@ -163,7 +163,7 @@ class LengowConfiguration
         self::LENGOW_TRACKING_ID => [
             'lengow_settings' => true,
             'global' => true,
-            'default_value' => 'id',
+            'default_value' => 'productId',
         ],
         self::LENGOW_ACCOUNT_STATUS => [
             'lengow_settings' => true,
@@ -495,6 +495,40 @@ class LengowConfiguration
             return [$accountId, $accessToken, $secretToken];
         }
         return [null, null, null];
+    }
+
+    /**
+     * Set Valid Account id / Access token / Secret token
+     *
+     * @param array $accessIds Account id / Access token / Secret token
+     *
+     * @return bool
+     */
+    public function setAccessIds(array $accessIds): bool
+    {
+        $count = 0;
+        $listKey = [self::LENGOW_ACCOUNT_ID, self::LENGOW_ACCESS_TOKEN, self::LENGOW_SECRET_TOKEN];
+        foreach ($accessIds as $key => $value) {
+            if (!in_array($key, $listKey, true)) {
+                continue;
+            }
+            if ($value !== '') {
+                $count++;
+                $this->set($key, (string) $value);
+            }
+        }
+        return $count === count($listKey);
+    }
+
+    /**
+     * Reset Account id / Access token / Secret token
+     */
+    public function resetAccessIds(): void
+    {
+        $accessIds = [self::LENGOW_ACCOUNT_ID, self::LENGOW_ACCESS_TOKEN, self::LENGOW_SECRET_TOKEN];
+        foreach ($accessIds as $key) {
+            $this->set($key, '');
+        }
     }
 
     /**

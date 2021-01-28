@@ -1,18 +1,7 @@
 // export const LENGOW_URL = 'https://my.lengow.io';
 export const LENGOW_URL = 'https://my.lengow.net';
 
-// export const LENGOW_CMS_URL = 'https://cms.lengow.io/';
-export const LENGOW_CMS_URL = 'https://cms.lengow.net/';
-
 export const MODULE_VERSION = '1.0.0';
-
-export const envMixin = {
-    data() {
-        return {
-            LENGOW_URL
-        };
-    }
-};
 
 export const ORDER_LENGOW_STATES = {
     accepted: 'accepted',

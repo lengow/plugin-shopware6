@@ -1,0 +1,155 @@
+{% block lgw_connection_cms %}
+    <sw-card class="lgw-connection-cms">
+        <div class="lgw-content-section">
+            <div class="lgw-text-center lgw-logo">
+                <img :src="'lengowconnector/lengow-blue.png' | asset" alt="lengow">
+            </div>
+        </div>
+        <div v-if="showCredentialForm">
+            {% block lgw_connection_cms_credential_form %}
+                <div class="lgw-content-section">
+                    <h2 class="lgw-text-center">
+                        {{ $tc('lengow-connector.connection.cms.credentials_title') }}
+                    </h2>
+                </div>
+                <div class="lgw-content-input">
+                    <sw-text-field @change="handleChangeCredentials('accessToken', $event)"
+                                   :value="accessToken"
+                                   :disabled="isLoading"
+                                   :placeholder="$tc('lengow-connector.connection.cms.credentials_placeholder_access_token')">
+                    </sw-text-field>
+                    <sw-text-field @change="handleChangeCredentials('secret', $event)"
+                                   :value="secret"
+                                   :disabled="isLoading"
+                                   :placeholder="$tc('lengow-connector.connection.cms.credentials_placeholder_secret')">
+                    </sw-text-field>
+                </div>
+                <div class="lgw-content-section">
+                    <p class="lgw-text-center">
+                        {{ $tc('lengow-connector.connection.cms.credentials_description') }}
+                    </p>
+                    <p class="lgw-text-center">
+                        {{ $tc('lengow-connector.connection.cms.credentials_help') }}
+                        <a :href="$tc('lengow-connector.connection.cms.credentials_help_center_url')" target="_blank">
+                            {{ $tc('lengow-connector.connection.cms.credentials_help_center') }}
+                        </a>
+                    </p>
+                </div>
+                <div class="lgw-text-center">
+                    <sw-button class="lgw-btn"
+                               @click="connectCms"
+                               :disabled="connectionButtonDisabled"
+                               :isLoading="isLoading">
+                        {{ $tc('lengow-connector.connection.cms.credentials_button') }}
+                    </sw-button>
+                </div>
+            {% endblock %}
+        </div>
+        <div v-else>
+            <div v-if="cmsConnected">
+                {% block lgw_connection_cms_success %}
+                    <div class="lgw-content-section">
+                        <h2 class="lgw-text-center">
+                            {{ $tc('lengow-connector.connection.cms.success_title') }}
+                        </h2>
+                    </div>
+                    <div class="lgw-module-illu mod-connected">
+                        <img :src="'lengowconnector/connected-shopware.png' | asset" class="lgw-module-illu-module" alt="">
+                        <img :src="'lengowconnector/connected-lengow.png' | asset" class="lgw-module-illu-lengow" alt="">
+                        <img :src="'lengowconnector/connection-module.png' | asset" class="lgw-module-illu-plug" alt="">
+                    </div>
+                    <template v-if="hasCatalogToLink">
+                        {% block lgw_connection_cms_success_catalog %}
+                            <div class="lgw-content-section">
+                                <p class="lgw-text-center">
+                                    {{ $tc('lengow-connector.connection.cms.success_description_first_catalog') }}
+                                </p>
+                                <p class="lgw-text-center">
+                                    {{ $tc('lengow-connector.connection.cms.success_description_second_catalog') }}
+                                </p>
+                            </div>
+                            <div class="lgw-text-center">
+                                <routerLink class="lgw-btn" :to="{ name: 'lengow.connector.connection.catalog' }">
+                                    {{ $tc('lengow-connector.connection.cms.success_button_catalog') }}
+                                </routerLink>
+                            </div>
+                        {% endblock %}
+                    </template>
+                    <template v-else>
+                        {% block lgw_connection_cms_success_no_catalog %}
+                            <div class="lgw-content-section">
+                                <p class="lgw-text-center">
+                                    {{ $tc('lengow-connector.connection.cms.success_description_first') }}
+                                </p>
+                                <p class="lgw-text-center">
+                                    {{ $tc('lengow-connector.connection.cms.success_description_second') }}
+                                    <a :href="lengowUrl" target="_blank">
+                                        {{ $tc('lengow-connector.connection.cms.success_description_second_go_to_lengow') }}
+                                    </a>
+                                </p>
+                            </div>
+                            <div class="lgw-text-center">
+                                <routerLink class="lgw-btn" :to="{ name: 'lengow.connector.dashboard' }">
+                                    {{ $tc('lengow-connector.connection.cms.success_button') }}
+                                </routerLink>
+                            </div>
+                        {% endblock %}
+                    </template>
+                {% endblock %}
+            </div>
+            <div v-else>
+                {% block lgw_connection_cms_failed %}
+                    <div class="lgw-content-section">
+                        <h2 class="lgw-text-center">
+                            {{ $tc('lengow-connector.connection.cms.failed_title') }}
+                        </h2>
+                    </div>
+                    <div class="lgw-module-illu mod-disconnected">
+                        <img :src="'lengowconnector/connected-shopware.png' | asset" class="lgw-module-illu-module" alt="">
+                        <img :src="'lengowconnector/connected-lengow.png' | asset" class="lgw-module-illu-lengow" alt="">
+                        <img :src="'lengowconnector/unplugged.png' | asset" class="lgw-module-illu-plug" alt="">
+                    </div>
+                    <div class="lgw-content-section">
+                        <template v-if="credentialsValid">
+                            {% block lgw_connection_cms_failed_cms_not_connected %}
+                                <p class="lgw-text-center">
+                                    {{ $tc('lengow-connector.connection.cms.failed_description') }}
+                                </p>
+                            {% endblock %}
+                        </template>
+                        <template v-else>
+                            {% block lgw_connection_cms_failed_crendentials_not_valid %}
+                                <p class="lgw-text-center">
+                                    {{ $tc('lengow-connector.connection.cms.failed_description_first_credentials') }}
+                                </p>
+                                <p v-if="preprod" class="lgw-text-center">
+                                    {{ $tc('lengow-connector.connection.cms.failed_description_second_credentials_preprod') }}
+                                </p>
+                                <p v-else class="lgw-text-center">
+                                    {{ $tc('lengow-connector.connection.cms.failed_description_second_credentials_prod') }}
+                                </p>
+                            {% endblock %}
+                        </template>
+                        <p class="lgw-text-center">
+                            {{ $tc('lengow-connector.connection.cms.failed_help') }}
+                            <a :href="$tc('lengow-connector.contact.knowledge_link_url')" target="_blank">
+                                {{ $tc('lengow-connector.connection.cms.failed_help_center') }}
+                            </a>
+                            {{ $tc('lengow-connector.connection.cms.failed_help_or') }}
+                            <a :href="$tc('lengow-connector.contact.link_lengow_support')" target="_blank">
+                                {{ $tc('lengow-connector.connection.cms.failed_help_customer_success_team') }}
+                            </a>
+                        </p>
+                    </div>
+                    <div class="lgw-text-center">
+                        <sw-button class="lgw-btn"
+                                   @click="retryConnection"
+                                   :isLoading="isLoading">
+                            {{ $tc('lengow-connector.connection.cms.failed_button') }}
+                        </sw-button>
+                    </div>
+                {% endblock %}
+            </div>
+        </div>
+    </sw-card>
+{% endblock %}

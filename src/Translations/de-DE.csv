@@ -39,3 +39,7 @@ lengow_log.exception.shopware_order_not_saved|VORSICHT! Bestellung konnte NICHT 
 lengow_log.mail_report.subject_report_mail|Lengow Importfehler
 lengow_log.mail_report.order|Bestellungen %{marketplace_sku}
 lengow_log.mail_report.no_error_in_report_mail|Keine Fehlermeldung, kontaktieren Sie den Support unter https://supportlengow.zendesk.com/agent/
+lengow_log.connection.status_draft|Vorlage
+lengow_log.connection.status_active|Aktiv
+lengow_log.connection.catalog|Katalog %{catalog_id}
+lengow_log.connection.catalog_label|%{catalog_id} - %{catalog_name} - %{nb_products} produkte - %{catalog_status}

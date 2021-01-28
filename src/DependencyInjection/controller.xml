@@ -6,6 +6,20 @@
 
     <services>
 
+        <service id="Lengow\Connector\Controller\LengowConnectionController">
+            <argument type="service" id="Lengow\Connector\Service\LengowCatalog"/>
+            <argument type="service" id="Lengow\Connector\Service\LengowConfiguration"/>
+            <argument type="service" id="Lengow\Connector\Service\LengowConnector"/>
+            <argument type="service" id="Lengow\Connector\Service\LengowLog"/>
+            <argument type="service" id="Lengow\Connector\Service\LengowSync"/>
+            <tag name="controller.service_arguments"/>
+        </service>
+
+        <service id="Lengow\Connector\Controller\LengowExportController">
+            <argument type="service" id="Lengow\Connector\Service\LengowExport"/>
+            <tag name="controller.service_arguments"/>
+        </service>
+
         <service id="Lengow\Connector\Controller\LengowOrderController">
             <argument type="service" id="Lengow\Connector\Service\LengowImport"/>
             <argument type="service" id="Lengow\Connector\Service\LengowLog"/>
@@ -22,11 +36,6 @@
 
         <service id="Lengow\Connector\Controller\LengowToolboxController">
             <argument type="service" id="Lengow\Connector\Service\LengowToolbox"/>
-            <tag name="controller.service_arguments"/>
-        </service>
-
-        <service id="Lengow\Connector\Controller\LengowExportController">
-            <argument type="service" id="Lengow\Connector\Service\LengowExport"/>
             <tag name="controller.service_arguments"/>
         </service>
 

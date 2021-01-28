@@ -59,6 +59,16 @@ class LengowConnector
     public const API_CMS = '/v3.1/cms';
 
     /**
+     * @var string url of cms catalog API
+     */
+    public const API_CMS_CATALOG = '/v3.1/cms/catalogs/';
+
+    /**
+     * @var string url of cms mapping API
+     */
+    public const API_CMS_MAPPING = '/v3.1/cms/mapping/';
+
+    /**
      * @var string url of plugin API
      */
     public const API_PLUGIN = '/v3.0/plugins';
@@ -174,7 +184,18 @@ class LengowConnector
         self::API_MARKETPLACE => 15,
         self::API_PLAN => 5,
         self::API_CMS => 5,
+        self::API_CMS_CATALOG => 10,
+        self::API_CMS_MAPPING => 10,
         self::API_PLUGIN => 5,
+    ];
+
+    /**
+     * @var array API requiring no arguments in the call url
+     */
+    private $apiWithoutUrlArgs = [
+        self::API_ACCESS_TOKEN,
+        self::API_ORDER_ACTION,
+        self::API_ORDER_MOI,
     ];
 
     /**
@@ -322,6 +343,43 @@ class LengowConnector
             $this->lengowConfiguration->set(LengowConfiguration::LENGOW_LAST_AUTH_TOKEN_UPDATE, (string)time());
         }
         $this->token = $authorizationToken;
+    }
+
+    /**
+     * Get account id by credentials from Middleware
+     *
+     * @param string $accessToken access token for api
+     * @param string $secret secret for api
+     * @param bool $logOutput see log or not
+     *
+     * @return int|null
+     */
+    public function getAccountIdByCredentials(string $accessToken, string $secret, bool $logOutput = false): ?int
+    {
+        // reset temporary token for the new authorization
+        $this->token = null;
+        try {
+            $data = $this->callAction(
+                self::API_ACCESS_TOKEN,
+                [
+                    'access_token' => $accessToken,
+                    'secret' => $secret,
+                ],
+                self::POST,
+                self::FORMAT_JSON,
+                '',
+                $logOutput
+            );
+        } catch (LengowException $e) {
+            $message = $this->lengowLog->decodeMessage($e->getMessage(), LengowTranslation::DEFAULT_ISO_CODE);
+            $error = $this->lengowLog->encodeMessage('log.connector.error_api', [
+                'error_code' => $e->getCode(),
+                'error_message' => $message,
+            ]);
+            $this->lengowLog->write(LengowLog::CODE_CONNECTOR, $error, $logOutput);
+            return null;
+        }
+        return $data['account_id'] ? (int) $data['account_id'] : null;
     }
 
     /**
@@ -531,16 +589,16 @@ class LengowConnector
      */
     private function makeRequest(string $type, string $api, array $args, string $token, string $body, bool $logOutput)
     {
-        // Define CURLE_OPERATION_TIMEDOUT for old php versions
+        // define CURLE_OPERATION_TIMEDOUT for old php versions
         defined('CURLE_OPERATION_TIMEDOUT') || define('CURLE_OPERATION_TIMEDOUT', CURLE_OPERATION_TIMEOUTED);
         $ch = curl_init();
-        // Default curl Options
+        // get default curl options
         $opts = $this->curlOpts;
         // get special timeout for specific Lengow API
         if (array_key_exists($api, $this->lengowUrls)) {
             $opts[CURLOPT_TIMEOUT] = $this->lengowUrls[$api];
         }
-        // get url for a specific environment
+        // get base url for a specific environment
         $url = self::LENGOW_API_URL . $api;
         $opts[CURLOPT_CUSTOMREQUEST] = strtoupper($type);
         $url = parse_url($url);
@@ -549,43 +607,30 @@ class LengowConnector
         }
         $opts[CURLOPT_HEADER] = false;
         $opts[CURLOPT_VERBOSE] = false;
-        if (isset($token)) {
+        if (!empty($token)) {
             $opts[CURLOPT_HTTPHEADER] = ['Authorization: ' . $token];
         }
-        $url = $url['scheme'] . '://' . $url['host'] . $url['path'];
-        switch ($type) {
-            case self::GET:
-                $opts[CURLOPT_URL] = $url . (!empty($args) ? '?' . http_build_query($args) : '');
-                break;
-            case self::PUT:
-                if (isset($token)) {
-                    $opts[CURLOPT_HTTPHEADER] = array_merge(
-                        $opts[CURLOPT_HTTPHEADER],
-                        [
-                            'Content-Type: application/json',
-                            'Content-Length: ' . strlen($body),
-                        ]
-                    );
-                }
-                $opts[CURLOPT_URL] = $url . '?' . http_build_query($args);
+        // get call url with the mandatory parameters
+        $opts[CURLOPT_URL] = $url['scheme'] . '://' . $url['host'] . $url['path'];
+        if (!empty($args) && ($type === self::GET || !in_array($api, $this->apiWithoutUrlArgs, true))) {
+            $opts[CURLOPT_URL] .= '?' . http_build_query($args);
+        }
+        if ($type !== self::GET) {
+            if (!empty($body)) {
+                // sending data in json format for new APIs
+                $opts[CURLOPT_HTTPHEADER] = array_merge(
+                    $opts[CURLOPT_HTTPHEADER],
+                    [
+                        'Content-Type: application/json',
+                        'Content-Length: ' . strlen($body),
+                    ]
+                );
                 $opts[CURLOPT_POSTFIELDS] = $body;
-                break;
-            case self::PATCH:
-                if (isset($token)) {
-                    $opts[CURLOPT_HTTPHEADER] = array_merge(
-                        $opts[CURLOPT_HTTPHEADER],
-                        ['Content-Type: application/json']
-                    );
-                }
-                $opts[CURLOPT_URL] = $url;
-                $opts[CURLOPT_POST] = count($args);
-                $opts[CURLOPT_POSTFIELDS] = json_encode($args);
-                break;
-            default:
-                $opts[CURLOPT_URL] = $url;
+            } else {
+                // sending data in string format for legacy APIs
                 $opts[CURLOPT_POST] = count($args);
                 $opts[CURLOPT_POSTFIELDS] = http_build_query($args);
-                break;
+            }
         }
         $this->lengowLog->write(
             LengowLog::CODE_CONNECTOR,
