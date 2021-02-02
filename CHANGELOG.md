@@ -16,4 +16,4 @@
 - Feature: Toolbox with all Lengow information for support
 - Feature: Download maintenance logs globally or per day
 - Feature: Direct management of settings in the plugin interface
-- Feature: Lengow account creation and synchronisation directly from the plugin
+- Feature: Lengow account synchronisation directly from the plugin

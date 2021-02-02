@@ -16,4 +16,4 @@
 - Feature: Toolbox mit allen Lengow-Informationen zur Unterstützung
 - Feature: Wartungsprotokolle global oder pro Tag herunterladen
 - Feature: Direkte Verwaltung von Einstellungen in der Plugin-Schnittstelle
-- Feature: Erstellung und Synchronisierung von Lengow-Konten direkt aus dem Plugin
+- Feature: Synchronisierung von Lengow-Konten direkt aus dem Plugin
