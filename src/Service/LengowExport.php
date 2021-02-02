@@ -447,6 +447,9 @@ class LengowExport
             // if selection is activated or product_ids get argument is used
             $lengowProductIds = $this->getLengowProductIdsToExport();
         }
+        if ($this->exportConfiguration['selection'] && empty($lengowProductIds)) {
+            return [];
+        }
         $entryPoint = $this->salesChannel->getNavigationCategoryId();
         // if no entry point is found, we can't retrieve the products
         if (!$entryPoint) {
