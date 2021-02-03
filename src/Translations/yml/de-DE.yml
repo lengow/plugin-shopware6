@@ -131,6 +131,7 @@ de:
           search_filter_label: "Suche nach ID, Name oder Produktnummer..."
         column:
           active_in_lengow: "In Lengow aktiv"
+          activate: "aktivieren"
       order:
         title: "Bestellungen"
         order_with_error: "mit Fehlern"

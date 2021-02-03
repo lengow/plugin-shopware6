@@ -146,7 +146,8 @@
                 "search_filter_label": "Search by id, name or product number..."
             },
             "column": {
-                "active_in_lengow": "Active in Lengow"
+                "active_in_lengow": "Active in Lengow",
+                "activate": "activate"
             }
         },
         "order": {

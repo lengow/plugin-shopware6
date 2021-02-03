@@ -131,6 +131,7 @@ fr:
           search_filter_label: "Recherche par id, nom ou référence produit..."
         column:
           active_in_lengow: "Actif dans Lengow"
+          activate: "activer"
       order:
         title: "Commandes"
         order_with_error: "en erreur"

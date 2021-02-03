@@ -146,7 +146,8 @@
                 "search_filter_label": "Suche nach ID, Name oder Produktnummer..."
             },
             "column": {
-                "active_in_lengow": "In Lengow aktiv"
+                "active_in_lengow": "In Lengow aktiv",
+                "activate": "aktivieren"
             }
         },
         "order": {
