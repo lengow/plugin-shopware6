@@ -420,7 +420,7 @@
 /src/Service/LengowToolbox.php|15776cee0300de74543062fd7365dfbf
 /src/Service/LengowConnector.php|bc56b3eff58785c170f880c20ccbdc4a
 /src/Service/LengowSync.php|ceb92af41bb5e6cb1df05c5eb33c3246
-/src/Service/LengowProduct.php|ea3f229cdffefa74c92f1d5e06b9f2f6
+/src/Service/LengowProduct.php|c9033bcb369677db05c14476132e8b8e
 /src/Service/LengowOrder.php|e5e45ee4119e5bb3fdb25fface324f33
 /src/Service/LengowActionSync.php|05a6f8c1eeacec33baa07320c91b7a8f
 /src/Service/LengowFeed.php|366a662fe47784b4d347409ab2c5006c

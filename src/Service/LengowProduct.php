@@ -87,7 +87,6 @@ class LengowProduct
         'height' => 'getHeight',
         'length' => 'getLength',
         'parent_id' => 'getParentId',
-        'status' => 'getActive',
         'description_short' => 'getMetaDescription',
         'description' => 'getDescription',
         'description_html' => 'getDescription',
@@ -437,8 +436,9 @@ class LengowProduct
                     $productData[$headerField] = $this->getUntranslatedField($headerField);
                     break;
                 case LengowExport::$defaultFields['status']:
-                    $value = $this->getUntranslatedField($headerField);
-                    $productData[$headerField] = $value === '1' ? 'Enabled' : 'Disabled';
+                    // get parent status > bug on child status which is null instead of boolean > issue created on Shopware's Github
+                    $value = self::$parentProduct ? self::$parentProduct->getActive() : $this->product->getActive();
+                    $productData[$headerField] = (string) $value === '1' ? 'Enabled' : 'Disabled';
                     break;
                 case LengowExport::$defaultFields['weight']:
                 case LengowExport::$defaultFields['width']:
