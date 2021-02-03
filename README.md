@@ -52,7 +52,6 @@ All Pull requests must be made on the `dev` branch and must be validated by revi
 By default the plugin is made to work on our pre-production environment (my.lengow.net).
 To change this environment, you must modify the two constants present in the file `path-to-api-connector-file`
 
-    const LENGOW_URL = 'lengow.net';
     const LENGOW_API_URL = 'https://api.lengow.net';
 
 ### Translation
