@@ -36,6 +36,7 @@ Component.register('lgw-product-list', {
             isLoading: false,
             total: 0,
             product: null,
+            defaultSalesChannel: null,
             currentSalesChannelId: this.salesChannelId,
             currentEntryPoint: null,
             salesChannelModel: null,
@@ -61,8 +62,7 @@ Component.register('lgw-product-list', {
             salesChannelName: '',
             salesChannelDomain: '',
             tempListActivated: [],
-            downloadLink: '',
-            exportToken: ''
+            downloadLink: ''
         };
     },
 
@@ -70,9 +70,9 @@ Component.register('lgw-product-list', {
         this.salesChannelRepository
             .search(new Criteria(), Shopware.Context.api)
             .then(salesChannelCollection => {
-                this.onSalesChannelChanged(salesChannelCollection.first().id).then(() => {
-                    this.$refs.lgwSalesChannelSwitch.salesChannelId = salesChannelCollection.first().id;
-                });
+                const salesChannelId = salesChannelCollection.first().id;
+                this.defaultSalesChannel = salesChannelId;
+                this.onSalesChannelChanged(salesChannelId);
             });
         this.SEARCHFILTER = 'search';
         this.ACTIVEFILTER = 'active';
@@ -277,23 +277,11 @@ Component.register('lgw-product-list', {
         },
 
         setExportLink(salesChannelId) {
-            const lengowSettingsCriteria = new Criteria();
-            lengowSettingsCriteria.addFilter(Criteria.equals('salesChannelId', salesChannelId));
-            lengowSettingsCriteria.addFilter(Criteria.equals('name', 'lengowChannelToken'));
-            this.lengowSettingsRepository
-                .search(lengowSettingsCriteria, Shopware.Context.api)
-                .then(result => {
-                    if (result.total > 0) {
-                        this.exportToken = result.first().value;
-                        this.downloadLink =
-                            `${window.location.origin
-                            }/lengow/export?token=${
-                                this.exportToken
-                            }&sales_channel_id=${
-                                salesChannelId
-                            }&stream=1&update_export_date=0&format=csv`;
-                    }
-                });
+            this.LengowConnectorExportService.getExportLink(salesChannelId).then(response => {
+                if (response.success) {
+                    this.downloadLink = response.link;
+                }
+            });
         },
 
         setupExportedCount() {
@@ -312,14 +300,14 @@ Component.register('lgw-product-list', {
             this.isLoading = true;
             this.countLoading = true;
             this.resetFilters();
-            this.currentSalesChannelId = salesChannelId;
+            this.currentSalesChannelId = salesChannelId ? salesChannelId : this.defaultSalesChannel;
             this.setupSelectionActivated();
-            this.setExportLink(salesChannelId);
-            this.LengowConnectorExportService.getProductList(salesChannelId).then(data => {
+            this.setExportLink(this.currentSalesChannelId);
+            this.LengowConnectorExportService.getProductList(this.currentSalesChannelId).then(data => {
                 this.productIds = data.productList;
                 return this.updateProductList().then(() => {
                     const salesChannelCriteria = new Criteria();
-                    salesChannelCriteria.setIds([salesChannelId]);
+                    salesChannelCriteria.setIds([this.currentSalesChannelId]);
                     salesChannelCriteria.addAssociation('domains');
                     return this.salesChannelRepository
                         .search(salesChannelCriteria, Shopware.Context.api)

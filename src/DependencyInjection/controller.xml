@@ -16,6 +16,7 @@
         </service>
 
         <service id="Lengow\Connector\Controller\LengowExportController">
+            <argument type="service" id="Lengow\Connector\Service\LengowConfiguration"/>
             <argument type="service" id="Lengow\Connector\Service\LengowExport"/>
             <tag name="controller.service_arguments"/>
         </service>

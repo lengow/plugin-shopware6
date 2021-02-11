@@ -7,6 +7,7 @@ use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\Routing\Annotation\Route;
 use Symfony\Component\HttpFoundation\JsonResponse;
+use Lengow\Connector\Service\LengowConfiguration;
 use Lengow\Connector\Service\LengowExport;
 
 /**
@@ -17,6 +18,11 @@ use Lengow\Connector\Service\LengowExport;
 class LengowExportController extends AbstractController
 {
     /**
+     * @var LengowConfiguration Lengow configuration service
+     */
+    private $lengowConfiguration;
+
+    /**
      * @var LengowExport lengow export service
      */
     private $lengowExport;
@@ -24,11 +30,37 @@ class LengowExportController extends AbstractController
     /**
      * LengowExportController constructor
      *
-     * @param LengowExport $lengowExport
+     * @param LengowConfiguration $lengowConfiguration Lengow configuration service
+     * @param LengowExport $lengowExport Lengow export service
      */
-    public function __construct(LengowExport $lengowExport)
+    public function __construct(LengowConfiguration $lengowConfiguration, LengowExport $lengowExport)
     {
+        $this->lengowConfiguration = $lengowConfiguration;
         $this->lengowExport = $lengowExport;
+    }
+
+    /**
+     * Get feed url for a specific sales channel
+     *
+     * @Route("/api/v{version}/_action/lengow/export/get-export-link",
+     *     name="api.action.lengow.export.get-export-link",
+     *     methods={"GET"})
+     *
+     * @param Request $request
+     * @return JsonResponse
+     */
+    public function getExportLink(Request $request) : JsonResponse
+    {
+        if ($request->get('salesChannelId')) {
+            $salesChannelId = $request->get('salesChannelId');
+            $feedUrl = $this->lengowConfiguration->getFeedUrl($salesChannelId);
+            $response = [
+                'success' => true,
+                'link' => $feedUrl . '&stream=1&update_export_date=0&format=csv`',
+            ];
+            return new JsonResponse($response);
+        }
+        return new JsonResponse(['success' => false]);
     }
 
     /**

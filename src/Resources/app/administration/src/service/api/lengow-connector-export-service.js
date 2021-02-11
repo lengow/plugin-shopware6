@@ -5,6 +5,21 @@ class LengowConnectorExportService extends ApiService {
         super(httpClient, loginService, apiEndpoint);
     }
 
+    getExportLink(salesChannelId) {
+        const headers = this.getBasicHeaders();
+        return this.httpClient
+            .get(
+                `_action/${this.getApiBasePath()}/export/get-export-link`,
+                {
+                    headers: headers,
+                    params: { salesChannelId: salesChannelId }
+                }
+            )
+            .then((response) => {
+                return ApiService.handleResponse(response);
+            });
+    }
+
     getExportCount(salesChannelId) {
         const headers = this.getBasicHeaders();
         return this.httpClient
