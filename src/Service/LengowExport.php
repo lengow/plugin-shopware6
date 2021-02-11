@@ -6,16 +6,12 @@ use \Exception;
 use Doctrine\DBAL\Connection as DatabaseConnexion;
 use Shopware\Core\Checkout\Shipping\ShippingMethodEntity;
 use Shopware\Core\Content\Product\Aggregate\ProductConfiguratorSetting\ProductConfiguratorSettingCollection;
-use Shopware\Core\Content\Product\ProductEntity;
-use Shopware\Core\Content\Product\ProductCollection;
 use Shopware\Core\Content\Property\PropertyGroupCollection;
 use Shopware\Core\Content\Property\PropertyGroupEntity;
 use Shopware\Core\Framework\Context;
-use Shopware\Core\Framework\DataAbstractionLayer\EntityCollection;
 use Shopware\Core\Framework\DataAbstractionLayer\EntityRepositoryInterface;
 use Shopware\Core\Framework\DataAbstractionLayer\Search\Criteria;
 use Shopware\Core\Framework\DataAbstractionLayer\Search\Filter\EqualsFilter;
-use Shopware\Core\Framework\DataAbstractionLayer\Search\Filter\ContainsFilter;
 use Shopware\Core\Framework\Uuid\Uuid;
 use Shopware\Core\System\Currency\CurrencyEntity;
 use Shopware\Core\System\CustomField\CustomFieldCollection;
@@ -24,7 +20,6 @@ use Shopware\Core\System\Language\LanguageCollection;
 use Shopware\Core\System\Language\LanguageEntity;
 use Shopware\Core\System\SalesChannel\SalesChannelCollection;
 use Shopware\Core\System\SalesChannel\SalesChannelEntity;
-use Symfony\Component\DependencyInjection\ContainerBuilder;
 use Lengow\Connector\Exception\LengowException;
 
 /**
@@ -329,11 +324,14 @@ class LengowExport
         if (!$entryPoint) {
             return 0;
         }
-        $products = $this->connexion->fetchAll('
-            SELECT DISTINCT id FROM product AS p
-            JOIN product_category_tree as pct ON p.id = pct.product_id
-            WHERE pct.category_id = "' . hex2bin($entryPoint) . '"
-        ');
+        $sql = '
+            SELECT DISTINCT p.`id` FROM `product` AS p
+            JOIN `product_category_tree` as pct ON p.`id` = pct.`product_id`
+            WHERE pct.`category_id` = :categoryId
+        ';
+        $products = $this->connexion->fetchAll($sql, [
+            'categoryId' => Uuid::fromHexToBytes($entryPoint),
+        ]);
         return count($products);
     }
 
@@ -455,13 +453,14 @@ class LengowExport
         if (!$entryPoint) {
             return [];
         }
-        $products = $this->connexion->fetchAll('
-            SELECT DISTINCT id, available_stock, active, parent_id
-            FROM product AS p
-            JOIN product_category_tree as pct
-            ON p.id = pct.product_id
-            WHERE pct.category_id = "' . hex2bin($entryPoint) . '"
-        ');
+        $sql = '
+            SELECT DISTINCT p.`id`, p.`available_stock`, p.`active`, p.`parent_id` FROM `product` AS p
+            JOIN `product_category_tree` as pct ON p.`id` = pct.`product_id`
+            WHERE pct.`category_id` = :categoryId
+        ';
+        $products = $this->connexion->fetchAll($sql, [
+            'categoryId' => Uuid::fromHexToBytes($entryPoint),
+        ]);
         // clean result from db before sorting
         foreach ($products as &$product) {
             $product['id'] = (string) bin2hex($product['id']);
@@ -520,11 +519,14 @@ class LengowExport
             return [];
         }
         $productIds = [];
-        $products = $this->connexion->fetchAll('
-            SELECT DISTINCT id FROM product AS p
-            JOIN product_category_tree as pct ON p.id = pct.product_id
-            WHERE pct.category_id = "' . hex2bin($entryPoint) . '" AND p.parent_id IS NULL
-        ');
+        $sql = '
+            SELECT DISTINCT p.`id` FROM `product` AS p
+            JOIN `product_category_tree` as pct ON p.`id` = pct.`product_id`
+            WHERE pct.`category_id` = :categoryId AND p.`parent_id` IS NULL
+        ';
+        $products = $this->connexion->fetchAll($sql, [
+            'categoryId' => Uuid::fromHexToBytes($entryPoint),
+        ]);
         // clean result from db before sorting
         foreach ($products as $product) {
             $productIds[] = (string) bin2hex($product['id']);
