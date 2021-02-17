@@ -1,3 +1,7 @@
+# v1.0.1
+- Bugfix: [export] Add parameters in product SQL requests
+- Bugfix: [export] Use getFeedUrl() function in product grid
+
 # v1.0.0
 - Feature: Lengow Dashboard (contact, helper center and quick links)
 - Feature: Product page with product selection by sales channel

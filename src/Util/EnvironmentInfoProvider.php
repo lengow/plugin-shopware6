@@ -34,7 +34,7 @@ class EnvironmentInfoProvider
     /**
      * @var string plugin version
      */
-    public const PLUGIN_VERSION = "1.0.0";
+    public const PLUGIN_VERSION = "1.0.1";
 
     /**
      * @var Kernel $kernel

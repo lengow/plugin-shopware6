@@ -1,3 +1,7 @@
+# v1.0.1
+- Bugfix: [export] Fügen Sie Parameter in Produkt-SQL-Anforderungen hinzu
+- Bugfix: [export] Verwenden Sie die Funktion getFeedUrl() im Produktraster
+
 # v1.0.0
 - Feature: Lengow Dashboard (Kontakt, HelpCenter und Quick-Links)
 - Feature: Produktseite mit Produktauswahl nach Vertriebskanal
