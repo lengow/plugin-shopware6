@@ -398,7 +398,8 @@
                 "write_permission": "Droit d'écriture sur le dossier média",
                 "server_ip": "IP Serveur",
                 "authorized_ip_enable": "Autorisation par IP activée",
-                "authorized_ips": "IP autorisée(s)"
+                "authorized_ips": "IP autorisée(s)",
+                "toolbox_url": "URL de la toolbox"
             },
             "import": {
                 "title": "Information sur la synchronisation",

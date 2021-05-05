@@ -6,6 +6,7 @@ use Shopware\Storefront\Controller\StorefrontController;
 use Symfony\Component\HttpFoundation\Request;
 use Lengow\Connector\Service\LengowAccess;
 use Lengow\Connector\Service\LengowConfiguration;
+use Lengow\Connector\Service\LengowExport;
 use Lengow\Connector\Service\LengowLog;
 use Lengow\Connector\Service\LengowTranslation;
 
@@ -58,10 +59,10 @@ abstract class LengowAbstractFrontController extends StorefrontController
     public function checkAccess(Request $request): ?string
     {
         $errorMessage = null;
-        $token = $request->query->get('token');
-        $salesChannelId = $request->query->get('sales_channel_id');
+        $token = $request->query->get(LengowExport::PARAM_TOKEN);
+        $salesChannelId = $request->query->get(LengowExport::PARAM_SALES_CHANNEL_ID);
         if (!$this->lengowAccessService->checkWebserviceAccess($token, $salesChannelId)) {
-            if ($this->lengowConfiguration->get(LengowConfiguration::LENGOW_IP_ENABLED)) {
+            if ($this->lengowConfiguration->get(LengowConfiguration::AUTHORIZED_IP_ENABLED)) {
                 $errorMessage = $this->lengowLog->decodeMessage(
                     'log.export.unauthorised_ip',
                     LengowTranslation::DEFAULT_ISO_CODE,
@@ -92,7 +93,7 @@ abstract class LengowAbstractFrontController extends StorefrontController
      */
     public function getSalesChannelName(Request $request): ?string
     {
-        $salesChannelId = $request->query->get('sales_channel_id');
+        $salesChannelId = $request->query->get(LengowExport::PARAM_SALES_CHANNEL_ID);
         if (!$salesChannelId || strlen($salesChannelId) <= 1) {
             $salesChannelId = null;
         }

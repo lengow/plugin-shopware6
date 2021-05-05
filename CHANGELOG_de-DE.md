@@ -1,3 +1,6 @@
+# v1.0.2
+- Feature: Auslagerung der Toolbox über den Webservice
+
 # v1.0.1
 - Bugfix: [export] Fügen Sie Parameter in Produkt-SQL-Anforderungen hinzu
 - Bugfix: [export] Verwenden Sie die Funktion getFeedUrl() im Produktraster

@@ -53,7 +53,7 @@ class LengowCronController extends LengowAbstractFrontController
     private $lengowActionSync;
 
     /**
-     * LengowAbstractFrontController constructor
+     * LengowCronController constructor
      *
      * @param LengowAccess $lengowAccess Lengow access security service
      * @param LengowConfiguration $lengowConfiguration Lengow configuration accessor service
@@ -94,46 +94,71 @@ class LengowCronController extends LengowAbstractFrontController
             return new Response($accessErrorMessage, Response::HTTP_FORBIDDEN);
         }
         $cronArgs = $this->createGetArgArray($request);
-        if ($cronArgs['get_sync'] === null || $cronArgs['get_sync']) {
+        if ($cronArgs[LengowImport::PARAM_GET_SYNC] === null || $cronArgs[LengowImport::PARAM_GET_SYNC]) {
             return new Response(json_encode($this->lengowSync->getSyncData()));
         }
         // sync catalogs id between Lengow and Shopware
-        if ($cronArgs['sync'] === null || $cronArgs['sync'] === LengowSync::SYNC_CATALOG) {
-            $this->lengowSync->syncCatalog($cronArgs['force'], $cronArgs['log_output']);
+        if ($cronArgs[LengowImport::PARAM_SYNC] === null
+            || $cronArgs[LengowImport::PARAM_SYNC] === LengowSync::SYNC_CATALOG
+        ) {
+            $this->lengowSync->syncCatalog(
+                $cronArgs[LengowImport::PARAM_FORCE],
+                $cronArgs[LengowImport::PARAM_LOG_OUTPUT]
+            );
         }
         // synchronise orders between Lengow and Shopware
-        if ($cronArgs['sync'] === null || $cronArgs['sync'] === LengowSync::SYNC_ORDER) {
+        if ($cronArgs[LengowImport::PARAM_SYNC] === null
+            || $cronArgs[LengowImport::PARAM_SYNC] === LengowSync::SYNC_ORDER
+        ) {
             $this->lengowImport->init($cronArgs);
             $this->lengowImport->exec();
         }
         // sync actions between Lengow and Shopware
-        if ($cronArgs['sync'] === null || $cronArgs['sync'] === LengowSync::SYNC_ACTION) {
-            $this->lengowActionSync->checkFinishAction($cronArgs['log_output']);
-            $this->lengowActionSync->checkOldAction($cronArgs['log_output']);
-            $this->lengowActionSync->checkNotSentAction($cronArgs['log_output']);
+        if ($cronArgs[LengowImport::PARAM_SYNC] === null
+            || $cronArgs[LengowImport::PARAM_SYNC] === LengowSync::SYNC_ACTION
+        ) {
+            $this->lengowActionSync->checkFinishAction($cronArgs[LengowImport::PARAM_LOG_OUTPUT]);
+            $this->lengowActionSync->checkOldAction($cronArgs[LengowImport::PARAM_LOG_OUTPUT]);
+            $this->lengowActionSync->checkNotSentAction($cronArgs[LengowImport::PARAM_LOG_OUTPUT]);
         }
         // sync options between Lengow and Shopware
-        if ($cronArgs['sync'] === null || $cronArgs['sync'] === LengowSync::SYNC_CMS_OPTION) {
-            $this->lengowSync->setCmsOption($cronArgs['force'], $cronArgs['log_output']);
+        if ($cronArgs[LengowImport::PARAM_SYNC] === null
+            || $cronArgs[LengowImport::PARAM_SYNC] === LengowSync::SYNC_CMS_OPTION
+        ) {
+            $this->lengowSync->setCmsOption(
+                $cronArgs[LengowImport::PARAM_FORCE],
+                $cronArgs[LengowImport::PARAM_LOG_OUTPUT]
+            );
         }
         // synchronise marketplaces between Lengow and Shopware
-        if ($cronArgs['sync'] === LengowSync::SYNC_MARKETPLACE) {
-            $this->lengowSync->getMarketplaces($cronArgs['force'], $cronArgs['log_output']);
+        if ($cronArgs[LengowImport::PARAM_SYNC] === LengowSync::SYNC_MARKETPLACE) {
+            $this->lengowSync->getMarketplaces(
+                $cronArgs[LengowImport::PARAM_FORCE],
+                $cronArgs[LengowImport::PARAM_LOG_OUTPUT]
+            );
         }
         // synchronise plugin data between Lengow and Shopware
-        if ($cronArgs['sync'] === LengowSync::SYNC_PLUGIN_DATA) {
-            $this->lengowSync->getPluginData($cronArgs['force'], $cronArgs['log_output']);
+        if ($cronArgs[LengowImport::PARAM_SYNC] === LengowSync::SYNC_PLUGIN_DATA) {
+            $this->lengowSync->getPluginData(
+                $cronArgs[LengowImport::PARAM_FORCE],
+                $cronArgs[LengowImport::PARAM_LOG_OUTPUT]
+            );
         }
         // synchronise account status between Lengow and Shopware
-        if ($cronArgs['sync'] === LengowSync::SYNC_STATUS_ACCOUNT) {
-            $this->lengowSync->getAccountStatus($cronArgs['force'], $cronArgs['log_output']);
+        if ($cronArgs[LengowImport::PARAM_SYNC] === LengowSync::SYNC_STATUS_ACCOUNT) {
+            $this->lengowSync->getAccountStatus(
+                $cronArgs[LengowImport::PARAM_FORCE],
+                $cronArgs[LengowImport::PARAM_LOG_OUTPUT]
+            );
         }
-        if ($cronArgs['sync'] && !$this->lengowSync->isSyncAction($cronArgs['sync'])) {
+        if ($cronArgs[LengowImport::PARAM_SYNC]
+            && !$this->lengowSync->isSyncAction($cronArgs[LengowImport::PARAM_SYNC])
+        ) {
             $errorMessage = $this->lengowLog->decodeMessage(
                 'log.import.not_valid_action',
                 LengowTranslation::DEFAULT_ISO_CODE,
                 [
-                    'action' => $cronArgs['sync'],
+                    'action' => $cronArgs[LengowImport::PARAM_SYNC],
                 ]
             );
             return new Response($errorMessage, Response::HTTP_BAD_REQUEST);
@@ -165,22 +190,24 @@ class LengowCronController extends LengowAbstractFrontController
     protected function createGetArgArray(Request $request): array
     {
         return [
-            'sync' => $request->query->get('sync'),
-            'debug_mode' => $request->query->get('debug_mode') !== null
-                ? $request->query->get('debug_mode') === '1'
+            LengowImport::PARAM_SYNC => $request->query->get(LengowImport::PARAM_SYNC),
+            LengowImport::PARAM_DEBUG_MODE => $request->query->get(LengowImport::PARAM_DEBUG_MODE) !== null
+                ? $request->query->get(LengowImport::PARAM_DEBUG_MODE) === '1'
                 : null,
-            'log_output' => $request->query->get('log_output') === '1',
-            'days' => (int)$request->query->get('days'),
-            'created_from' => $request->query->get('created_from'),
-            'created_to' => $request->query->get('created_to'),
-            'limit' => (int)$request->query->get('limit'),
-            'marketplace_sku' => $request->query->get('marketplace_sku'),
-            'marketplace_name' => $request->query->get('marketplace_name'),
-            'sales_channel_id'=> $request->query->get('sales_channel_id'),
-            'delivery_address_id' => (int)$request->query->get('delivery_address_id'),
-            'get_sync' => $request->query->get('get_sync') === '1',
-            'force' => $request->query->get('force') === '1',
-            'type' => LengowImport::TYPE_CRON,
+            LengowImport::PARAM_LOG_OUTPUT => $request->query->get(LengowImport::PARAM_LOG_OUTPUT) === '1',
+            LengowImport::PARAM_DAYS => (int) $request->query->get(LengowImport::PARAM_DAYS),
+            LengowImport::PARAM_CREATED_FROM => $request->query->get(LengowImport::PARAM_CREATED_FROM),
+            LengowImport::PARAM_CREATED_TO => $request->query->get(LengowImport::PARAM_CREATED_TO),
+            LengowImport::PARAM_LIMIT => (int) $request->query->get(LengowImport::PARAM_LIMIT),
+            LengowImport::PARAM_MARKETPLACE_SKU => $request->query->get(LengowImport::PARAM_MARKETPLACE_SKU),
+            LengowImport::PARAM_MARKETPLACE_NAME => $request->query->get(LengowImport::PARAM_MARKETPLACE_NAME),
+            LengowImport::PARAM_SALES_CHANNEL_ID => $request->query->get(LengowImport::PARAM_SALES_CHANNEL_ID),
+            LengowImport::PARAM_DELIVERY_ADDRESS_ID => (int) $request->query->get(
+                LengowImport::PARAM_DELIVERY_ADDRESS_ID
+            ),
+            LengowImport::PARAM_GET_SYNC => $request->query->get(LengowImport::PARAM_GET_SYNC) === '1',
+            LengowImport::PARAM_FORCE => $request->query->get(LengowImport::PARAM_FORCE) === '1',
+            LengowImport::PARAM_TYPE => LengowImport::TYPE_CRON,
         ];
     }
 }

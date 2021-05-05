@@ -12,55 +12,20 @@ use Lengow\Connector\Util\EnvironmentInfoProvider;
  */
 class LengowLog
 {
-    /**
-     * @var string install log code
-     */
+    /* Log category codes */
     public const CODE_INSTALL = 'Install';
-
-    /**
-     * @var string connection log code
-     */
     public const CODE_CONNECTION = 'Connection';
-
-    /**
-     * @var string setting log code
-     */
     public const CODE_SETTING = 'Setting';
-
-    /**
-     * @var string connector log code
-     */
     public const CODE_CONNECTOR = 'Connector';
-
-    /**
-     * @var string export log code
-     */
     public const CODE_EXPORT = 'Export';
-
-    /**
-     * @var string import log code
-     */
     public const CODE_IMPORT = 'Import';
-
-    /**
-     * @var string action log code
-     */
     public const CODE_ACTION = 'Action';
-
-    /**
-     * @var string mail report code
-     */
     public const CODE_MAIL_REPORT = 'Mail Report';
-
-    /**
-     * @var string orm code
-     */
     public const CODE_ORM = 'Orm';
 
-    /**
-     * @var string name of logs folder
-     */
-    public const LOG_FOLDER_NAME = 'Logs';
+    /* Log params for export */
+    public const LOG_DATE = 'date';
+    public const LOG_LINK = 'link';
 
     /**
      * @var int life of log files in days
@@ -184,7 +149,7 @@ class LengowLog
         // init new LengowFile for logging
         if ($this->lengowFile === null) {
             $this->lengowFile = $this->lengowFileFactory->create(
-                self::LOG_FOLDER_NAME,
+                EnvironmentInfoProvider::FOLDER_LOG,
                 'logs-' . date('Y-m-d') . '.txt'
             );
         }
@@ -200,13 +165,12 @@ class LengowLog
         for ($i = 1; $i < self::LOG_LIFE; $i++) {
             $days[] = 'logs-' . date('Y-m-d', strtotime('-' . $i . 'day')) . '.txt';
         }
-        /** @var LengowFile[] $logFiles */
         $logFiles = $this->getFilesFromFolder();
         if (empty($logFiles)) {
             return;
         }
         foreach ($logFiles as $logFile) {
-            if (!in_array($logFile->getFileName(), $days)) {
+            if (!in_array($logFile->getFileName(), $days, true)) {
                 $logFile->delete();
             }
         }
@@ -215,18 +179,18 @@ class LengowLog
     /**
      * Get all log file list for log folder
      *
-     * @return array
+     * @return LengowFile[]
      */
     public function getFilesFromFolder(): array
     {
         $files = [];
         $sep = DIRECTORY_SEPARATOR;
-        $folderPath = $this->environmentInfoProvider->getPluginPath() . $sep . self::LOG_FOLDER_NAME;
+        $folderPath = $this->environmentInfoProvider->getPluginPath() . $sep . EnvironmentInfoProvider::FOLDER_LOG;
         if (file_exists($folderPath)) {
             $folderContent = scandir($folderPath);
             foreach ($folderContent as $fileName) {
                 if (!preg_match('/^\.[a-zA-Z\.]+$|^\.$|index\.php/', $fileName)) {
-                    $files[] = $this->lengowFileFactory->create(self::LOG_FOLDER_NAME, $fileName);
+                    $files[] = $this->lengowFileFactory->create(EnvironmentInfoProvider::FOLDER_LOG, $fileName);
                 }
             }
         }
@@ -234,15 +198,50 @@ class LengowLog
     }
 
     /**
+     * Get log files path
+     *
+     * @return array
+     */
+    public function getPaths(): array
+    {
+        $logs = [];
+        $files = $this->getFilesFromFolder();
+        if (empty($files)) {
+            return $logs;
+        }
+        foreach ($files as $file) {
+            preg_match('/^logs-(\d{4}-\d{2}-\d{2})\.txt$/', $file->getFileName(), $match);
+            $date = $match[1];
+            if ($date) {
+                $logs[] = [
+                    self::LOG_DATE => $date,
+                    self::LOG_LINK => $this->lengowConfiguration->getToolboxUrl()
+                        . '&' . LengowToolbox::PARAM_TOOLBOX_ACTION . '=' . LengowToolbox::ACTION_LOG
+                        . '&' . LengowToolbox::PARAM_DATE . '=' . urlencode($date),
+                ];
+            }
+        }
+        return array_reverse($logs);
+    }
+
+    /**
      * Download log file individually or globally
      *
-     * @param string|null $fileName name of file to download
+     * @param string|null $date date for a specific log file
      */
-    public function download($fileName = null): void
+    public function download($date = null): void
     {
         /** @var LengowFile[] $logFiles */
-        if ($fileName && preg_match('/^logs-(\d{4}-\d{2}-\d{2})\.txt$/', $fileName)) {
-            $logFiles = [$this->lengowFileFactory->create(self::LOG_FOLDER_NAME, $fileName)];
+        if ($date && preg_match('/^(\d{4}-\d{2}-\d{2})$/', $date)) {
+            $logFiles = [];
+            $file = 'logs-' . $date . '.txt';
+            $fileName = $date . '.txt';
+            $sep = DIRECTORY_SEPARATOR;
+            $filePath = $this->environmentInfoProvider->getPluginPath()
+                . $sep . EnvironmentInfoProvider::FOLDER_LOG . $sep . $file;
+            if (file_exists($filePath)) {
+                $logFiles = [$this->lengowFileFactory->create(EnvironmentInfoProvider::FOLDER_LOG, $file)];
+            }
         } else {
             $fileName = 'logs.txt';
             $logFiles = $this->getFilesFromFolder();

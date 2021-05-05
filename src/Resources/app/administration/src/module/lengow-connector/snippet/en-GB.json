@@ -395,10 +395,11 @@
                 "version": "Shopware version",
                 "plugin_version": "Plugin version",
                 "debug_disabled": "Debug Mode disabled",
-                "write_permission": "Read and write permission from media folder",
+                "write_permission": "Read and write permission for media folder",
                 "server_ip": "Server IP",
                 "authorized_ip_enable": "Authorisation by IP enabled",
-                "authorized_ips": "Authorised IP"
+                "authorized_ips": "Authorised IP",
+                "toolbox_url": "Toolbox URL"
             },
             "import": {
                 "title": "Synchronisation information",

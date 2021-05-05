@@ -1,3 +1,6 @@
+# v1.0.2
+- Feature: Outsourcing of the toolbox via webservice
+
 # v1.0.1
 - Bugfix: [export] Add parameters in product SQL requests
 - Bugfix: [export] Use getFeedUrl() function in product grid

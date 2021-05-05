@@ -81,9 +81,11 @@ class SalesChannelWrittenSubscriber implements EventSubscriberInterface
                 $this->lengowSettingsRepository
             );
             foreach (LengowConfiguration::$lengowSettings as $key => $lengowSetting) {
-                if (isset($lengowSetting['channel']) && $lengowSetting['channel']) {
-                    if ($key === LengowConfiguration::LENGOW_IMPORT_DEFAULT_SHIPPING_METHOD
-                        || $key === LengowConfiguration::LENGOW_EXPORT_DEFAULT_SHIPPING_METHOD) {
+                if (isset($lengowSetting[LengowConfiguration::PARAM_SHOP])
+                    && $lengowSetting[LengowConfiguration::PARAM_SHOP]
+                ) {
+                    if ($key === LengowConfiguration::DEFAULT_IMPORT_CARRIER_ID
+                        || $key === LengowConfiguration::DEFAULT_EXPORT_CARRIER_ID) {
                         $defaultSalesChannelConfig[] = [
                             'salesChannelId' => $entityWriteResult->getPrimaryKey(),
                             'name' => $key,
@@ -93,7 +95,9 @@ class SalesChannelWrittenSubscriber implements EventSubscriberInterface
                         $defaultSalesChannelConfig[] = [
                             'salesChannelId' => $entityWriteResult->getPrimaryKey(),
                             'name' => $key,
-                            'value' => LengowConfiguration::$lengowSettings[$key]['default_value'],
+                            'value' => LengowConfiguration::$lengowSettings[$key][
+                                LengowConfiguration::PARAM_DEFAULT_VALUE
+                            ],
                         ];
                     }
                 }

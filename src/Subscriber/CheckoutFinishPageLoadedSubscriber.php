@@ -79,12 +79,12 @@ class CheckoutFinishPageLoadedSubscriber implements EventSubscriberInterface
     public function onCheckoutFinish(CheckoutFinishPageLoadedEvent $event) : void
     {
         // if tracking is disable, no need for anything else
-        if (!$this->lengowConfiguration->get(LengowConfiguration::LENGOW_TRACKING_ENABLED)) {
+        if (!$this->lengowConfiguration->get(LengowConfiguration::TRACKING_ENABLED)) {
             return;
         }
         // retrieve tracking mode from configuration
         $this->trackingMode =
-            $this->lengowConfiguration->get(LengowConfiguration::LENGOW_TRACKING_ID) === self::TRACKING_WITH_ID
+            $this->lengowConfiguration->get(LengowConfiguration::TRACKING_ID) === self::TRACKING_WITH_ID
                 ? self::TRACKING_WITH_ID
                 : self::TRACKING_WITH_REFERENCE;
         /** @var SalesChannelContext $salesChannelContext */
@@ -109,7 +109,7 @@ class CheckoutFinishPageLoadedSubscriber implements EventSubscriberInterface
     private function getTrackerData(ShopwareOrderEntity $order, SalesChannelContext $salesChannelContext): array
     {
         return [
-            'accountId' => (int)$this->lengowConfiguration->get(LengowConfiguration::LENGOW_ACCOUNT_ID),
+            'accountId' => (int) $this->lengowConfiguration->get(LengowConfiguration::ACCOUNT_ID),
             'orderReference' => $order->getOrderNumber(),
             'orderAmount' => $order->getPrice()->getTotalPrice(),
             'currency' => $this->retrieveOrderCurrency($order->getCurrencyId()),

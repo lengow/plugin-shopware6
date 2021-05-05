@@ -84,26 +84,26 @@ class LengowSettingUpdateSubscriber implements EventSubscriberInterface
             return;
         }
         $settingData = LengowConfiguration::$lengowSettings[$setting->getName()];
-        if (isset($settingData['export']) && !$settingData['export']) {
+        if (isset($settingData[LengowConfiguration::PARAM_LOG]) && !$settingData[LengowConfiguration::PARAM_LOG]) {
             return;
         }
-        if (isset($settingData['secret'])) {
+        if (isset($settingData[LengowConfiguration::PARAM_SECRET])) {
             $value = preg_replace("/[a-zA-Z0-9]/", '*', $value);
         }
-        if (isset($settingData['global']) && $setting->getSalesChannel() === null) {
+        if (isset($settingData[LengowConfiguration::PARAM_GLOBAL]) && $setting->getSalesChannel() === null) {
             $this->lengowLog->write(
                 LengowLog::CODE_SETTING,
                 $this->lengowLog->encodeMessage('log.setting.setting_change', [
-                    'key' => $setting->getName(),
+                    'key' => LengowConfiguration::$genericParamKeys[$setting->getName()],
                     'value' => $value,
                 ])
             );
         }
-        if (isset($settingData['channel']) && $setting->getSalesChannel()) {
+        if (isset($settingData[LengowConfiguration::PARAM_SHOP]) && $setting->getSalesChannel()) {
             $this->lengowLog->write(
                 LengowLog::CODE_SETTING,
                 $this->lengowLog->encodeMessage('log.setting.setting_change_for_sales_channel', [
-                    'key' => $setting->getName(),
+                    'key' => LengowConfiguration::$genericParamKeys[$setting->getName()],
                     'value' => $value,
                     'sales_channel_name' => $setting->getSalesChannel()->getName(),
                     'sales_channel_id' => $setting->getSalesChannel()->getId(),
@@ -111,8 +111,8 @@ class LengowSettingUpdateSubscriber implements EventSubscriberInterface
             );
         }
         // save last update date for a specific settings (change synchronisation interval time)
-        if (isset($settingData['update'])) {
-            $this->lengowConfiguration->set(LengowConfiguration::LENGOW_LAST_SETTING_UPDATE, (string)time());
+        if (isset($settingData[LengowConfiguration::PARAM_UPDATE])) {
+            $this->lengowConfiguration->set(LengowConfiguration::LAST_UPDATE_SETTING, (string) time());
         }
     }
 }

@@ -45,10 +45,10 @@ class LengowToolboxController extends AbstractController
     public function getOverviewData(): JsonResponse
     {
         return new JsonResponse([
-            'checklist' => $this->lengowToolbox->getChecklistData(),
-            'plugin' => $this->lengowToolbox->getPluginData(),
-            'import' => $this->lengowToolbox->getImportData(),
-            'export' => $this->lengowToolbox->getExportData(),
+            LengowToolbox::CHECKLIST => $this->lengowToolbox->getData(LengowToolbox::DATA_TYPE_CHECKLIST),
+            LengowToolbox::PLUGIN => $this->lengowToolbox->getData(LengowToolbox::DATA_TYPE_PLUGIN),
+            LengowToolbox::SYNCHRONIZATION => $this->lengowToolbox->getData(LengowToolbox::DATA_TYPE_SYNCHRONIZATION),
+            LengowToolbox::SHOPS => $this->lengowToolbox->getData(LengowToolbox::DATA_TYPE_SHOP),
         ]);
     }
 
@@ -63,7 +63,7 @@ class LengowToolboxController extends AbstractController
      */
     public function getChecksumData(): JsonResponse
     {
-        return new JsonResponse($this->lengowToolbox->getChecksumData());
+        return new JsonResponse($this->lengowToolbox->getData(LengowToolbox::DATA_TYPE_CHECKSUM));
     }
 
     /**
@@ -77,7 +77,7 @@ class LengowToolboxController extends AbstractController
      */
     public function getLogData(): JsonResponse
     {
-        return new JsonResponse($this->lengowToolbox->getLogData());
+        return new JsonResponse($this->lengowToolbox->getData(LengowToolbox::DATA_TYPE_LOG));
     }
 
     /**
@@ -94,8 +94,8 @@ class LengowToolboxController extends AbstractController
      */
     public function downloadLog(Request $request): Response
     {
-        $fileName = $request->get('fileName');
-        $this->lengowToolbox->downloadLog($fileName === 'logs' ? null : $fileName);
+        $date = $request->get('date');
+        $this->lengowToolbox->downloadLog($date === 'logs' ? null : $date);
         return new Response();
     }
 }

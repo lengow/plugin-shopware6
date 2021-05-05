@@ -24,5 +24,13 @@
             <tag name="controller.service_arguments"/>
         </service>
 
+        <service id="Lengow\Connector\Storefront\Controller\LengowToolboxController">
+            <argument type="service" id="Lengow\Connector\Service\LengowAccess"/>
+            <argument type="service" id="Lengow\Connector\Service\LengowConfiguration"/>
+            <argument type="service" id="Lengow\Connector\Service\LengowLog"/>
+            <argument type="service" id="Lengow\Connector\Service\LengowToolbox"/>
+            <tag name="controller.service_arguments"/>
+        </service>
+
     </services>
 </container>

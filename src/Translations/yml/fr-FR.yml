@@ -342,6 +342,7 @@ fr:
           server_ip: "IP Serveur"
           authorized_ip_enable: "Autorisation par IP activée"
           authorized_ips: "IP autorisée(s)"
+          toolbox_url: "URL de la toolbox"
         import:
           title: "Information sur la synchronisation"
           global_token: "Token de synchronisation"
@@ -424,7 +425,7 @@ fr:
       mail_report:
         subject_report_mail: "Erreur de l'import Lengow"
         order: "Commande %{marketplace_sku}"
-        no_error_in_report_mail: "Pas de message d'erreur, contacter le support via https://supportlengow.zendesk.com/agent/"
+        no_error_in_report_mail: "Pas de message d'erreur, contacter le support via https://supportlengow.zendesk.com/hc/fr/requests/new"
       connection:
         status_draft: "Incomplet"
         status_active: "Actif"

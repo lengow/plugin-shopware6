@@ -621,7 +621,7 @@ class LengowAddress
             case self::ISO_A2_IT:
                 $shortCode = $this->regionCodes[$countryIsoA2][$postcodeSubstr] ?? false;
                 if ($shortCode && is_array($shortCode) && !empty($shortCode)) {
-                    $shortCode = $this->getShortCodeFromIntervalPostcodes((int)$postcode, $shortCode);
+                    $shortCode = $this->getShortCodeFromIntervalPostcodes((int) $postcode, $shortCode);
                 }
                 break;
             default:
@@ -657,8 +657,8 @@ class LengowAddress
         foreach ($intervalPostcodes as $intervalPostcode => $shortCode) {
             $intervalPostcodes = explode('-', $intervalPostcode);
             if (!empty($intervalPostcodes) && count($intervalPostcodes) === 2) {
-                $minPostcode = is_numeric($intervalPostcodes[0]) ? (int)$intervalPostcodes[0] : false;
-                $maxPostcode = is_numeric($intervalPostcodes[1]) ? (int)$intervalPostcodes[1] : false;
+                $minPostcode = is_numeric($intervalPostcodes[0]) ? (int) $intervalPostcodes[0] : false;
+                $maxPostcode = is_numeric($intervalPostcodes[1]) ? (int) $intervalPostcodes[1] : false;
                 if (($minPostcode && $maxPostcode) && ($postcode >= $minPostcode && $postcode <= $maxPostcode)) {
                     return $shortCode;
                 }
@@ -701,7 +701,7 @@ class LengowAddress
                     $nameCleaned = $this->cleanString($countryState->getName());
                     similar_text($stateRegionCleaned, $nameCleaned, $percent);
                     if ($percent > 70) {
-                        $results[(int)$percent] = $countryState;
+                        $results[(int) $percent] = $countryState;
                     }
                 }
                 if (!empty($results)) {

@@ -244,7 +244,7 @@ class LengowProduct
             $productData[$node] = $api->{$node};
         }
         if (isset($productData['amount'], $productData['quantity'])) {
-            $productData['price_unit'] = (float)$productData['amount'] / (float)$productData['quantity'];
+            $productData['price_unit'] = (float) $productData['amount'] / (float) $productData['quantity'];
         } else {
             $productData['price_unit'] = 0;
         }

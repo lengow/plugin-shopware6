@@ -113,7 +113,7 @@ class LengowActionSync
                 $this->checkAndUpdateAction($lengowAction, $apiActions[$lengowAction->getActionId()], $logOutput);
             }
         }
-        $this->lengowConfiguration->set(LengowConfiguration::LENGOW_LAST_ACTION_SYNC, (string) time());
+        $this->lengowConfiguration->set(LengowConfiguration::LAST_UPDATE_ACTION_SYNCHRONIZATION, (string) time());
     }
 
     /**
@@ -332,9 +332,11 @@ class LengowActionSync
     private function getIntervalTime(): int
     {
         $intervalTime = self::MAX_INTERVAL_TIME;
-        $lastActionSynchronisation = $this->lengowConfiguration->get(LengowConfiguration::LENGOW_LAST_ACTION_SYNC);
+        $lastActionSynchronisation = $this->lengowConfiguration->get(
+            LengowConfiguration::LAST_UPDATE_ACTION_SYNCHRONIZATION
+        );
         if ($lastActionSynchronisation) {
-            $lastIntervalTime = time() - (int)$lastActionSynchronisation;
+            $lastIntervalTime = time() - (int) $lastActionSynchronisation;
             $lastIntervalTime += self::SECURITY_INTERVAL_TIME;
             $intervalTime = $lastIntervalTime > $intervalTime ? $intervalTime : $lastIntervalTime;
         }

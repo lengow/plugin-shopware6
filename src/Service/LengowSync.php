@@ -50,11 +50,6 @@ class LengowSync
     /**
      * @var string name of logs folder
      */
-    public const CONFIG_FOLDER_NAME = 'Config';
-
-    /**
-     * @var string name of logs folder
-     */
     private const MARKETPLACE_FILE = 'marketplaces.json';
 
     /**
@@ -175,6 +170,7 @@ class LengowSync
             'plugin_version' => $this->environmentInfoProvider->getPluginVersion(),
             'email' => $this->lengowConfiguration->get('core.basicInformation.email'),
             'cron_url' => $this->lengowConfiguration->getCronUrl(),
+            'toolbox_url' => $this->lengowConfiguration->getToolboxUrl(),
             'shops' => [],
         ];
         $salesChannels = $this->environmentInfoProvider->getActiveSalesChannels();
@@ -182,7 +178,7 @@ class LengowSync
             foreach ($salesChannels as $salesChannel) {
                 $salesChannelId = $salesChannel->getId();
                 $this->lengowExport->init([
-                    'sales_channel_id' => $salesChannelId,
+                    LengowExport::PARAM_SALES_CHANNEL_ID => $salesChannelId,
                 ]);
                 $syncData['shops'][] = [
                     'token' => $this->lengowConfiguration->getToken($salesChannelId),
@@ -190,7 +186,7 @@ class LengowSync
                     'domain_url' => $this->environmentInfoProvider->getBaseUrl($salesChannelId),
                     'feed_url' => $this->lengowConfiguration->getFeedUrl($salesChannelId),
                     'total_product_number' => $this->lengowExport->getTotalProduct(),
-                    'exported_product_number' => $this->lengowExport->getTotalExportedProduct(),
+                    'exported_product_number' => $this->lengowExport->getTotalExportProduct(),
                     'enabled' => $this->lengowConfiguration->salesChannelIsActive($salesChannelId),
                 ];
             }
@@ -214,7 +210,7 @@ class LengowSync
             return $success;
         }
         if (!$force) {
-            $updatedAt = $this->lengowConfiguration->get(LengowConfiguration::LENGOW_CATALOG_UPDATE);
+            $updatedAt = $this->lengowConfiguration->get(LengowConfiguration::LAST_UPDATE_CATALOG);
             if ($updatedAt !== null && (time() - (int) $updatedAt) < $this->cacheTimes[self::SYNC_CATALOG]) {
                 return $success;
             }
@@ -244,9 +240,9 @@ class LengowSync
         }
         // save last update date for a specific settings (change synchronisation interval time)
         if ($settingUpdated) {
-            $this->lengowConfiguration->set(LengowConfiguration::LENGOW_LAST_SETTING_UPDATE, (string) time());
+            $this->lengowConfiguration->set(LengowConfiguration::LAST_UPDATE_SETTING, (string) time());
         }
-        $this->lengowConfiguration->set(LengowConfiguration::LENGOW_CATALOG_UPDATE, (string) time());
+        $this->lengowConfiguration->set(LengowConfiguration::LAST_UPDATE_CATALOG, (string) time());
         return $success;
     }
 
@@ -269,13 +265,13 @@ class LengowSync
             foreach ($salesChannels as $salesChannel) {
                 $salesChannelId = $salesChannel->getId();
                 $this->lengowExport->init([
-                    'sales_channel_id' => $salesChannelId,
+                    LengowExport::PARAM_SALES_CHANNEL_ID => $salesChannelId,
                 ]);
                 $data['shops'][] = [
                     'token' => $this->lengowConfiguration->getToken($salesChannelId),
                     'enabled' => $this->lengowConfiguration->salesChannelIsActive($salesChannelId),
                     'total_product_number' => $this->lengowExport->getTotalProduct(),
-                    'exported_product_number' =>$this->lengowExport->getTotalExportedProduct(),
+                    'exported_product_number' =>$this->lengowExport->getTotalExportProduct(),
                     'options' => $this->lengowConfiguration->getAllValues($salesChannelId),
                 ];
             }
@@ -297,14 +293,14 @@ class LengowSync
             return false;
         }
         if (!$force) {
-            $updatedAt = $this->lengowConfiguration->get(LengowConfiguration::LENGOW_OPTION_CMS_UPDATE);
+            $updatedAt = $this->lengowConfiguration->get(LengowConfiguration::LAST_UPDATE_OPTION_CMS);
             if ($updatedAt !== null && (time() - (int) $updatedAt) < $this->cacheTimes[self::SYNC_CMS_OPTION]) {
                 return false;
             }
         }
         $options = json_encode($this->getOptionData());
         $this->lengowConnector->queryApi(LengowConnector::PUT, LengowConnector::API_CMS, [], $options, $logOutput);
-        $this->lengowConfiguration->set(LengowConfiguration::LENGOW_OPTION_CMS_UPDATE, (string) time());
+        $this->lengowConfiguration->set(LengowConfiguration::LAST_UPDATE_OPTION_CMS, (string) time());
         return true;
     }
 
@@ -320,9 +316,9 @@ class LengowSync
     {
         $sep = DIRECTORY_SEPARATOR;
         $filePath = $this->environmentInfoProvider->getPluginPath()
-            . $sep . self::CONFIG_FOLDER_NAME . $sep . self::MARKETPLACE_FILE;
+            . $sep . EnvironmentInfoProvider::FOLDER_CONFIG . $sep . self::MARKETPLACE_FILE;
         if (!$force) {
-            $updatedAt = $this->lengowConfiguration->get(LengowConfiguration::LENGOW_MARKETPLACE_UPDATE);
+            $updatedAt = $this->lengowConfiguration->get(LengowConfiguration::LAST_UPDATE_MARKETPLACE);
             if ($updatedAt !== null
                 && (time() - (int) $updatedAt) < $this->cacheTimes[self::SYNC_MARKETPLACE]
                 && file_exists($filePath)
@@ -346,13 +342,13 @@ class LengowSync
             // updated marketplaces.json file
             try {
                 $marketplaceFile = $this->lengowFileFactory->create(
-                    self::CONFIG_FOLDER_NAME,
+                    EnvironmentInfoProvider::FOLDER_CONFIG,
                     self::MARKETPLACE_FILE,
                     'w+'
                 );
                 $marketplaceFile->write(json_encode($result));
                 $marketplaceFile->close();
-                $this->lengowConfiguration->set(LengowConfiguration::LENGOW_MARKETPLACE_UPDATE, (string) time());
+                $this->lengowConfiguration->set(LengowConfiguration::LAST_UPDATE_MARKETPLACE, (string) time());
             } catch (Exception $e) {
                 $decodedMessage = $this->lengowLog->decodeMessage(
                     $e->getMessage(),
@@ -389,12 +385,12 @@ class LengowSync
     public function getPluginData(bool $force = false, bool $logOutput = false): ?array
     {
         if (!$force) {
-            $updatedAt = $this->lengowConfiguration->get('lengowPluginDataUpdate');
+            $updatedAt = $this->lengowConfiguration->get(LengowConfiguration::LAST_UPDATE_PLUGIN_DATA);
             if ($updatedAt !== null
-                && (time() - (int)$updatedAt) < $this->cacheTimes[self::SYNC_PLUGIN_DATA]
-                && $this->lengowConfiguration->get('lengowPluginData')
+                && (time() - (int) $updatedAt) < $this->cacheTimes[self::SYNC_PLUGIN_DATA]
+                && $this->lengowConfiguration->get(LengowConfiguration::PLUGIN_DATA)
             ) {
-                return json_decode($this->lengowConfiguration->get('lengowPluginData'), true);
+                return json_decode($this->lengowConfiguration->get(LengowConfiguration::PLUGIN_DATA), true);
             }
         }
         $plugins = $this->lengowConnector->queryApi(
@@ -405,7 +401,7 @@ class LengowSync
             $logOutput
         );
         if (!$plugins) {
-            $pluginData = $this->lengowConfiguration->get('lengowPluginData');
+            $pluginData = $this->lengowConfiguration->get(LengowConfiguration::PLUGIN_DATA);
             return $pluginData ? json_decode($pluginData, true) : null;
         }
         foreach ($plugins as $plugin) {
@@ -414,8 +410,8 @@ class LengowSync
                     'version' => $plugin->version,
                     'download_link' => $plugin->archive,
                 ];
-                $this->lengowConfiguration->set('lengowPluginData', json_encode($pluginData));
-                $this->lengowConfiguration->set('lengowPluginDataUpdate', (string) time());
+                $this->lengowConfiguration->set(LengowConfiguration::PLUGIN_DATA, json_encode($pluginData));
+                $this->lengowConfiguration->set(LengowConfiguration::LAST_UPDATE_PLUGIN_DATA, (string) time());
                 return $pluginData;
             }
         }
@@ -433,12 +429,12 @@ class LengowSync
     public function getAccountStatus(bool $force = false, bool $logOutput = false): ?array
     {
         if (!$force) {
-            $updatedAt = $this->lengowConfiguration->get('lengowAccountStatusUpdate');
+            $updatedAt = $this->lengowConfiguration->get(LengowConfiguration::LAST_UPDATE_ACCOUNT_STATUS_DATA);
             if ($updatedAt !== null
-                && (time() - (int)$updatedAt) < $this->cacheTimes[self::SYNC_PLUGIN_DATA]
-                && $this->lengowConfiguration->get('lengowAccountStatus')
+                && (time() - (int) $updatedAt) < $this->cacheTimes[self::SYNC_PLUGIN_DATA]
+                && $this->lengowConfiguration->get(LengowConfiguration::ACCOUNT_STATUS_DATA)
             ) {
-                return json_decode($this->lengowConfiguration->get('lengowAccountStatus'), true);
+                return json_decode($this->lengowConfiguration->get(LengowConfiguration::ACCOUNT_STATUS_DATA), true);
             }
         }
         $status = null;
@@ -455,10 +451,10 @@ class LengowSync
                 'day' => (int) $accountData->leftDaysBeforeExpired < 0 ? 0 : (int) $accountData->leftDaysBeforeExpired,
                 'expired' => (bool) $accountData->isExpired,
             ];
-            $this->lengowConfiguration->set('lengowAccountStatus', json_encode($status));
-            $this->lengowConfiguration->set('lengowAccountStatusUpdate', (string) time());
-        } else if ($this->lengowConfiguration->get('lengowAccountStatus')) {
-            $status = json_decode($this->lengowConfiguration->get('lengowAccountStatus'), true);
+            $this->lengowConfiguration->set(LengowConfiguration::ACCOUNT_STATUS_DATA, json_encode($status));
+            $this->lengowConfiguration->set(LengowConfiguration::LAST_UPDATE_ACCOUNT_STATUS_DATA, (string) time());
+        } else if ($this->lengowConfiguration->get(LengowConfiguration::ACCOUNT_STATUS_DATA)) {
+            $status = json_decode($this->lengowConfiguration->get(LengowConfiguration::ACCOUNT_STATUS_DATA), true);
         }
         return $status;
     }

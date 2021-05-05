@@ -59,11 +59,13 @@ Component.register('lgw-toolbox-log', {
                 };
                 if (this.logData.length > 0) {
                     this.logData.forEach(log => {
-                        const date = new Date(log.date);
-                        availableLogs.push({
-                            label: date.toLocaleDateString(undefined, options),
-                            value: log.name
-                        });
+                        if (log.date !== null) {
+                            const date = new Date(log.date);
+                            availableLogs.push({
+                                label: date.toLocaleDateString(undefined, options),
+                                value: log.date
+                            });
+                        }
                     });
                     availableLogs.push({
                         label: this.$tc('lengow-connector.toolbox.log.download_all_files'),
@@ -77,17 +79,17 @@ Component.register('lgw-toolbox-log', {
 
         onChangeLogFilter(value) {
             this.logFilter = value;
-            if (this.logFilter !== '') {
+            if (this.logFilter !== null && this.logFilter !== '') {
                 this.showButton = true;
             }
         },
 
         downloadLog() {
             this.buttonIsLoading = true;
-            const fileName = this.logFilter;
-            this.LengowConnectorToolboxService.downloadLog({ fileName })
+            const date = this.logFilter;
+            this.LengowConnectorToolboxService.downloadLog({ date })
                 .then(response => {
-                    this.forceFileDownload(response, fileName);
+                    this.forceFileDownload(response, date);
                 })
                 .finally(() => {
                     this.buttonIsLoading = false;

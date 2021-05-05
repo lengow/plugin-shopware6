@@ -17,6 +17,24 @@ use Lengow\Connector\Exception\LengowException;
  */
 class LengowImport
 {
+    /* Import GET params */
+    public const PARAM_TOKEN = 'token';
+    public const PARAM_TYPE = 'type';
+    public const PARAM_SALES_CHANNEL_ID = 'sales_channel_id';
+    public const PARAM_MARKETPLACE_SKU = 'marketplace_sku';
+    public const PARAM_MARKETPLACE_NAME = 'marketplace_name';
+    public const PARAM_DELIVERY_ADDRESS_ID = 'delivery_address_id';
+    public const PARAM_DAYS = 'days';
+    public const PARAM_CREATED_FROM = 'created_from';
+    public const PARAM_CREATED_TO = 'created_to';
+    public const PARAM_LENGOW_ORDER_ID = 'lengow_order_id';
+    public const PARAM_LIMIT = 'limit';
+    public const PARAM_LOG_OUTPUT = 'log_output';
+    public const PARAM_DEBUG_MODE = 'debug_mode';
+    public const PARAM_FORCE = 'force';
+    public const PARAM_SYNC = 'sync';
+    public const PARAM_GET_SYNC = 'get_sync';
+
     /**
      * @var string manual import type
      */
@@ -233,31 +251,33 @@ class LengowImport
     public function init(array $params = []): void
     {
         // get generic params for synchronisation
-        $this->accountId = (int)$this->lengowConfiguration->get(LengowConfiguration::LENGOW_ACCOUNT_ID);
-        $this->debugMode = $params['debug_mode'] ?? $this->lengowConfiguration->debugModeIsActive();
-        $this->importType = $params['type'] ?? self::TYPE_MANUAL;
-        $this->logOutput = $params['log_output'] ?? false;
-        $this->salesChannelId = $params['sales_channel_id'] ?? null;
+        $this->accountId = (int) $this->lengowConfiguration->get(LengowConfiguration::ACCOUNT_ID);
+        $this->debugMode = $params[self::PARAM_DEBUG_MODE] ?? $this->lengowConfiguration->debugModeIsActive();
+        $this->importType = $params[self::PARAM_TYPE] ?? self::TYPE_MANUAL;
+        $this->logOutput = $params[self::PARAM_LOG_OUTPUT] ?? false;
+        $this->salesChannelId = $params[self::PARAM_SALES_CHANNEL_ID] ?? null;
         // get params for synchronise one or all orders
-        if (isset($params['marketplace_sku'], $params['marketplace_name']) && $this->salesChannelId) {
+        if (isset($params[self::PARAM_MARKETPLACE_SKU], $params[self::PARAM_MARKETPLACE_NAME])
+            && $this->salesChannelId
+        ) {
             $this->limit = 1;
             $this->importOneOrder = true;
-            $this->marketplaceSku = $params['marketplace_sku'];
-            $this->marketplaceName = $params['marketplace_name'];
-            if (isset($params['delivery_address_id']) && $params['delivery_address_id'] !== 0) {
-                $this->deliveryAddressId = $params['delivery_address_id'];
+            $this->marketplaceSku = $params[self::PARAM_MARKETPLACE_SKU];
+            $this->marketplaceName = $params[self::PARAM_MARKETPLACE_NAME];
+            if (isset($params[self::PARAM_DELIVERY_ADDRESS_ID]) && $params[self::PARAM_DELIVERY_ADDRESS_ID] !== 0) {
+                $this->deliveryAddressId = $params[self::PARAM_DELIVERY_ADDRESS_ID];
             }
-            if (isset($params['lengow_order_id'])) {
-                $this->lengowOrderId = $params['lengow_order_id'];
+            if (isset($params[self::PARAM_LENGOW_ORDER_ID])) {
+                $this->lengowOrderId = $params[self::PARAM_LENGOW_ORDER_ID];
             }
         } else {
             // set the time interval
             $this->setIntervalTime(
-                $params['days'] ?? null,
-                $params['created_from'] ?? null,
-                $params['created_to'] ?? null
+                $params[self::PARAM_DAYS] ?? null,
+                $params[self::PARAM_CREATED_FROM] ?? null,
+                $params[self::PARAM_CREATED_TO] ?? null
             );
-            $this->limit = $params['limit'] ?? 0;
+            $this->limit = $params[self::PARAM_LIMIT] ?? 0;
         }
     }
 
@@ -446,7 +466,7 @@ class LengowImport
             // sending email in error for orders
             if (!$this->debugMode
                 && !$this->importOneOrder
-                && $this->lengowConfiguration->get(LengowConfiguration::LENGOW_REPORT_MAIL_ENABLED)
+                && $this->lengowConfiguration->get(LengowConfiguration::REPORT_MAIL_ENABLED)
             ) {
                 $this->sendMailAlert($this->logOutput);
             }
@@ -483,19 +503,19 @@ class LengowImport
      */
     public function getLastImport(): array
     {
-        $timestampCron = $this->lengowConfiguration->get(LengowConfiguration::LENGOW_LAST_IMPORT_CRON);
-        $timestampManual = $this->lengowConfiguration->get(LengowConfiguration::LENGOW_LAST_IMPORT_MANUAL);
+        $timestampCron = $this->lengowConfiguration->get(LengowConfiguration::LAST_UPDATE_CRON_SYNCHRONIZATION);
+        $timestampManual = $this->lengowConfiguration->get(LengowConfiguration::LAST_UPDATE_MANUAL_SYNCHRONIZATION);
         if ($timestampCron && $timestampManual) {
-            if ((int)$timestampCron > (int)$timestampManual) {
-                return ['type' => self::TYPE_CRON, 'timestamp' => (int)$timestampCron];
+            if ((int) $timestampCron > (int) $timestampManual) {
+                return ['type' => self::TYPE_CRON, 'timestamp' => (int) $timestampCron];
             }
-            return ['type' => self::TYPE_MANUAL, 'timestamp' => (int)$timestampManual];
+            return ['type' => self::TYPE_MANUAL, 'timestamp' => (int) $timestampManual];
         }
         if ($timestampCron && !$timestampManual) {
-            return ['type' => self::TYPE_CRON, 'timestamp' => (int)$timestampCron];
+            return ['type' => self::TYPE_CRON, 'timestamp' => (int) $timestampCron];
         }
         if ($timestampManual && !$timestampCron) {
-            return ['type' => self::TYPE_MANUAL, 'timestamp' => (int)$timestampManual];
+            return ['type' => self::TYPE_MANUAL, 'timestamp' => (int) $timestampManual];
         }
         return ['type' => 'none', 'timestamp' => 'none'];
     }
@@ -507,7 +527,7 @@ class LengowImport
      */
     public function isInProcess(): bool
     {
-        $timestamp = (int)$this->lengowConfiguration->get(LengowConfiguration::LENGOW_IMPORT_IN_PROGRESS);
+        $timestamp = (int) $this->lengowConfiguration->get(LengowConfiguration::SYNCHRONIZATION_IN_PROGRESS);
         // security check : if last import is more than 60 seconds old => authorize new import to be launched
         return ($timestamp > 0 && ($timestamp + (60 * 1)) > time());
     }
@@ -519,7 +539,7 @@ class LengowImport
      */
     public function restTimeToImport(): int
     {
-        $timestamp = (int)$this->lengowConfiguration->get(LengowConfiguration::LENGOW_IMPORT_IN_PROGRESS);
+        $timestamp = (int) $this->lengowConfiguration->get(LengowConfiguration::SYNCHRONIZATION_IN_PROGRESS);
         if ($timestamp > 0) {
             return $timestamp + (60 * 1) - time();
         }
@@ -533,11 +553,11 @@ class LengowImport
      */
     private function setLastImport(string $type): void
     {
-        $time = (string)time();
+        $time = (string) time();
         if ($type === self::TYPE_CRON) {
-            $this->lengowConfiguration->set(LengowConfiguration::LENGOW_LAST_IMPORT_CRON, $time);
+            $this->lengowConfiguration->set(LengowConfiguration::LAST_UPDATE_CRON_SYNCHRONIZATION, $time);
         } else {
-            $this->lengowConfiguration->set(LengowConfiguration::LENGOW_LAST_IMPORT_MANUAL, $time);
+            $this->lengowConfiguration->set(LengowConfiguration::LAST_UPDATE_MANUAL_SYNCHRONIZATION, $time);
         }
     }
 
@@ -546,7 +566,7 @@ class LengowImport
      */
     private function setInProcess(): void
     {
-        $this->lengowConfiguration->set(LengowConfiguration::LENGOW_IMPORT_IN_PROGRESS, (string)time());
+        $this->lengowConfiguration->set(LengowConfiguration::SYNCHRONIZATION_IN_PROGRESS, (string) time());
     }
 
     /**
@@ -554,7 +574,7 @@ class LengowImport
      */
     private function setEnd(): void
     {
-        $this->lengowConfiguration->set(LengowConfiguration::LENGOW_IMPORT_IN_PROGRESS, '');
+        $this->lengowConfiguration->set(LengowConfiguration::SYNCHRONIZATION_IN_PROGRESS, '');
     }
 
     /**
@@ -639,7 +659,7 @@ class LengowImport
         do {
             try {
                 $currencyConversion = !$this->lengowConfiguration->get(
-                    LengowConfiguration::LENGOW_CURRENCY_CONVERSION_ENABLED
+                    LengowConfiguration::CURRENCY_CONVERSION_ENABLED
                 );
                 if ($this->importOneOrder) {
                     $results = $this->lengowConnector->get(
@@ -740,7 +760,7 @@ class LengowImport
                 $this->setInProcess();
             }
             $nbPackage = 0;
-            $marketplaceSku = (string)$orderData->marketplace_order_id;
+            $marketplaceSku = (string) $orderData->marketplace_order_id;
             if ($this->debugMode) {
                 $marketplaceSku .= '--' . time();
             }
@@ -769,7 +789,7 @@ class LengowImport
                     );
                     continue;
                 }
-                $packageDeliveryAddressId = (int)$packageData->delivery->id;
+                $packageDeliveryAddressId = (int) $packageData->delivery->id;
                 $firstPackage = $nbPackage <= 1;
                 // check the package for re-import order
                 if ($this->importOneOrder
@@ -898,14 +918,14 @@ class LengowImport
             $intervalTime = $intervalTime > self::MAX_INTERVAL_TIME ? self::MAX_INTERVAL_TIME : $intervalTime;
         } else {
             // order recovery updated since ... days
-            $importDays = (int)$this->lengowConfiguration->get(LengowConfiguration::LENGOW_IMPORT_DAYS);
+            $importDays = (int) $this->lengowConfiguration->get(LengowConfiguration::SYNCHRONIZATION_DAY_INTERVAL);
             $intervalTime = $importDays * 86400;
             // add security for older versions of the plugin
             $intervalTime = $intervalTime < self::MIN_INTERVAL_TIME ? self::MIN_INTERVAL_TIME : $intervalTime;
             $intervalTime = $intervalTime > self::MAX_INTERVAL_TIME ? self::MAX_INTERVAL_TIME : $intervalTime;
             // get dynamic interval time for cron synchronisation
             $lastImport = $this->getLastImport();
-            $lastSettingUpdate = (int)$this->lengowConfiguration->get(LengowConfiguration::LENGOW_LAST_SETTING_UPDATE);
+            $lastSettingUpdate = (int) $this->lengowConfiguration->get(LengowConfiguration::LAST_UPDATE_SETTING);
             if ($this->importType !== self::TYPE_MANUAL
                 && $lastImport['timestamp'] !== 'none'
                 && $lastImport['timestamp'] > $lastSettingUpdate

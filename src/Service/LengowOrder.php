@@ -807,7 +807,7 @@ class LengowOrder
         // finish actions if lengow order is shipped, closed, cancel or refunded
         $orderProcessState = $this->getOrderProcessState($orderStateLengow);
         $tracks = $packageData->delivery->trackings;
-        $trackingCode = !empty($tracks) && !empty($tracks[0]->number) ? (string)$tracks[0]->number : false;
+        $trackingCode = !empty($tracks) && !empty($tracks[0]->number) ? (string) $tracks[0]->number : false;
         if ($orderProcessState === self::PROCESS_STATE_FINISH) {
             $this->lengowAction->finishActions($order->getId());
             $this->lengowOrderError->finishOrderErrors($lengowOrder->getId(), LengowOrderError::TYPE_ERROR_SEND);
@@ -1022,7 +1022,7 @@ class LengowOrder
             $merchantOrderIds[] = $shopwareOrder->getOrderNumber();
         }
         $body = [
-            'account_id' => (int)$this->lengowConfiguration->get(LengowConfiguration::LENGOW_ACCOUNT_ID),
+            'account_id' => (int) $this->lengowConfiguration->get(LengowConfiguration::ACCOUNT_ID),
             'marketplace_order_id' => $lengowOrder->getMarketplaceSku(),
             'marketplace' => $lengowOrder->getMarketplaceName(),
             'merchant_order_id' => $merchantOrderIds,
@@ -1159,16 +1159,16 @@ class LengowOrder
                 'marketplace' => $lengowOrder->getMarketplaceName(),
             ]
         );
-        if (isset($results->count) && (int)$results->count === 0) {
+        if (isset($results->count) && (int) $results->count === 0) {
             return [];
         }
         $orderData = $results->results[0];
         foreach ($orderData->packages as $package) {
             $packageLines = [];
             foreach ($package->cart as $product) {
-                $packageLines[] = (string)$product->marketplace_order_line_id;
+                $packageLines[] = (string) $product->marketplace_order_line_id;
             }
-            $orderLinesByPackage[(int)$package->delivery->id] = $packageLines;
+            $orderLinesByPackage[(int) $package->delivery->id] = $packageLines;
         }
         return $orderLinesByPackage[$lengowOrder->getDeliveryAddressId()] ?? [];
     }

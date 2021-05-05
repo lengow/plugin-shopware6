@@ -78,12 +78,12 @@ class LengowExportController extends AbstractController
         if ($request->get('salesChannelId')) {
             $salesChannelId = $request->get('salesChannelId');
             $this->lengowExport->init([
-                'sales_channel_id' => $salesChannelId,
+                LengowExport::PARAM_SALES_CHANNEL_ID => $salesChannelId,
             ]);
             $response = [
                 'success' => true,
                 'total' => $this->lengowExport->getTotalProduct(),
-                'exported' => $this->lengowExport->getTotalExportedProduct(),
+                'exported' => $this->lengowExport->getTotalExportProduct(),
             ];
             return new JsonResponse($response);
         }
@@ -105,7 +105,7 @@ class LengowExportController extends AbstractController
         if ($request->get('productId') && $request->get('salesChannelId')) {
             $salesChannelId = $request->get('salesChannelId');
             $this->lengowExport->init([
-                'sales_channel_id' => $salesChannelId,
+                LengowExport::PARAM_SALES_CHANNEL_ID => $salesChannelId,
             ]);
             $response = [
                 'success' => true,
@@ -134,7 +134,7 @@ class LengowExportController extends AbstractController
         if ($request->get('salesChannelId')) {
             $salesChannelId = $request->get('salesChannelId');
             $this->lengowExport->init([
-                'sales_channel_id' => $salesChannelId,
+                LengowExport::PARAM_SALES_CHANNEL_ID => $salesChannelId,
             ]);
             $response = [
                 'success' => true,

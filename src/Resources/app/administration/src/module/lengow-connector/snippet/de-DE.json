@@ -398,7 +398,8 @@
                 "write_permission": "Genehmigung vom Mediumordner schreiben",
                 "server_ip": "Server IP",
                 "authorized_ip_enable": "Autorisierung über IP aktiviert",
-                "authorized_ips": "Autorisierte IP"
+                "authorized_ips": "Autorisierte IP",
+                "toolbox_url": "Toolbox-URL"
             },
             "import": {
                 "title": "Informationen zur Synchronisierung",
