@@ -688,7 +688,6 @@ class LengowProduct
     private function getDescription(bool $cleanHtml = true): string
     {
         $value = $this->getTranslatedField(LengowExport::$defaultFields['description']);
-        $value = html_entity_decode($value);
         if ($cleanHtml) {
             $value = StringCleaner::cleanHtml($value);
         }
