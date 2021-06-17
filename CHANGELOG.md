@@ -1,6 +1,7 @@
 # v1.0.2
 - Feature: Outsourcing of the toolbox via webservice
 - Bugfix: [export] remove html_entity_decode call when retrieving product description
+- Bugfix: [export] fix headers fields duplication
 
 # v1.0.1
 - Bugfix: [export] Add parameters in product SQL requests

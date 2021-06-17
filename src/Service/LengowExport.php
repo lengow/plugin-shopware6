@@ -823,12 +823,12 @@ class LengowExport
         foreach (self::$defaultFields as $key => $value) {
             $fields[] = $key;
         }
-        return array_merge(
+        return array_values(array_unique(array_merge(
             $fields,
             $this->getAllOptionHeaderField(),
             $this->getAllCustomHeaderField(),
             $this->getAllPropertiesHeaderField()
-        );
+        )));
     }
 
     /**
