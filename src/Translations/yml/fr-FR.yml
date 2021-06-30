@@ -24,6 +24,23 @@ fr:
         settings: "Paramètres"
         legal_notices: "Mentions légales"
         toolbox: "Toolbox"
+      update:
+        version_available: "Nouvelle version disponible !"
+        start_now: "Commencez dès maintenant à profiter des nouvelles fonctionnalités, améliorations et corrections de bugs résumées sur notre"
+        link_changelog: "journal des modifications."
+        step_one: "Étape 1"
+        download_last_version: "Téléchargez la dernière version du plugin ci-dessous."
+        plugin_compatibility: "Compatible avec Shopware"
+        plugin_compatibility_to: "à"
+        extension_required: "Nécessite l'extension"
+        extension_required_to: "à"
+        step_two: "Étape 2"
+        link_follow: "Suivez"
+        update_procedure: "la procédure de mise à jour (simple et rapide)."
+        not_working: "Ça ne fonctionne pas ? Contactez notre"
+        customer_success_team: "équipe Customer Success"
+        button_download_version: "Lengow Shopware"
+        button_remind_me_later: "Pas maintenant, rappelez-moi plus tard"
       connection:
         home:
           description_first: "Lengow vous aide à optimiser votre entreprise dans le monde entier !"
@@ -38,7 +55,6 @@ fr:
           credentials_description: "Vous trouverez ces informations dans les paramètres de votre compte, section \"A.P.I\"."
           credentials_help: "Besoin d'aide ?"
           credentials_help_center: "Consultez notre centre d'aide"
-          credentials_help_center_url: "https://support.lengow.com/kb/fr"
           credentials_button: "Se connecter à Lengow"
           credentials_placeholder_access_token: "Entrez votre jeton d'accès"
           credentials_placeholder_secret: "Entrez votre secret"
@@ -86,7 +102,6 @@ fr:
           title: "Besoin d'aide ?"
           contact: "Prenez contact avec les équipes lengow"
           help_center_link: "Visitez notre help center"
-          help_center_target: "https://support.lengow.com/kb/guide/fr/shopware-6-1KEHaAuucG/Steps/98507"
           help_center: "pour plus d'informations sur la configuration de votre plugin Shopware"
       footer:
         link: 'https://www.lengow.com/fr'
@@ -95,12 +110,10 @@ fr:
         title: "Demandez de l'aide à notre équipe Support !"
         contain_text_support: "Des questions, un feedback sur Lengow... transmettez vos demandes au"
         title_lengow_support: "support Lengow"
-        link_lengow_support: "https://supportlengow.zendesk.com/hc/fr/requests/new"
         need_some_help: "Besoin d'aide ?"
         contain_text_support_hour: "Nous ferons notre maximum pour revenir vers vous au plus vite (Notre équipe Support est disponible du lundi au vendredi, de 9h à 18h)"
         find_answer: "Vous pouvez aussi consulter"
         link_magento_guide: "notre guide dédié à Shopware 6"
-        knowledge_link_url: "https://support.lengow.com/kb/guide/fr/shopware-6-1KEHaAuucG/Steps/98507"
       legals:
         title: "Mentions légales"
         simplified_company: "Société par actions simplifiés"
@@ -425,7 +438,7 @@ fr:
       mail_report:
         subject_report_mail: "Erreur de l'import Lengow"
         order: "Commande %{marketplace_sku}"
-        no_error_in_report_mail: "Pas de message d'erreur, contacter le support via https://supportlengow.zendesk.com/hc/fr/requests/new"
+        no_error_in_report_mail: "Pas de message d'erreur, contacter le support via %{support_link}"
       connection:
         status_draft: "Incomplet"
         status_active: "Actif"

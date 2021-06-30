@@ -38,7 +38,7 @@ lengow_log.exception.shopware_customer_not_saved|VORSICHT! Kunde konnte NICHT in
 lengow_log.exception.shopware_order_not_saved|VORSICHT! Bestellung konnte NICHT in der Shopware Datenbank gespeichert werden
 lengow_log.mail_report.subject_report_mail|Lengow Importfehler
 lengow_log.mail_report.order|Bestellungen %{marketplace_sku}
-lengow_log.mail_report.no_error_in_report_mail|Keine Fehlermeldung, kontaktieren Sie den Support unter https://supportlengow.zendesk.com/hc/en-us/requests/new
+lengow_log.mail_report.no_error_in_report_mail|Keine Fehlermeldung, kontaktieren Sie den Support unter %{support_link}
 lengow_log.connection.status_draft|Vorlage
 lengow_log.connection.status_active|Aktiv
 lengow_log.connection.catalog|Katalog %{catalog_id}

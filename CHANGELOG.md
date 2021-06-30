@@ -1,6 +1,7 @@
 # v1.0.2
 - Feature: Outsourcing of the toolbox via webservice
 - Feature: Added compatibility with Shopware 6.4
+- Feature: Setting up a modal for the plugin update
 - Bugfix: [export] remove html_entity_decode call when retrieving product description
 - Bugfix: [export] fix headers fields duplication
 

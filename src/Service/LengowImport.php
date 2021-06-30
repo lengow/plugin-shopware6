@@ -984,7 +984,10 @@ class LengowImport
         if ($orderErrorCollection->count() === 0) {
             return $mailBody;
         }
-        $support = $this->lengowLog->decodeMessage('lengow_log.mail_report.no_error_in_report_mail');
+        $pluginLinks = $this->lengowSync->getPluginLinks();
+        $support = $this->lengowLog->decodeMessage('lengow_log.mail_report.no_error_in_report_mail', null, [
+            'support_link' => $pluginLinks[LengowSync::LINK_TYPE_SUPPORT],
+        ]);
         $mailBody = '<h2>'
             . $this->lengowLog->decodeMessage('lengow_log.mail_report.subject_report_mail')
             . '</h2><p><ul>';

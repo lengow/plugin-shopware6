@@ -10,6 +10,7 @@ import './component/lgw-free-trial-warning';
 import './component/lgw-lockable-string-field';
 import './component/lgw-order-state-label';
 import './component/lgw-order-type-icon';
+import './component/lgw-update-modal';
 import './component/lgw-update-warning';
 import './extension/sw-order-detail';
 import './page/lgw-connection';

@@ -10,10 +10,15 @@ use Lengow\Connector\Util\EnvironmentInfoProvider;
  */
 class LengowTranslation
 {
+    /* Plugin translation iso codes */
+    public const ISO_CODE_EN = 'en-GB';
+    public const ISO_CODE_FR = 'fr-FR';
+    public const ISO_CODE_DE = 'de-DE';
+
     /**
      * @var string default iso code
      */
-    public const DEFAULT_ISO_CODE = 'en-GB';
+    public const DEFAULT_ISO_CODE = self::ISO_CODE_EN;
 
     /**
      * @var EnvironmentInfoProvider Environment info provider utility
@@ -23,7 +28,7 @@ class LengowTranslation
     /**
      * @var array|null all translations
      */
-    private $translation = null;
+    private $translation;
 
     /**
      * LengowTranslation Construct
@@ -40,11 +45,11 @@ class LengowTranslation
      *
      * @param string $message localization key
      * @param array $args arguments to replace word in string
-     * @param array|null $isoCode translation iso code
+     * @param string|null $isoCode translation iso code
      *
      * @return string
      */
-    public function t(string $message, array $args = [], $isoCode = null): string
+    public function t(string $message, array $args = [], string $isoCode = null): string
     {
         if ($isoCode === null) {
             $isoCode = $this->environmentInfoProvider->getLocaleCode();
@@ -90,15 +95,12 @@ class LengowTranslation
      * Load csv file
      *
      * @param string $isoCode translation iso code
-     * @param string|null $filename file location
      *
      * @return bool
      */
-    private function loadFile(string $isoCode, $filename = null): bool
+    private function loadFile(string $isoCode): bool
     {
-        if (!$filename) {
-            $filename = $this->environmentInfoProvider->getPluginPath() . '/Translations/' . $isoCode . '.csv';
-        }
+        $filename = $this->environmentInfoProvider->getPluginPath() . '/Translations/' . $isoCode . '.csv';
         $translation = [];
         if (file_exists($filename) && ($handle = fopen($filename, 'r')) !== false) {
             while (($data = fgetcsv($handle, 1000, '|')) !== false) {

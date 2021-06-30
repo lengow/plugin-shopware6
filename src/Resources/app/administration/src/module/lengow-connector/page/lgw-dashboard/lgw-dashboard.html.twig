@@ -8,8 +8,13 @@
                             {{ $tc('lengow-connector.page.dashboard') }}
                             <template v-if="!trialExpired && !isLoading">
                                 <lgw-debug-warning></lgw-debug-warning>
-                                <lgw-update-warning></lgw-update-warning>
-                                <lgw-free-trial-warning></lgw-free-trial-warning>
+                                <lgw-update-warning v-if="newVersionIsAvailable"
+                                                    :pluginData="pluginData"
+                                                    :onClickDownload="openUpdateModal">
+                                </lgw-update-warning>
+                                <lgw-free-trial-warning v-if="freeTrialEnabled"
+                                                        :accountStatusData="accountStatusData">
+                                </lgw-free-trial-warning>
                             </template>
                         {% endblock %}
                     </h2>
@@ -20,6 +25,10 @@
             <template #content>
                 <template v-if="!trialExpired && !isLoading">
                     <lgw-dashboard-home></lgw-dashboard-home>
+                    <lgw-update-modal v-if="showUpdateModal"
+                                      :pluginData="pluginData"
+                                      :onClickClose="closeUpdateModal">
+                    </lgw-update-modal>
                 </template>
                 <template v-else-if="trialExpired && !isLoading">
                     <lgw-dashboard-free-trial></lgw-dashboard-free-trial>

@@ -38,7 +38,7 @@ lengow_log.exception.shopware_customer_not_saved|WARNING! Customer could NOT be 
 lengow_log.exception.shopware_order_not_saved|WARNING! Order could NOT be saved in Shopware order table
 lengow_log.mail_report.subject_report_mail|Lengow imports errors
 lengow_log.mail_report.order|Order %{marketplace_sku}
-lengow_log.mail_report.no_error_in_report_mail|no error message, contact support via https://supportlengow.zendesk.com/hc/en-us/requests/new
+lengow_log.mail_report.no_error_in_report_mail|no error message, contact support via %{support_link}
 lengow_log.connection.status_draft|Draft
 lengow_log.connection.status_active|Active
 lengow_log.connection.catalog|Catalogue %{catalog_id}

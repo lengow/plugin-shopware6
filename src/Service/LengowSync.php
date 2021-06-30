@@ -13,49 +13,40 @@ use Lengow\Connector\Util\EnvironmentInfoProvider;
 class LengowSync
 {
     /**
-     * @var string sync catalog action
+     * @var string plugin type for lengow
      */
+    private const PLUGIN_TYPE = 'shopware';
+
+    /* Sync actions */
     public const SYNC_CATALOG = 'catalog';
-
-    /**
-     * @var string sync cms option action
-     */
     public const SYNC_CMS_OPTION = 'cms_option';
-
-    /**
-     * @var string sync status account action
-     */
     public const SYNC_STATUS_ACCOUNT = 'status_account';
-
-    /**
-     * @var string sync marketplace action
-     */
     public const SYNC_MARKETPLACE = 'marketplace';
-
-    /**
-     * @var string sync order action
-     */
     public const SYNC_ORDER = 'order';
-
-    /**
-     * @var string sync action action
-     */
     public const SYNC_ACTION = 'action';
-
-    /**
-     * @var string sync plugin version action
-     */
     public const SYNC_PLUGIN_DATA = 'plugin';
+
+    /* Plugin link types */
+    public const LINK_TYPE_HELP_CENTER = 'help_center';
+    public const LINK_TYPE_CHANGELOG = 'changelog';
+    public const LINK_TYPE_UPDATE_GUIDE = 'update_guide';
+    public const LINK_TYPE_SUPPORT = 'support';
+
+    /* Default plugin links */
+    private const LINK_HELP_CENTER = 'https://support.lengow.com/kb/guide/en/shopware-6-1KEHaAuucG/Steps/98507';
+    private const LINK_CHANGELOG = 'https://support.lengow.com/kb/guide/en/shopware-6-1KEHaAuucG/Steps/98507,113511,180222';
+    private const LINK_UPDATE_GUIDE = 'https://support.lengow.com/kb/guide/en/shopware-6-1KEHaAuucG/Steps/98507,123308';
+    private const LINK_SUPPORT = 'https://help-support.lengow.com/hc/en-us/requests/new';
+
+    /* Api iso codes */
+    private const API_ISO_CODE_EN = 'en';
+    private const API_ISO_CODE_FR = 'fr';
+    private const API_ISO_CODE_DE = 'de';
 
     /**
      * @var string name of logs folder
      */
     private const MARKETPLACE_FILE = 'marketplaces.json';
-
-    /**
-     * @var string plugin type for lengow
-     */
-    private const PLUGIN_TYPE = 'shopware';
 
     /**
      * @var string plugin data type for lengow
@@ -114,6 +105,25 @@ class LengowSync
         self::SYNC_ACTION,
         self::SYNC_CATALOG,
         self::SYNC_PLUGIN_DATA,
+    ];
+
+    /**
+     * @var array iso code correspondence for plugin links
+     */
+    private $genericIsoCodes = [
+        self::API_ISO_CODE_EN => LengowTranslation::ISO_CODE_EN,
+        self::API_ISO_CODE_FR => LengowTranslation::ISO_CODE_FR,
+        self::API_ISO_CODE_DE => LengowTranslation::ISO_CODE_DE,
+    ];
+
+    /**
+     * @var array default plugin links when the API is not available
+     */
+    private $defaultPluginLinks = [
+        self::LINK_TYPE_HELP_CENTER => self::LINK_HELP_CENTER,
+        self::LINK_TYPE_CHANGELOG => self::LINK_CHANGELOG,
+        self::LINK_TYPE_UPDATE_GUIDE => self::LINK_UPDATE_GUIDE,
+        self::LINK_TYPE_SUPPORT => self::LINK_SUPPORT,
     ];
 
     /**
@@ -406,9 +416,22 @@ class LengowSync
         }
         foreach ($plugins as $plugin) {
             if ($plugin->type === self::PLUGIN_DATA_TYPE) {
+                $pluginLinks = [];
+                if (!empty($plugin->links)) {
+                    foreach ($plugin->links as $link) {
+                        if (array_key_exists($link->language->iso_a2, $this->genericIsoCodes)) {
+                            $genericIsoCode = $this->genericIsoCodes[$link->language->iso_a2];
+                            $pluginLinks[$genericIsoCode][$link->link_type] = $link->link;
+                        }
+                    }
+                }
                 $pluginData = [
                     'version' => $plugin->version,
                     'download_link' => $plugin->archive,
+                    'cms_min_version' => '6.2',
+                    'cms_max_version' => '6.4',
+                    'links' => $pluginLinks,
+                    'extensions' => $plugin->extensions,
                 ];
                 $this->lengowConfiguration->set(LengowConfiguration::PLUGIN_DATA, json_encode($pluginData));
                 $this->lengowConfiguration->set(LengowConfiguration::LAST_UPDATE_PLUGIN_DATA, (string) time());
@@ -457,5 +480,36 @@ class LengowSync
             $status = json_decode($this->lengowConfiguration->get(LengowConfiguration::ACCOUNT_STATUS_DATA), true);
         }
         return $status;
+    }
+
+    /**
+     * Get an array of plugin links for a specific iso code
+     *
+     * @param string|null $isoCode
+     *
+     * @return array
+     */
+    public function getPluginLinks(string $isoCode = null): array
+    {
+        $pluginData = $this->getPluginData();
+        if (!$pluginData) {
+            return $this->defaultPluginLinks;
+        }
+        // check if the links are available in the locale
+        $isoCode = $isoCode ?: LengowTranslation::DEFAULT_ISO_CODE;
+        $localeLinks = $pluginData['links'][$isoCode] ?? false;
+        $defaultLocaleLinks = $pluginData['links'][LengowTranslation::DEFAULT_ISO_CODE] ?? false;
+        // for each type of link, we check if the link is translated
+        $pluginLinks = [];
+        foreach ($this->defaultPluginLinks as $linkType => $defaultLink) {
+            if ($localeLinks && isset($localeLinks[$linkType])) {
+                $pluginLinks[$linkType] = $localeLinks[$linkType];
+            } elseif ($defaultLocaleLinks && isset($defaultLocaleLinks[$linkType])) {
+                $pluginLinks[$linkType] = $defaultLocaleLinks[$linkType];
+            } else {
+                $pluginLinks[$linkType] = $defaultLink;
+            }
+        }
+        return $pluginLinks;
     }
 }

@@ -7,10 +7,26 @@ const { Component } = Shopware;
 Component.register('lgw-dashboard-home', {
     template,
 
+    inject: ['LengowConnectorSyncService'],
+
     data() {
         return {
             lengow_url: LENGOW_URL,
-            isLoading: true
+            helpCenterLink: ''
         };
+    },
+
+    created() {
+        this.createdComponent();
+    },
+
+    methods: {
+        createdComponent() {
+            this.LengowConnectorSyncService.getPluginLinks().then(result => {
+                if (result.success) {
+                    this.helpCenterLink = result.links.help_center;
+                }
+            });
+        }
     }
 });

@@ -65,7 +65,7 @@ class SettingsDefinition extends EntityDefinition
                 (new OneToOneAssociationField('salesChannel', 'sales_channel_id', 'id', ShopwareSalesChannelDefinition::class))
                     ->addFlags(new setNullOnDelete()),
                 (new StringField('name', 'name'))->addFlags(new Required()),
-                (new StringField('value', 'value')),
+                (new StringField('value', 'value', 20000)),
             ]
         );
     }
