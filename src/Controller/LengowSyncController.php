@@ -35,8 +35,11 @@ class LengowSyncController extends AbstractController
     /**
      * Get plugin data
      *
-     * @Route("/api/v{version}/_action/lengow/sync/get-plugin-data",
+     * @Route("/api/_action/lengow/sync/get-plugin-data",
      *      name="api.action.lengow.sync.get-plugin-data",
+     *      methods={"GET"})
+     * @Route("/api/v{version}/_action/lengow/sync/get-plugin-data",
+     *      name="api.action.lengow.sync.get-plugin-data-old",
      *      methods={"GET"})
      *
      * @return JsonResponse
@@ -58,8 +61,11 @@ class LengowSyncController extends AbstractController
     /**
      * Get Account data
      *
-     * @Route("/api/v{version}/_action/lengow/sync/get-account-status",
+     * @Route("/api/_action/lengow/sync/get-account-status",
      *     name="api.action.lengow.sync.get-account-status",
+     *     methods={"GET"})
+     * @Route("/api/v{version}/_action/lengow/sync/get-account-status",
+     *     name="api.action.lengow.sync.get-account-status-old",
      *     methods={"GET"})
      *
      * @param Request $request

@@ -36,8 +36,11 @@ class LengowToolboxController extends AbstractController
     /**
      * Get overview data
      *
-     * @Route("/api/v{version}/_action/lengow/toolbox/get-overview-data",
+     * @Route("/api/_action/lengow/toolbox/get-overview-data",
      *     name="api.action.lengow.toolbox.get-overview-data",
+     *     methods={"GET"})
+     * @Route("/api/v{version}/_action/lengow/toolbox/get-overview-data",
+     *     name="api.action.lengow.toolbox.get-overview-data-old",
      *     methods={"GET"})
      *
      * @return JsonResponse
@@ -55,8 +58,11 @@ class LengowToolboxController extends AbstractController
     /**
      * Get checksum data
      *
-     * @Route("/api/v{version}/_action/lengow/toolbox/get-checksum-data",
+     * @Route("/api/_action/lengow/toolbox/get-checksum-data",
      *     name="api.action.lengow.toolbox.get-checksum-data",
+     *     methods={"GET"})
+     * @Route("/api/v{version}/_action/lengow/toolbox/get-checksum-data",
+     *     name="api.action.lengow.toolbox.get-checksum-data-old",
      *     methods={"GET"})
      *
      * @return JsonResponse
@@ -69,8 +75,11 @@ class LengowToolboxController extends AbstractController
     /**
      * Get log data
      *
-     * @Route("/api/v{version}/_action/lengow/toolbox/get-log-data",
+     * @Route("/api/_action/lengow/toolbox/get-log-data",
      *     name="api.action.lengow.toolbox.get-log-data",
+     *     methods={"GET"})
+     * @Route("/api/v{version}/_action/lengow/toolbox/get-log-data",
+     *     name="api.action.lengow.toolbox.get-log-data-old",
      *     methods={"GET"})
      *
      * @return JsonResponse
@@ -83,9 +92,13 @@ class LengowToolboxController extends AbstractController
     /**
      * Download log file individually or globally
      *
-     * @Route("/api/v{version}/_action/lengow/order/download-log",
+     * @Route("/api/_action/lengow/order/download-log",
      *     defaults={"auth_enabled"=true},
      *     name="api.action.lengow.toolbox.download-log",
+     *     methods={"POST"})
+     * @Route("/api/v{version}/_action/lengow/order/download-log",
+     *     defaults={"auth_enabled"=true},
+     *     name="api.action.lengow.toolbox.download-log-old",
      *     methods={"POST"})
      *
      * @param Request $request

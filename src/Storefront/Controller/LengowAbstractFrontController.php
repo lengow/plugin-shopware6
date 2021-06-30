@@ -53,14 +53,15 @@ abstract class LengowAbstractFrontController extends StorefrontController
      * Check access by token or ip
      *
      * @param Request $request Http request
+     * @param bool $export Check access for export request or not
      *
      * @return string|null
      */
-    public function checkAccess(Request $request): ?string
+    public function checkAccess(Request $request, bool $export = false): ?string
     {
         $errorMessage = null;
         $token = $request->query->get(LengowExport::PARAM_TOKEN);
-        $salesChannelId = $request->query->get(LengowExport::PARAM_SALES_CHANNEL_ID);
+        $salesChannelId = $export ? $request->query->get(LengowExport::PARAM_SALES_CHANNEL_ID) : null;
         if (!$this->lengowAccessService->checkWebserviceAccess($token, $salesChannelId)) {
             if ($this->lengowConfiguration->get(LengowConfiguration::AUTHORIZED_IP_ENABLED)) {
                 $errorMessage = $this->lengowLog->decodeMessage(

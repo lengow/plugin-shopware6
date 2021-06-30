@@ -72,8 +72,11 @@ class LengowConnectionController extends AbstractController
     /**
      * Check API credentials and save them in Database
      *
-     * @Route("/api/v{version}/_action/lengow/connection/check-api-credentials",
+     * @Route("/api/_action/lengow/connection/check-api-credentials",
      *     name="api.action.lengow.connection.check-api-credentials",
+     *     methods={"POST"})
+     * @Route("/api/v{version}/_action/lengow/connection/check-api-credentials",
+     *     name="api.action.lengow.connection.check-api-credentials-old",
      *     methods={"POST"})
      *
      * @param Request $request
@@ -101,8 +104,11 @@ class LengowConnectionController extends AbstractController
     /**
      * Connect cms with Lengow
      *
-     * @Route("/api/v{version}/_action/lengow/connection/connect-cms",
+     * @Route("/api/_action/lengow/connection/connect-cms",
      *     name="api.action.lengow.connection.connect-cms",
+     *     methods={"GET"})
+     * @Route("/api/v{version}/_action/lengow/connection/connect-cms",
+     *     name="api.action.lengow.connection.connect-cms-old",
      *     methods={"GET"})
      *
      * @return JsonResponse
@@ -142,8 +148,11 @@ class LengowConnectionController extends AbstractController
     /**
      * Get all catalogs available in Lengow
      *
-     * @Route("/api/v{version}/_action/lengow/connection/get-catalog-list",
+     * @Route("/api/_action/lengow/connection/get-catalog-list",
      *     name="api.action.lengow.connection.get-catalog-list",
+     *     methods={"GET"})
+     * @Route("/api/v{version}/_action/lengow/connection/get-catalog-list",
+     *     name="api.action.lengow.connection.get-catalog-list-old",
      *     methods={"GET"})
      *
      * @return JsonResponse
@@ -163,8 +172,11 @@ class LengowConnectionController extends AbstractController
     /**
      * Save catalogs linked in database and send data to Lengow with call API
      *
-     * @Route("/api/v{version}/_action/lengow/connection/save-catalogs-linked",
+     * @Route("/api/_action/lengow/connection/save-catalogs-linked",
      *     name="api.action.lengow.connection.save-catalogs-linked",
+     *     methods={"POST"})
+     * @Route("/api/v{version}/_action/lengow/connection/save-catalogs-linked",
+     *     name="api.action.lengow.connection.save-catalogs-linked-old",
      *     methods={"POST"})
      *
      * @param Request $request

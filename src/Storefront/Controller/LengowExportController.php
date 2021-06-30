@@ -64,7 +64,7 @@ class LengowExportController extends LengowAbstractFrontController
             );
             return new Response($errorMessage, Response::HTTP_BAD_REQUEST);
         }
-        $accessErrorMessage = $this->checkAccess($request);
+        $accessErrorMessage = $this->checkAccess($request, true);
         if ($accessErrorMessage !== null) {
             return new Response($accessErrorMessage, Response::HTTP_FORBIDDEN);
         }

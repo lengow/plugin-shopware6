@@ -300,7 +300,7 @@ class LengowImportOrder
         LengowCustomer $lengowCustomer,
         LengowAddress $lengowAddress,
         EntityRepositoryInterface $currencyRepository,
-        SalesChannelContextFactory $salesChannelContextFactory,
+        $salesChannelContextFactory,
         CartService $cartService,
         OrderConverter $orderConverter,
         QuantityPriceCalculator $calculator,

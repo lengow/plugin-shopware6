@@ -3,12 +3,10 @@
 namespace Lengow\Connector\Service;
 
 use Exception;
-use Swift_Message;
-use Swift_Mailer;
-use Lengow\Connector\Entity\Lengow\OrderError\OrderErrorEntity;
 use Shopware\Core\Checkout\Order\OrderEntity;
 use Shopware\Core\Framework\DataAbstractionLayer\EntityCollection;
 use Shopware\Core\System\SalesChannel\SalesChannelEntity;
+use Lengow\Connector\Entity\Lengow\OrderError\OrderErrorEntity;
 use Lengow\Connector\Exception\LengowException;
 
 /**
@@ -99,11 +97,6 @@ class LengowImport
      * @var LengowActionSync Lengow action sync service
      */
     private $lengowActionSync;
-
-    /**
-     * @var Swift_Mailer Swift mailer service
-     */
-    private $swiftMailer;
 
     /**
      * @var string order id being imported
@@ -206,7 +199,6 @@ class LengowImport
      * @param LengowOrderError $lengowOrderError Lengow order error service
      * @param LengowSync $lengowSync Lengow sync service
      * @param LengowActionSync $lengowActionSync Lengow action sync service
-     * @param Swift_Mailer $swiftMailer Swift Mailer service
      */
     public function __construct(
         LengowConnector $lengowConnector,
@@ -216,8 +208,7 @@ class LengowImport
         LengowOrder $lengowOrder,
         LengowOrderError $lengowOrderError,
         LengowSync $lengowSync,
-        LengowActionSync $lengowActionSync,
-        Swift_Mailer $swiftMailer
+        LengowActionSync $lengowActionSync
     )
     {
         $this->lengowConnector = $lengowConnector;
@@ -228,7 +219,6 @@ class LengowImport
         $this->lengowOrderError = $lengowOrderError;
         $this->lengowSync = $lengowSync;
         $this->lengowActionSync = $lengowActionSync;
-        $this->swiftMailer = $swiftMailer;
     }
 
     /**
@@ -1026,12 +1016,14 @@ class LengowImport
      */
     private function sendMail(string $email, string $subject, string $body): bool
     {
-        // Create a message
-        $message = (new Swift_Message($subject))
-            ->setFrom([$this->lengowConfiguration->get('core.basicInformation.email') => 'Lengow'])
-            ->setTo([$email])
-            ->setBody($body);
-        // Send the message
-        return $this->swiftMailer->send($message) === 1;
+        // use of the php mail function because the different versions of Shopware do not have any service in common
+        // Shopware 6.2 / 6.3 uses the SwiftMailer service and Shopware 6.4 uses the native Symfony Mailer service
+        // Shopware has a mail service but it does not have the same class name depending on the versions
+        $headers = [
+            'MIME-Version: 1.0',
+            'Content-type: text/html; charset=iso-8859-1',
+            'From: Lengow <' . $this->lengowConfiguration->get('core.basicInformation.email') . '>',
+        ];
+        return mail($email, $subject, $body, implode("\r\n", $headers));
     }
 }
