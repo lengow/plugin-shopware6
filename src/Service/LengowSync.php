@@ -416,7 +416,19 @@ class LengowSync
         }
         foreach ($plugins as $plugin) {
             if ($plugin->type === self::PLUGIN_DATA_TYPE) {
+                $cmsMinVersion = '';
+                $cmsMaxVersion = '';
                 $pluginLinks = [];
+                $currentVersion = $plugin->version;
+                if (!empty($plugin->versions)) {
+                    foreach ($plugin->versions as $version) {
+                        if ($version->version === $currentVersion) {
+                            $cmsMinVersion = $version->cms_min_version;
+                            $cmsMaxVersion = $version->cms_max_version;
+                            break;
+                        }
+                    }
+                }
                 if (!empty($plugin->links)) {
                     foreach ($plugin->links as $link) {
                         if (array_key_exists($link->language->iso_a2, $this->genericIsoCodes)) {
@@ -426,10 +438,10 @@ class LengowSync
                     }
                 }
                 $pluginData = [
-                    'version' => $plugin->version,
+                    'version' => $currentVersion,
                     'download_link' => $plugin->archive,
-                    'cms_min_version' => '6.2',
-                    'cms_max_version' => '6.4',
+                    'cms_min_version' => $cmsMinVersion,
+                    'cms_max_version' => $cmsMaxVersion,
                     'links' => $pluginLinks,
                     'extensions' => $plugin->extensions,
                 ];
