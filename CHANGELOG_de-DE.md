@@ -4,6 +4,7 @@
 - Feature: Einrichten eines Modals für das Plugin-Update
 - Bugfix: [export] html_entity_decode-Aufruf beim Abrufen der Produktbeschreibung entfernen
 - Bugfix: [export] Duplizierung von Header-Feldern behoben
+- Bugfix: [export] Bildabruf korrigieren
 
 # v1.0.1
 - Bugfix: [export] Fügen Sie Parameter in Produkt-SQL-Anforderungen hinzu
