@@ -1,9 +1,9 @@
 # Lengow for Shopware 6
 
 - **Requires at least:** Shopware 6.2
-- **Tested up to:** Shopware 6.3
+- **Tested up to:** Shopware 6.4
 - **Requires PHP:** 7.3.11
-- **Stable tag:** 1.0.1
+- **Stable tag:** 1.0.2
 - **License:** MIT
 - **License URI:** https://opensource.org/licenses/MIT
 
