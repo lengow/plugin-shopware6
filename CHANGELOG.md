@@ -4,6 +4,7 @@
 - Feature: Setting up a modal for the plugin update
 - Bugfix: [export] remove html_entity_decode call when retrieving product description
 - Bugfix: [export] fix headers fields duplication
+- Bugfix: [export] fix image retrieval
 
 # v1.0.1
 - Bugfix: [export] Add parameters in product SQL requests

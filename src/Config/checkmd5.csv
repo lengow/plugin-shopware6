@@ -424,7 +424,7 @@
 /src/Service/LengowToolbox.php|121e5dccfd89379e6273a74c6c0eb4be
 /src/Service/LengowConnector.php|69cb2a1026b6d36bffb6b96e0afff11a
 /src/Service/LengowSync.php|d673f8ea2c7e3767fe5ec0047d08ee4e
-/src/Service/LengowProduct.php|7c0c7ec82b4de9ee19056f4fbca45159
+/src/Service/LengowProduct.php|35a249b6d473769e7844f4f0bfcf579a
 /src/Service/LengowOrder.php|e5ae66aac8608b085884e33cbbb5b6d5
 /src/Service/LengowActionSync.php|21695a99230437a21a0d511c711a5000
 /src/Service/LengowFeed.php|f2a52c7795acdb6048f70763f590b395

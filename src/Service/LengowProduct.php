@@ -73,6 +73,11 @@ class LengowProduct
     private const SHIPPING_PRICE_RANGE_MAX = 10000000000;
 
     /**
+     * @var string Accepted mime type for product images
+     */
+    private const PRODUCT_IMAGE_MIME_TYPE = 'image/jpeg';
+
+    /**
      * Callback for shopware ProductEntity getter
      */
     private const LINK = [
@@ -834,12 +839,16 @@ class LengowProduct
         }
         // get all product image urls
         if ($productMedia && $productMedia->count() > 0) {
+            $productMediaIterator = array ($productMedia->getIterator());
+            uasort($productMediaIterator, function (ProductMediaEntity $a, ProductMediaEntity $b): int {
+                return ($a->getPosition() < $b->getPosition()) ? -1 : 1;
+            });
             /** @var ProductMediaEntity $media */
             foreach ($productMedia as $media) {
                 if ($media->getMedia()) {
                     if ($coverId && $media->getId() === $coverId) {
                         $coverUrl = $media->getMedia()->getUrl();
-                    } else {
+                    } elseif ($media->getMedia()->getMimeType() === self::PRODUCT_IMAGE_MIME_TYPE) {
                         $urls[] = $media->getMedia()->getUrl();
                     }
                 }
