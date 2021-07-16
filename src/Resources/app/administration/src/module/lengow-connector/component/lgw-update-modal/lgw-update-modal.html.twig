@@ -1,0 +1,73 @@
+{% block lgw_update_modal %}
+    <template>
+        <sw-modal variant="large" :showHeader="false" @modal-close="closeModal">
+            <div class="lgw-update-modal">
+                <button class="sw-modal__close lgw-close"
+                        :title="$tc('global.sw-modal.labelClose')"
+                        :aria-label="$tc('global.sw-modal.labelClose')"
+                        @click.prevent="closeModal">
+                        <sw-icon name="small-default-x-line-medium" small></sw-icon>
+                </button>
+                <div class="lgw-row flexbox-vertical-center">
+                    <div class="lgw-col-5 text-center">
+                        <img :src="'lengowconnector/plugin-update.png' | asset">
+                    </div>
+                    <div class="lgw-col-7">
+                        <h1>{{ $tc('lengow-connector.update.version_available') }}</h1>
+                        <p>
+                            {{ $tc('lengow-connector.update.start_now') }}
+                            <a :href="changelogLink" target="_blank">
+                                {{ $tc('lengow-connector.update.link_changelog') }}
+                            </a>
+                        </p>
+                        <div class="lgw-content-section mod-small">
+                            <h2 class="no-margin-bottom">{{ $tc('lengow-connector.update.step_one') }}</h2>
+                            <p class="no-margin-bottom">
+                                {{ $tc('lengow-connector.update.download_last_version') }}
+                            </p>
+                            <p class="text-lesser text-italic">
+                                {{ $tc('lengow-connector.update.plugin_compatibility') }}
+                                {{ cmsMinVersion }}
+                                {{ $tc('lengow-connector.update.plugin_compatibility_to') }}
+                                {{ cmsMaxVersion }}
+                                <template v-for="extension in extensions">
+                                    <br />
+                                    {{ $tc('lengow-connector.update.extension_required') }}
+                                    {{ extension.name }}
+                                    {{ extension.min_version }}
+                                    {{ $tc('lengow-connector.update.extension_required_to') }}
+                                    {{ extension.max_version }}
+                                </template>
+                            </p>
+                        </div>
+                        <div class="lgw-content-section mod-small">
+                            <h2 class="no-margin-bottom">{{ $tc('lengow-connector.update.step_two') }}</h2>
+                            <p class="no-margin-bottom">
+                                <a :href="updateGuideLink" target="_blank">
+                                    {{ $tc('lengow-connector.update.link_follow') }}
+                                </a>
+                                {{ $tc('lengow-connector.update.update_procedure') }}
+                            </p>
+                            <p class="text-lesser text-italic">
+                                {{ $tc('lengow-connector.update.not_working') }}
+                                <a :href="supportLink" target="_blank">
+                                    {{ $tc('lengow-connector.update.customer_success_team') }}
+                                </a>
+                            </p>
+                        </div>
+                        <div class="flexbox-vertical-center margin-standard">
+                            <a class="lgw-btn no-margin-top" :href="downloadLink" target="_blank">
+                                {{ $tc('lengow-connector.update.button_download_version') }} {{ version }}
+                            </a>
+                            <button v-if="showRemindMeLater"
+                                    @click.prevent="remindMeLater"
+                                    class="lgw-btn-link no-margin-top text-small">
+                                {{ $tc('lengow-connector.update.button_remind_me_later') }}
+                            </button>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </sw-modal>
+    </template>
+{% endblock %}

@@ -21,6 +21,11 @@ use Lengow\Connector\LengowConnector;
  */
 class EnvironmentInfoProvider
 {
+    /* Lengow plugin folders */
+    public const FOLDER_CONFIG = 'Config';
+    public const FOLDER_EXPORT = 'Export';
+    public const FOLDER_LOG = 'Logs';
+
     /**
      * @var string Default locale code
      */
@@ -34,7 +39,7 @@ class EnvironmentInfoProvider
     /**
      * @var string plugin version
      */
-    public const PLUGIN_VERSION = "1.0.1";
+    public const PLUGIN_VERSION = '1.0.2';
 
     /**
      * @var Kernel $kernel

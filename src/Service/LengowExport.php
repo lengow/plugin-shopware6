@@ -28,6 +28,26 @@ use Lengow\Connector\Exception\LengowException;
  */
 class LengowExport
 {
+    /* Export GET params */
+    public const PARAM_TOKEN = 'token';
+    public const PARAM_MODE = 'mode';
+    public const PARAM_FORMAT = 'format';
+    public const PARAM_STREAM = 'stream';
+    public const PARAM_OFFSET = 'offset';
+    public const PARAM_LIMIT = 'limit';
+    public const PARAM_SELECTION = 'selection';
+    public const PARAM_OUT_OF_STOCK = 'out_of_stock';
+    public const PARAM_PRODUCT_IDS = 'product_ids';
+    public const PARAM_VARIATION = 'variation';
+    public const PARAM_INACTIVE = 'inactive';
+    public const PARAM_SALES_CHANNEL_ID = 'sales_channel_id';
+    public const PARAM_CURRENCY = 'currency';
+    public const PARAM_LANGUAGE = 'language';
+    public const PARAM_TYPE = 'type';
+    public const PARAM_LOG_OUTPUT = 'log_output';
+    public const PARAM_UPDATE_EXPORT_DATE = 'update_export_date';
+    public const PARAM_GET_PARAMS = 'get_params';
+
     /**
      * @var string manual export type
      */
@@ -107,22 +127,22 @@ class LengowExport
      * @var array all available params for export
      */
     public static $exportParams = [
-        'mode',
-        'format',
-        'stream',
-        'offset',
-        'limit',
-        'selection',
-        'out_of_stock',
-        'product_ids',
-        'variation',
-        'inactive',
-        'sales_channel_id',
-        'currency',
-        'language',
-        'log_output',
-        'update_export_date',
-        'get_params',
+        self::PARAM_MODE,
+        self::PARAM_FORMAT,
+        self::PARAM_STREAM,
+        self::PARAM_OFFSET,
+        self::PARAM_LIMIT,
+        self::PARAM_SELECTION,
+        self::PARAM_OUT_OF_STOCK,
+        self::PARAM_PRODUCT_IDS,
+        self::PARAM_VARIATION,
+        self::PARAM_INACTIVE,
+        self::PARAM_SALES_CHANNEL_ID,
+        self::PARAM_CURRENCY,
+        self::PARAM_LANGUAGE,
+        self::PARAM_LOG_OUTPUT,
+        self::PARAM_UPDATE_EXPORT_DATE,
+        self::PARAM_GET_PARAMS,
     ];
 
     /**
@@ -278,37 +298,31 @@ class LengowExport
      */
     public function init(array $params = []): void
     {
-        $salesChannelId = $params['sales_channel_id'] ?? '';
+        $salesChannelId = $params[self::PARAM_SALES_CHANNEL_ID] ?? '';
         $this->salesChannel = $this->getExportSalesChannel($salesChannelId);
-        $stream = $params['stream'] ?? true;
-        $this->logOutput = $stream ? false : ($params['log_output'] ?? false);
-        $updateExportDate = $params['update_export_date'] ?? true;
+        $stream = $params[self::PARAM_STREAM] ?? true;
+        $this->logOutput = $stream ? false : ($params[self::PARAM_LOG_OUTPUT] ?? false);
+        $updateExportDate = $params[self::PARAM_UPDATE_EXPORT_DATE] ?? true;
         $this->exportConfiguration = [
-            'format' => $this->setFormat($params['format'] ?? ''),
-            'stream' => $stream,
-            'type' => $updateExportDate ? self::TYPE_CRON : self::TYPE_MANUAL,
-            'update_export_date' => $updateExportDate,
-            'offset' => $params['offset'] ?? 0,
-            'limit' => $params['limit'] ?? 0,
-            'selection' => $params['selection'] ?? $this->lengowConfiguration->get(
-                    LengowConfiguration::LENGOW_EXPORT_SELECTION_ENABLED,
+            self::PARAM_FORMAT => $this->setFormat($params[self::PARAM_FORMAT] ?? ''),
+            self::PARAM_STREAM => $stream,
+            self::PARAM_TYPE => $updateExportDate ? self::TYPE_CRON : self::TYPE_MANUAL,
+            self::PARAM_UPDATE_EXPORT_DATE => $updateExportDate,
+            self::PARAM_OFFSET => $params[self::PARAM_OFFSET] ?? 0,
+            self::PARAM_LIMIT => $params[self::PARAM_LIMIT] ?? 0,
+            self::PARAM_SELECTION => $params[self::PARAM_SELECTION] ?? $this->lengowConfiguration->get(
+                    LengowConfiguration::SELECTION_ENABLED,
                     $salesChannelId
                 ),
-            'out_of_stock' => $params['out_of_stock'] ?? $this->lengowConfiguration->get(
-                    LengowConfiguration::LENGOW_EXPORT_OUT_OF_STOCK_ENABLED,
+            self::PARAM_INACTIVE => $params[self::PARAM_INACTIVE] ?? $this->lengowConfiguration->get(
+                    LengowConfiguration::INACTIVE_ENABLED,
                     $salesChannelId
                 ),
-            'inactive' => $params['inactive'] ?? $this->lengowConfiguration->get(
-                    LengowConfiguration::LENGOW_EXPORT_DISABLED_PRODUCT,
-                    $salesChannelId
-                ),
-            'variation' => $params['variation'] ?? $this->lengowConfiguration->get(
-                    LengowConfiguration::LENGOW_EXPORT_VARIATION_ENABLED,
-                    $salesChannelId
-                ),
-            'product_ids' => $this->setProductIds($params['product_ids'] ?? false),
-            'currency' => $params['currency'] ?? null,
-            'language' => $params['language'] ?? null,
+            self::PARAM_OUT_OF_STOCK => $params[self::PARAM_OUT_OF_STOCK] ?? true,
+            self::PARAM_VARIATION => $params[self::PARAM_VARIATION] ?? true,
+            self::PARAM_PRODUCT_IDS => $this->setProductIds($params[self::PARAM_PRODUCT_IDS ] ?? false),
+            self::PARAM_CURRENCY => $params[self::PARAM_CURRENCY] ?? null,
+            self::PARAM_LANGUAGE => $params[self::PARAM_LANGUAGE] ?? null,
         ];
     }
 
@@ -340,7 +354,7 @@ class LengowExport
      *
      * @return int
      */
-    public function getTotalExportedProduct(): int
+    public function getTotalExportProduct(): int
     {
         return count($this->getProductIdsExport());
     }
@@ -356,7 +370,7 @@ class LengowExport
             $this->lengowLog->write(
                 LengowLog::CODE_EXPORT,
                 $this->lengowLog->encodeMessage('log.export.start', [
-                    'type' => $this->exportConfiguration['type'],
+                    'type' => $this->exportConfiguration[self::PARAM_TYPE],
                 ]),
                 $this->logOutput
             );
@@ -377,8 +391,8 @@ class LengowExport
             $fields = $this->getHeaderFields();
             $this->lengowFeed->init(
                 $this->salesChannel->getId(),
-                $this->exportConfiguration['stream'],
-                $this->exportConfiguration['format']
+                $this->exportConfiguration[self::PARAM_STREAM],
+                $this->exportConfiguration[self::PARAM_FORMAT]
             );
             // write headers
             $this->lengowFeed->write(LengowFeed::HEADER, $fields);
@@ -390,7 +404,7 @@ class LengowExport
                     $this->lengowLog->encodeMessage('log.export.error_folder_not_created_or_writable')
                 );
             }
-            if (!$this->exportConfiguration['stream']) {
+            if (!$this->exportConfiguration[self::PARAM_STREAM]) {
                 $this->lengowLog->write(
                     LengowLog::CODE_EXPORT,
                     $this->lengowLog->encodeMessage('log.export.generate_feed_available_here', [
@@ -400,13 +414,17 @@ class LengowExport
                     $this->logOutput
                 );
             }
-            if ($this->exportConfiguration['update_export_date']) {
-                $this->lengowConfiguration->set('lengowLastExport', (string) time(), $this->salesChannel->getId());
+            if ($this->exportConfiguration[self::PARAM_UPDATE_EXPORT_DATE]) {
+                $this->lengowConfiguration->set(
+                    LengowConfiguration::LAST_UPDATE_EXPORT,
+                    (string) time(),
+                    $this->salesChannel->getId()
+                );
             }
             $this->lengowLog->write(
                 LengowLog::CODE_EXPORT,
                 $this->lengowLog->encodeMessage('log.export.end', [
-                    'type' => $this->exportConfiguration['type'],
+                    'type' => $this->exportConfiguration[self::PARAM_TYPE],
                 ]),
                 $this->logOutput
             );
@@ -441,11 +459,13 @@ class LengowExport
         // function can be use to retrieve specific product
         if ($LengowSelectionProductIds) {
             $lengowProductIds = array_merge($lengowProductIds, $LengowSelectionProductIds);
-        } else if ($this->exportConfiguration['selection'] || !empty($this->exportConfiguration['product_ids'])) {
+        } else if ($this->exportConfiguration[self::PARAM_SELECTION]
+            || !empty($this->exportConfiguration[self::PARAM_PRODUCT_IDS])
+        ) {
             // if selection is activated or product_ids get argument is used
             $lengowProductIds = $this->getLengowProductIdsToExport();
         }
-        if ($this->exportConfiguration['selection'] && empty($lengowProductIds)) {
+        if ($this->exportConfiguration[self::PARAM_SELECTION] && empty($lengowProductIds)) {
             return [];
         }
         $entryPoint = $this->salesChannel->getNavigationCategoryId();
@@ -463,9 +483,9 @@ class LengowExport
         ]);
         // clean result from db before sorting
         foreach ($products as &$product) {
-            $product['id'] = (string) bin2hex($product['id']);
+            $product['id'] = bin2hex($product['id']);
             if ($product['parent_id']) {
-                $product['parent_id'] = (string) bin2hex($product['parent_id']);
+                $product['parent_id'] = bin2hex($product['parent_id']);
             }
         }
         // unset foreach ref for garbage collector
@@ -529,7 +549,7 @@ class LengowExport
         ]);
         // clean result from db before sorting
         foreach ($products as $product) {
-            $productIds[] = (string) bin2hex($product['id']);
+            $productIds[] = bin2hex($product['id']);
         }
         return $productIds;
     }
@@ -537,45 +557,45 @@ class LengowExport
     /**
      * return json encoded string with all export parameters
      *
-     * @return mixed All export params with example
+     * @return false|string All export params with example
      */
     public function getExportParams()
     {
         $params = [];
         foreach (self::$exportParams as $param) {
             switch ($param) {
-                case 'mode':
+                case self::PARAM_MODE:
                     $authorizedValue = ['size', 'total'];
                     $type = 'string';
                     $example = 'size';
                     break;
-                case 'format':
+                case self::PARAM_FORMAT:
                     $authorizedValue = LengowFeed::$availableFormats;
                     $type = 'string';
                     $example = LengowFeed::FORMAT_CSV;
                     break;
-                case 'sales_channel_id':
+                case self::PARAM_SALES_CHANNEL_ID:
                     $authorizedValue = $this->getAllSalesChannelAvailableId();
                     $type = 'string';
                     $example = '98432def39fc4624b33213a56b8c944d';
                     break;
-                case 'currency':
+                case self::PARAM_CURRENCY:
                     $authorizedValue = $this->getAllCurrenciesAvailable();
                     $type = 'string';
                     $example = 'EUR';
                     break;
-                case 'language':
+                case self::PARAM_LANGUAGE:
                     $authorizedValue = $this->getAllLanguages();
                     $type = 'string';
                     $example = 'en-GB';
                     break;
-                case 'offset':
-                case 'limit':
+                case self::PARAM_OFFSET:
+                case self::PARAM_LIMIT:
                     $authorizedValue = 'all integers';
                     $type = 'integer';
                     $example = 100;
                     break;
-                case 'product_ids':
+                case self::PARAM_PRODUCT_IDS:
                     $authorizedValue = 'all strings';
                     $type = 'string';
                     $example = '98432def39fc4624b33213a56b8c944d,98329ef39fc4624b33213r87ds56gh9';
@@ -641,7 +661,7 @@ class LengowExport
     /**
      * Set product ids to export
      *
-     * @param bool|array $productIds product ids to export
+     * @param bool|string $productIds product ids to export
      *
      * @return array
      */
@@ -650,7 +670,7 @@ class LengowExport
         $ids = [];
         if ($productIds) {
             $exportedIds = explode(',', $productIds);
-            $ids = array_filter($exportedIds, function($id) {
+            $ids = array_filter($exportedIds, static function($id) {
                 return Uuid::isValid($id);
             });
         }
@@ -691,15 +711,15 @@ class LengowExport
     {
         if ($parentData) {
             return !(
-                (!$this->exportConfiguration['variation'] && !empty($productData['parent_id']))
-                || (!$this->exportConfiguration['out_of_stock'] && (int) $productData['available_stock'] <= 0)
-                || (!$this->exportConfiguration['inactive'] && !((bool) $parentData['active']))
+                (!$this->exportConfiguration[self::PARAM_VARIATION] && !empty($productData['parent_id']))
+                || (!$this->exportConfiguration[self::PARAM_OUT_OF_STOCK] && (int) $productData['available_stock'] <= 0)
+                || (!$this->exportConfiguration[self::PARAM_INACTIVE] && !((bool) $parentData['active']))
             );
         }
         return !(
-            (!$this->exportConfiguration['variation'] && !empty($productData['parent_id']))
-            || (!$this->exportConfiguration['out_of_stock'] && (int) $productData['available_stock'] <= 0)
-            || (!$this->exportConfiguration['inactive'] && !((bool) $productData['active']))
+            (!$this->exportConfiguration[self::PARAM_VARIATION] && !empty($productData['parent_id']))
+            || (!$this->exportConfiguration[self::PARAM_OUT_OF_STOCK] && (int) $productData['available_stock'] <= 0)
+            || (!$this->exportConfiguration[self::PARAM_INACTIVE] && !((bool) $productData['active']))
         );
     }
 
@@ -711,7 +731,7 @@ class LengowExport
     private function getLengowProductIdsToExport(): array
     {
         $lengowProductIds = [];
-        if ($this->exportConfiguration['selection']) {
+        if ($this->exportConfiguration[self::PARAM_SELECTION]) {
             $lengowProductCriteria = new Criteria();
             $lengowProductCriteria->addFilter(new EqualsFilter('salesChannelId', $this->salesChannel->getId()));
             $lengowProductArray = $this->lengowProductRepository
@@ -721,12 +741,15 @@ class LengowExport
             foreach($lengowProductArray as $id => $product) {
                 $lengowProductIds[] = $product->getProductId();
             }
-            if ($this->exportConfiguration['product_ids']) {
+            if ($this->exportConfiguration[self::PARAM_PRODUCT_IDS]) {
                 // search for specific product ids
-                $lengowProductIds = array_intersect($lengowProductIds, $this->exportConfiguration['product_ids']);
+                $lengowProductIds = array_intersect(
+                    $lengowProductIds,
+                    $this->exportConfiguration[self::PARAM_PRODUCT_IDS]
+                );
             }
-        } else if (!empty($this->exportConfiguration['product_ids'])) { // search for specific product ids
-            $lengowProductIds = $this->exportConfiguration['product_ids'];
+        } else if (!empty($this->exportConfiguration[self::PARAM_PRODUCT_IDS])) { // search for specific product ids
+            $lengowProductIds = $this->exportConfiguration[self::PARAM_PRODUCT_IDS];
         }
         return $lengowProductIds;
     }
@@ -800,28 +823,25 @@ class LengowExport
         foreach (self::$defaultFields as $key => $value) {
             $fields[] = $key;
         }
-        $fields = array_merge(
+        return array_values(array_unique(array_merge(
             $fields,
             $this->getAllOptionHeaderField(),
             $this->getAllCustomHeaderField(),
             $this->getAllPropertiesHeaderField()
-        );
-        return $fields;
+        )));
     }
 
     /**
      * @param array $headerFields all header field
      *
      * @throws LengowException
-     *
-     * @return bool
      */
-    private function writeFieldsData(array $headerFields): bool
+    private function writeFieldsData(array $headerFields): void
     {
         $numberOfProducts = $displayedProducts = 0;
         // get language, currency and shipping method for export
-        $language = $this->getExportLanguage($this->exportConfiguration['language']);
-        $currency = $this->getExportCurrency($this->exportConfiguration['currency']);
+        $language = $this->getExportLanguage($this->exportConfiguration[self::PARAM_LANGUAGE]);
+        $currency = $this->getExportCurrency($this->exportConfiguration[self::PARAM_CURRENCY]);
         $shippingMethod = $this->getExportShippingMethod();
         if ($language === null || $currency === null || $shippingMethod === null) {
             throw new LengowException(
@@ -858,14 +878,14 @@ class LengowExport
         );
         foreach ($products as $product) {
             // if offset specified in params
-            if ($this->exportConfiguration['offset'] !== 0
-                && $this->exportConfiguration['offset'] > $numberOfProducts)
+            if ($this->exportConfiguration[self::PARAM_OFFSET] !== 0
+                && $this->exportConfiguration[self::PARAM_OFFSET] > $numberOfProducts)
             {
                 $numberOfProducts++;
                 continue;
             }
-            if ($this->exportConfiguration['limit'] !== 0
-                && $this->exportConfiguration['limit'] <= $displayedProducts)
+            if ($this->exportConfiguration[self::PARAM_LIMIT] !== 0
+                && $this->exportConfiguration[self::PARAM_LIMIT] <= $displayedProducts)
             {
                 break;
             }
@@ -893,7 +913,6 @@ class LengowExport
             ]),
             $this->logOutput
         );
-        return true;
     }
 
 
@@ -995,7 +1014,7 @@ class LengowExport
     {
         // get shipping method from lengow configuration
         $shippingMethodId = $this->lengowConfiguration->get(
-            LengowConfiguration::LENGOW_EXPORT_DEFAULT_SHIPPING_METHOD,
+            LengowConfiguration::DEFAULT_EXPORT_CARRIER_ID,
             $this->salesChannel->getId()
         );
         $shippingMethodCriteria = new Criteria();

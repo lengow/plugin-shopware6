@@ -193,6 +193,13 @@ class LengowConnector
     ];
 
     /**
+     * @var array API requiring no authorization for the call url
+     */
+    protected $apiWithoutAuthorizations = [
+        self::API_PLUGIN,
+    ];
+
+    /**
      * @var int account id to connect
      */
     private $accountId;
@@ -226,16 +233,6 @@ class LengowConnector
     }
 
     /**
-     * Check if PHP Curl is activated
-     *
-     * @return bool
-     */
-    public function isCurlActivated(): bool
-    {
-        return function_exists('curl_version');
-    }
-
-    /**
      * Check API Authentication
      *
      * @param boolean $logOutput see log or not
@@ -248,7 +245,7 @@ class LengowConnector
             if ($this->accountId === null) {
                 return false;
             }
-            if (!$this->isCurlActivated()) {
+            if (!LengowToolbox::isCurlActivated()) {
                 throw new LengowException(
                     $this->lengowLog->encodeMessage('log.connector.curl_disabled'),
                     self::CODE_500
@@ -281,10 +278,11 @@ class LengowConnector
     public function queryApi(string $type, string $api, array $args = [], string $body = '', bool $logOutput = false)
     {
         try {
-            if ($this->accountId === null) {
+            $authorizationRequired = !in_array($api, $this->apiWithoutAuthorizations, true);
+            if ($this->accountId === null && $authorizationRequired) {
                 return false;
             }
-            if (!in_array($type, [self::GET, self::POST, self::PUT, self::PATCH])) {
+            if (!in_array($type, [self::GET, self::POST, self::PUT, self::PATCH], true)) {
                 throw new LengowException(
                     $this->lengowLog->encodeMessage('log.connector.method_not_valid', [
                         'type' => $type
@@ -293,13 +291,8 @@ class LengowConnector
                 );
             }
             $type = strtolower($type);
-            $results = $this->$type(
-                $api,
-                array_merge(['account_id' => $this->accountId], $args),
-                self::FORMAT_STREAM,
-                $body,
-                $logOutput
-            );
+            $args = $authorizationRequired ? array_merge(['account_id' => $this->accountId], $args) : $args;
+            $results = $this->$type($api, $args, self::FORMAT_STREAM, $body, $logOutput);
         } catch (LengowException $e) {
             $message = $this->lengowLog->decodeMessage($e->getMessage(), LengowTranslation::DEFAULT_ISO_CODE);
             $error = $this->lengowLog->encodeMessage('log.connector.error_api', [
@@ -322,8 +315,8 @@ class LengowConnector
      */
     public function connect(bool $force = false, bool $logOutput = false): void
     {
-        $token = $this->lengowConfiguration->get(LengowConfiguration::LENGOW_AUTH_TOKEN);
-        $updatedAt = $this->lengowConfiguration->get(LengowConfiguration::LENGOW_LAST_AUTH_TOKEN_UPDATE);
+        $token = $this->lengowConfiguration->get(LengowConfiguration::AUTHORIZATION_TOKEN);
+        $updatedAt = $this->lengowConfiguration->get(LengowConfiguration::LAST_UPDATE_AUTHORIZATION_TOKEN);
         if (!$force
             && $token !== null
             && $updatedAt !== null
@@ -333,8 +326,8 @@ class LengowConnector
             $authorizationToken = $token;
         } else {
             $authorizationToken = $this->getAuthorizationToken($logOutput);
-            $this->lengowConfiguration->set(LengowConfiguration::LENGOW_AUTH_TOKEN, $authorizationToken);
-            $this->lengowConfiguration->set(LengowConfiguration::LENGOW_LAST_AUTH_TOKEN_UPDATE, (string)time());
+            $this->lengowConfiguration->set(LengowConfiguration::AUTHORIZATION_TOKEN, $authorizationToken);
+            $this->lengowConfiguration->set(LengowConfiguration::LAST_UPDATE_AUTHORIZATION_TOKEN, (string) time());
         }
         $this->token = $authorizationToken;
     }
@@ -489,7 +482,9 @@ class LengowConnector
     private function call(string $api, array $args, string $type, string $format, string $body, bool $logOutput)
     {
         try {
-            $this->connect(false, $logOutput);
+            if (!in_array($api, $this->apiWithoutAuthorizations, true)) {
+                $this->connect(false, $logOutput);
+            }
             $data = $this->callAction($api, $args, $type, $format, $body, $logOutput);
         } catch (Exception $e) {
             if (in_array($e->getCode(), $this->authorizationCodes, true)) {
@@ -498,7 +493,9 @@ class LengowConnector
                     $this->lengowLog->encodeMessage('log.connector.retry_get_token'),
                     $logOutput
                 );
-                $this->connect(true, $logOutput);
+                if (!in_array($api, $this->apiWithoutAuthorizations, true)) {
+                    $this->connect(true, $logOutput);
+                }
                 $data = $this->callAction($api, $args, $type, $format, $body, $logOutput);
             } else {
                 throw new LengowException($e->getMessage(), $e->getCode());
@@ -579,7 +576,7 @@ class LengowConnector
      *
      * @throws LengowException
      *
-     * @return mixed
+     * @return bool|string
      */
     private function makeRequest(string $type, string $api, array $args, string $token, string $body, bool $logOutput)
     {
@@ -673,7 +670,7 @@ class LengowConnector
         if (!in_array($httpCode, $this->successCodes, true)) {
             $result = $this->format($result);
             // recovery of Lengow Api errors
-            if (isset($result['error'])) {
+            if (isset($result['error']['message'])) {
                 throw new LengowException($result['error']['message'], $httpCode);
             }
             throw new LengowException($this->lengowLog->encodeMessage('log.connector.api_not_available'), $httpCode);

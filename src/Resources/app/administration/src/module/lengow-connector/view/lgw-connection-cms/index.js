@@ -8,7 +8,10 @@ const { mapState } = Shopware.Component.getComponentHelper();
 Component.register('lgw-connection-cms', {
     template,
 
-    inject: ['LengowConnectorConnectionService'],
+    inject: [
+        'LengowConnectorConnectionService',
+        'LengowConnectorSyncService'
+    ],
 
     data() {
         return {
@@ -21,7 +24,9 @@ Component.register('lgw-connection-cms', {
             cmsConnected: false,
             hasCatalogToLink: false,
             accessToken: '',
-            secret: ''
+            secret: '',
+            helpCenterLink: '',
+            supportLink: ''
         };
     },
 
@@ -39,6 +44,12 @@ Component.register('lgw-connection-cms', {
             if (this.lengowUrl === 'https://my.lengow.net') {
                 this.preprod = true;
             }
+            this.LengowConnectorSyncService.getPluginLinks().then(result => {
+                if (result.success) {
+                    this.helpCenterLink = result.links.help_center;
+                    this.supportLink = result.links.support;
+                }
+            });
             this.isLoading = false;
         },
 

@@ -69,7 +69,6 @@
             <argument type="service" id="Lengow\Connector\Service\LengowOrderError"/>
             <argument type="service" id="Lengow\Connector\Service\LengowSync"/>
             <argument type="service" id="Lengow\Connector\Service\LengowActionSync"/>
-            <argument type="service" id="swiftmailer.mailer.default"/>
         </service>
 
         <service id="Lengow\Connector\Service\LengowImportOrder">

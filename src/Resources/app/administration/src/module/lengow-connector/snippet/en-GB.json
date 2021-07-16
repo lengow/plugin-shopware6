@@ -25,6 +25,24 @@
             "legal_notices": "Legal notices",
             "toolbox": "Toolbox"
         },
+        "update": {
+            "version_available": "New version available!",
+            "start_now": "Start now benefiting the new features, improvements and bug fixes summed up in our",
+            "link_changelog": "changelog.",
+            "step_one": "Step 1",
+            "download_last_version": "Download the latest plugin version below.",
+            "plugin_compatibility": "Compatible with Shopware",
+            "plugin_compatibility_to": "to",
+            "extension_required": "Requires extension",
+            "extension_required_to": "to",
+            "step_two": "Step 2",
+            "link_follow": "Follow",
+            "update_procedure": "the update procedure (easy and fast).",
+            "not_working": "Not working? Contact our",
+            "customer_success_team": "Customer Success team",
+            "button_download_version": "Lengow Shopware",
+            "button_remind_me_later": "Not now, remind me later"
+        },
         "connection": {
             "home": {
                 "description_first": "Lengow helps you optimize your business worldwide!",
@@ -40,7 +58,6 @@
                 "credentials_description": "Find these credentials in your account settings, section \"A.P.I\"",
                 "credentials_help": "Need help?",
                 "credentials_help_center": "Check out our Help Center",
-                "credentials_help_center_url": "https:\/\/support.lengow.com\/kb\/en",
                 "credentials_button": "Connect to Lengow",
                 "credentials_placeholder_access_token": "Enter your access token",
                 "credentials_placeholder_secret": "Enter your secret",
@@ -95,7 +112,6 @@
                 "title": "Need some help?",
                 "contact": "Get in touch with Lengow",
                 "help_center_link": "Visit our Help Center",
-                "help_center_target": "https:\/\/support.lengow.com\/kb\/guide\/en\/shopware-6-1KEHaAuucG\/Steps\/98507",
                 "help_center": "for detailed information on how to configure your Shopware plugin properly"
             }
         },
@@ -107,12 +123,10 @@
             "title": "Get a little help from your support team!",
             "contain_text_support": "Ask us anything about Lengow or share your feedback with",
             "title_lengow_support": "Lengow Support",
-            "link_lengow_support": "https:\/\/supportlengow.zendesk.com\/hc\/en-us\/requests\/new",
             "need_some_help": "Need some help?",
             "contain_text_support_hour": "We’ll do our best to get back to you during regular business hours (Monday to Friday – 9am to 6pm GMT+1)",
             "find_answer": "You can also find answers in our",
-            "link_magento_guide": "Shopware 6 dedicated guide",
-            "knowledge_link_url": "https:\/\/support.lengow.com\/kb\/guide\/en\/shopware-6-1KEHaAuucG\/Steps\/98507"
+            "link_magento_guide": "Shopware 6 dedicated guide"
         },
         "legals": {
             "title": "Legal notices",
@@ -395,10 +409,11 @@
                 "version": "Shopware version",
                 "plugin_version": "Plugin version",
                 "debug_disabled": "Debug Mode disabled",
-                "write_permission": "Read and write permission from media folder",
+                "write_permission": "Read and write permission for media folder",
                 "server_ip": "Server IP",
                 "authorized_ip_enable": "Authorisation by IP enabled",
-                "authorized_ips": "Authorised IP"
+                "authorized_ips": "Authorised IP",
+                "toolbox_url": "Toolbox URL"
             },
             "import": {
                 "title": "Synchronisation information",

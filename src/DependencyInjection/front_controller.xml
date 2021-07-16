@@ -12,6 +12,9 @@
             <argument type="service" id="Lengow\Connector\Service\LengowLog"/>
             <argument type="service" id="Lengow\Connector\Service\LengowExport"/>
             <tag name="controller.service_arguments"/>
+            <call method="setContainer">
+                <argument type="service" id="service_container"/>
+            </call>
         </service>
 
         <service id="Lengow\Connector\Storefront\Controller\LengowCronController">
@@ -22,6 +25,20 @@
             <argument type="service" id="Lengow\Connector\Service\LengowSync"/>
             <argument type="service" id="Lengow\Connector\Service\LengowActionSync"/>
             <tag name="controller.service_arguments"/>
+            <call method="setContainer">
+                <argument type="service" id="service_container"/>
+            </call>
+        </service>
+
+        <service id="Lengow\Connector\Storefront\Controller\LengowToolboxController">
+            <argument type="service" id="Lengow\Connector\Service\LengowAccess"/>
+            <argument type="service" id="Lengow\Connector\Service\LengowConfiguration"/>
+            <argument type="service" id="Lengow\Connector\Service\LengowLog"/>
+            <argument type="service" id="Lengow\Connector\Service\LengowToolbox"/>
+            <tag name="controller.service_arguments"/>
+            <call method="setContainer">
+                <argument type="service" id="service_container"/>
+            </call>
         </service>
 
     </services>

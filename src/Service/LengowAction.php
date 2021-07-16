@@ -363,7 +363,7 @@ class LengowAction
         if (isset($result->error, $result->error->message)) {
             throw new LengowException($result->error->message);
         }
-        if (!isset($result->count) || (int)$result->count === 0) {
+        if (!isset($result->count) || (int) $result->count === 0) {
             return $sendAction;
         }
         foreach ($result->results as $row) {

@@ -2,7 +2,6 @@
 
 namespace Lengow\Connector\Storefront\Controller;
 
-use Lengow\Connector\Service\LengowTranslation;
 use Shopware\Core\Framework\Routing\Annotation\RouteScope;
 use Shopware\Core\System\SalesChannel\SalesChannelContext;
 use Symfony\Component\Routing\Annotation\Route;
@@ -10,8 +9,9 @@ use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\Response;
 use Lengow\Connector\Service\LengowAccess;
 use Lengow\Connector\Service\LengowConfiguration;
-use Lengow\Connector\Service\LengowLog;
 use Lengow\Connector\Service\LengowExport;
+use Lengow\Connector\Service\LengowLog;
+use Lengow\Connector\Service\LengowTranslation;
 
 /**
  * Class LengowExportController
@@ -64,17 +64,17 @@ class LengowExportController extends LengowAbstractFrontController
             );
             return new Response($errorMessage, Response::HTTP_BAD_REQUEST);
         }
-        $accessErrorMessage = $this->checkAccess($request);
+        $accessErrorMessage = $this->checkAccess($request, true);
         if ($accessErrorMessage !== null) {
             return new Response($accessErrorMessage, Response::HTTP_FORBIDDEN);
         }
         $exportArgs = $this->createGetArgArray($request);
         $this->lengowExport->init($exportArgs);
-        if ($exportArgs['get_params']) {
+        if ($exportArgs[LengowExport::PARAM_GET_PARAMS]) {
             return new Response($this->lengowExport->getExportParams());
         }
-        if ($exportArgs['mode']) {
-            return new Response($this->modeSize($exportArgs['mode']));
+        if ($exportArgs[LengowExport::PARAM_MODE]) {
+            return new Response($this->modeSize($exportArgs[LengowExport::PARAM_MODE]));
         }
         $this->lengowExport->exec();
         return new Response();
@@ -107,37 +107,41 @@ class LengowExportController extends LengowAbstractFrontController
     protected function createGetArgArray(Request $request): array
     {
         return [
-            'mode' => $request->query->get('mode'),
-            'format' => $request->query->get('format'),
-            'stream' => $request->query->get('stream') !== null
-                ? $request->query->get('stream') === '1'
+            LengowExport::PARAM_MODE => $request->query->get(LengowExport::PARAM_MODE),
+            LengowExport::PARAM_FORMAT => $request->query->get(LengowExport::PARAM_FORMAT),
+            LengowExport::PARAM_STREAM => $request->query->get(LengowExport::PARAM_STREAM) !== null
+                ? $request->query->get(LengowExport::PARAM_STREAM) === '1'
                 : null,
-            'offset' => $request->query->get('offset') !== null ? (int) $request->query->get('offset') : null,
-            'limit' => $request->query->get('limit') !== null ? (int) $request->query->get('limit') : null,
-            'selection' => $request->query->get('selection') !== null
-                ? $request->query->get('selection') === '1'
+            LengowExport::PARAM_OFFSET => $request->query->get(LengowExport::PARAM_OFFSET) !== null
+                ? (int) $request->query->get(LengowExport::PARAM_OFFSET)
                 : null,
-            'out_of_stock' => $request->query->get('out_of_stock') !== null
-                ? $request->query->get('out_of_stock') === '1'
+            LengowExport::PARAM_LIMIT => $request->query->get(LengowExport::PARAM_LIMIT) !== null
+                ? (int) $request->query->get(LengowExport::PARAM_LIMIT)
                 : null,
-            'variation' => $request->query->get('variation') !== null
-                ? $request->query->get('variation') === '1'
+            LengowExport::PARAM_SELECTION => $request->query->get(LengowExport::PARAM_SELECTION) !== null
+                ? $request->query->get(LengowExport::PARAM_SELECTION) === '1'
                 : null,
-            'inactive' => $request->query->get('inactive') !== null
-                ? $request->query->get('inactive') === '1'
+            LengowExport::PARAM_OUT_OF_STOCK => $request->query->get(LengowExport::PARAM_OUT_OF_STOCK) !== null
+                ? $request->query->get(LengowExport::PARAM_OUT_OF_STOCK) === '1'
                 : null,
-            'product_ids' => $request->query->get('product_ids'),
-            'sales_channel_id' => $request->query->get('sales_channel_id'),
-            'currency' => $request->query->get('currency'),
-            'language' => $request->query->get('language'),
-            'log_output' => $request->query->get('log_output') !== null
-                ? $request->query->get('log_output') === '1'
+            LengowExport::PARAM_VARIATION => $request->query->get(LengowExport::PARAM_VARIATION) !== null
+                ? $request->query->get(LengowExport::PARAM_VARIATION) === '1'
                 : null,
-            'update_export_date' => $request->query->get('update_export_date') !== null
-                ? $request->query->get('update_export_date') === '1'
+            LengowExport::PARAM_INACTIVE => $request->query->get(LengowExport::PARAM_INACTIVE) !== null
+                ? $request->query->get(LengowExport::PARAM_INACTIVE) === '1'
                 : null,
-            'get_params' => $request->query->get('get_params') !== null
-                ? $request->query->get('get_params') === '1'
+            LengowExport::PARAM_PRODUCT_IDS => $request->query->get(LengowExport::PARAM_PRODUCT_IDS),
+            LengowExport::PARAM_SALES_CHANNEL_ID => $request->query->get(LengowExport::PARAM_SALES_CHANNEL_ID),
+            LengowExport::PARAM_CURRENCY => $request->query->get(LengowExport::PARAM_CURRENCY),
+            LengowExport::PARAM_LANGUAGE => $request->query->get(LengowExport::PARAM_LANGUAGE ),
+            LengowExport::PARAM_LOG_OUTPUT => $request->query->get(LengowExport::PARAM_LOG_OUTPUT) !== null
+                ? $request->query->get(LengowExport::PARAM_LOG_OUTPUT) === '1'
+                : null,
+            LengowExport::PARAM_UPDATE_EXPORT_DATE => $request->query->get(
+                LengowExport::PARAM_UPDATE_EXPORT_DATE
+            ) !== null ? $request->query->get(LengowExport::PARAM_UPDATE_EXPORT_DATE) === '1' : null,
+            LengowExport::PARAM_GET_PARAMS => $request->query->get( LengowExport::PARAM_GET_PARAMS) !== null
+                ? $request->query->get( LengowExport::PARAM_GET_PARAMS) === '1'
                 : null,
         ];
     }
@@ -152,7 +156,7 @@ class LengowExportController extends LengowAbstractFrontController
     protected function modeSize(string $mode): int
     {
         if ($mode === 'size') {
-            return $this->lengowExport->getTotalExportedProduct();
+            return $this->lengowExport->getTotalExportProduct();
         }
         if ($mode === 'total') {
             return $this->lengowExport->getTotalProduct();

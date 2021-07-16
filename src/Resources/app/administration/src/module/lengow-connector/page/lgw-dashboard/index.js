@@ -7,30 +7,53 @@ Component.register('lgw-dashboard', {
 
     inject: ['LengowConnectorSyncService'],
 
-    mixins: [],
-
     data() {
         return {
             isLoading: true,
-            trialExpired: false
+            freeTrialEnabled: false,
+            trialExpired: false,
+            newVersionIsAvailable: false,
+            showUpdateModal: false,
+            accountStatusData: [],
+            pluginData: []
         };
     },
 
-    computed: {},
-
     created() {
-        this.isTrialExpired();
+        this.createdComponent();
     },
 
     methods: {
-        isTrialExpired() {
+        createdComponent() {
+            this.isLoading = true;
             this.LengowConnectorSyncService.getAccountStatus(false).then(result => {
-                if (result.success && result.type === 'free_trial') {
-                    this.trialExpired = result.expired;
+                if (result.success) {
+                    this.accountStatusData = result;
+                    this.freeTrialEnabled = this.accountStatusData.type === 'free_trial';
+                    if (this.freeTrialEnabled && this.accountStatusData.expired) {
+                        this.trialExpired = true;
+                        this.isLoading = false;
+                    } else {
+                        this.LengowConnectorSyncService.getPluginData().then(result => {
+                            if (result.success) {
+                                this.pluginData = result.plugin_data;
+                                this.newVersionIsAvailable = this.pluginData.new_version_is_available;
+                                this.showUpdateModal = this.pluginData.show_update_modal;
+                            }
+                        }).finally(() => {
+                            this.isLoading = false;
+                        });
+                    }
                 }
-            }).finally(() => {
-                this.isLoading = false;
             });
+        },
+
+        openUpdateModal() {
+            this.showUpdateModal = true;
+        },
+
+        closeUpdateModal() {
+            this.showUpdateModal = false;
         }
     }
 });

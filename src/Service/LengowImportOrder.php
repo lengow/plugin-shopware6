@@ -300,7 +300,7 @@ class LengowImportOrder
         LengowCustomer $lengowCustomer,
         LengowAddress $lengowAddress,
         EntityRepositoryInterface $currencyRepository,
-        SalesChannelContextFactory $salesChannelContextFactory,
+        $salesChannelContextFactory,
         CartService $cartService,
         OrderConverter $orderConverter,
         QuantityPriceCalculator $calculator,
@@ -497,8 +497,8 @@ class LengowImportOrder
         // get all customer data (name, contact email and VAT number)
         $customerName = $this->getCustomerName();
         $customerEmail = $this->orderData->billing_address->email !== null
-            ? (string)$this->orderData->billing_address->email
-            : (string)$this->packageData->delivery->email;
+            ? (string) $this->orderData->billing_address->email
+            : (string) $this->packageData->delivery->email;
         $customerVatNumber = $this->getVatNumberFromOrderData();
         // update Lengow order with new data
         $this->lengowOrder->update($lengowOrder->getId(), [
@@ -508,7 +508,7 @@ class LengowImportOrder
             'customerName' => $customerName,
             'customerEmail' => $customerEmail,
             'customerVatNumber' => $customerVatNumber,
-            'commission' => (float)$this->orderData->commission,
+            'commission' => (float) $this->orderData->commission,
             'carrier' => $this->carrierName,
             'carrierMethod' => $this->carrierMethod,
             'carrierTracking' => $this->trackingNumber,
@@ -530,7 +530,7 @@ class LengowImportOrder
                     $this->logOutput,
                     $this->marketplaceSku
                 );
-                if (!$this->lengowConfiguration->get(LengowConfiguration::LENGOW_IMPORT_SHIPPED_BY_MKTP)) {
+                if (!$this->lengowConfiguration->get(LengowConfiguration::SHIPPED_BY_MARKETPLACE_ENABLED)) {
                     // update Lengow order with new data
                     $this->lengowOrder->update($lengowOrder->getId(), [
                         'orderProcessState' => LengowOrder::PROCESS_STATE_FINISH,
@@ -575,7 +575,7 @@ class LengowImportOrder
             // don't reduce stock for re-import order and order shipped by marketplace
             if ($this->isReimported
                 || ($this->shippedByMp
-                    && !$this->lengowConfiguration->get(LengowConfiguration::LENGOW_IMPORT_MKTP_DECR_STOCK)
+                    && !$this->lengowConfiguration->get(LengowConfiguration::SHIPPED_BY_MARKETPLACE_STOCK_ENABLED)
                 )
             ) {
                 if ($this->isReimported) {
@@ -836,8 +836,8 @@ class LengowImportOrder
      */
     private function loadOrderAmountData(): void
     {
-        $this->processingFee = (float)$this->orderData->processing_fee;
-        $this->shippingCost = (float)$this->orderData->shipping;
+        $this->processingFee = (float) $this->orderData->processing_fee;
+        $this->shippingCost = (float) $this->orderData->shipping;
         // rewrite processing fees and shipping cost
         if (!$this->firstPackage) {
             $this->processingFee = 0;
@@ -861,13 +861,13 @@ class LengowImportOrder
         foreach ($this->packageData->cart as $product) {
             // check whether the product is canceled for amount
             if ($product->marketplace_status !== null) {
-                $stateProduct = $this->lengowMarketplace->getStateLengow((string)$product->marketplace_status);
+                $stateProduct = $this->lengowMarketplace->getStateLengow((string) $product->marketplace_status);
                 if ($stateProduct === LengowOrder::STATE_CANCELED || $stateProduct === LengowOrder::STATE_REFUSED) {
                     continue;
                 }
             }
-            $nbItems += (int)$product->quantity;
-            $totalAmount += (float)$product->amount;
+            $nbItems += (int) $product->quantity;
+            $totalAmount += (float) $product->amount;
         }
         $this->orderItems = $nbItems;
         $this->orderAmount = $totalAmount + $this->processingFee + $this->shippingCost;
@@ -895,10 +895,10 @@ class LengowImportOrder
      */
     private function getCustomerName(): string
     {
-        $firstName = ucfirst(strtolower((string)$this->orderData->billing_address->first_name));
-        $lastName = ucfirst(strtolower((string)$this->orderData->billing_address->last_name));
+        $firstName = ucfirst(strtolower((string) $this->orderData->billing_address->first_name));
+        $lastName = ucfirst(strtolower((string) $this->orderData->billing_address->last_name));
         if (empty($firstName) && empty($lastName)) {
-            return ucwords(strtolower((string)$this->orderData->billing_address->full_name));
+            return ucwords(strtolower((string) $this->orderData->billing_address->full_name));
         }
         return $firstName . ' ' . $lastName;
     }
@@ -912,7 +912,7 @@ class LengowImportOrder
      */
     private function getOrderDate(): string
     {
-        $orderDate = (string)($this->orderData->marketplace_order_date ?? $this->orderData->imported_at);
+        $orderDate = (string) ($this->orderData->marketplace_order_date ?? $this->orderData->imported_at);
         return $this->lengowConfiguration->gmtDate(strtotime($orderDate), Defaults::STORAGE_DATE_TIME_FORMAT);
     }
 
@@ -925,7 +925,7 @@ class LengowImportOrder
     {
         return is_array($this->orderData->comments)
             ? implode(',', $this->orderData->comments)
-            : (string)$this->orderData->comments;
+            : (string) $this->orderData->comments;
     }
 
     /**
@@ -935,7 +935,7 @@ class LengowImportOrder
      */
     private function getVatNumberFromOrderData(): string
     {
-        return (string)($this->orderData->billing_address->vat_number ?? $this->packageData->delivery->vat_number);
+        return (string) ($this->orderData->billing_address->vat_number ?? $this->packageData->delivery->vat_number);
     }
 
     /**
@@ -968,8 +968,8 @@ class LengowImportOrder
             }
             $product = null;
             $productIds = [
-                'merchant_product_id' => (string)$productData['merchant_product_id']->id,
-                'marketplace_product_id' => (string)$productData['marketplace_product_id'],
+                'merchant_product_id' => (string) $productData['merchant_product_id']->id,
+                'marketplace_product_id' => (string) $productData['marketplace_product_id'],
             ];
             foreach ($productIds as $attributeName => $attributeValue) {
                 $product = $this->lengowProduct->searchProduct(
@@ -990,7 +990,7 @@ class LengowImportOrder
                 );
             }
             // if found, id does not concerns a variation but a parent
-            if ($product && (int)$product->getChildCount() !== 0) {
+            if ($product && (int) $product->getChildCount() !== 0) {
                 throw new LengowException(
                     $this->lengowLog->encodeMessage('lengow_log.exception.product_is_a_parent', [
                         'product_number' => $product->getProductNumber(),
@@ -1009,14 +1009,14 @@ class LengowImportOrder
             }
             $productId = $product->getId();
             if (array_key_exists($productId, $products)) {
-                $products[$productId]['quantity'] += (int)$productData['quantity'];
-                $products[$productId]['amount'] += (float)$productData['amount'];
+                $products[$productId]['quantity'] += (int) $productData['quantity'];
+                $products[$productId]['amount'] += (float) $productData['amount'];
                 $products[$productId]['order_line_ids'][] = $productData['marketplace_order_line_id'];
             } else {
                 $products[$productId] = [
                     'shopware_product' => $product,
-                    'quantity' => (int)$productData['quantity'],
-                    'amount' => (float)$productData['amount'],
+                    'quantity' => (int) $productData['quantity'],
+                    'amount' => (float) $productData['amount'],
                     'price_unit' => $productData['price_unit'],
                     'order_line_ids' => [$productData['marketplace_order_line_id']],
                 ];
@@ -1072,7 +1072,7 @@ class LengowImportOrder
     {
         $token = Uuid::randomHex();
         $shippingMethodId = $this->lengowConfiguration->get(
-            LengowConfiguration::LENGOW_IMPORT_DEFAULT_SHIPPING_METHOD,
+            LengowConfiguration::DEFAULT_IMPORT_CARRIER_ID,
             $this->salesChannel->getId()
         );
         // create a specific context with all order data
@@ -1174,7 +1174,7 @@ class LengowImportOrder
         // if b2b import is activated and order is b2b type : set order as vat free
         if (isset($this->orderTypes[LengowOrder::TYPE_BUSINESS])
             && $this->orderTypes[LengowOrder::TYPE_BUSINESS]
-            && $this->lengowConfiguration->get('lengowImportB2b')
+            && $this->lengowConfiguration->get(LengowConfiguration::B2B_WITHOUT_TAX_ENABLED)
         ) {
             $cart->setPrice(
                 new CartPrice(
@@ -1352,8 +1352,8 @@ class LengowImportOrder
                     ')
                 );
                 $query->execute([
-                    'stock' => (int)$stock,
-                    'available_stock' => (int)$availableStock,
+                    'stock' => (int) $stock,
+                    'available_stock' => (int) $availableStock,
                     'id' => Uuid::fromHexToBytes($product->getId()),
                     'version' => Uuid::fromHexToBytes(Defaults::LIVE_VERSION),
                 ]);

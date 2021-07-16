@@ -1,32 +1,39 @@
 import template from './lgw-update-warning.html.twig';
 import './lgw-update-warning.scss';
 
-import { LENGOW_URL } from '../../../const';
-
 const { Component } = Shopware;
 
 Component.register('lgw-update-warning', {
     template,
 
-    inject: ['LengowConnectorSyncService'],
+    props: {
+        pluginData: {
+            type: Object,
+            required: true
+        },
+        onClickDownload: {
+            type: Object,
+            required: true
+        },
+    },
 
     data() {
         return {
-            display: false,
-            newVersion: null,
-            link: ''
+            version: ''
         };
     },
 
-    computed: {},
-
     created() {
-        this.LengowConnectorSyncService.getPluginData().then(data => {
-            if (data.success && data.should_update) {
-                this.display = true;
-                this.newVersion = data.plugin_data.version;
-                this.link = LENGOW_URL + data.plugin_data.download_link;
-            }
-        });
+        this.createdComponent();
+    },
+
+    methods: {
+        createdComponent() {
+            this.version = this.pluginData.version;
+        },
+
+        onClick() {
+            this.onClickDownload();
+        }
     }
 });

@@ -1,3 +1,11 @@
+# v1.0.2
+- Feature: Auslagerung der Toolbox über den Webservice
+- Feature: Kompatibilität mit Shopware 6.4 hinzugefügt
+- Feature: Einrichten eines Modals für das Plugin-Update
+- Bugfix: [export] html_entity_decode-Aufruf beim Abrufen der Produktbeschreibung entfernen
+- Bugfix: [export] Duplizierung von Header-Feldern behoben
+- Bugfix: [export] Bildabruf korrigieren
+
 # v1.0.1
 - Bugfix: [export] Fügen Sie Parameter in Produkt-SQL-Anforderungen hinzu
 - Bugfix: [export] Verwenden Sie die Funktion getFeedUrl() im Produktraster

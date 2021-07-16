@@ -42,8 +42,11 @@ class LengowExportController extends AbstractController
     /**
      * Get feed url for a specific sales channel
      *
-     * @Route("/api/v{version}/_action/lengow/export/get-export-link",
+     * @Route("/api/_action/lengow/export/get-export-link",
      *     name="api.action.lengow.export.get-export-link",
+     *     methods={"GET"})
+     * @Route("/api/v{version}/_action/lengow/export/get-export-link",
+     *     name="api.action.lengow.export.get-export-link-old",
      *     methods={"GET"})
      *
      * @param Request $request
@@ -66,8 +69,11 @@ class LengowExportController extends AbstractController
     /**
      * Get sales channel export count
      *
-     * @Route("/api/v{version}/_action/lengow/export/get-export-count",
+     * @Route("/api/_action/lengow/export/get-export-count",
      *     name="api.action.lengow.export.get-export-count",
+     *     methods={"GET"})
+     * @Route("/api/v{version}/_action/lengow/export/get-export-count",
+     *     name="api.action.lengow.export.get-export-count-old",
      *     methods={"GET"})
      *
      * @param Request $request
@@ -78,12 +84,12 @@ class LengowExportController extends AbstractController
         if ($request->get('salesChannelId')) {
             $salesChannelId = $request->get('salesChannelId');
             $this->lengowExport->init([
-                'sales_channel_id' => $salesChannelId,
+                LengowExport::PARAM_SALES_CHANNEL_ID => $salesChannelId,
             ]);
             $response = [
                 'success' => true,
                 'total' => $this->lengowExport->getTotalProduct(),
-                'exported' => $this->lengowExport->getTotalExportedProduct(),
+                'exported' => $this->lengowExport->getTotalExportProduct(),
             ];
             return new JsonResponse($response);
         }
@@ -93,8 +99,11 @@ class LengowExportController extends AbstractController
     /**
      * Get product count value (parent + all variants)
      *
-     * @Route("/api/v{version}/_action/lengow/export/get-product-count",
+     * @Route("/api/_action/lengow/export/get-product-count",
      *     name="api.action.lengow.export.get-product-count",
+     *     methods={"GET"})
+     * @Route("/api/v{version}/_action/lengow/export/get-product-count",
+     *     name="api.action.lengow.export.get-product-count-old",
      *     methods={"GET"})
      *
      * @param Request $request
@@ -105,7 +114,7 @@ class LengowExportController extends AbstractController
         if ($request->get('productId') && $request->get('salesChannelId')) {
             $salesChannelId = $request->get('salesChannelId');
             $this->lengowExport->init([
-                'sales_channel_id' => $salesChannelId,
+                LengowExport::PARAM_SALES_CHANNEL_ID => $salesChannelId,
             ]);
             $response = [
                 'success' => true,
@@ -122,8 +131,11 @@ class LengowExportController extends AbstractController
     /**
      * Get product list for salesChannelId
      *
-     * @Route("/api/v{version}/_action/lengow/export/get-product-list",
+     * @Route("/api/_action/lengow/export/get-product-list",
      *     name="api.action.lengow.export.get-product-list",
+     *     methods={"GET"})
+     * @Route("/api/v{version}/_action/lengow/export/get-product-list",
+     *     name="api.action.lengow.export.get-product-list-old",
      *     methods={"GET"})
      *
      * @param Request $request
@@ -134,7 +146,7 @@ class LengowExportController extends AbstractController
         if ($request->get('salesChannelId')) {
             $salesChannelId = $request->get('salesChannelId');
             $this->lengowExport->init([
-                'sales_channel_id' => $salesChannelId,
+                LengowExport::PARAM_SALES_CHANNEL_ID => $salesChannelId,
             ]);
             $response = [
                 'success' => true,

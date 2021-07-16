@@ -13,12 +13,18 @@
             <argument type="service" id="Lengow\Connector\Service\LengowLog"/>
             <argument type="service" id="Lengow\Connector\Service\LengowSync"/>
             <tag name="controller.service_arguments"/>
+            <call method="setContainer">
+                <argument type="service" id="service_container"/>
+            </call>
         </service>
 
         <service id="Lengow\Connector\Controller\LengowExportController">
             <argument type="service" id="Lengow\Connector\Service\LengowConfiguration"/>
             <argument type="service" id="Lengow\Connector\Service\LengowExport"/>
             <tag name="controller.service_arguments"/>
+            <call method="setContainer">
+                <argument type="service" id="service_container"/>
+            </call>
         </service>
 
         <service id="Lengow\Connector\Controller\LengowOrderController">
@@ -28,16 +34,27 @@
             <argument type="service" id="Lengow\Connector\Service\LengowOrderError"/>
             <argument type="service" id="Lengow\Connector\Service\LengowAction"/>
             <tag name="controller.service_arguments"/>
+            <call method="setContainer">
+                <argument type="service" id="service_container"/>
+            </call>
         </service>
 
         <service id="Lengow\Connector\Controller\LengowSyncController">
+            <argument type="service" id="Lengow\Connector\Service\LengowConfiguration"/>
             <argument type="service" id="Lengow\Connector\Service\LengowSync"/>
+            <argument type="service" id="Lengow\Connector\Util\EnvironmentInfoProvider"/>
             <tag name="controller.service_arguments"/>
+            <call method="setContainer">
+                <argument type="service" id="service_container"/>
+            </call>
         </service>
 
         <service id="Lengow\Connector\Controller\LengowToolboxController">
             <argument type="service" id="Lengow\Connector\Service\LengowToolbox"/>
             <tag name="controller.service_arguments"/>
+            <call method="setContainer">
+                <argument type="service" id="service_container"/>
+            </call>
         </service>
 
     </services>

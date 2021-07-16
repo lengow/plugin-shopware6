@@ -74,8 +74,11 @@ class LengowOrderController extends AbstractController
     /**
      * Synchronise all orders
      *
-     * @Route("/api/v{version}/_action/lengow/order/synchronise-orders",
+     * @Route("/api/_action/lengow/order/synchronise-orders",
      *     name="api.action.lengow.order.synchronise-order",
+     *     methods={"GET"})
+     * @Route("/api/v{version}/_action/lengow/order/synchronise-orders",
+     *     name="api.action.lengow.order.synchronise-order-old",
      *     methods={"GET"})
      *
      * @return JsonResponse
@@ -91,8 +94,11 @@ class LengowOrderController extends AbstractController
     /**
      * re-synchronise specific order
      *
-     * @Route("/api/v{version}/_action/lengow/order/re-synchronise-order",
+     * @Route("/api/_action/lengow/order/re-synchronise-order",
      *     name="api.action.lengow.order.re-synchronise-order",
+     *     methods={"POST"})
+     * @Route("/api/v{version}/_action/lengow/order/re-synchronise-order",
+     *     name="api.action.lengow.order.re-synchronise-order-old",
      *     methods={"POST"})
      *
      * @param Request $request
@@ -124,9 +130,13 @@ class LengowOrderController extends AbstractController
     /**
      * Re-import a specific order
      *
-     * @Route("/api/v{version}/_action/lengow/order/reimport-order",
+     * @Route("/api/_action/lengow/order/reimport-order",
      *     defaults={"auth_enabled"=true},
      *     name="api.action.lengow.order.reimport-order",
+     *     methods={"POST"})
+     * @Route("/api/v{version}/_action/lengow/order/reimport-order",
+     *     defaults={"auth_enabled"=true},
+     *     name="api.action.lengow.order.reimport-order-old",
      *     methods={"POST"})
      *
      * @param Request $request
@@ -147,9 +157,13 @@ class LengowOrderController extends AbstractController
     /**
      * Re-import a specific failed order
      *
-     * @Route("/api/v{version}/_action/lengow/order/reimport-failed-order",
+     * @Route("/api/_action/lengow/order/reimport-failed-order",
      *     defaults={"auth_enabled"=true},
      *     name="api.action.lengow.order.reimport-failed-order",
+     *     methods={"POST"})
+     * @Route("/api/v{version}/_action/lengow/order/reimport-failed-order",
+     *     defaults={"auth_enabled"=true},
+     *     name="api.action.lengow.order.reimport-failed-order-old",
      *     methods={"POST"})
      *
      * @param Request $request
@@ -168,15 +182,15 @@ class LengowOrderController extends AbstractController
         }
         if ($lengowOrder && $order) {
             $this->lengowImport->init([
-                'type' => LengowImport::TYPE_MANUAL,
-                'marketplace_sku' => $lengowOrder->getMarketplaceSku(),
-                'marketplace_name' => $lengowOrder->getMarketplaceName(),
-                'delivery_address_id' => $lengowOrder->getDeliveryAddressId(),
-                'sales_channel_id' => $lengowOrder->getSalesChannel()->getId(),
+                LengowImport::PARAM_TYPE => LengowImport::TYPE_MANUAL,
+                LengowImport::PARAM_MARKETPLACE_SKU => $lengowOrder->getMarketplaceSku(),
+                LengowImport::PARAM_MARKETPLACE_NAME => $lengowOrder->getMarketplaceName(),
+                LengowImport::PARAM_DELIVERY_ADDRESS_ID => $lengowOrder->getDeliveryAddressId(),
+                LengowImport::PARAM_SALES_CHANNEL_ID => $lengowOrder->getSalesChannel()->getId(),
             ]);
             $result = $this->lengowImport->exec();
             if (isset($result['order_id'], $result['order_new'])
-                && (int)$result['order_id'] !== $orderId
+                && (int) $result['order_id'] !== $orderId
                 && $result['order_new']
             ) {
                 $this->lengowOrder->putOrderInLengowTechnicalErrorState($order);
@@ -193,9 +207,13 @@ class LengowOrderController extends AbstractController
     /**
      * Re-send a action for a order
      *
-     * @Route("/api/v{version}/_action/lengow/order/resend-action",
+     * @Route("/api/_action/lengow/order/resend-action",
      *     defaults={"auth_enabled"=true},
      *     name="api.action.lengow.order.resend-action",
+     *     methods={"POST"})
+     * @Route("/api/v{version}/_action/lengow/order/resend-action",
+     *     defaults={"auth_enabled"=true},
+     *     name="api.action.lengow.order.resend-action-old",
      *     methods={"POST"})
      *
      * @param Request $request
@@ -216,9 +234,13 @@ class LengowOrderController extends AbstractController
     /**
      * Re-import a list of orders
      *
-     * @Route("/api/v{version}/_action/lengow/order/mass-reimport-orders",
+     * @Route("/api/_action/lengow/order/mass-reimport-orders",
      *     defaults={"auth_enabled"=true},
      *     name="api.action.lengow.order.mass-reimport-orders",
+     *     methods={"POST"})
+     * @Route("/api/v{version}/_action/lengow/order/mass-reimport-orders",
+     *     defaults={"auth_enabled"=true},
+     *     name="api.action.lengow.order.mass-reimport-orders-old",
      *     methods={"POST"})
      *
      * @param Request $request
@@ -244,9 +266,13 @@ class LengowOrderController extends AbstractController
     /**
      * Re-send a list of actions
      *
-     * @Route("/api/v{version}/_action/lengow/order/mass-resend-actions",
+     * @Route("/api/_action/lengow/order/mass-resend-actions",
      *     defaults={"auth_enabled"=true},
      *     name="api.action.lengow.order.mass-resend-actions",
+     *     methods={"POST"})
+     *  @Route("/api/v{version}/_action/lengow/order/mass-resend-actions",
+     *     defaults={"auth_enabled"=true},
+     *     name="api.action.lengow.order.mass-resend-actions-old",
      *     methods={"POST"})
      *
      * @param Request $request
@@ -273,8 +299,11 @@ class LengowOrderController extends AbstractController
     /**
      * Get all available marketplaces for filter
      *
-     * @Route("/api/v{version}/_action/lengow/order/get-available-marketplaces",
+     * @Route("/api/_action/lengow/order/get-available-marketplaces",
      *     name="api.action.lengow.order.get-available-marketplaces",
+     *     methods={"GET"})
+     * @Route("/api/v{version}/_action/lengow/order/get-available-marketplaces",
+     *     name="api.action.lengow.order.get-available-marketplaces-old",
      *     methods={"GET"})
      *
      * @return JsonResponse
@@ -295,9 +324,13 @@ class LengowOrderController extends AbstractController
     /**
      * Get all order error messages
      *
-     * @Route("/api/v{version}/_action/lengow/order/get-order-errors",
+     * @Route("/api/_action/lengow/order/get-order-errors",
      *     defaults={"auth_enabled"=true},
      *     name="api.action.lengow.order.get-order-errors",
+     *     methods={"POST"})
+     * @Route("/api/v{version}/_action/lengow/order/get-order-errors",
+     *     defaults={"auth_enabled"=true},
+     *     name="api.action.lengow.order.get-order-errors-old",
      *     methods={"POST"})
      *
      * @param Request $request
@@ -333,12 +366,12 @@ class LengowOrderController extends AbstractController
         $lengowOrder = $this->lengowOrder->getLengowOrderById($lengowOrderId);
         if ($lengowOrder) {
             $this->lengowImport->init([
-                'type' => LengowImport::TYPE_MANUAL,
-                'lengow_order_id' => $lengowOrderId,
-                'marketplace_sku' => $lengowOrder->getMarketplaceSku(),
-                'marketplace_name' => $lengowOrder->getMarketplaceName(),
-                'delivery_address_id' => $lengowOrder->getDeliveryAddressId(),
-                'sales_channel_id' => $lengowOrder->getSalesChannel()->getId(),
+                LengowImport::PARAM_TYPE => LengowImport::TYPE_MANUAL,
+                LengowImport::PARAM_LENGOW_ORDER_ID => $lengowOrderId,
+                LengowImport::PARAM_MARKETPLACE_SKU => $lengowOrder->getMarketplaceSku(),
+                LengowImport::PARAM_MARKETPLACE_NAME => $lengowOrder->getMarketplaceName(),
+                LengowImport::PARAM_DELIVERY_ADDRESS_ID => $lengowOrder->getDeliveryAddressId(),
+                LengowImport::PARAM_SALES_CHANNEL_ID => $lengowOrder->getSalesChannel()->getId(),
             ]);
             $result = $this->lengowImport->exec();
             if (isset($result['order_new']) && $result['order_new']) {

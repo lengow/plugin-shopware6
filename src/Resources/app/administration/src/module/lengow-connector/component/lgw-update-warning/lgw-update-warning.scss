@@ -1,22 +1,23 @@
 .lgw-update-warning {
-    color: white;
-    background: #00349c;
-    padding: 5px 10px;
-    border-radius: 4px;
-    margin-bottom: 15px;
-    margin-right: 10px;
-    font-size: 11px;
-    font-weight: bold;
-    display: inline-block;
-    float: right;
+  color: white;
+  background: #00349c;
+  padding: 5px 10px;
+  border-radius: 4px;
+  margin-bottom: 15px;
+  margin-right: 10px;
+  font-size: 11px;
+  font-weight: bold;
+  display: inline-block;
+  float: right;
 }
 
-.lgw-update-warning a:link {
-    color: white;
-    background-color: transparent;
-}
-.lgw-update-warning a:visited {
-    color: white;
-    background-color: transparent;
-    text-decoration: none;
+.lgw-update-warning .lgw-btn-link {
+  color: white;
+  border: 0;
+  background: transparent;
+  outline: none;
+  text-decoration: underline;
+  font-size: 11px;
+  font-weight: bold;
+  cursor: pointer;
 }

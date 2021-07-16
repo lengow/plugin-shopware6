@@ -65,11 +65,6 @@ class LengowFeed
     public const FOOTER = 'footer';
 
     /**
-     * @var string name of export folder
-     */
-    public const EXPORT_FOLDER_NAME = 'Export';
-
-    /**
      * @var string feed content
      */
     protected $content = '';
@@ -163,7 +158,7 @@ class LengowFeed
     public function initExportFile() : void
     {
         $sep = DIRECTORY_SEPARATOR;
-        $folderPath  = $this->environmentInfoProvider->getPluginPath() . $sep . self::EXPORT_FOLDER_NAME;
+        $folderPath  = $this->environmentInfoProvider->getPluginPath() . $sep . EnvironmentInfoProvider::FOLDER_EXPORT;
         if (!file_exists($folderPath)) {
             if (!mkdir($folderPath) && !is_dir($folderPath)) {
                 throw new LengowException(
@@ -174,7 +169,7 @@ class LengowFeed
             }
         }
         $fileName = $this->salesChannelId . '-flux-' . time() . '.' . $this->format;
-        $this->lengowFile = $this->lengowFileFactory->create(self::EXPORT_FOLDER_NAME, $fileName);
+        $this->lengowFile = $this->lengowFileFactory->create(EnvironmentInfoProvider::FOLDER_EXPORT, $fileName);
     }
 
     /**
@@ -218,7 +213,7 @@ class LengowFeed
         $this->write(self::FOOTER);
         if (!$this->stream) {
             $oldFileName = $this->salesChannelId . '-flux.' . $this->format;
-            $oldFile = $this->lengowFileFactory->create(self::EXPORT_FOLDER_NAME, $oldFileName);
+            $oldFile = $this->lengowFileFactory->create(EnvironmentInfoProvider::FOLDER_EXPORT, $oldFileName);
             if ($oldFile->exists()) {
                 $oldFilePath = $oldFile->getPath();
                 $oldFile->delete();
@@ -352,7 +347,7 @@ class LengowFeed
                 foreach ($data as $field => $value) {
                     $field = self::formatFields($field, self::FORMAT_YAML);
                     $content .= '    ' . self::PROTECTION . $field . self::PROTECTION . ':';
-                    $content .= $this->indentYaml($field, $fieldMaxSize) . (string)$value . self::EOL;
+                    $content .= $this->indentYaml($field, $fieldMaxSize) . $value . self::EOL;
                 }
                 return $content;
         }

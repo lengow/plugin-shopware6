@@ -109,7 +109,7 @@ class LengowAccess
     {
         return $this->checkIp($_SERVER['REMOTE_ADDR'])
             || ($token
-                && !$this->lengowConfiguration->get(LengowConfiguration::LENGOW_IP_ENABLED)
+                && !$this->lengowConfiguration->get(LengowConfiguration::AUTHORIZED_IP_ENABLED)
                 && $this->checkToken($token, $salesChannelId)
             );
     }
@@ -134,8 +134,8 @@ class LengowAccess
     public function getAuthorizedIps(): array
     {
         $authorizedIps = [];
-        $ips = $this->lengowConfiguration->get(LengowConfiguration::LENGOW_AUTHORIZED_IP);
-        $ipEnable = $this->lengowConfiguration->get(LengowConfiguration::LENGOW_IP_ENABLED);
+        $ips = $this->lengowConfiguration->get(LengowConfiguration::AUTHORIZED_IPS);
+        $ipEnable = $this->lengowConfiguration->get(LengowConfiguration::AUTHORIZED_IP_ENABLED);
         if ($ipEnable && !empty($ips)) {
             foreach ($ips as $ip) {
                 $authorizedIps[] = trim(str_replace(["\r\n", ',', '-', '|', ' ', '/'], ';', $ip), ';');

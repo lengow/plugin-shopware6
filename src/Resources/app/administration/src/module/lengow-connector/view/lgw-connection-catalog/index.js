@@ -9,7 +9,11 @@ const { mapState } = Shopware.Component.getComponentHelper();
 Component.register('lgw-connection-catalog', {
     template,
 
-    inject: ['repositoryFactory', 'LengowConnectorConnectionService'],
+    inject: [
+        'repositoryFactory',
+        'LengowConnectorConnectionService',
+        'LengowConnectorSyncService'
+    ],
 
     data() {
         return {
@@ -18,7 +22,9 @@ Component.register('lgw-connection-catalog', {
             salesChannels: [],
             salesChannelLoaded: false,
             nbCatalog: 0,
-            hasError: false
+            hasError: false,
+            helpCenterLink: '',
+            supportLink: ''
         };
     },
 
@@ -39,6 +45,12 @@ Component.register('lgw-connection-catalog', {
             this.isLoading = true;
             this.nbCatalog = this.catalogList.length;
             this.buttonDisabled = this.nbCatalog === 0;
+            this.LengowConnectorSyncService.getPluginLinks().then(result => {
+                if (result.success) {
+                    this.helpCenterLink = result.links.help_center;
+                    this.supportLink = result.links.support;
+                }
+            });
             const salesChannelCriteria = new Criteria();
             salesChannelCriteria.addAssociation('domains');
             this.salesChannelRepository.search(salesChannelCriteria, Shopware.Context.api)
