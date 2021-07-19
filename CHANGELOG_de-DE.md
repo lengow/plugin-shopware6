@@ -1,3 +1,6 @@
+# v1.0.3
+
+
 # v1.0.2
 - Feature: Auslagerung der Toolbox über den Webservice
 - Feature: Kompatibilität mit Shopware 6.4 hinzugefügt

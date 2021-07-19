@@ -1,3 +1,6 @@
+# v1.0.3
+
+
 # v1.0.2
 - Feature: Outsourcing of the toolbox via webservice
 - Feature: Added compatibility with Shopware 6.4
