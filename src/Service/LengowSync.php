@@ -33,9 +33,9 @@ class LengowSync
     public const LINK_TYPE_SUPPORT = 'support';
 
     /* Default plugin links */
-    private const LINK_HELP_CENTER = 'https://support.lengow.com/kb/guide/en/shopware-6-1KEHaAuucG/Steps/98507';
-    private const LINK_CHANGELOG = 'https://support.lengow.com/kb/guide/en/shopware-6-1KEHaAuucG/Steps/98507,113511,180222';
-    private const LINK_UPDATE_GUIDE = 'https://support.lengow.com/kb/guide/en/shopware-6-1KEHaAuucG/Steps/98507,123308';
+    private const LINK_HELP_CENTER = 'https://support.lengow.com/kb/guide/en/1KEHaAuucG';
+    private const LINK_CHANGELOG = 'https://support.lengow.com/kb/guide/en/wxmN8B2Awk';
+    private const LINK_UPDATE_GUIDE = 'https://support.lengow.com/kb/guide/en/1KEHaAuucG/Steps/98507,123308';
     private const LINK_SUPPORT = 'https://help-support.lengow.com/hc/en-us/requests/new';
 
     /* Api iso codes */
