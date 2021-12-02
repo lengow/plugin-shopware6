@@ -28,6 +28,12 @@ class OrderLineDefinition extends EntityDefinition
 {
     public const ENTITY_NAME = 'lengow_order_line';
 
+    /* Order line fields */
+    public const FIELD_ID = 'id';
+    public const FIELD_ORDER_ID = 'orderId';
+    public const FIELD_PRODUCT_ID = 'productId';
+    public const FIELD_ORDER_LINE_ID = 'orderLineId';
+
     /**
      * @return string
      */
@@ -59,14 +65,14 @@ class OrderLineDefinition extends EntityDefinition
     {
         return new FieldCollection(
             [
-                (new IdField('id', 'id'))->addFlags(new Required(), new PrimaryKey()),
-                (new IdField('order_id', 'orderId')),
+                (new IdField('id', self::FIELD_ID))->addFlags(new Required(), new PrimaryKey()),
+                (new IdField('order_id', self::FIELD_ORDER_ID)),
                 (new OneToOneAssociationField('order', 'order_id', 'id', ShopwareOrderDefinition::class))
                     ->addFlags(new setNullOnDelete()),
-                (new IdField('product_id', 'productId')),
+                (new IdField('product_id', self::FIELD_PRODUCT_ID)),
                 (new OneToOneAssociationField('product', 'product_id', 'id', ShopwareProductDefinition::class))
                     ->addFlags(new SetNullOnDelete()),
-                (new StringField('order_line_id', 'orderLineId'))->addFlags(new Required()),
+                (new StringField('order_line_id', self::FIELD_ORDER_LINE_ID))->addFlags(new Required()),
             ]
         );
     }

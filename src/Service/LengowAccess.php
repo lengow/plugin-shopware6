@@ -92,7 +92,7 @@ class LengowAccess
         );
         $salesChannels = $result->getEntities();
         if ($salesChannels->count() > 0) {
-            return $salesChannels->first()->getName();
+            return $salesChannels->first() ? $salesChannels->first()->getName() : null;
         }
         return null;
     }

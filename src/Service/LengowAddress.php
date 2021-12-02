@@ -22,44 +22,18 @@ use Lengow\Connector\Util\StringCleaner;
  */
 class LengowAddress
 {
-    /**
-     * @var string address billing type
-     */
+    /* Address types */
     public const TYPE_BILLING = 'billing';
-
-    /**
-     * @var string address shipping type
-     */
     public const TYPE_SHIPPING = 'shipping';
 
-    /**
-     * @var string salutation mister type
-     */
+    /* Salutation types */
     private const SALUTATION_MR = 'mr';
-
-    /**
-     * @var string salutation miss type
-     */
     private const SALUTATION_MRS = 'mrs';
-
-    /**
-     * @var string salutation not specified type
-     */
     private const SALUTATION_NOT_SPECIFIED = 'not_specified';
 
-    /**
-     * @var string code ISO A2 for France
-     */
+    /* Country iso codes */
     private const ISO_A2_FR = 'FR';
-
-    /**
-     * @var string code ISO A2 for Spain
-     */
     private const ISO_A2_ES = 'ES';
-
-    /**
-     * @var string code ISO A2 for Italy
-     */
     private const ISO_A2_IT = 'IT';
 
     /**
@@ -467,11 +441,11 @@ class LengowAddress
     /**
      * Extract address data from API
      *
-     * @param object $apiData API nodes containing data
+     * @param mixed $apiData API nodes containing data
      *
      * @return array
      */
-    private function extractAddressDataFromAPI(object $apiData): array
+    private function extractAddressDataFromAPI($apiData): array
     {
         $addressData = [];
         foreach ($this->addressApiNodes as $node) {

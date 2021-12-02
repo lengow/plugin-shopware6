@@ -114,5 +114,11 @@ class LengowSettingUpdateSubscriber implements EventSubscriberInterface
         if (isset($settingData[LengowConfiguration::PARAM_UPDATE])) {
             $this->lengowConfiguration->set(LengowConfiguration::LAST_UPDATE_SETTING, (string) time());
         }
+        // reset the authorization token when a configuration parameter is changed
+        if (isset($settingData[LengowConfiguration::PARAM_RESET_TOKEN])
+            && $settingData[LengowConfiguration::PARAM_RESET_TOKEN]
+        ) {
+            $this->lengowConfiguration->resetAuthorizationToken();
+        }
     }
 }

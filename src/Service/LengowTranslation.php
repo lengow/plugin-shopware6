@@ -95,14 +95,12 @@ class LengowTranslation
      * Load csv file
      *
      * @param string $isoCode translation iso code
-     *
-     * @return bool
      */
-    private function loadFile(string $isoCode): bool
+    private function loadFile(string $isoCode): void
     {
         $filename = $this->environmentInfoProvider->getPluginPath() . '/Translations/' . $isoCode . '.csv';
         $translation = [];
-        if (file_exists($filename) && ($handle = fopen($filename, 'r')) !== false) {
+        if (file_exists($filename) && ($handle = fopen($filename, 'rb')) !== false) {
             while (($data = fgetcsv($handle, 1000, '|')) !== false) {
                 if (isset($data[1])) {
                     $translation[$data[0]] = $data[1];
@@ -111,6 +109,5 @@ class LengowTranslation
             fclose($handle);
         }
         $this->translation[$isoCode] = $translation;
-        return !empty($translation);
     }
 }

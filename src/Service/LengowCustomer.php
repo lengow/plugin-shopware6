@@ -2,7 +2,7 @@
 
 namespace Lengow\Connector\Service;
 
-use \Exception;
+use Exception;
 use Shopware\Core\Checkout\Customer\CustomerCollection;
 use Shopware\Core\Checkout\Customer\CustomerEntity;
 use Shopware\Core\Framework\Context;
@@ -166,7 +166,8 @@ class LengowCustomer
         try {
             $this->customerRepository->create([$customerData], Context::createDefaultContext());
         } catch (Exception $e) {
-            $errorMessage = '[Shopware error] "' . $e->getMessage() . '" ' . $e->getFile() . ' | ' . $e->getLine();
+            $errorMessage = '[Shopware error]: "' . $e->getMessage()
+                . '" in ' . $e->getFile() . ' on line ' . $e->getLine();
             $this->lengowLog->write(
                 LengowLog::CODE_ORM,
                 $this->lengowLog->encodeMessage('log.orm.record_insert_failed', [

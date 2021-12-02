@@ -2,9 +2,12 @@
 
 namespace Lengow\Connector\Service;
 
+use Lengow\Connector\Util\EnvironmentInfoProvider;
 use Shopware\Core\Checkout\Order\OrderEntity;
 use Shopware\Core\Checkout\Order\OrderStates;
+use Lengow\Connector\Entity\Lengow\Action\ActionDefinition as LengowActionDefinition;
 use Lengow\Connector\Entity\Lengow\Action\ActionEntity as LengowActionEntity;
+use Lengow\Connector\Entity\Lengow\Order\OrderDefinition as LengowOrderDefinition;
 use Lengow\Connector\Entity\Lengow\Order\OrderEntity as LengowOrderEntity;
 
 /**
@@ -138,7 +141,7 @@ class LengowActionSync
         }
         foreach ($oldActions as $lengowAction) {
             $this->lengowAction->update($lengowAction->getId(), [
-                'state' => LengowAction::STATE_FINISH,
+                LengowActionDefinition::FIELD_STATE => LengowAction::STATE_FINISH,
             ]);
             $lengowOrder = $this->lengowOrder->getLengowOrderByOrderId($lengowAction->getOrder()->getId());
             if ($lengowOrder === null) {
@@ -219,15 +222,15 @@ class LengowActionSync
                 LengowConnector::GET,
                 LengowConnector::API_ORDER_ACTION,
                 [
-                    'updated_from' => $this->lengowConfiguration->date(
+                    LengowImport::ARG_UPDATED_FROM => $this->lengowConfiguration->date(
                         $dateFromTimestamp,
-                        LengowConfiguration::API_DATE_TIME_FORMAT
+                        EnvironmentInfoProvider::DATE_ISO_8601
                     ),
-                    'updated_to' => $this->lengowConfiguration->date(
+                    LengowImport::ARG_UPDATED_TO => $this->lengowConfiguration->date(
                         $dateToTimestamp,
-                        LengowConfiguration::API_DATE_TIME_FORMAT
+                        EnvironmentInfoProvider::DATE_ISO_8601
                     ),
-                    'page' => $page,
+                    LengowImport::ARG_PAGE => $page,
                 ],
                 '',
                 $logOutput
@@ -250,12 +253,12 @@ class LengowActionSync
      * Check the action and updates data if necessary
      *
      * @param LengowActionEntity $lengowAction Lengow action entity
-     * @param Object $apiAction Action data from api
+     * @param mixed $apiAction Action data from api
      * @param bool $logOutput see log or not
      */
     private function checkAndUpdateAction(
         LengowActionEntity $lengowAction,
-        Object $apiAction,
+        $apiAction,
         bool $logOutput = false
     ): void
     {
@@ -268,7 +271,7 @@ class LengowActionSync
         }
         // finish action in lengow_action table
         $this->lengowAction->update($lengowAction->getId(), [
-            'state' => LengowAction::STATE_FINISH,
+            LengowActionDefinition::FIELD_STATE => LengowAction::STATE_FINISH,
         ]);
         $lengowOrder = $this->lengowOrder->getLengowOrderByOrderId($lengowAction->getOrder()->getId());
         if ($lengowOrder === null) {
@@ -278,7 +281,7 @@ class LengowActionSync
         $this->lengowOrderError->finishOrderErrors($lengowOrder->getId(), LengowOrderError::TYPE_ERROR_SEND);
         if ($lengowOrder->isInError()) {
             $this->lengowOrder->update($lengowOrder->getId(), [
-                'isInError' => false,
+                LengowOrderDefinition::FIELD_IS_IN_ERROR => false,
             ]);
         }
         if ($lengowOrder->getOrderProcessState() === LengowOrder::PROCESS_STATE_FINISH) {
@@ -287,7 +290,7 @@ class LengowActionSync
         // if action is accepted -> close order and finish all order actions
         if ($apiAction->processed === true && empty($apiAction->errors)) {
             $this->lengowOrder->update($lengowOrder->getId(), [
-                'orderProcessState' => LengowOrder::PROCESS_STATE_FINISH,
+                LengowOrderDefinition::FIELD_ORDER_PROCESS_STATE => LengowOrder::PROCESS_STATE_FINISH,
             ]);
             $this->lengowAction->finishActions($lengowAction->getOrder()->getId());
         } else {
@@ -310,7 +313,7 @@ class LengowActionSync
     ): void
     {
         $this->lengowOrder->update($lengowOrder->getId(), [
-            'isInError' => true,
+            LengowOrderDefinition::FIELD_IS_IN_ERROR  => true,
         ]);
         $this->lengowOrderError->create($lengowOrder->getId(), $errorMessage, LengowOrderError::TYPE_ERROR_SEND);
         $decodedMessage = $this->lengowLog->decodeMessage($errorMessage, LengowTranslation::DEFAULT_ISO_CODE);

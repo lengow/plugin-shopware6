@@ -8,6 +8,7 @@ use Symfony\Component\Routing\Annotation\Route;
 use Symfony\Component\HttpFoundation\Request;
 use Lengow\Connector\Service\LengowAccess;
 use Lengow\Connector\Service\LengowConfiguration;
+use Lengow\Connector\Service\LengowConnector;
 use Lengow\Connector\Service\LengowLog;
 use Lengow\Connector\Service\LengowToolbox;
 use Lengow\Connector\Service\LengowTranslation;
@@ -75,7 +76,7 @@ class LengowToolboxController extends LengowAbstractFrontController
         }
         $toolboxArgs = $this->createGetArgArray($request);
         // check if toolbox action is valid
-        $action = $toolboxArgs[LengowToolbox::PARAM_TOOLBOX_ACTION] ?: LengowToolbox::ACTION_DATA;
+        $action = $toolboxArgs[LengowToolbox::PARAM_TOOLBOX_ACTION];
         if (!$this->lengowToolbox->isToolboxAction($action)) {
             $errorMessage = $this->lengowLog->decodeMessage(
                 'log.import.not_valid_action',
@@ -90,6 +91,16 @@ class LengowToolboxController extends LengowAbstractFrontController
             case LengowToolbox::ACTION_LOG:
                 $this->lengowToolbox->downloadLog($toolboxArgs[LengowToolbox::PARAM_DATE]);
                 break;
+            case LengowToolbox::ACTION_ORDER:
+                $result = $this->lengowToolbox->syncOrders($toolboxArgs);
+                $responseCode = Response::HTTP_OK;
+                if (isset($result[LengowToolbox::ERRORS][LengowToolbox::ERROR_CODE])) {
+                    $errorCode = $result[LengowToolbox::ERRORS][LengowToolbox::ERROR_CODE];
+                    $responseCode = $errorCode === LengowConnector::CODE_404
+                        ? Response::HTTP_NOT_FOUND
+                        : Response::HTTP_FORBIDDEN;
+                }
+                return new Response(json_encode($result), $responseCode);
             default:
                 $toolboxData = $this->lengowToolbox->getData($toolboxArgs[LengowToolbox::PARAM_TYPE]);
                 return new Response(json_encode($toolboxData));
@@ -100,9 +111,17 @@ class LengowToolboxController extends LengowAbstractFrontController
     /**
      * Get all parameters from request
      * List params
-     * string toolbox_action toolbox specific action
-     * string type           type of data to display
-     * string date           date of the log to export
+     * string  toolbox_action   Toolbox specific action
+     * string  type             Type of data to display
+     * string  created_from     Synchronization of orders since
+     * string  created_to       Synchronization of orders until
+     * string  date             Log date to download
+     * string  marketplace_name Lengow marketplace name to synchronize
+     * string  marketplace_sku  Lengow marketplace order id to synchronize
+     * string  process          Type of process for order action
+     * bool    force            Force synchronization order even if there are errors (1) or not (0)
+     * int     shop_id          Shop id to synchronize
+     * int     days             Synchronization interval time
      *
      * @param Request $request Http request
      *
@@ -111,9 +130,19 @@ class LengowToolboxController extends LengowAbstractFrontController
     protected function createGetArgArray(Request $request): array
     {
         return [
-            LengowToolbox::PARAM_TOOLBOX_ACTION => $request->query->get(LengowToolbox::PARAM_TOOLBOX_ACTION),
-            LengowToolbox::PARAM_TYPE => $request->query->get(LengowToolbox::PARAM_TYPE),
+            LengowToolbox::PARAM_TOOLBOX_ACTION => $request->query->get(
+                LengowToolbox::PARAM_TOOLBOX_ACTION,
+                LengowToolbox::ACTION_DATA
+            ),
+            LengowToolbox::PARAM_TYPE => $request->query->get(LengowToolbox::PARAM_TYPE, LengowToolbox::DATA_TYPE_CMS),
             LengowToolbox::PARAM_DATE => $request->query->get(LengowToolbox::PARAM_DATE),
+            LengowToolbox::PARAM_CREATED_TO => $request->query->get(LengowToolbox::PARAM_CREATED_TO),
+            LengowToolbox::PARAM_CREATED_FROM => $request->query->get(LengowToolbox::PARAM_CREATED_FROM),
+            LengowToolbox::PARAM_DAYS => $request->query->get(LengowToolbox::PARAM_DAYS),
+            LengowToolbox::PARAM_FORCE => $request->query->get(LengowToolbox::PARAM_FORCE),
+            LengowToolbox::PARAM_MARKETPLACE_NAME => $request->query->get(LengowToolbox::PARAM_MARKETPLACE_NAME),
+            LengowToolbox::PARAM_MARKETPLACE_SKU => $request->query->get(LengowToolbox::PARAM_MARKETPLACE_SKU),
+            LengowToolbox::PARAM_SHOP_ID => $request->query->get(LengowToolbox::PARAM_SHOP_ID),
         ];
     }
 }

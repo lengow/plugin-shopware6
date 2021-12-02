@@ -26,8 +26,13 @@ use Lengow\Connector\Entity\Lengow\Settings\SettingsEntity as LengowSettingsEnti
  */
 class SettingsDefinition extends EntityDefinition
 {
-
     public const ENTITY_NAME = 'lengow_settings';
+
+    /* Setting fields */
+    public const FIELD_ID = 'id';
+    public const FIELD_SALES_CHANNEL_ID = 'salesChannelId';
+    public const FIELD_NAME = 'name';
+    public const FIELD_VALUE = 'value';
 
     /**
      * @return string
@@ -60,12 +65,12 @@ class SettingsDefinition extends EntityDefinition
     {
         return new FieldCollection(
             [
-                (new IdField('id', 'id'))->addFlags(new Required(), new PrimaryKey()),
-                (new FkField('sales_channel_id', 'salesChannelId', ShopwareSalesChannelDefinition::class)),
+                (new IdField('id', self::FIELD_ID))->addFlags(new Required(), new PrimaryKey()),
+                (new FkField('sales_channel_id', self::FIELD_SALES_CHANNEL_ID, ShopwareSalesChannelDefinition::class)),
                 (new OneToOneAssociationField('salesChannel', 'sales_channel_id', 'id', ShopwareSalesChannelDefinition::class))
                     ->addFlags(new setNullOnDelete()),
-                (new StringField('name', 'name'))->addFlags(new Required()),
-                (new StringField('value', 'value', 20000)),
+                (new StringField('name', self::FIELD_NAME))->addFlags(new Required()),
+                (new StringField('value', self::FIELD_VALUE, 20000)),
             ]
         );
     }

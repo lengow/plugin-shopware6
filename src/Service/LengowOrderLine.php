@@ -2,14 +2,16 @@
 
 namespace Lengow\Connector\Service;
 
-use \Exception;
+use Exception;
 use Shopware\Core\Framework\Context;
 use Shopware\Core\Framework\DataAbstractionLayer\EntityRepositoryInterface;
 use Shopware\Core\Framework\DataAbstractionLayer\Search\Criteria;
 use Shopware\Core\Framework\DataAbstractionLayer\Search\Filter\EqualsFilter;
 use Shopware\Core\Framework\Uuid\Uuid;
 use Lengow\Connector\Entity\Lengow\OrderLine\OrderLineCollection as LengowOrderLineCollection;
+use Lengow\Connector\Entity\Lengow\OrderLine\OrderLineDefinition as LengowOrderLineDefinition;
 use Lengow\Connector\Entity\Lengow\OrderLine\OrderLineEntity as LengowOrderLineEntity;
+use Lengow\Connector\Util\EnvironmentInfoProvider;
 
 /**
  * Class LengowOrderLine
@@ -33,9 +35,18 @@ class LengowOrderLine
      * updated  => Fields allowed when updating registration
      */
     private $fieldList = [
-        'orderId' => ['required' => true, 'updated' => false],
-        'productId' => ['required' => true, 'updated' => false],
-        'orderLineId' => ['required' => true, 'updated' => false],
+        LengowOrderLineDefinition::FIELD_ORDER_ID => [
+            EnvironmentInfoProvider::FIELD_REQUIRED => true,
+            EnvironmentInfoProvider::FIELD_CAN_BE_UPDATED => false,
+        ],
+        LengowOrderLineDefinition::FIELD_PRODUCT_ID => [
+            EnvironmentInfoProvider::FIELD_REQUIRED => true,
+            EnvironmentInfoProvider::FIELD_CAN_BE_UPDATED => false,
+        ],
+        LengowOrderLineDefinition::FIELD_ORDER_LINE_ID => [
+            EnvironmentInfoProvider::FIELD_REQUIRED => true,
+            EnvironmentInfoProvider::FIELD_CAN_BE_UPDATED => false,
+        ],
     ];
 
     /**
@@ -59,10 +70,10 @@ class LengowOrderLine
      */
     public function create(array $data): bool
     {
-        $data = array_merge($data, ['id' => Uuid::randomHex()]);
+        $data = array_merge($data, [LengowOrderLineDefinition::FIELD_ID => Uuid::randomHex()]);
         // checks if all mandatory data is present
         foreach ($this->fieldList as $key => $value) {
-            if (!array_key_exists($key, $data) && $value['required']) {
+            if (!array_key_exists($key, $data) && $value[EnvironmentInfoProvider::FIELD_REQUIRED]) {
                 $this->lengowLog->write(
                     LengowLog::CODE_ORM,
                     $this->lengowLog->encodeMessage('log.orm.field_is_required', [
@@ -75,7 +86,8 @@ class LengowOrderLine
         try {
             $this->lengowOrderLineRepository->create([$data], Context::createDefaultContext());
         } catch (Exception $e) {
-            $errorMessage = '[Shopware error] "' . $e->getMessage() . '" ' . $e->getFile() . ' | ' . $e->getLine();
+            $errorMessage = '[Shopware error]: "' . $e->getMessage()
+                . '" in ' . $e->getFile() . ' on line ' . $e->getLine();
             $this->lengowLog->write(
                 LengowLog::CODE_ORM,
                 $this->lengowLog->encodeMessage('log.orm.record_insert_failed', [

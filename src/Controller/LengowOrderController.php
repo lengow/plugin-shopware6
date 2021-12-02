@@ -8,9 +8,11 @@ use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\Routing\Annotation\Route;
 use Symfony\Component\HttpFoundation\JsonResponse;
+use Lengow\Connector\Entity\Lengow\Order\OrderDefinition as LengowOrderDefinition;
 use Lengow\Connector\Entity\Lengow\OrderError\OrderErrorEntity as LengowOrderErrorEntity;
 use Lengow\Connector\Service\LengowAction;
 use Lengow\Connector\Service\LengowImport;
+use Lengow\Connector\Service\LengowImportOrder;
 use Lengow\Connector\Service\LengowLog;
 use Lengow\Connector\Service\LengowOrder;
 use Lengow\Connector\Service\LengowOrderError;
@@ -189,13 +191,21 @@ class LengowOrderController extends AbstractController
                 LengowImport::PARAM_SALES_CHANNEL_ID => $lengowOrder->getSalesChannel()->getId(),
             ]);
             $result = $this->lengowImport->exec();
-            if (isset($result['order_id'], $result['order_new'])
-                && (int) $result['order_id'] !== $orderId
-                && $result['order_new']
-            ) {
-                $this->lengowOrder->putOrderInLengowTechnicalErrorState($order);
-                $newOrderId = $result['order_id'];
-                $success = true;
+            if (!empty($result[LengowImport::ORDERS_CREATED])) {
+                $orderCreated = $result[LengowImport::ORDERS_CREATED][0];
+                if ($orderCreated[LengowImportOrder::MERCHANT_ORDER_ID] !== $orderId) {
+                    $this->lengowOrder->putOrderInLengowTechnicalErrorState($order);
+                    $newOrderId = $orderCreated[LengowImportOrder::MERCHANT_ORDER_ID];
+                    $success = true;
+                }
+            } else {
+                // in the event of an error, all new order errors are finished and the order is reset
+                $this->lengowOrderError->finishOrderErrors($lengowOrder->getId());
+                // update Lengow order with new data
+                $this->lengowOrder->update($lengowOrder->getId(), [
+                    LengowOrderDefinition::FIELD_IS_IN_ERROR => false,
+                    LengowOrderDefinition::FIELD_IS_REIMPORTED => false,
+                ]);
             }
         }
         return new JsonResponse([
@@ -205,7 +215,7 @@ class LengowOrderController extends AbstractController
     }
 
     /**
-     * Re-send a action for a order
+     * Re-send an action for an order
      *
      * @Route("/api/_action/lengow/order/resend-action",
      *     defaults={"auth_enabled"=true},
@@ -354,7 +364,7 @@ class LengowOrderController extends AbstractController
     }
 
     /**
-     * Load lengow order entity an try a re-import
+     * Load lengow order entity a try a re-import
      *
      * @param string $lengowOrderId Lengow order id
      *
@@ -362,7 +372,6 @@ class LengowOrderController extends AbstractController
      */
     private function loadAndImportOrder(string $lengowOrderId): bool
     {
-        $success = false;
         $lengowOrder = $this->lengowOrder->getLengowOrderById($lengowOrderId);
         if ($lengowOrder) {
             $this->lengowImport->init([
@@ -374,15 +383,15 @@ class LengowOrderController extends AbstractController
                 LengowImport::PARAM_SALES_CHANNEL_ID => $lengowOrder->getSalesChannel()->getId(),
             ]);
             $result = $this->lengowImport->exec();
-            if (isset($result['order_new']) && $result['order_new']) {
-                $success = true;
+            if (!empty($result[LengowImport::ORDERS_CREATED])) {
+                return true;
             }
         }
-        return $success;
+        return false;
     }
 
     /**
-     * Load Shopware order entity an try a re-send action
+     * Load Shopware order entity a try a re-send action
      *
      * @param string $lengowOrderId Lengow order id
      *
@@ -423,29 +432,29 @@ class LengowOrderController extends AbstractController
     {
         $messages = [];
         // if global error return this
-        if (isset($result['error'][0])) {
-            return [$this->lengowLog->decodeMessage($result['error'][0])];
+        if (isset($result[LengowImport::ERRORS][0])) {
+            return [$this->lengowLog->decodeMessage($result[LengowImport::ERRORS][0])];
         }
         // specific messages for order synchronisation
-        if (isset($result['order_new']) && $result['order_new'] > 0) {
+        if (isset($result[LengowImport::NUMBER_ORDERS_CREATED]) && $result[LengowImport::NUMBER_ORDERS_CREATED] > 0) {
             $messages[] = $this->lengowLog->decodeMessage(
                 'lengow_log.error.nb_order_imported',
                 null,
-                ['nb_order' => $result['order_new']]
+                ['nb_order' => $result[LengowImport::NUMBER_ORDERS_CREATED]]
             );
         }
-        if (isset($result['order_update']) && $result['order_update'] > 0) {
+        if (isset($result[LengowImport::NUMBER_ORDERS_UPDATED]) && $result[LengowImport::NUMBER_ORDERS_UPDATED] > 0) {
             $messages[] = $this->lengowLog->decodeMessage(
                 'lengow_log.error.nb_order_updated',
                 null,
-                ['nb_order' => $result['order_update']]
+                ['nb_order' => $result[LengowImport::NUMBER_ORDERS_UPDATED]]
             );
         }
-        if (isset($result['order_error']) && $result['order_error'] > 0) {
+        if (isset($result[LengowImport::NUMBER_ORDERS_FAILED]) && $result[LengowImport::NUMBER_ORDERS_FAILED] > 0) {
             $messages[] = $this->lengowLog->decodeMessage(
                 'lengow_log.error.nb_order_with_error',
                 null,
-                ['nb_order' => $result['order_error']]
+                ['nb_order' => $result[LengowImport::NUMBER_ORDERS_FAILED]]
             );
         }
         // specific message for mass resend action
@@ -469,8 +478,8 @@ class LengowOrderController extends AbstractController
             $messages[] = $this->lengowLog->decodeMessage($key);
         }
         // return specific error for a Sales Channel
-        if (isset($result['error'])) {
-            foreach ($result['error'] as $salesChannelName => $values) {
+        if (isset($result[LengowImport::ERRORS])) {
+            foreach ($result[LengowImport::ERRORS] as $salesChannelName => $values) {
                 $messages[] = $salesChannelName . ': ' . $this->lengowLog->decodeMessage($values);
             }
         }

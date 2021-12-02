@@ -6,8 +6,10 @@ use Exception;
 use Shopware\Core\Checkout\Order\OrderEntity;
 use Shopware\Core\Framework\DataAbstractionLayer\EntityCollection;
 use Shopware\Core\System\SalesChannel\SalesChannelEntity;
-use Lengow\Connector\Entity\Lengow\OrderError\OrderErrorEntity;
+use Lengow\Connector\Entity\Lengow\OrderError\OrderErrorDefinition as LengowOrderErrorDefinition;
+use Lengow\Connector\Entity\Lengow\OrderError\OrderErrorEntity as LengowOrderErrorEntity;
 use Lengow\Connector\Exception\LengowException;
+use Lengow\Connector\Util\EnvironmentInfoProvider;
 
 /**
  * Class LengowConnector
@@ -30,21 +32,44 @@ class LengowImport
     public const PARAM_LOG_OUTPUT = 'log_output';
     public const PARAM_DEBUG_MODE = 'debug_mode';
     public const PARAM_FORCE = 'force';
+    public const PARAM_FORCE_SYNC = 'force_sync';
     public const PARAM_SYNC = 'sync';
     public const PARAM_GET_SYNC = 'get_sync';
 
-    /**
-     * @var string manual import type
-     */
+    /* Import API arguments */
+    public const ARG_ACCOUNT_ID = 'account_id';
+    public const ARG_CATALOG_IDS = 'catalog_ids';
+    public const ARG_MARKETPLACE = 'marketplace';
+    public const ARG_MARKETPLACE_ORDER_DATE_FROM = 'marketplace_order_date_from';
+    public const ARG_MARKETPLACE_ORDER_DATE_TO = 'marketplace_order_date_to';
+    public const ARG_MARKETPLACE_ORDER_ID = 'marketplace_order_id';
+    public const ARG_MERCHANT_ORDER_ID = 'merchant_order_id';
+    public const ARG_NO_CURRENCY_CONVERSION = 'no_currency_conversion';
+    public const ARG_PAGE = 'page';
+    public const ARG_UPDATED_FROM = 'updated_from';
+    public const ARG_UPDATED_TO = 'updated_to';
+
+    /* Import types */
     public const TYPE_MANUAL = 'manual';
-
-    /**
-     * @var string cron import type
-     */
     public const TYPE_CRON = 'cron';
+    public const TYPE_TOOLBOX = 'toolbox';
+
+    /* Import Data */
+    public const NUMBER_ORDERS_PROCESSED = 'number_orders_processed';
+    public const NUMBER_ORDERS_CREATED = 'number_orders_created';
+    public const NUMBER_ORDERS_UPDATED = 'number_orders_updated';
+    public const NUMBER_ORDERS_FAILED = 'number_orders_failed';
+    public const NUMBER_ORDERS_IGNORED = 'number_orders_ignored';
+    public const NUMBER_ORDERS_NOT_FORMATTED = 'number_orders_not_formatted';
+    public const ORDERS_CREATED = 'orders_created';
+    public const ORDERS_UPDATED = 'orders_updated';
+    public const ORDERS_FAILED = 'orders_failed';
+    public const ORDERS_IGNORED = 'orders_ignored';
+    public const ORDERS_NOT_FORMATTED = 'orders_not_formatted';
+    public const ERRORS = 'errors';
 
     /**
-     * @var int max interval time for order synchronisation old versions (1 day)
+     * @var int max interval time for order synchronization old versions (1 day)
      */
     private const MIN_INTERVAL_TIME = 86400;
 
@@ -54,9 +79,14 @@ class LengowImport
     private const MAX_INTERVAL_TIME = 864000;
 
     /**
-     * @var int security interval time for cron synchronisation (2 hours)
+     * @var int security interval time for cron synchronization (2 hours)
      */
     private const SECURITY_INTERVAL_TIME = 7200;
+
+    /**
+     * @var integer interval of minutes for cron synchronization
+     */
+    private const MINUTE_INTERVAL_TIME = 1;
 
     /**
      * @var LengowConnector Lengow connector service
@@ -117,6 +147,11 @@ class LengowImport
      * @var int amount of products to export
      */
     private $limit;
+
+    /**
+     * @var boolean force import order even if there are errors
+     */
+    private $forceSync;
 
     /**
      * @var boolean see log or not
@@ -189,6 +224,36 @@ class LengowImport
     private $catalogIds = [];
 
     /**
+     * @var array all orders created during the process
+     */
+    private $ordersCreated = [];
+
+    /**
+     * @var array all orders updated during the process
+     */
+    private $ordersUpdated = [];
+
+    /**
+     * @var array all orders failed during the process
+     */
+    private $ordersFailed = [];
+
+    /**
+     * @var array all orders ignored during the process
+     */
+    private $ordersIgnored = [];
+
+    /**
+     * @var array all incorrectly formatted orders that cannot be processed
+     */
+    private $ordersNotFormatted = [];
+
+    /**
+     * @var array all synchronization error (global or by shop)
+     */
+    private $errors = [];
+
+    /**
      * LengowImport Construct
      *
      * @param LengowConnector $lengowConnector Lengow connector service
@@ -225,28 +290,30 @@ class LengowImport
      * Init a new import
      *
      * @param array $params optional options
-     * string marketplace_sku     lengow marketplace order id to import
-     * string marketplace_name    lengow marketplace name to import
-     * string type                type of current import
-     * string created_from        import of orders since
-     * string created_to          import of orders until
-     * int    delivery_address_id Lengow delivery address id to import
+     * string marketplace_sku     Lengow marketplace order id to synchronize
+     * string marketplace_name    Lengow marketplace name to synchronize
+     * string type                Type of current import
+     * string created_from        Synchronization of orders since
+     * string created_to          Synchronization of orders until
+     * int    delivery_address_id Lengow delivery address id to synchronize
      * int    order_lengow_id     Lengow order id in Magento
-     * int    sales_channel_id    sales channel id for current import
-     * int    days                import period
-     * int    limit               number of orders to import
-     * bool   log_output          display log messages
-     * bool   debug_mode          debug mode
+     * int    sales_channel_id    Sales channel id for current import
+     * int    days                Synchronization interval time
+     * int    limit               Maximum number of new orders created
+     * bool   log_output          Display log messages
+     * bool   debug_mode          Activate debug mode
+     * bool   force_sync          Force synchronization order even if there are errors
      */
     public function init(array $params = []): void
     {
-        // get generic params for synchronisation
+        // get generic params for synchronization
         $this->accountId = (int) $this->lengowConfiguration->get(LengowConfiguration::ACCOUNT_ID);
         $this->debugMode = $params[self::PARAM_DEBUG_MODE] ?? $this->lengowConfiguration->debugModeIsActive();
         $this->importType = $params[self::PARAM_TYPE] ?? self::TYPE_MANUAL;
+        $this->forceSync = isset($params[self::PARAM_FORCE_SYNC]) && $params[self::PARAM_FORCE_SYNC];
         $this->logOutput = $params[self::PARAM_LOG_OUTPUT] ?? false;
         $this->salesChannelId = $params[self::PARAM_SALES_CHANNEL_ID] ?? null;
-        // get params for synchronise one or all orders
+        // get params for synchronize one or all orders
         if (isset($params[self::PARAM_MARKETPLACE_SKU], $params[self::PARAM_MARKETPLACE_NAME])
             && $this->salesChannelId
         ) {
@@ -259,6 +326,7 @@ class LengowImport
             }
             if (isset($params[self::PARAM_LENGOW_ORDER_ID])) {
                 $this->lengowOrderId = $params[self::PARAM_LENGOW_ORDER_ID];
+                $this->forceSync = true;
             }
         } else {
             // set the time interval
@@ -278,212 +346,43 @@ class LengowImport
      */
     public function exec(): array
     {
-        $orderNew = 0;
-        $orderUpdate = 0;
-        $orderError = 0;
-        $error = [];
-        $globalError = false;
         $syncOk = true;
-        // clean log files
-        $this->lengowLog->cleanLog();
-        if (!$this->debugMode && !$this->importOneOrder && $this->isInProcess()) {
-            $globalError = $this->lengowLog->encodeMessage('lengow_log.error.rest_time_to_import', [
-                'rest_time' => $this->restTimeToImport()
-            ]);
-            $this->lengowLog->write(LengowLog::CODE_IMPORT, $globalError, $this->logOutput);
-        } elseif (!$this->lengowConnector->isValidAuth($this->logOutput)) {
-            $globalError = $this->lengowLog->encodeMessage('lengow_log.error.credentials_not_valid');
-            $this->lengowLog->write(LengowLog::CODE_IMPORT, $globalError, $this->logOutput);
-        } else {
-            if (!$this->importOneOrder) {
-                $this->setInProcess();
-            }
-            // check Lengow catalogs for order synchronisation
-            if (!$this->importOneOrder && $this->importType === self::TYPE_MANUAL) {
-                $this->lengowSync->syncCatalog();
-            }
-            // start order synchronisation
-            $this->lengowLog->write(
-                LengowLog::CODE_IMPORT,
-                $this->lengowLog->encodeMessage('log.import.start', [
-                    'type' => $this->importType
-                ]),
-                $this->logOutput
-            );
-            if ($this->debugMode) {
-                $this->lengowLog->write(
-                    LengowLog::CODE_IMPORT,
-                    $this->lengowLog->encodeMessage('log.import.debug_mode_active'),
-                    $this->logOutput
-                );
-            }
-            // get all sales channel enabled for synchronisation
-            /** @var SalesChannelEntity[] $salesChannels */
-            $salesChannels = $this->lengowConfiguration->getLengowActiveSalesChannels();
-            foreach ($salesChannels as $salesChannel) {
-                if ($this->salesChannelId !== null && $salesChannel->getId() !== $this->salesChannelId) {
-                    continue;
-                }
-                $this->lengowLog->write(
-                    LengowLog::CODE_IMPORT,
-                    $this->lengowLog->encodeMessage('log.import.start_for_sales_channel', [
-                        'sales_channel_name' => $salesChannel->getName(),
-                        'sales_channel_id' => $salesChannel->getId(),
-                    ]),
-                    $this->logOutput
-                );
-                try {
-                    // check sales channel catalog ids
-                    if (!$this->checkCatalogIds($salesChannel)) {
-                        $errorCatalogIds = $this->lengowLog->encodeMessage(
-                            'lengow_log.error.no_catalog_for_sales_channel',
-                            [
-                                'sales_channel_name' => $salesChannel->getName(),
-                                'sales_channel_id' => $salesChannel->getId(),
-                            ]
-                        );
-                        $this->lengowLog->write(LengowLog::CODE_IMPORT, $errorCatalogIds, $this->logOutput);
-                        $error[$salesChannel->getName()] = $errorCatalogIds;
-                        continue;
-                    }
-                    // get orders from Lengow API
-                    $orders = $this->getOrdersFromApi($salesChannel);
-                    $totalOrders = count($orders);
-                    if ($this->importOneOrder) {
-                        $this->lengowLog->write(
-                            LengowLog::CODE_IMPORT,
-                            $this->lengowLog->encodeMessage('log.import.find_one_order', [
-                                'nb_order' => $totalOrders,
-                                'marketplace_sku' => $this->marketplaceSku,
-                                'marketplace_name' => $this->marketplaceName,
-                                'account_id' => $this->accountId,
-                            ]),
-                            $this->logOutput
-                        );
-                    } else {
-                        $this->lengowLog->write(
-                            LengowLog::CODE_IMPORT,
-                            $this->lengowLog->encodeMessage('log.import.find_all_orders', [
-                                'nb_order' => $totalOrders,
-                                'sales_channel_name' => $salesChannel->getName(),
-                                'sales_channel_id' => $salesChannel->getId(),
-                            ]),
-                            $this->logOutput
-                        );
-                    }
-                    if ($totalOrders <= 0 && $this->importOneOrder) {
-                        throw new LengowException(
-                            $this->lengowLog->encodeMessage('lengow_log.error.order_not_found')
-                        );
-                    }
-                    if ($totalOrders <= 0) {
-                        continue;
-                    }
-                    if ($this->lengowOrderId !== null) {
-                        $this->lengowOrderError->finishOrderErrors($this->lengowOrderId);
-                    }
-                    $result = $this->importOrders($orders, $salesChannel);
-                    if (!$this->importOneOrder) {
-                        $orderNew += $result['order_new'];
-                        $orderUpdate += $result['order_update'];
-                        $orderError += $result['order_error'];
-                    }
-                } catch (LengowException $e) {
-                    $errorMessage = $e->getMessage();
-                } catch (Exception $e) {
-                    $errorMessage = '[Shopware error] "' . $e->getMessage() . '" '
-                        . $e->getFile() . ' | ' . $e->getLine();
-                }
-                if (isset($errorMessage)) {
-                    $syncOk = false;
-                    if ($this->lengowOrderId !== null) {
-                        $this->lengowOrderError->finishOrderErrors($this->lengowOrderId);
-                        $this->lengowOrderError->create($this->lengowOrderId, $errorMessage);
-                    }
-                    $decodedMessage = $this->lengowLog->decodeMessage(
-                        $errorMessage,
-                        LengowTranslation::DEFAULT_ISO_CODE
-                    );
-                    $this->lengowLog->write(
-                        LengowLog::CODE_IMPORT,
-                        $this->lengowLog->encodeMessage('log.import.import_failed', [
-                            'decoded_message' => $decodedMessage
-                        ]),
-                        $this->logOutput
-                    );
-                    $error[$salesChannel->getName()] = $errorMessage;
-                    unset($errorMessage);
-                    continue;
-                }
-                unset($salesChannel);
-            }
-            if (!$this->importOneOrder) {
-                $this->lengowLog->write(
-                    LengowLog::CODE_IMPORT,
-                    $this->lengowLog->encodeMessage('lengow_log.error.nb_order_imported', [
-                        'nb_order' => $orderNew,
-                    ]),
-                    $this->logOutput
-                );
-                $this->lengowLog->write(
-                    LengowLog::CODE_IMPORT,
-                    $this->lengowLog->encodeMessage('lengow_log.error.nb_order_updated', [
-                        'nb_order' => $orderUpdate,
-                    ]),
-                    $this->logOutput
-                );
-                $this->lengowLog->write(
-                    LengowLog::CODE_IMPORT,
-                    $this->lengowLog->encodeMessage('lengow_log.error.nb_order_with_error', [
-                        'nb_order' => $orderError,
-                    ]),
-                    $this->logOutput
-                );
-            }
-            // update last import date
-            if (!$this->importOneOrder && $syncOk) {
-                $this->setLastImport($this->importType);
-            }
-            // finish import process
-            $this->setEnd();
-            $this->lengowLog->write(
-                LengowLog::CODE_IMPORT,
-                $this->lengowLog->encodeMessage('log.import.end', [
-                    'type' => $this->importType
-                ]),
-                $this->logOutput
-            );
-            // sending email in error for orders
-            if (!$this->debugMode
-                && !$this->importOneOrder
-                && $this->lengowConfiguration->get(LengowConfiguration::REPORT_MAIL_ENABLED)
-            ) {
-                $this->sendMailAlert($this->logOutput);
-            }
-            // check if order action is finish (Ship / Cancel)
-            if (!$this->debugMode && !$this->importOneOrder && $this->importType === self::TYPE_MANUAL) {
-                $this->lengowActionSync->checkFinishAction($this->logOutput);
-                $this->lengowActionSync->checkOldAction($this->logOutput);
-                $this->lengowActionSync->checkNotSentAction($this->logOutput);
+        // checks if a synchronization is not already in progress
+        if (!$this->canExecuteSynchronization()) {
+            return $this->getResult();
+        }
+        // starts some processes necessary for synchronization
+        $this->setupSynchronization();
+        // get all sales channel enabled for synchronization
+        /** @var SalesChannelEntity[] $salesChannels */
+        $salesChannels = $this->lengowConfiguration->getLengowActiveSalesChannels($this->salesChannelId);
+        foreach ($salesChannels as $salesChannel) {
+            // synchronize all orders for a specific store
+            if (!$this->synchronizeOrdersBySalesChannel($salesChannel)) {
+                $syncOk = false;
             }
         }
-        if ($globalError) {
-            $error[0] = $globalError;
-            if ($this->lengowOrderId !== null) {
-                $this->lengowOrderError->finishOrderErrors($this->lengowOrderId);
-                $this->lengowOrderError->create($this->lengowOrderId, $globalError);
-            }
+        // get order synchronization result
+        $result = $this->getResult();
+        $this->lengowLog->write(
+            LengowLog::CODE_IMPORT,
+            $this->lengowLog->encodeMessage('log.import.sync_result', [
+                'number_orders_processed' => $result[self::NUMBER_ORDERS_PROCESSED],
+                'number_orders_created' => $result[self::NUMBER_ORDERS_CREATED],
+                'number_orders_updated' => $result[self::NUMBER_ORDERS_UPDATED],
+                'number_orders_failed' => $result[self::NUMBER_ORDERS_FAILED],
+                'number_orders_ignored' => $result[self::NUMBER_ORDERS_IGNORED],
+                'number_orders_not_formatted' => $result[self::NUMBER_ORDERS_NOT_FORMATTED],
+            ]),
+            $this->logOutput
+        );
+        // update last import date
+        if (!$this->importOneOrder && $syncOk) {
+            $this->setLastImport($this->importType);
         }
-        if ($this->importOneOrder) {
-            $result['error'] = $error;
-            return $result;
-        }
-        return [
-            'order_new' => $orderNew,
-            'order_update' => $orderUpdate,
-            'order_error' => $orderError,
-            'error' => $error,
-        ];
+        // complete synchronization and start all necessary processes
+        $this->finishSynchronization();
+        return $result;
     }
 
     /**
@@ -519,11 +418,11 @@ class LengowImport
     {
         $timestamp = (int) $this->lengowConfiguration->get(LengowConfiguration::SYNCHRONIZATION_IN_PROGRESS);
         // security check : if last import is more than 60 seconds old => authorize new import to be launched
-        return ($timestamp > 0 && ($timestamp + (60 * 1)) > time());
+        return ($timestamp > 0 && ($timestamp + (60 * self::MINUTE_INTERVAL_TIME)) > time());
     }
 
     /**
-     * Get Rest time to make re import order
+     * Get Rest time to make re-import order
      *
      * @return int
      */
@@ -531,40 +430,227 @@ class LengowImport
     {
         $timestamp = (int) $this->lengowConfiguration->get(LengowConfiguration::SYNCHRONIZATION_IN_PROGRESS);
         if ($timestamp > 0) {
-            return $timestamp + (60 * 1) - time();
+            return $timestamp + (60 * self::MINUTE_INTERVAL_TIME) - time();
         }
         return 0;
     }
 
     /**
-     * Record the date of the last import
+     * Set interval time for order synchronization
      *
-     * @param string $type (cron or manual)
+     * @param int|null $days Import period
+     * @param string|null $createdFrom Import of orders since
+     * @param string|null $createdTo Import of orders until
      */
-    private function setLastImport(string $type): void
+    private function setIntervalTime(int $days = null, string $createdFrom = null, string $createdTo = null): void
     {
-        $time = (string) time();
-        if ($type === self::TYPE_CRON) {
-            $this->lengowConfiguration->set(LengowConfiguration::LAST_UPDATE_CRON_SYNCHRONIZATION, $time);
+        if ($createdFrom && $createdTo) {
+            // retrieval of orders created from ... until ...
+            $createdFromTimestamp = strtotime($createdFrom);
+            $createdToTimestamp = strtotime($createdTo) + 86399;
+            $intervalTime = $createdToTimestamp - $createdFromTimestamp;
+            $this->createdFrom = $createdFromTimestamp;
+            $this->createdTo = $intervalTime > self::MAX_INTERVAL_TIME
+                ? $createdFromTimestamp + self::MAX_INTERVAL_TIME
+                : $createdToTimestamp;
+            return;
+        }
+        if ($days) {
+            $intervalTime = $days * 86400;
+            $intervalTime = $intervalTime > self::MAX_INTERVAL_TIME ? self::MAX_INTERVAL_TIME : $intervalTime;
         } else {
-            $this->lengowConfiguration->set(LengowConfiguration::LAST_UPDATE_MANUAL_SYNCHRONIZATION, $time);
+            // order recovery updated since ... days
+            $importDays = (int) $this->lengowConfiguration->get(LengowConfiguration::SYNCHRONIZATION_DAY_INTERVAL);
+            $intervalTime = $importDays * 86400;
+            // add security for older versions of the plugin
+            $intervalTime = $intervalTime < self::MIN_INTERVAL_TIME ? self::MIN_INTERVAL_TIME : $intervalTime;
+            $intervalTime = $intervalTime > self::MAX_INTERVAL_TIME ? self::MAX_INTERVAL_TIME : $intervalTime;
+            // get dynamic interval time for cron synchronization
+            $lastImport = $this->getLastImport();
+            $lastSettingUpdate = (int) $this->lengowConfiguration->get(LengowConfiguration::LAST_UPDATE_SETTING);
+            if ($this->importType !== self::TYPE_MANUAL
+                && $lastImport['timestamp'] !== 'none'
+                && $lastImport['timestamp'] > $lastSettingUpdate
+            ) {
+                $lastIntervalTime = (time() - $lastImport['timestamp']) + self::SECURITY_INTERVAL_TIME;
+                $intervalTime = $lastIntervalTime > $intervalTime ? $intervalTime : $lastIntervalTime;
+            }
+        }
+        $this->updatedFrom = time() - $intervalTime;
+        $this->updatedTo = time();
+    }
+
+    /**
+     * Checks if a synchronization is not already in progress
+     *
+     * @return bool
+     */
+    private function canExecuteSynchronization(): bool
+    {
+        $globalError = null;
+        // checks if the process can start
+        if (!$this->debugMode && !$this->importOneOrder && $this->isInProcess()) {
+            $globalError = $this->lengowLog->encodeMessage('lengow_log.error.rest_time_to_import', [
+                'rest_time' => $this->restTimeToImport()
+            ]);
+            $this->lengowLog->write(LengowLog::CODE_IMPORT, $globalError, $this->logOutput);
+        } elseif (!$this->lengowConnector->isValidAuth($this->logOutput)) {
+            $globalError = $this->lengowLog->encodeMessage('lengow_log.error.credentials_not_valid');
+            $this->lengowLog->write(LengowLog::CODE_IMPORT, $globalError, $this->logOutput);
+        }
+        // if we have a global error, we stop the process directly
+        if ($globalError) {
+            $this->errors[0] = $globalError;
+            if (isset($this->lengowOrderId) && $this->lengowOrderId) {
+                $this->lengowOrderError->finishOrderErrors($this->lengowOrderId);
+                $this->lengowOrderError->create($this->lengowOrderId, $globalError);
+            }
+            return false;
+        }
+        return true;
+    }
+
+    /**
+     * Starts some processes necessary for synchronization
+     */
+    private function setupSynchronization(): void
+    {
+        // suppress log files when too old
+        $this->lengowLog->cleanLog();
+        if (!$this->importOneOrder) {
+            $this->setInProcess();
+        }
+        // check Lengow catalogs for order synchronization
+        if (!$this->importOneOrder && $this->importType === self::TYPE_MANUAL) {
+            $this->lengowSync->syncCatalog();
+        }
+        // start order synchronization
+        $this->lengowLog->write(
+            LengowLog::CODE_IMPORT,
+            $this->lengowLog->encodeMessage('log.import.start', [
+                'type' => $this->importType
+            ]),
+            $this->logOutput
+        );
+        if ($this->debugMode) {
+            $this->lengowLog->write(
+                LengowLog::CODE_IMPORT,
+                $this->lengowLog->encodeMessage('log.import.debug_mode_active'),
+                $this->logOutput
+            );
         }
     }
 
     /**
-     * Set import to "in process" state
+     * Return the synchronization result
+     *
+     * @return array
      */
-    private function setInProcess(): void
+    private function getResult(): array
     {
-        $this->lengowConfiguration->set(LengowConfiguration::SYNCHRONIZATION_IN_PROGRESS, (string) time());
+        $nbOrdersCreated = count($this->ordersCreated);
+        $nbOrdersUpdated = count($this->ordersUpdated);
+        $nbOrdersFailed = count($this->ordersFailed);
+        $nbOrdersIgnored = count($this->ordersIgnored);
+        $nbOrdersNotFormatted = count($this->ordersNotFormatted);
+        $nbOrdersProcessed = $nbOrdersCreated
+            + $nbOrdersUpdated
+            + $nbOrdersFailed
+            + $nbOrdersIgnored
+            + $nbOrdersNotFormatted;
+        return [
+            self::NUMBER_ORDERS_PROCESSED => $nbOrdersProcessed,
+            self::NUMBER_ORDERS_CREATED => $nbOrdersCreated,
+            self::NUMBER_ORDERS_UPDATED => $nbOrdersUpdated,
+            self::NUMBER_ORDERS_FAILED => $nbOrdersFailed,
+            self::NUMBER_ORDERS_IGNORED => $nbOrdersIgnored,
+            self::NUMBER_ORDERS_NOT_FORMATTED => $nbOrdersNotFormatted,
+            self::ORDERS_CREATED => $this->ordersCreated,
+            self::ORDERS_UPDATED => $this->ordersUpdated,
+            self::ORDERS_FAILED => $this->ordersFailed,
+            self::ORDERS_IGNORED => $this->ordersIgnored,
+            self::ORDERS_NOT_FORMATTED => $this->ordersNotFormatted,
+            self::ERRORS => $this->errors,
+        ];
     }
 
     /**
-     * Set import to finished
+     * Synchronize all orders for a specific sales channel
+     *
+     * @param SalesChannelEntity $salesChannel Shopware sales channel instance
+     *
+     * @return bool
      */
-    private function setEnd(): void
+    private function synchronizeOrdersBySalesChannel(SalesChannelEntity $salesChannel): bool
     {
-        $this->lengowConfiguration->set(LengowConfiguration::SYNCHRONIZATION_IN_PROGRESS, '');
+        $this->lengowLog->write(
+            LengowLog::CODE_IMPORT,
+            $this->lengowLog->encodeMessage('log.import.start_for_sales_channel', [
+                'sales_channel_name' => $salesChannel->getName(),
+                'sales_channel_id' => $salesChannel->getId(),
+            ]),
+            $this->logOutput
+        );
+        // check sales channel catalog ids
+        if (!$this->checkCatalogIds($salesChannel)) {
+            return true;
+        }
+        try {
+            // get orders from Lengow API
+            $orders = $this->getOrdersFromApi($salesChannel);
+            $numberOrdersFound = count($orders);
+            if ($this->importOneOrder) {
+                $this->lengowLog->write(
+                    LengowLog::CODE_IMPORT,
+                    $this->lengowLog->encodeMessage('log.import.find_one_order', [
+                        'nb_order' => $numberOrdersFound,
+                        'marketplace_sku' => $this->marketplaceSku,
+                        'marketplace_name' => $this->marketplaceName,
+                        'account_id' => $this->accountId,
+                    ]),
+                    $this->logOutput
+                );
+            } else {
+                $this->lengowLog->write(
+                    LengowLog::CODE_IMPORT,
+                    $this->lengowLog->encodeMessage('log.import.find_all_orders', [
+                        'nb_order' => $numberOrdersFound,
+                        'sales_channel_name' => $salesChannel->getName(),
+                        'sales_channel_id' => $salesChannel->getId(),
+                    ]),
+                    $this->logOutput
+                );
+            }
+            if ($numberOrdersFound === 0 && $this->importOneOrder) {
+                throw new LengowException($this->lengowLog->encodeMessage('lengow_log.error.order_not_found'));
+            }
+            if ($numberOrdersFound > 0) {
+                // import orders in Shopware
+                $this->importOrders($orders, $salesChannel);
+            }
+        } catch (LengowException $e) {
+            $errorMessage = $e->getMessage();
+        } catch (Exception $e) {
+            $errorMessage = '[Shopware error]: "' . $e->getMessage()
+                . '" in ' . $e->getFile() . ' on line ' . $e->getLine();
+        }
+        if (!isset($errorMessage)) {
+            return true;
+        }
+        if (isset($this->lengowOrderId) && $this->lengowOrderId) {
+            $this->lengowOrderError->finishOrderErrors($this->lengowOrderId);
+            $this->lengowOrderError->create($this->lengowOrderId, $errorMessage);
+        }
+        $decodedMessage = $this->lengowLog->decodeMessage($errorMessage, LengowTranslation::DEFAULT_ISO_CODE);
+        $this->lengowLog->write(
+            LengowLog::CODE_IMPORT,
+            $this->lengowLog->encodeMessage('log.import.import_failed', [
+                'decoded_message' => $decodedMessage
+            ]),
+            $this->logOutput
+        );
+        $this->errors[$salesChannel->getName()] = $errorMessage;
+        return false;
     }
 
     /**
@@ -604,6 +690,15 @@ class LengowImport
             $this->salesChannelCatalogIds = $salesChannelCatalogIds;
             return true;
         }
+        $message = $this->lengowLog->encodeMessage(
+            'lengow_log.error.no_catalog_for_sales_channel',
+            [
+                'sales_channel_name' => $salesChannel->getName(),
+                'sales_channel_id' => $salesChannel->getId(),
+            ]
+        );
+        $this->lengowLog->write(LengowLog::CODE_IMPORT, $message, $this->logOutput);
+        $this->errors[$salesChannel->getName()] = $message;
         return false;
     }
 
@@ -655,10 +750,10 @@ class LengowImport
                     $results = $this->lengowConnector->get(
                         LengowConnector::API_ORDER,
                         [
-                            'marketplace_order_id' => $this->marketplaceSku,
-                            'marketplace' => $this->marketplaceName,
-                            'account_id' => $this->accountId,
-                            'no_currency_conversion' => $currencyConversion,
+                            self::ARG_MARKETPLACE_ORDER_ID => $this->marketplaceSku,
+                            self::ARG_MARKETPLACE => $this->marketplaceName,
+                            self::ARG_ACCOUNT_ID => $this->accountId,
+                            self::ARG_NO_CURRENCY_CONVERSION => $currencyConversion,
                         ],
                         LengowConnector::FORMAT_STREAM,
                         '',
@@ -667,34 +762,34 @@ class LengowImport
                 } else {
                     if ($this->createdFrom && $this->createdTo) {
                         $timeParams = [
-                            'marketplace_order_date_from' => $this->lengowConfiguration->gmtDate(
+                            self::ARG_MARKETPLACE_ORDER_DATE_FROM => $this->lengowConfiguration->gmtDate(
                                 $this->createdFrom,
-                                LengowConfiguration::API_DATE_TIME_FORMAT
+                                EnvironmentInfoProvider::DATE_ISO_8601
                             ),
-                            'marketplace_order_date_to' => $this->lengowConfiguration->gmtDate(
+                            self::ARG_MARKETPLACE_ORDER_DATE_TO => $this->lengowConfiguration->gmtDate(
                                 $this->createdTo,
-                                LengowConfiguration::API_DATE_TIME_FORMAT
+                                EnvironmentInfoProvider::DATE_ISO_8601
                             ),
                         ];
                     } else {
                         $timeParams = [
-                            'updated_from' => $this->lengowConfiguration->date(
+                            self::ARG_UPDATED_FROM => $this->lengowConfiguration->date(
                                 $this->updatedFrom,
-                                LengowConfiguration::API_DATE_TIME_FORMAT
+                                EnvironmentInfoProvider::DATE_ISO_8601
                             ),
-                            'updated_to' => $this->lengowConfiguration->date(
+                            self::ARG_UPDATED_TO => $this->lengowConfiguration->date(
                                 $this->updatedTo,
-                                LengowConfiguration::API_DATE_TIME_FORMAT
+                                EnvironmentInfoProvider::DATE_ISO_8601
                             ),
                         ];
                     }
                     $results = $this->lengowConnector->get(
                         LengowConnector::API_ORDER,
                         array_merge($timeParams, [
-                            'catalog_ids' => implode(',', $this->salesChannelCatalogIds),
-                            'account_id' => $this->accountId,
-                            'page' => $page,
-                            'no_currency_conversion' => $currencyConversion,
+                            self::ARG_CATALOG_IDS => implode(',', $this->salesChannelCatalogIds),
+                            self::ARG_ACCOUNT_ID => $this->accountId,
+                            self::ARG_PAGE => $page,
+                            self::ARG_NO_CURRENCY_CONVERSION => $currencyConversion,
                         ]),
                         LengowConnector::FORMAT_STREAM,
                         '',
@@ -712,8 +807,9 @@ class LengowImport
                     ])
                 );
             }
+            // don't add true, decoded data are used as object
             $results = json_decode($results, false);
-            if ($results === null || !is_object($results)) {
+            if (!is_object($results)) {
                 throw new LengowException(
                     $this->lengowLog->encodeMessage('lengow_log.exception.no_connection_webservice', [
                         'sales_channel_name' => $salesChannel->getName(),
@@ -736,14 +832,9 @@ class LengowImport
      *
      * @param array $orders API orders
      * @param SalesChannelEntity $salesChannel Shopware sales channel instance
-     *
-     * @return array|false
      */
-    private function importOrders(array $orders, SalesChannelEntity $salesChannel)
+    private function importOrders(array $orders, SalesChannelEntity $salesChannel): void
     {
-        $orderNew = 0;
-        $orderUpdate = 0;
-        $orderError = 0;
         $importFinished = false;
         foreach ($orders as $orderData) {
             if (!$this->importOneOrder) {
@@ -758,12 +849,9 @@ class LengowImport
             self::$currentOrder = $marketplaceSku;
             // if order contains no package
             if (empty($orderData->packages)) {
-                $this->lengowLog->write(
-                    LengowLog::CODE_IMPORT,
-                    $this->lengowLog->encodeMessage('log.import.error_no_package'),
-                    $this->logOutput,
-                    $marketplaceSku
-                );
+                $message = $this->lengowLog->encodeMessage('log.import.error_no_package');
+                $this->lengowLog->write(LengowLog::CODE_IMPORT, $message, $this->logOutput, $marketplaceSku);
+                $this->addOrderNotFormatted($marketplaceSku, $message, $orderData);
                 continue;
             }
             // start import
@@ -771,12 +859,9 @@ class LengowImport
                 $nbPackage++;
                 // check whether the package contains a shipping address
                 if (!isset($packageData->delivery->id)) {
-                    $this->lengowLog->write(
-                        LengowLog::CODE_IMPORT,
-                        $this->lengowLog->encodeMessage('log.import.error_no_delivery_address'),
-                        $this->logOutput,
-                        $marketplaceSku
-                    );
+                    $message = $this->lengowLog->encodeMessage('log.import.error_no_delivery_address');
+                    $this->lengowLog->write(LengowLog::CODE_IMPORT, $message, $this->logOutput, $marketplaceSku);
+                    $this->addOrderNotFormatted($marketplaceSku, $message, $orderData);
                     continue;
                 }
                 $packageDeliveryAddressId = (int) $packageData->delivery->id;
@@ -786,35 +871,37 @@ class LengowImport
                     && $this->deliveryAddressId !== null
                     && $this->deliveryAddressId !== $packageDeliveryAddressId
                 ) {
-                    $this->lengowLog->write(
-                        LengowLog::CODE_IMPORT,
-                        $this->lengowLog->encodeMessage('log.import.error_wrong_package_number'),
-                        $this->logOutput,
-                        $marketplaceSku
-                    );
+                    $message = $this->lengowLog->encodeMessage('log.import.error_wrong_package_number');
+                    $this->lengowLog->write(LengowLog::CODE_IMPORT, $message, $this->logOutput, $marketplaceSku);
+                    $this->addOrderNotFormatted($marketplaceSku, $message, $orderData);
                     continue;
                 }
                 try {
                     // try to import or update order
                     $this->lengowImportOrder->init(
                         [
-                            'sales_channel' => $salesChannel,
-                            'debug_mode' => $this->debugMode,
-                            'log_output' => $this->logOutput,
-                            'marketplace_sku' => $marketplaceSku,
-                            'delivery_address_id' => $packageDeliveryAddressId,
-                            'order_data' => $orderData,
-                            'package_data' => $packageData,
-                            'first_package' => $firstPackage,
-                            'import_one_order' => $this->importOneOrder,
+                            LengowImportOrder::PARAM_SALES_CHANNEL => $salesChannel,
+                            LengowImportOrder::PARAM_FORCE_SYNC => $this->forceSync,
+                            LengowImportOrder::PARAM_DEBUG_MODE => $this->debugMode,
+                            LengowImportOrder::PARAM_LOG_OUTPUT => $this->logOutput,
+                            LengowImportOrder::PARAM_MARKETPLACE_SKU => $marketplaceSku,
+                            LengowImportOrder::PARAM_DELIVERY_ADDRESS_ID => $packageDeliveryAddressId,
+                            LengowImportOrder::PARAM_ORDER_DATA => $orderData,
+                            LengowImportOrder::PARAM_PACKAGE_DATA => $packageData,
+                            LengowImportOrder::PARAM_FIRST_PACKAGE => $firstPackage,
+                            LengowImportOrder::PARAM_IMPORT_ONE_ORDER => $this->importOneOrder,
                         ]
                     );
-                    $order = $this->lengowImportOrder->exec();
+                    $result = $this->lengowImportOrder->exec();
+                    // synchronize the merchant order id with Lengow
+                    $this->synchronizeMerchantOrderId($result);
+                    // save the result of the order synchronization by type
+                    $this->saveSynchronizationResult($result);
                 } catch (LengowException $e) {
                     $errorMessage = $e->getMessage();
                 } catch (Exception $e) {
-                    $errorMessage = '[Shopware error]: "' . $e->getMessage() . '" '
-                        . $e->getFile() . ' | ' . $e->getLine();
+                    $errorMessage = '[Shopware error]: "' . $e->getMessage()
+                        . '" in ' . $e->getFile() . ' on line ' . $e->getLine();
                 }
                 if (isset($errorMessage)) {
                     $decodedMessage = $this->lengowLog->decodeMessage(
@@ -832,115 +919,133 @@ class LengowImport
                     unset($errorMessage);
                     continue;
                 }
-                // sync to lengow if no debug_mode
-                if (!$this->debugMode && isset($order['order_new']) && $order['order_new']) {
-                    /** @var OrderEntity $shopwareOrder */
-                    $shopwareOrder = $this->lengowOrder->getOrderById($order['order_id']);
-                    $synchro = $this->lengowOrder->synchronizeOrder($shopwareOrder, $this->logOutput);
-                    $messageKey = $synchro
-                        ? 'log.import.order_synchronized_with_lengow'
-                        : 'log.import.order_not_synchronized_with_lengow';
-                    $this->lengowLog->write(
-                        LengowLog::CODE_IMPORT,
-                        $this->lengowLog->encodeMessage($messageKey, [
-                            'order_id' => $shopwareOrder->getOrderNumber()
-                        ]),
-                        $this->logOutput,
-                        $marketplaceSku
-                    );
-                    unset($shopwareOrder);
-                }
-                // if re-import order -> return order information
-                if (isset($order) && $this->importOneOrder) {
-                    return $order;
-                }
-                if (isset($order)) {
-                    if (isset($order['order_new']) && $order['order_new']) {
-                        $orderNew++;
-                    } elseif (isset($order['order_update']) && $order['order_update']) {
-                        $orderUpdate++;
-                    } elseif (isset($order['order_error']) && $order['order_error']) {
-                        $orderError++;
-                    }
-                }
-                // clean process
-                self::$currentOrder = null;
-                unset($importOrder, $order);
                 // if limit is set
-                if ($this->limit > 0 && $orderNew === $this->limit) {
+                if ($this->limit > 0 && count($this->ordersCreated) === $this->limit) {
                     $importFinished = true;
                     break;
                 }
             }
+            // clean current order
+            self::$currentOrder = null;
             if ($importFinished) {
                 break;
             }
         }
-        return [
-            'order_new' => $orderNew,
-            'order_update' => $orderUpdate,
-            'order_error' => $orderError,
+    }
+
+    /**
+     * Return an array of result for order not formatted
+     *
+     * @param string $marketplaceSku id lengow of current order
+     * @param string $errorMessage Error message
+     * @param mixed $orderData API order data
+     */
+    private function addOrderNotFormatted(string $marketplaceSku, string $errorMessage, $orderData): void
+    {
+        $messageDecoded = $this->lengowLog->decodeMessage($errorMessage, LengowTranslation::DEFAULT_ISO_CODE);
+        $this->ordersNotFormatted[] = [
+            LengowImportOrder::MERCHANT_ORDER_ID => null,
+            LengowImportOrder::MERCHANT_ORDER_REFERENCE => null,
+            LengowImportOrder::LENGOW_ORDER_ID => $this->lengowOrderId,
+            LengowImportOrder::MARKETPLACE_SKU => $marketplaceSku,
+            LengowImportOrder::MARKETPLACE_NAME => (string) $orderData->marketplace,
+            LengowImportOrder::DELIVERY_ADDRESS_ID => null,
+            LengowImportOrder::SHOP_ID => $this->salesChannelId,
+            LengowImportOrder::CURRENT_ORDER_STATUS => (string) $orderData->lengow_status,
+            LengowImportOrder::PREVIOUS_ORDER_STATUS => (string) $orderData->lengow_status,
+            LengowImportOrder::ERRORS => [$messageDecoded],
         ];
     }
 
     /**
-     * Set interval time for order synchronisation
+     * Synchronize the merchant order id with Lengow
      *
-     * @param int|null $days Import period
-     * @param string|null $createdFrom Import of orders since
-     * @param string|null $createdTo Import of orders until
+     * @param array $result synchronization order result
      */
-    private function setIntervalTime(int $days = null, string $createdFrom = null, string $createdTo = null): void
+    private function synchronizeMerchantOrderId(array $result): void
     {
-        if ($createdFrom && $createdTo) {
-            // retrieval of orders created from ... until ...
-            $createdFromTimestamp = strtotime($createdFrom);
-            $createdToTimestamp = strtotime($createdTo) + 86399;
-            $intervalTime = $createdToTimestamp - $createdFromTimestamp;
-            $this->createdFrom = $createdFromTimestamp;
-            $this->createdTo = $intervalTime > self::MAX_INTERVAL_TIME
-                ? $createdFromTimestamp + self::MAX_INTERVAL_TIME
-                : $createdToTimestamp;
-            return;
+        if (!$this->debugMode && $result[LengowImportOrder::RESULT_TYPE] === LengowImportOrder::RESULT_CREATED) {
+            /** @var OrderEntity $shopwareOrder */
+            $shopwareOrder = $this->lengowOrder->getOrderById($result[LengowImportOrder::MERCHANT_ORDER_ID]);
+            $success = $this->lengowOrder->synchronizeOrder($shopwareOrder, $this->logOutput);
+            $messageKey = $success
+                ? 'log.import.order_synchronized_with_lengow'
+                : 'log.import.order_not_synchronized_with_lengow';
+            $this->lengowLog->write(
+                LengowLog::CODE_IMPORT,
+                $this->lengowLog->encodeMessage($messageKey, [
+                    'order_id' => $shopwareOrder->getOrderNumber()
+                ]),
+                $this->logOutput,
+                $result[LengowImportOrder::MARKETPLACE_SKU]
+            );
         }
-        if ($days) {
-            $intervalTime = $days * 86400;
-            $intervalTime = $intervalTime > self::MAX_INTERVAL_TIME ? self::MAX_INTERVAL_TIME : $intervalTime;
-        } else {
-            // order recovery updated since ... days
-            $importDays = (int) $this->lengowConfiguration->get(LengowConfiguration::SYNCHRONIZATION_DAY_INTERVAL);
-            $intervalTime = $importDays * 86400;
-            // add security for older versions of the plugin
-            $intervalTime = $intervalTime < self::MIN_INTERVAL_TIME ? self::MIN_INTERVAL_TIME : $intervalTime;
-            $intervalTime = $intervalTime > self::MAX_INTERVAL_TIME ? self::MAX_INTERVAL_TIME : $intervalTime;
-            // get dynamic interval time for cron synchronisation
-            $lastImport = $this->getLastImport();
-            $lastSettingUpdate = (int) $this->lengowConfiguration->get(LengowConfiguration::LAST_UPDATE_SETTING);
-            if ($this->importType !== self::TYPE_MANUAL
-                && $lastImport['timestamp'] !== 'none'
-                && $lastImport['timestamp'] > $lastSettingUpdate
-            ) {
-                $lastIntervalTime = (time() - $lastImport['timestamp']) + self::SECURITY_INTERVAL_TIME;
-                $intervalTime = $lastIntervalTime > $intervalTime ? $intervalTime : $lastIntervalTime;
-            }
+    }
+
+    /**
+     * Save the result of the order synchronization by type
+     *
+     * @param array $result synchronization order result
+     */
+    private function saveSynchronizationResult(array $result): void
+    {
+        $resultType = $result[LengowImportOrder::RESULT_TYPE];
+        unset($result[LengowImportOrder::RESULT_TYPE]);
+        switch ($resultType) {
+            case LengowImportOrder::RESULT_CREATED:
+                $this->ordersCreated[] = $result;
+                break;
+            case LengowImportOrder::RESULT_UPDATED:
+                $this->ordersUpdated[] = $result;
+                break;
+            case LengowImportOrder::RESULT_FAILED:
+                $this->ordersFailed[] = $result;
+                break;
+            case LengowImportOrder::RESULT_IGNORED:
+                $this->ordersIgnored[] = $result;
+                break;
         }
-        $this->updatedFrom = time() - $intervalTime;
-        $this->updatedTo = time();
+    }
+
+    /**
+     * Complete synchronization and start all necessary processes
+     */
+    private function finishSynchronization(): void
+    {
+        // finish import process
+        $this->setEnd();
+        $this->lengowLog->write(
+            LengowLog::CODE_IMPORT,
+            $this->lengowLog->encodeMessage('log.import.end', [
+                'type' => $this->importType
+            ]),
+            $this->logOutput
+        );
+        // check if order action is finish (Ship / Cancel)
+        if (!$this->debugMode && !$this->importOneOrder && $this->importType === self::TYPE_MANUAL) {
+            $this->lengowActionSync->checkFinishAction($this->logOutput);
+            $this->lengowActionSync->checkOldAction($this->logOutput);
+            $this->lengowActionSync->checkNotSentAction($this->logOutput);
+        }
+        // sending email in error for orders
+        if (!$this->debugMode
+            && !$this->importOneOrder
+            && $this->lengowConfiguration->get(LengowConfiguration::REPORT_MAIL_ENABLED)
+        ) {
+            $this->sendMailAlert($this->logOutput);
+        }
     }
 
     /**
      * Check order error table and send mail for order not imported correctly
      *
      * @param bool $logOutput see log or not
-     *
-     * @return bool
      */
-    private function sendMailAlert(bool $logOutput = false): bool
+    private function sendMailAlert(bool $logOutput = false): void
     {
-        $success = true;
         $orderErrorCollection = $this->lengowOrderError->getOrderErrorNotSent();
         if ($orderErrorCollection === null) {
-            return $success;
+            return;
         }
         $subject = $this->lengowLog->decodeMessage('lengow_log.mail_report.subject_report_mail');
         $mailBody = $this->getMailAlertBody($orderErrorCollection);
@@ -965,16 +1070,14 @@ class LengowImport
                     ]),
                     $logOutput
                 );
-                $success = false;
             }
         }
-        return $success;
     }
 
     /**
      * Get mail alert body and put mail attribute at true in order lengow record
      *
-     * @param EntityCollection $orderErrorCollection order errors ready to be send
+     * @param EntityCollection $orderErrorCollection order errors ready to be sent
      *
      * @return string
      */
@@ -991,7 +1094,7 @@ class LengowImport
         $mailBody = '<h2>'
             . $this->lengowLog->decodeMessage('lengow_log.mail_report.subject_report_mail')
             . '</h2><p><ul>';
-        /** @var OrderErrorEntity $orderError */
+        /** @var LengowOrderErrorEntity $orderError */
         foreach ($orderErrorCollection as $orderError) {
             $order = $this->lengowLog->decodeMessage('lengow_log.mail_report.order', null, [
                 'marketplace_sku' => $orderError->getOrder()->getMarketplaceSku(),
@@ -1001,7 +1104,7 @@ class LengowImport
                 : $support;
             $mailBody .= '<li>' . $order . ' - ' . $message . '</li>';
             $this->lengowOrderError->update($orderError->getId(), [
-                'mail' => true,
+                LengowOrderErrorDefinition::FIELD_MAIL => true,
             ]);
         }
         $mailBody .= '</ul></p>';
@@ -1021,12 +1124,43 @@ class LengowImport
     {
         // use of the php mail function because the different versions of Shopware do not have any service in common
         // Shopware 6.2 / 6.3 uses the SwiftMailer service and Shopware 6.4 uses the native Symfony Mailer service
-        // Shopware has a mail service but it does not have the same class name depending on the versions
+        // Shopware has a mail service, but it does not have the same class name depending on the versions
         $headers = [
             'MIME-Version: 1.0',
             'Content-type: text/html; charset=iso-8859-1',
             'From: Lengow <' . $this->lengowConfiguration->get('core.basicInformation.email') . '>',
         ];
         return mail($email, $subject, $body, implode("\r\n", $headers));
+    }
+
+    /**
+     * Record the date of the last import
+     *
+     * @param string $type (cron or manual)
+     */
+    private function setLastImport(string $type): void
+    {
+        $time = (string) time();
+        if ($type === self::TYPE_CRON) {
+            $this->lengowConfiguration->set(LengowConfiguration::LAST_UPDATE_CRON_SYNCHRONIZATION, $time);
+        } else {
+            $this->lengowConfiguration->set(LengowConfiguration::LAST_UPDATE_MANUAL_SYNCHRONIZATION, $time);
+        }
+    }
+
+    /**
+     * Set import to "in process" state
+     */
+    private function setInProcess(): void
+    {
+        $this->lengowConfiguration->set(LengowConfiguration::SYNCHRONIZATION_IN_PROGRESS, (string) time());
+    }
+
+    /**
+     * Set import to finished
+     */
+    private function setEnd(): void
+    {
+        $this->lengowConfiguration->set(LengowConfiguration::SYNCHRONIZATION_IN_PROGRESS, '');
     }
 }

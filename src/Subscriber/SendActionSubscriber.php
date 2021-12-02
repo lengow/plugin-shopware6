@@ -100,7 +100,7 @@ class SendActionSubscriber implements EventSubscriberInterface
             return;
         }
         $order = $this->lengowOrder->getOrderById($orderDelivery->getOrderId());
-        $currentOrderDeliveryState = $orderDelivery ? $orderDelivery->getStateMachineState() : null;
+        $currentOrderDeliveryState = $orderDelivery->getStateMachineState();
         if ($order
             && $currentOrderDeliveryState
             && $currentOrderDeliveryState->getTechnicalName() === OrderDeliveryStates::STATE_SHIPPED

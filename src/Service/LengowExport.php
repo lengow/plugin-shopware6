@@ -2,7 +2,7 @@
 
 namespace Lengow\Connector\Service;
 
-use \Exception;
+use Exception;
 use Doctrine\DBAL\Connection as DatabaseConnexion;
 use Shopware\Core\Checkout\Shipping\ShippingMethodEntity;
 use Shopware\Core\Content\Product\Aggregate\ProductConfiguratorSetting\ProductConfiguratorSettingCollection;
@@ -48,14 +48,8 @@ class LengowExport
     public const PARAM_UPDATE_EXPORT_DATE = 'update_export_date';
     public const PARAM_GET_PARAMS = 'get_params';
 
-    /**
-     * @var string manual export type
-     */
+    /* Export types */
     public const TYPE_MANUAL = 'manual';
-
-    /**
-     * @var string cron export type
-     */
     public const TYPE_CRON = 'cron';
 
     /**
@@ -233,7 +227,7 @@ class LengowExport
      * LengowExport constructor
      * @param LengowConfiguration $lengowConfiguration lengow config access
      * @param EntityRepositoryInterface $salesChannelRepository sales channel repository
-     * @param EntityRepositoryInterface $shippingMethodRepository, shipping method repository
+     * @param EntityRepositoryInterface $shippingMethodRepository shipping method repository
      * @param EntityRepositoryInterface $lengowProductRepository lengow product repository
      * @param EntityRepositoryInterface $currencyRepository currency repository
      * @param EntityRepositoryInterface $languageRepository language repository
@@ -431,7 +425,8 @@ class LengowExport
         } catch (LengowException $e) {
             $errorMessage = $e->getMessage();
         } catch (Exception $e) {
-            $errorMessage = '[Shopware error]: "' . $e->getMessage() . '" ' . $e->getFile() . ' | ' . $e->getLine();
+            $errorMessage = '[Shopware error]: "' . $e->getMessage()
+                . '" in ' . $e->getFile() . ' on line ' . $e->getLine();
         }
         if (isset($errorMessage)) {
             $decodedMessage = $this->lengowLog->decodeMessage($errorMessage, LengowTranslation::DEFAULT_ISO_CODE);
@@ -456,7 +451,7 @@ class LengowExport
     public function getProductIdsExport(array $LengowSelectionProductIds = []): array
     {
         $lengowProductIds = [];
-        // function can be use to retrieve specific product
+        // function can be used to retrieve specific product
         if ($LengowSelectionProductIds) {
             $lengowProductIds = array_merge($lengowProductIds, $LengowSelectionProductIds);
         } else if ($this->exportConfiguration[self::PARAM_SELECTION]
@@ -738,7 +733,7 @@ class LengowExport
                 ->search($lengowProductCriteria, Context::createDefaultContext())
                 ->getEntities()
                 ->getElements();
-            foreach($lengowProductArray as $id => $product) {
+            foreach($lengowProductArray as $product) {
                 $lengowProductIds[] = $product->getProductId();
             }
             if ($this->exportConfiguration[self::PARAM_PRODUCT_IDS]) {
@@ -926,7 +921,7 @@ class LengowExport
     private function getExportLanguage($languageIso = null): ?LanguageEntity
     {
         $context = Context::createDefaultContext();
-        // if language is specified, check if it exist and retrieve it
+        // if language is specified, check if it exists and retrieve it
         if ($languageIso) {
             $criteria = new Criteria();
             $criteria->addFilter(new EqualsFilter('translationCode.code', $languageIso))
@@ -972,7 +967,7 @@ class LengowExport
      */
     private function getExportCurrency($currencyIso = null): ?CurrencyEntity
     {
-        // if currency is specified, check if it exist and retrieve it
+        // if currency is specified, check if it exists and retrieve it
         if ($currencyIso) {
             $currencyCriteria = new Criteria();
             $currencyCriteria->addFilter(new EqualsFilter('isoCode', $currencyIso));

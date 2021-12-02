@@ -26,6 +26,11 @@ class ProductDefinition extends EntityDefinition
 {
     public const ENTITY_NAME = 'lengow_product';
 
+    /* Setting fields */
+    public const FIELD_ID = 'id';
+    public const FIELD_PRODUCT_ID = 'productId';
+    public const FIELD_SALES_CHANNEL_ID = 'salesChannelId';
+
     /**
      * @return string
      */
@@ -49,9 +54,9 @@ class ProductDefinition extends EntityDefinition
     {
         return new FieldCollection(
             [
-                (new IdField('id', 'id'))->addFlags(new Required(), new PrimaryKey()),
-                (new FkField('product_id', 'productId', ShopwareProductDefinition::class)),
-                (new FkField('sales_channel_id', 'salesChannelId', ShopwareSalesChannelDefinition::class)),
+                (new IdField('id', self::FIELD_ID))->addFlags(new Required(), new PrimaryKey()),
+                (new FkField('product_id', self::FIELD_PRODUCT_ID, ShopwareProductDefinition::class)),
+                (new FkField('sales_channel_id', self::FIELD_SALES_CHANNEL_ID, ShopwareSalesChannelDefinition::class)),
             ]
         );
     }

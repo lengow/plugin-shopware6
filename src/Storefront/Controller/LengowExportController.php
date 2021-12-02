@@ -3,7 +3,6 @@
 namespace Lengow\Connector\Storefront\Controller;
 
 use Shopware\Core\Framework\Routing\Annotation\RouteScope;
-use Shopware\Core\System\SalesChannel\SalesChannelContext;
 use Symfony\Component\Routing\Annotation\Route;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\Response;
@@ -48,13 +47,12 @@ class LengowExportController extends LengowAbstractFrontController
      * Export Process
      *
      * @param Request $request Http request
-     * @param SalesChannelContext $context SalesChannel context
      *
      * @Route("/lengow/export", name="frontend.lengow.export", methods={"GET"})
      *
      * @return Response
      */
-    public function export(Request $request, SalesChannelContext $context): Response
+    public function export(Request $request): Response
     {
         $salesChannelName = $this->getSalesChannelName($request);
         if ($salesChannelName === null) {
@@ -74,7 +72,7 @@ class LengowExportController extends LengowAbstractFrontController
             return new Response($this->lengowExport->getExportParams());
         }
         if ($exportArgs[LengowExport::PARAM_MODE]) {
-            return new Response($this->modeSize($exportArgs[LengowExport::PARAM_MODE]));
+            return new Response((string) $this->modeSize($exportArgs[LengowExport::PARAM_MODE]));
         }
         $this->lengowExport->exec();
         return new Response();

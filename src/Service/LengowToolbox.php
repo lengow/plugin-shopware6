@@ -2,6 +2,7 @@
 
 namespace Lengow\Connector\Service;
 
+use Exception;
 use Lengow\Connector\Util\EnvironmentInfoProvider;
 
 /**
@@ -11,14 +12,23 @@ use Lengow\Connector\Util\EnvironmentInfoProvider;
 class LengowToolbox
 {
     /* Toolbox GET params */
+    public const PARAM_CREATED_FROM = 'created_from';
+    public const PARAM_CREATED_TO = 'created_to';
+    public const PARAM_DATE = 'date';
+    public const PARAM_DAYS = 'days';
+    public const PARAM_FORCE = 'force';
+    public const PARAM_MARKETPLACE_NAME = 'marketplace_name';
+    public const PARAM_MARKETPLACE_SKU = 'marketplace_sku';
+    public const PARAM_PROCESS = 'process';
+    public const PARAM_SHOP_ID = 'shop_id';
     public const PARAM_TOKEN = 'token';
     public const PARAM_TOOLBOX_ACTION = 'toolbox_action';
-    public const PARAM_DATE = 'date';
     public const PARAM_TYPE = 'type';
 
     /* Toolbox Actions */
     public const ACTION_DATA = 'data';
     public const ACTION_LOG = 'log';
+    public const ACTION_ORDER = 'order';
 
     /* Data type */
     public const DATA_TYPE_ALL = 'all';
@@ -78,9 +88,20 @@ class LengowToolbox
     public const CHECKSUM_FILE_DELETED = 'file_deleted';
     public const LOGS = 'logs';
 
+    /* Toolbox order data  */
+    public const ERRORS = 'errors';
+    public const ERROR_TYPE = 'type';
+    public const ERROR_MESSAGE = 'message';
+    public const ERROR_CODE = 'code';
+
+    /* PHP extensions */
+    private const PHP_EXTENSION_CURL = 'curl_version';
+    private const PHP_EXTENSION_SIMPLEXML = 'simplexml_load_file';
+    private const PHP_EXTENSION_JSON = 'json_decode';
+
     /* Toolbox files */
-    public const FILE_CHECKMD5 = 'checkmd5.csv';
-    public const FILE_TEST = 'test.txt';
+    private const FILE_CHECKMD5 = 'checkmd5.csv';
+    private const FILE_TEST = 'test.txt';
 
     /**
      * @var array valid toolbox actions
@@ -88,6 +109,7 @@ class LengowToolbox
     private $toolboxActions = [
         self::ACTION_DATA,
         self::ACTION_LOG,
+        self::ACTION_ORDER,
     ];
 
     /**
@@ -155,7 +177,7 @@ class LengowToolbox
      *
      * @return array
      */
-    public function getData($type = self::DATA_TYPE_CMS): array
+    public function getData(string $type = self::DATA_TYPE_CMS): array
     {
         switch ($type) {
             case self::DATA_TYPE_ALL:
@@ -191,6 +213,27 @@ class LengowToolbox
     }
 
     /**
+     * Start order synchronization based on specific parameters
+     *
+     * @param array $params synchronization parameters
+     *
+     * @return array
+     */
+    public function syncOrders(array $params = []): array
+    {
+        // get all params for order synchronization
+        $params = $this->filterParamsForSync($params);
+        $this->lengowImport->init($params);
+        $result = $this->lengowImport->exec();
+        // if global error return error message and request http code
+        if (isset($result[LengowImport::ERRORS][0])) {
+            return $this->generateErrorReturn(LengowConnector::CODE_403, $result[LengowImport::ERRORS][0]);
+        }
+        unset($result[LengowImport::ERRORS]);
+        return $result;
+    }
+
+    /**
      * Is toolbox action
      *
      * @param string $action toolbox action
@@ -209,7 +252,7 @@ class LengowToolbox
      */
     public static function isCurlActivated(): bool
     {
-        return function_exists('curl_version');
+        return function_exists(self::PHP_EXTENSION_CURL);
     }
 
     /**
@@ -370,7 +413,7 @@ class LengowToolbox
         $fileName = $pluginPath . $sep . EnvironmentInfoProvider::FOLDER_CONFIG . $sep . self::FILE_CHECKMD5;
         if (file_exists($fileName)) {
             $md5Available = true;
-            if (($file = fopen($fileName, 'r')) !== false) {
+            if (($file = fopen($fileName, 'rb')) !== false) {
                 while (($data = fgetcsv($file, 1000, '|')) !== false) {
                     $fileCounter++;
                     $shortPath = $data[0];
@@ -391,9 +434,10 @@ class LengowToolbox
         }
         $fileModifiedCounter = count($fileModified);
         $fileDeletedCounter = count($fileDeleted);
+        $md5Success = $md5Available && !($fileModifiedCounter > 0) && !($fileDeletedCounter > 0);
         return [
             self::CHECKSUM_AVAILABLE => $md5Available,
-            self::CHECKSUM_SUCCESS => !$md5Available || !($fileModifiedCounter > 0) || !($fileModifiedCounter > 0),
+            self::CHECKSUM_SUCCESS => $md5Success,
             self::CHECKSUM_NUMBER_FILES_CHECKED => $fileCounter,
             self::CHECKSUM_NUMBER_FILES_MODIFIED => $fileModifiedCounter,
             self::CHECKSUM_NUMBER_FILES_DELETED => $fileDeletedCounter,
@@ -427,7 +471,7 @@ class LengowToolbox
      */
     private function isSimpleXMLActivated(): bool
     {
-        return function_exists('simplexml_load_file');
+        return function_exists(self::PHP_EXTENSION_SIMPLEXML);
     }
 
     /**
@@ -437,7 +481,7 @@ class LengowToolbox
      */
     private function isJsonActivated(): bool
     {
-        return function_exists('json_decode');
+        return function_exists(self::PHP_EXTENSION_JSON);
     }
 
     /**
@@ -451,14 +495,66 @@ class LengowToolbox
         $pluginPath = $this->environmentInfoProvider->getPluginPath();
         $filePath = $pluginPath . $sep . EnvironmentInfoProvider::FOLDER_CONFIG . $sep . self::FILE_TEST;
         try {
-            $file = fopen($filePath, 'w+');
+            $file = fopen($filePath, 'wb+');
             if (!$file) {
                 return false;
             }
             unlink($filePath);
             return true;
-        } catch (\Exception $e) {
+        } catch (Exception $e) {
             return false;
         }
+    }
+
+    /**
+     * Filter parameters for order synchronization
+     *
+     * @param array $params synchronization params
+     *
+     * @return array
+     */
+    private function filterParamsForSync(array $params = []): array
+    {
+        $paramsFiltered = [LengowImport::PARAM_TYPE => LengowImport::TYPE_TOOLBOX];
+        if (isset(
+            $params[self::PARAM_MARKETPLACE_SKU],
+            $params[self::PARAM_MARKETPLACE_NAME],
+            $params[self::PARAM_SHOP_ID]
+        )) {
+            // get all parameters to synchronize a specific order
+            $paramsFiltered[LengowImport::PARAM_MARKETPLACE_SKU] = $params[self::PARAM_MARKETPLACE_SKU];
+            $paramsFiltered[LengowImport::PARAM_MARKETPLACE_NAME] = $params[self::PARAM_MARKETPLACE_NAME];
+            $paramsFiltered[LengowImport::PARAM_SALES_CHANNEL_ID] = $params[self::PARAM_SHOP_ID];
+        } elseif (isset($params[self::PARAM_CREATED_FROM], $params[self::PARAM_CREATED_TO])) {
+            // get all parameters to synchronize over a fixed period
+            $paramsFiltered[LengowImport::PARAM_CREATED_FROM] = $params[self::PARAM_CREATED_FROM];
+            $paramsFiltered[LengowImport::PARAM_CREATED_TO] = $params[self::PARAM_CREATED_TO];
+        } elseif (isset($params[self::PARAM_DAYS])) {
+            // get all parameters to synchronize over a time interval
+            $paramsFiltered[LengowImport::PARAM_DAYS] = (int) $params[self::PARAM_DAYS];
+        }
+        // force order synchronization by removing pending errors
+        if (isset($params[self::PARAM_FORCE])) {
+            $paramsFiltered[LengowImport::PARAM_FORCE_SYNC] = (bool) $params[self::PARAM_FORCE];
+        }
+        return $paramsFiltered;
+    }
+
+    /**
+     * Generates an error return for the Toolbox webservice
+     *
+     * @param int $httpCode request http code
+     * @param string $error error message
+     *
+     * @return array
+     */
+    private function generateErrorReturn(int $httpCode, string $error): array
+    {
+        return [
+            self::ERRORS => [
+                self::ERROR_MESSAGE => $this->lengowLog->decodeMessage($error, LengowTranslation::DEFAULT_ISO_CODE),
+                self::ERROR_CODE => $httpCode,
+            ],
+        ];
     }
 }

@@ -29,6 +29,14 @@ class OrderErrorDefinition extends EntityDefinition
 {
     public const ENTITY_NAME = 'lengow_order_error';
 
+    /* Order error fields */
+    public const FIELD_ID = 'id';
+    public const FIELD_LENGOW_ORDER_ID = 'lengowOrderId';
+    public const FIELD_MESSAGE = 'message';
+    public const FIELD_TYPE = 'type';
+    public const FIELD_IS_FINISHED = 'isFinished';
+    public const FIELD_MAIL = 'mail';
+
     /**
      * @return string
      */
@@ -51,8 +59,8 @@ class OrderErrorDefinition extends EntityDefinition
     public function getDefaults(): array
     {
         return [
-            'isFinished' => false,
-            'mail' => false,
+            self::FIELD_IS_FINISHED => false,
+            self::FIELD_MAIL => false,
         ];
     }
 
@@ -63,14 +71,14 @@ class OrderErrorDefinition extends EntityDefinition
     {
         return new FieldCollection(
             [
-                (new IdField('id', 'id'))->addFlags(new Required(), new PrimaryKey()),
-                (new IdField('lengow_order_id', 'lengowOrderId')),
+                (new IdField('id', self::FIELD_ID))->addFlags(new Required(), new PrimaryKey()),
+                (new IdField('lengow_order_id', self::FIELD_LENGOW_ORDER_ID)),
                 (new OneToOneAssociationField('order', 'lengow_order_id', 'id', LengowOrderDefinition::class))
                     ->addFlags(new setNullOnDelete()),
-                (new StringField('message', 'message')),
-                (new IntField('type', 'type'))->addFlags(new Required()),
-                (new BoolField('is_finished', 'isFinished'))->addFlags(new Required()),
-                (new BoolField('mail', 'mail'))->addFlags(new Required()),
+                (new StringField('message', self::FIELD_MESSAGE)),
+                (new IntField('type', self::FIELD_TYPE))->addFlags(new Required()),
+                (new BoolField('is_finished', self::FIELD_IS_FINISHED))->addFlags(new Required()),
+                (new BoolField('mail', self::FIELD_MAIL))->addFlags(new Required()),
             ]
         );
     }

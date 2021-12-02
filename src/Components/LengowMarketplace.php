@@ -2,13 +2,14 @@
 
 namespace Lengow\Connector\Components;
 
-use \Exception;
+use Exception;
 use Shopware\Core\Checkout\Order\OrderEntity;
 use Shopware\Core\Checkout\Order\Aggregate\OrderDelivery\OrderDeliveryEntity;
 use Lengow\Connector\Entity\Lengow\Order\OrderEntity as LengowOrderEntity;
 use Lengow\Connector\Exception\LengowException;
 use Lengow\Connector\Service\LengowAction;
 use Lengow\Connector\Service\LengowConfiguration;
+use Lengow\Connector\Service\LengowImport;
 use Lengow\Connector\Service\LengowLog;
 
 /**
@@ -71,14 +72,14 @@ class LengowMarketplace
      * Construct a new Marketplace instance with xml configuration
      *
      * @param string $marketplaceCode code of the marketplace
-     * @param object $marketplaceData marketplace data
+     * @param mixed $marketplaceData marketplace data
      * @param LengowAction $lengowAction Lengow action service
      * @param LengowLog $lengowLog Lengow log service
      * @param LengowConfiguration $lengowConfiguration Lengow configuration service
      */
     public function __construct(
         string $marketplaceCode,
-        object $marketplaceData,
+        $marketplaceData,
         LengowAction $lengowAction,
         Lengowlog $lengowLog,
         lengowConfiguration $lengowConfiguration
@@ -112,8 +113,8 @@ class LengowMarketplace
                         $validValues[(string) $code] = (string) ($validValue->label ?? $validValue);
                     }
                 }
-                $defaultValue = (string) ($argDescription->default_value ?? '');
-                $acceptFreeValue = (bool) ($argDescription->accept_free_values ?? true);
+                $defaultValue = $argDescription->default_value ?? '';
+                $acceptFreeValue = $argDescription->accept_free_values ?? true;
                 $this->argValues[(string) $argKey] = [
                     'default_value' => $defaultValue,
                     'accept_free_values' => $acceptFreeValue,
@@ -251,8 +252,8 @@ class LengowMarketplace
         if ($orderLineId !== null) {
             $params[LengowAction::ARG_LINE] = $orderLineId;
         }
-        $params['marketplace_order_id'] = $lengowOrder->getMarketplaceSku();
-        $params['marketplace'] = $lengowOrder->getMarketplaceName();
+        $params[LengowImport::ARG_MARKETPLACE_ORDER_ID] = $lengowOrder->getMarketplaceSku();
+        $params[LengowImport::ARG_MARKETPLACE] = $lengowOrder->getMarketplaceName();
         $params[LengowAction::ARG_ACTION_TYPE] = $action;
         // checks whether the action is already created to not return an action
         if ($this->lengowAction->canSendAction($params, $order)) {
@@ -505,6 +506,6 @@ class LengowMarketplace
         if ($strict) {
             return $pattern === $subject;
         }
-        return preg_match('`.*?' . $pattern . '.*?`i', $subject) ? true : false;
+        return (bool) preg_match('`.*?' . $pattern . '.*?`i', $subject);
     }
 }

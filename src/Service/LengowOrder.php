@@ -2,7 +2,7 @@
 
 namespace Lengow\Connector\Service;
 
-use \Exception;
+use Exception;
 use Shopware\Core\Checkout\Order\Aggregate\OrderDelivery\OrderDeliveryCollection;
 use Shopware\Core\Checkout\Order\Aggregate\OrderDelivery\OrderDeliveryDefinition;
 use Shopware\Core\Checkout\Order\Aggregate\OrderDelivery\OrderDeliveryEntity;
@@ -27,9 +27,11 @@ use Shopware\Core\System\StateMachine\Aggregation\StateMachineTransition\StateMa
 use Shopware\Core\System\StateMachine\StateMachineRegistry;
 use Shopware\Core\System\StateMachine\Transition;
 use Lengow\Connector\Factory\LengowMarketplaceFactory;
-use Lengow\Connector\Entity\Lengow\Order\OrderEntity as LengowOrderEntity;
 use Lengow\Connector\Entity\Lengow\Order\OrderCollection as LengowOrderCollection;
+use Lengow\Connector\Entity\Lengow\Order\OrderDefinition as LengowOrderDefinition;
+use Lengow\Connector\Entity\Lengow\Order\OrderEntity as LengowOrderEntity;
 use Lengow\Connector\Exception\LengowException;
+use Lengow\Connector\Util\EnvironmentInfoProvider;
 
 /**
  * Class LengowOrder
@@ -37,80 +39,30 @@ use Lengow\Connector\Exception\LengowException;
  */
 class LengowOrder
 {
-    /**
-     * @var int order process state for order not imported
-     */
+    /* Order process states */
     public const PROCESS_STATE_NEW = 0;
-
-    /**
-     * @var int order process state for order imported
-     */
     public const PROCESS_STATE_IMPORT = 1;
-
-    /**
-     * @var int order process state for order finished
-     */
     public const PROCESS_STATE_FINISH = 2;
 
-    /**
-     * @var string order state accepted
-     */
+    /* Order states */
     public const STATE_ACCEPTED = 'accepted';
-
-    /**
-     * @var string order state waiting_shipment
-     */
     public const STATE_WAITING_SHIPMENT = 'waiting_shipment';
-
-    /**
-     * @var string order state shipped
-     */
     public const STATE_SHIPPED = 'shipped';
-
-    /**
-     * @var string order state closed
-     */
     public const STATE_CLOSED = 'closed';
-
-    /**
-     * @var string order state refused
-     */
     public const STATE_REFUSED = 'refused';
-
-    /**
-     * @var string order state canceled
-     */
     public const STATE_CANCELED = 'canceled';
-
-    /**
-     * @var string order state refunded
-     */
     public const STATE_REFUNDED = 'refunded';
+
+    /* Order types */
+    public const TYPE_PRIME = 'is_prime';
+    public const TYPE_EXPRESS = 'is_express';
+    public const TYPE_BUSINESS = 'is_business';
+    public const TYPE_DELIVERED_BY_MARKETPLACE = 'is_delivered_by_marketplace';
 
     /**
      * @var string order state lengow technical error
      */
     public const STATE_TECHNICAL_ERROR = 'technical_error';
-
-    /**
-     * @var string order type prime
-     */
-    public const TYPE_PRIME = 'is_prime';
-
-    /**
-     * @var string order type express
-     */
-    public const TYPE_EXPRESS = 'is_express';
-
-    /**
-     * @var string order type business
-     */
-    public const TYPE_BUSINESS = 'is_business';
-
-    /**
-     * @var string order type delivered by marketplace
-     */
-    public const TYPE_DELIVERED_BY_MARKETPLACE = 'is_delivered_by_marketplace';
 
     /**
      * @var EntityRepositoryInterface Shopware order repository
@@ -130,7 +82,7 @@ class LengowOrder
     /**
      * @var StateMachineRegistry Shopware state machine registry
      */
-    protected $stateMachineRegistry;
+    private $stateMachineRegistry;
 
     /**
      * @var EntityRepositoryInterface $lengowOrderRepository Lengow order repository
@@ -178,35 +130,122 @@ class LengowOrder
      * updated  => Fields allowed when updating registration
      */
     private $fieldList = [
-        'orderId' => ['required' => false, 'updated' => true],
-        'orderSku' => ['required' => false, 'updated' => true],
-        'salesChannelId' => ['required' => true, 'updated' => false],
-        'deliveryAddressId' => ['required' => true, 'updated' => false],
-        'deliveryCountryIso' => ['required' => false, 'updated' => true],
-        'marketplaceSku' => ['required' => true, 'updated' => false],
-        'marketplaceName' => ['required' => true, 'updated' => false],
-        'marketplaceLabel' => ['required' => true, 'updated' => false],
-        'orderLengowState' => ['required' => true, 'updated' => true],
-        'orderProcessState' => ['required' => true, 'updated' => true],
-        'orderDate' => ['required' => true, 'updated' => false],
-        'orderItem' => ['required' => false, 'updated' => true],
-        'orderTypes' => ['required' => true, 'updated' => false],
-        'currency' => ['required' => false, 'updated' => true],
-        'totalPaid' => ['required' => false, 'updated' => true],
-        'commission' => ['required' => false, 'updated' => true],
-        'customerName' => ['required' => false, 'updated' => true],
-        'customerEmail' => ['required' => false, 'updated' => true],
-        'customerVatNumber' => ['required' => false, 'updated' => true],
-        'carrier' => ['required' => false, 'updated' => true],
-        'carrierMethod' => ['required' => false, 'updated' => true],
-        'carrierTracking' => ['required' => false, 'updated' => true],
-        'carrierIdRelay' => ['required' => false, 'updated' => true],
-        'sentMarketplace' => ['required' => false, 'updated' => true],
-        'isInError' => ['required' => false, 'updated' => true],
-        'isReimported' => ['required' => false, 'updated' => true],
-        'message' => ['required' => true, 'updated' => true],
-        'importedAt' => ['required' => false, 'updated' => true],
-        'extra' => ['required' => false, 'updated' => true],
+        LengowOrderDefinition::FIELD_ORDER_ID => [
+            EnvironmentInfoProvider::FIELD_REQUIRED => false,
+            EnvironmentInfoProvider::FIELD_CAN_BE_UPDATED => true,
+        ],
+        LengowOrderDefinition::FIELD_ORDER_SKU => [
+            EnvironmentInfoProvider::FIELD_REQUIRED => false,
+            EnvironmentInfoProvider::FIELD_CAN_BE_UPDATED => true,
+        ],
+        LengowOrderDefinition::FIELD_SALES_CHANNEL_ID => [
+            EnvironmentInfoProvider::FIELD_REQUIRED => true,
+            EnvironmentInfoProvider::FIELD_CAN_BE_UPDATED => false,
+        ],
+        LengowOrderDefinition::FIELD_DELIVERY_ADDRESS_ID => [
+            EnvironmentInfoProvider::FIELD_REQUIRED => true,
+            EnvironmentInfoProvider::FIELD_CAN_BE_UPDATED => false,
+        ],
+        LengowOrderDefinition::FIELD_DELIVERY_COUNTRY_ISO => [
+            EnvironmentInfoProvider::FIELD_REQUIRED => false,
+            EnvironmentInfoProvider::FIELD_CAN_BE_UPDATED => true,
+        ],
+        LengowOrderDefinition::FIELD_MARKETPLACE_SKU => [
+            EnvironmentInfoProvider::FIELD_REQUIRED => true,
+            EnvironmentInfoProvider::FIELD_CAN_BE_UPDATED => false,
+        ],
+        LengowOrderDefinition::FIELD_MARKETPLACE_NAME => [
+            EnvironmentInfoProvider::FIELD_REQUIRED => true,
+            EnvironmentInfoProvider::FIELD_CAN_BE_UPDATED => false,
+        ],
+        LengowOrderDefinition::FIELD_MARKETPLACE_LABEL => [
+            EnvironmentInfoProvider::FIELD_REQUIRED => true,
+            EnvironmentInfoProvider::FIELD_CAN_BE_UPDATED => false,
+        ],
+        LengowOrderDefinition::FIELD_ORDER_LENGOW_STATE => [
+            EnvironmentInfoProvider::FIELD_REQUIRED => true,
+            EnvironmentInfoProvider::FIELD_CAN_BE_UPDATED => true,
+        ],
+        LengowOrderDefinition::FIELD_ORDER_PROCESS_STATE => [
+            EnvironmentInfoProvider::FIELD_REQUIRED => true,
+            EnvironmentInfoProvider::FIELD_CAN_BE_UPDATED => true,
+        ],
+        LengowOrderDefinition::FIELD_ORDER_DATE => [
+            EnvironmentInfoProvider::FIELD_REQUIRED => true,
+            EnvironmentInfoProvider::FIELD_CAN_BE_UPDATED => false,
+        ],
+        LengowOrderDefinition::FIELD_ORDER_ITEM => [
+            EnvironmentInfoProvider::FIELD_REQUIRED => false,
+            EnvironmentInfoProvider::FIELD_CAN_BE_UPDATED => true,
+        ],
+        LengowOrderDefinition::FIELD_ORDER_TYPES => [
+            EnvironmentInfoProvider::FIELD_REQUIRED => true,
+            EnvironmentInfoProvider::FIELD_CAN_BE_UPDATED => false,
+        ],
+        LengowOrderDefinition::FIELD_CURRENCY => [
+            EnvironmentInfoProvider::FIELD_REQUIRED => false,
+            EnvironmentInfoProvider::FIELD_CAN_BE_UPDATED => true,
+        ],
+        LengowOrderDefinition::FIELD_TOTAL_PAID => [
+            EnvironmentInfoProvider::FIELD_REQUIRED => false,
+            EnvironmentInfoProvider::FIELD_CAN_BE_UPDATED => true,
+        ],
+        LengowOrderDefinition::FIELD_COMMISSION => [
+            EnvironmentInfoProvider::FIELD_REQUIRED => false,
+            EnvironmentInfoProvider::FIELD_CAN_BE_UPDATED => true,
+        ],
+        LengowOrderDefinition::FIELD_CUSTOMER_NAME => [
+            EnvironmentInfoProvider::FIELD_REQUIRED => false,
+            EnvironmentInfoProvider::FIELD_CAN_BE_UPDATED => true,
+        ],
+        LengowOrderDefinition::FIELD_CUSTOMER_EMAIL => [
+            EnvironmentInfoProvider::FIELD_REQUIRED => false,
+            EnvironmentInfoProvider::FIELD_CAN_BE_UPDATED => true,
+        ],
+        LengowOrderDefinition::FIELD_CUSTOMER_VAT_NUMBER => [
+            EnvironmentInfoProvider::FIELD_REQUIRED => false,
+            EnvironmentInfoProvider::FIELD_CAN_BE_UPDATED => true,
+        ],
+        LengowOrderDefinition::FIELD_CARRIER => [
+            EnvironmentInfoProvider::FIELD_REQUIRED => false,
+            EnvironmentInfoProvider::FIELD_CAN_BE_UPDATED => true,
+        ],
+        LengowOrderDefinition::FIELD_CARRIER_METHOD => [
+            EnvironmentInfoProvider::FIELD_REQUIRED => false,
+            EnvironmentInfoProvider::FIELD_CAN_BE_UPDATED => true,
+        ],
+        LengowOrderDefinition::FIELD_CARRIER_TRACKING => [
+            EnvironmentInfoProvider::FIELD_REQUIRED => false,
+            EnvironmentInfoProvider::FIELD_CAN_BE_UPDATED => true,
+        ],
+        LengowOrderDefinition::FIELD_CARRIER_RELAY_ID => [
+            EnvironmentInfoProvider::FIELD_REQUIRED => false,
+            EnvironmentInfoProvider::FIELD_CAN_BE_UPDATED => true,
+        ],
+        LengowOrderDefinition::FIELD_SENT_MARKETPLACE => [
+            EnvironmentInfoProvider::FIELD_REQUIRED => false,
+            EnvironmentInfoProvider::FIELD_CAN_BE_UPDATED => true,
+        ],
+        LengowOrderDefinition::FIELD_IS_IN_ERROR => [
+            EnvironmentInfoProvider::FIELD_REQUIRED => false,
+            EnvironmentInfoProvider::FIELD_CAN_BE_UPDATED => true,
+        ],
+        LengowOrderDefinition::FIELD_IS_REIMPORTED => [
+            EnvironmentInfoProvider::FIELD_REQUIRED => false,
+            EnvironmentInfoProvider::FIELD_CAN_BE_UPDATED => true,
+        ],
+        LengowOrderDefinition::FIELD_MESSAGE => [
+            EnvironmentInfoProvider::FIELD_REQUIRED => true,
+            EnvironmentInfoProvider::FIELD_CAN_BE_UPDATED => true,
+        ],
+        LengowOrderDefinition::FIELD_IMPORTED_AT => [
+            EnvironmentInfoProvider::FIELD_REQUIRED => false,
+            EnvironmentInfoProvider::FIELD_CAN_BE_UPDATED => true,
+        ],
+        LengowOrderDefinition::FIELD_EXTRA => [
+            EnvironmentInfoProvider::FIELD_REQUIRED => false,
+            EnvironmentInfoProvider::FIELD_CAN_BE_UPDATED => true,
+        ],
     ];
 
     /**
@@ -299,13 +338,13 @@ class LengowOrder
      */
     public function create(array $data = []): bool
     {
-        $data = array_merge($data, ['id' => Uuid::randomHex()]);
-        if (empty($data['orderProcessState'])) {
-            $data['orderProcessState'] = self::PROCESS_STATE_NEW;
+        $data = array_merge($data, [LengowOrderDefinition::FIELD_ID => Uuid::randomHex()]);
+        if (empty($data[LengowOrderDefinition::FIELD_ORDER_PROCESS_STATE])) {
+            $data[LengowOrderDefinition::FIELD_ORDER_PROCESS_STATE] = self::PROCESS_STATE_NEW;
         }
         // checks if all mandatory data is present
         foreach ($this->fieldList as $key => $value) {
-            if (!array_key_exists($key, $data) && $value['required']) {
+            if (!array_key_exists($key, $data) && $value[EnvironmentInfoProvider::FIELD_REQUIRED]) {
                 $this->lengowLog->write(
                     LengowLog::CODE_ORM,
                     $this->lengowLog->encodeMessage('log.orm.field_is_required', [
@@ -318,7 +357,8 @@ class LengowOrder
         try {
             $this->lengowOrderRepository->create([$data], Context::createDefaultContext());
         } catch (Exception $e) {
-            $errorMessage = '[Shopware error] "' . $e->getMessage() . '" ' . $e->getFile() . ' | ' . $e->getLine();
+            $errorMessage = '[Shopware error]: "' . $e->getMessage()
+                . '" in ' . $e->getFile() . ' on line ' . $e->getLine();
             $this->lengowLog->write(
                 LengowLog::CODE_ORM,
                 $this->lengowLog->encodeMessage('log.orm.record_insert_failed', [
@@ -342,15 +382,16 @@ class LengowOrder
     {
         // update only authorized values
         foreach ($this->fieldList as $key => $value) {
-            if (array_key_exists($key, $data) && !$value['updated']) {
+            if (array_key_exists($key, $data) && !$value[EnvironmentInfoProvider::FIELD_CAN_BE_UPDATED]) {
                 unset($data[$key]);
             }
         }
-        $data = array_merge($data, ['id' => $lengowOrderId]);
+        $data = array_merge($data, [LengowOrderDefinition::FIELD_ID => $lengowOrderId]);
         try {
             $this->lengowOrderRepository->update([$data], Context::createDefaultContext());
         } catch (Exception $e) {
-            $errorMessage = '[Shopware error] "' . $e->getMessage() . '" ' . $e->getFile() . ' | ' . $e->getLine();
+            $errorMessage = '[Shopware error]: "' . $e->getMessage()
+                . '" in ' . $e->getFile() . ' on line ' . $e->getLine();
             $this->lengowLog->write(
                 LengowLog::CODE_ORM,
                 $this->lengowLog->encodeMessage('log.orm.record_insert_failed', [
@@ -407,9 +448,9 @@ class LengowOrder
         $context = Context::createDefaultContext();
         $criteria = new Criteria();
         $criteria->addFilter(new MultiFilter(MultiFilter::CONNECTION_AND, [
-            new EqualsFilter('marketplaceSku', $marketplaceSku),
-            new EqualsFilter('marketplaceName', $marketplaceName),
-            new EqualsFilter('deliveryAddressId', $deliveryAddressId),
+            new EqualsFilter(LengowOrderDefinition::FIELD_MARKETPLACE_SKU, $marketplaceSku),
+            new EqualsFilter(LengowOrderDefinition::FIELD_MARKETPLACE_NAME, $marketplaceName),
+            new EqualsFilter(LengowOrderDefinition::FIELD_DELIVERY_ADDRESS_ID, $deliveryAddressId),
         ]));
         $criteria->addAssociation('order.deliveries')
             ->addAssociation('order.deliveries.shippingMethod')
@@ -464,7 +505,7 @@ class LengowOrder
         $criteria = new Criteria();
         $criteria->addFilter(new MultiFilter(MultiFilter::CONNECTION_AND, [
             new EqualsFilter('order.orderNumber', $orderNumber),
-            new EqualsFilter('deliveryAddressId', $deliveryAddressId),
+            new EqualsFilter(LengowOrderDefinition::FIELD_DELIVERY_ADDRESS_ID, $deliveryAddressId),
         ]));
         $criteria->addAssociation('order.deliveries')
             ->addAssociation('order.deliveries.shippingMethod')
@@ -496,13 +537,13 @@ class LengowOrder
         $context = Context::createDefaultContext();
         $criteria = new Criteria();
         $criteria->addFilter(new MultiFilter(MultiFilter::CONNECTION_AND, [
-            new EqualsFilter('marketplaceSku', $marketplaceSku),
-            new EqualsFilter('marketplaceName', $marketplaceName),
-            new EqualsFilter('deliveryAddressId', $deliveryAddressId),
+            new EqualsFilter(LengowOrderDefinition::FIELD_MARKETPLACE_SKU, $marketplaceSku),
+            new EqualsFilter(LengowOrderDefinition::FIELD_MARKETPLACE_NAME, $marketplaceName),
+            new EqualsFilter(LengowOrderDefinition::FIELD_DELIVERY_ADDRESS_ID, $deliveryAddressId),
         ]));
         $criteria->addFilter(new MultiFilter(MultiFilter::CONNECTION_OR, [
-            new EqualsFilter('orderProcessState', self::PROCESS_STATE_IMPORT),
-            new EqualsFilter('orderProcessState', self::PROCESS_STATE_FINISH),
+            new EqualsFilter(LengowOrderDefinition::FIELD_ORDER_PROCESS_STATE, self::PROCESS_STATE_IMPORT),
+            new EqualsFilter(LengowOrderDefinition::FIELD_ORDER_PROCESS_STATE, self::PROCESS_STATE_FINISH),
         ]));
         $criteria->addAssociation('order.deliveries')
             ->addAssociation('order.deliveries.shippingMethod')
@@ -536,8 +577,8 @@ class LengowOrder
         $orders = [];
         $criteria = new Criteria();
         $criteria->addFilter(new MultiFilter(MultiFilter::CONNECTION_AND, [
-            new EqualsFilter('marketplaceSku', $marketplaceSku),
-            new EqualsFilter('marketplaceName', $marketplaceName),
+            new EqualsFilter(LengowOrderDefinition::FIELD_MARKETPLACE_SKU, $marketplaceSku),
+            new EqualsFilter(LengowOrderDefinition::FIELD_MARKETPLACE_NAME, $marketplaceName),
         ]));
         $criteria->addAssociation('order.deliveries')
             ->addAssociation('order.deliveries.shippingMethod')
@@ -570,8 +611,8 @@ class LengowOrder
         $orders = [];
         $criteria = new Criteria();
         $criteria->addFilter(new MultiFilter(MultiFilter::CONNECTION_AND, [
-            new EqualsFilter('orderProcessState', self::PROCESS_STATE_IMPORT),
-            new EqualsFilter('isInError', false),
+            new EqualsFilter(LengowOrderDefinition::FIELD_ORDER_PROCESS_STATE, self::PROCESS_STATE_IMPORT),
+            new EqualsFilter(LengowOrderDefinition::FIELD_IS_IN_ERROR, false),
             new MultiFilter(MultiFilter::CONNECTION_OR, [
                 new EqualsFilter(
                     'order.stateMachineState.technicalName',
@@ -614,7 +655,7 @@ class LengowOrder
         $marketplaceList = [];
         $context = Context::createDefaultContext();
         $criteria = new Criteria();
-        $criteria->addGroupField(new FieldGrouping('marketplaceName'));
+        $criteria->addGroupField(new FieldGrouping(LengowOrderDefinition::FIELD_MARKETPLACE_NAME));
         /** @var LengowOrderCollection $lengowOrderCollection */
         $lengowOrderCollection = $this->lengowOrderRepository->search($criteria, $context)->getEntities();
         if ($lengowOrderCollection->count() !== 0) {
@@ -756,7 +797,8 @@ class LengowOrder
         try {
             $this->orderRepository->create([$orderData], Context::createDefaultContext());
         } catch (Exception $e) {
-            $errorMessage = '[Shopware error] "' . $e->getMessage() . '" ' . $e->getFile() . ' | ' . $e->getLine();
+            $errorMessage = '[Shopware error]: "' . $e->getMessage()
+                . '" in ' . $e->getFile() . ' on line ' . $e->getLine();
             $this->lengowLog->write(
                 LengowLog::CODE_ORM,
                 $this->lengowLog->encodeMessage('log.orm.record_insert_failed', [
@@ -793,7 +835,7 @@ class LengowOrder
      * @param OrderEntity $order Shopware order instance
      * @param LengowOrderEntity $lengowOrder Lengow order instance
      * @param string $orderStateLengow lengow order status
-     * @param object $packageData package data
+     * @param mixed $packageData package data
      *
      * @return string|null
      */
@@ -801,7 +843,7 @@ class LengowOrder
         OrderEntity $order,
         LengowOrderEntity $lengowOrder,
         string $orderStateLengow,
-        object $packageData
+        $packageData
     ): ?string
     {
         // finish actions if lengow order is shipped, closed, cancel or refunded
@@ -815,17 +857,17 @@ class LengowOrder
         // update Lengow order if necessary
         $data = [];
         if ($lengowOrder->getOrderLengowState() !== $orderStateLengow) {
-            $data['orderLengowState'] = $orderStateLengow;
+            $data[LengowOrderDefinition::FIELD_ORDER_LENGOW_STATE] = $orderStateLengow;
             if ($trackingCode) {
-                $data['carrierTracking'] = $trackingCode;
+                $data[LengowOrderDefinition::FIELD_CARRIER_TRACKING] = $trackingCode;
             }
         }
         if ($orderProcessState === self::PROCESS_STATE_FINISH) {
             if ($lengowOrder->getOrderProcessState() !== $orderProcessState) {
-                $data['orderProcessState'] = $orderProcessState;
+                $data[LengowOrderDefinition::FIELD_ORDER_PROCESS_STATE] = $orderProcessState;
             }
             if ($lengowOrder->isInError()) {
-                $data['isInError'] = false;
+                $data[LengowOrderDefinition::FIELD_IS_IN_ERROR] = false;
             }
         }
         if (!empty($data)) {
@@ -908,7 +950,7 @@ class LengowOrder
     public function setAsReImported(LengowOrderEntity $lengowOrder) : bool
     {
         return $this->update($lengowOrder->getId(), [
-            'isReimported' => true,
+            LengowOrderDefinition::FIELD_IS_REIMPORTED => true,
         ]);
     }
 
@@ -983,7 +1025,8 @@ class LengowOrder
         try {
             $this->orderDeliveryRepository->update([$data], Context::createDefaultContext());
         } catch (Exception $e) {
-            $errorMessage = '[Shopware error] "' . $e->getMessage() . '" ' . $e->getFile() . ' | ' . $e->getLine();
+            $errorMessage = '[Shopware error]: "' . $e->getMessage()
+                . '" in ' . $e->getFile() . ' on line ' . $e->getLine();
             $this->lengowLog->write(
                 LengowLog::CODE_ORM,
                 $this->lengowLog->encodeMessage('log.orm.record_insert_failed', [
@@ -1022,10 +1065,10 @@ class LengowOrder
             $merchantOrderIds[] = $shopwareOrder->getOrderNumber();
         }
         $body = [
-            'account_id' => (int) $this->lengowConfiguration->get(LengowConfiguration::ACCOUNT_ID),
-            'marketplace_order_id' => $lengowOrder->getMarketplaceSku(),
-            'marketplace' => $lengowOrder->getMarketplaceName(),
-            'merchant_order_id' => $merchantOrderIds,
+            LengowImport::ARG_ACCOUNT_ID => (int) $this->lengowConfiguration->get(LengowConfiguration::ACCOUNT_ID),
+            LengowImport::ARG_MARKETPLACE_ORDER_ID => $lengowOrder->getMarketplaceSku(),
+            LengowImport::ARG_MARKETPLACE => $lengowOrder->getMarketplaceName(),
+            LengowImport::ARG_MERCHANT_ORDER_ID => $merchantOrderIds,
         ];
         try {
             $result = $this->lengowConnector->patch(
@@ -1084,7 +1127,7 @@ class LengowOrder
             $this->lengowOrderError->finishOrderErrors($lengowOrder->getId(), LengowOrderError::TYPE_ERROR_SEND);
             if ($lengowOrder->isInError()) {
                 $this->update($lengowOrder->getId(), [
-                    'isInError' => false,
+                    LengowOrderDefinition::FIELD_IS_IN_ERROR => false,
                 ]);
             }
             $marketplace = $this->lengowMarketplaceFactory->create($lengowOrder->getMarketplaceName());
@@ -1092,7 +1135,7 @@ class LengowOrder
                 $orderLineIds = $this->lengowOrderLine->getOrderLineIdsByOrderId($order->getId());
                 // get order line ids by API for security
                 if (empty($orderLineIds)) {
-                    $orderLineCollection = $this->getOrderLineIdsByApi($lengowOrder);
+                    $orderLineIds = $this->getOrderLineIdsByApi($lengowOrder);
                 }
                 if (empty($orderLineIds)) {
                     throw new LengowException(
@@ -1108,12 +1151,13 @@ class LengowOrder
         } catch (LengowException $e) {
             $errorMessage = $e->getMessage();
         } catch (Exception $e) {
-            $errorMessage = 'Shopware error: "' . $e->getMessage() . '" ' . $e->getFile() . ' line ' . $e->getLine();
+            $errorMessage = '[Shopware error]: "' . $e->getMessage()
+                . '" in ' . $e->getFile() . ' on line ' . $e->getLine();
         }
         if (isset($errorMessage)) {
             if ($lengowOrder->getOrderProcessState() !== self::PROCESS_STATE_FINISH) {
                 $this->update($lengowOrder->getId(), [
-                    'isInError' => true,
+                    LengowOrderDefinition::FIELD_IS_IN_ERROR => true,
                 ]);
                 $this->lengowOrderError->create(
                     $lengowOrder->getId(),
@@ -1155,8 +1199,8 @@ class LengowOrder
             LengowConnector::GET,
             LengowConnector::API_ORDER,
             [
-                'marketplace_order_id' => $lengowOrder->getMarketplaceSku(),
-                'marketplace' => $lengowOrder->getMarketplaceName(),
+                LengowImport::ARG_MARKETPLACE_ORDER_ID => $lengowOrder->getMarketplaceSku(),
+                LengowImport::ARG_MARKETPLACE => $lengowOrder->getMarketplaceName(),
             ]
         );
         if (isset($results->count) && (int) $results->count === 0) {
@@ -1182,7 +1226,9 @@ class LengowOrder
     {
         $context = Context::createDefaultContext();
         $criteria = new Criteria();
-        $criteria->addFilter(new NotFilter(NotFilter::CONNECTION_AND, [new EqualsFilter('orderId', null)]));
+        $criteria->addFilter(
+            new NotFilter(NotFilter::CONNECTION_AND, [new EqualsFilter(LengowOrderDefinition::FIELD_ORDER_ID, null)])
+        );
         /** @var LengowOrderCollection $lengowOrderCollection */
         return $this->lengowOrderRepository->search($criteria, $context)->getEntities()->count();
     }
@@ -1196,7 +1242,7 @@ class LengowOrder
     {
         $context = Context::createDefaultContext();
         $criteria = new Criteria();
-        $criteria->addFilter(new EqualsFilter('isInError', true));
+        $criteria->addFilter(new EqualsFilter(LengowOrderDefinition::FIELD_IS_IN_ERROR, true));
         /** @var LengowOrderCollection $lengowOrderCollection */
         return $this->lengowOrderRepository->search($criteria, $context)->getEntities()->count();
     }
@@ -1210,7 +1256,9 @@ class LengowOrder
     {
         $context = Context::createDefaultContext();
         $criteria = new Criteria();
-        $criteria->addFilter(new EqualsFilter('orderProcessState', 1));
+        $criteria->addFilter(
+            new EqualsFilter(LengowOrderDefinition::FIELD_ORDER_PROCESS_STATE, self::PROCESS_STATE_IMPORT)
+        );
         /** @var LengowOrderCollection $lengowOrderCollection */
         return $this->lengowOrderRepository->search($criteria, $context)->getEntities()->count();
     }

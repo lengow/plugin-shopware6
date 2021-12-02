@@ -2,7 +2,7 @@
 
 namespace Lengow\Connector\Service;
 
-use \Exception;
+use Exception;
 use Shopware\Core\Framework\Context;
 use Shopware\Core\Framework\DataAbstractionLayer\EntityCollection;
 use Shopware\Core\Framework\DataAbstractionLayer\EntityRepositoryInterface;
@@ -11,6 +11,8 @@ use Shopware\Core\Framework\DataAbstractionLayer\Search\Filter\EqualsFilter;
 use Shopware\Core\Framework\DataAbstractionLayer\Search\Filter\MultiFilter;
 use Shopware\Core\Framework\Uuid\Uuid;
 use Lengow\Connector\Entity\Lengow\OrderError\OrderErrorCollection as LengowOrderErrorCollection;
+use Lengow\Connector\Entity\Lengow\OrderError\OrderErrorDefinition as LengowOrderErrorDefinition;
+use Lengow\Connector\Util\EnvironmentInfoProvider;
 
 /**
  * Class LengowOrderError
@@ -18,14 +20,8 @@ use Lengow\Connector\Entity\Lengow\OrderError\OrderErrorCollection as LengowOrde
  */
 class LengowOrderError
 {
-    /**
-     * @var int order error import type
-     */
+    /* Order error types */
     public const TYPE_ERROR_IMPORT = 1;
-
-    /**
-     * @var int order error send type
-     */
     public const TYPE_ERROR_SEND = 2;
 
     /**
@@ -44,11 +40,26 @@ class LengowOrderError
      * updated  => Fields allowed when updating registration
      */
     private $fieldList = [
-        'lengowOrderId' => ['required' => true, 'updated' => false],
-        'message' => ['required' => true, 'updated' => false],
-        'type' => ['required' => true, 'updated' => false],
-        'isFinished' => ['required' => false, 'updated' => true],
-        'mail' => ['required' => false, 'updated' => true],
+        LengowOrderErrorDefinition::FIELD_LENGOW_ORDER_ID => [
+            EnvironmentInfoProvider::FIELD_REQUIRED => true,
+            EnvironmentInfoProvider::FIELD_CAN_BE_UPDATED => false,
+        ],
+        LengowOrderErrorDefinition::FIELD_MESSAGE => [
+            EnvironmentInfoProvider::FIELD_REQUIRED => true,
+            EnvironmentInfoProvider::FIELD_CAN_BE_UPDATED => false,
+        ],
+        LengowOrderErrorDefinition::FIELD_TYPE => [
+            EnvironmentInfoProvider::FIELD_REQUIRED => true,
+            EnvironmentInfoProvider::FIELD_CAN_BE_UPDATED => false,
+        ],
+        LengowOrderErrorDefinition::FIELD_IS_FINISHED => [
+            EnvironmentInfoProvider::FIELD_REQUIRED => false,
+            EnvironmentInfoProvider::FIELD_CAN_BE_UPDATED => true,
+        ],
+        LengowOrderErrorDefinition::FIELD_MAIL => [
+            EnvironmentInfoProvider::FIELD_REQUIRED => false,
+            EnvironmentInfoProvider::FIELD_CAN_BE_UPDATED => true,
+        ],
     ];
 
     /**
@@ -75,14 +86,14 @@ class LengowOrderError
     public function create(string $lengowOrderId, string $message, int $type = self::TYPE_ERROR_IMPORT): bool
     {
         $data = [
-            'id' => Uuid::randomHex(),
-            'lengowOrderId' => $lengowOrderId,
-            'message' => $message,
-            'type' => $type,
+            LengowOrderErrorDefinition::FIELD_ID => Uuid::randomHex(),
+            LengowOrderErrorDefinition::FIELD_LENGOW_ORDER_ID => $lengowOrderId,
+            LengowOrderErrorDefinition::FIELD_MESSAGE => $message,
+            LengowOrderErrorDefinition::FIELD_TYPE => $type,
         ];
         // checks if all mandatory data is present
         foreach ($this->fieldList as $key => $value) {
-            if (!array_key_exists($key, $data) && $value['required']) {
+            if (!array_key_exists($key, $data) && $value[EnvironmentInfoProvider::FIELD_REQUIRED]) {
                 $this->lengowLog->write(
                     LengowLog::CODE_ORM,
                     $this->lengowLog->encodeMessage('log.orm.field_is_required', [
@@ -95,7 +106,8 @@ class LengowOrderError
         try {
             $this->lengowOrderErrorRepository->create([$data], Context::createDefaultContext());
         } catch (Exception $e) {
-            $errorMessage = '[Shopware error] "' . $e->getMessage() . '" ' . $e->getFile() . ' | ' . $e->getLine();
+            $errorMessage = '[Shopware error]: "' . $e->getMessage()
+                . '" in ' . $e->getFile() . ' on line ' . $e->getLine();
             $this->lengowLog->write(
                 LengowLog::CODE_ORM,
                 $this->lengowLog->encodeMessage('log.orm.record_insert_failed', [
@@ -119,15 +131,16 @@ class LengowOrderError
     {
         // update only authorized values
         foreach ($this->fieldList as $key => $value) {
-            if (array_key_exists($key, $data) && !$value['updated']) {
+            if (array_key_exists($key, $data) && !$value[EnvironmentInfoProvider::FIELD_CAN_BE_UPDATED]) {
                 unset($data[$key]);
             }
         }
-        $data = array_merge($data, ['id' => $orderErrorId]);
+        $data = array_merge($data, [LengowOrderErrorDefinition::FIELD_ID => $orderErrorId]);
         try {
             $this->lengowOrderErrorRepository->update([$data], Context::createDefaultContext());
         } catch (Exception $e) {
-            $errorMessage = '[Shopware error] "' . $e->getMessage() . '" ' . $e->getFile() . ' | ' . $e->getLine();
+            $errorMessage = '[Shopware error]: "' . $e->getMessage()
+                . '" in ' . $e->getFile() . ' on line ' . $e->getLine();
             $this->lengowLog->write(
                 LengowLog::CODE_ORM,
                 $this->lengowLog->encodeMessage('log.orm.record_insert_failed', [
@@ -159,8 +172,8 @@ class LengowOrderError
         $criteria->addFilter(new MultiFilter(MultiFilter::CONNECTION_AND, [
             new EqualsFilter('order.marketplaceSku', $marketplaceSku),
             new EqualsFilter('order.deliveryAddressId', $deliveryAddressId),
-            new EqualsFilter('type', $type),
-            new EqualsFilter('isFinished', false),
+            new EqualsFilter(LengowOrderErrorDefinition::FIELD_TYPE, $type),
+            new EqualsFilter(LengowOrderErrorDefinition::FIELD_IS_FINISHED, false),
         ]));
         /** @var LengowOrderErrorCollection $LengowOrderErrorCollection */
         $LengowOrderErrorCollection = $this->lengowOrderErrorRepository->search($criteria, $context)->getEntities();
@@ -185,10 +198,10 @@ class LengowOrderError
         $criteria = new Criteria();
         $criteria->addFilter(new EqualsFilter('order.id', $lengowOrderId));
         if ($type) {
-            $criteria->addFilter(new EqualsFilter('type', $type));
+            $criteria->addFilter(new EqualsFilter(LengowOrderErrorDefinition::FIELD_TYPE, $type));
         }
         if ($finished !== null) {
-            $criteria->addFilter(new EqualsFilter('isFinished', $finished));
+            $criteria->addFilter(new EqualsFilter(LengowOrderErrorDefinition::FIELD_IS_FINISHED, $finished));
         }
         /** @var LengowOrderErrorCollection $LengowOrderErrorCollection */
         $LengowOrderErrorCollection = $this->lengowOrderErrorRepository->search($criteria, $context)->getEntities();
@@ -213,12 +226,14 @@ class LengowOrderError
         $criteria = new Criteria();
         $criteria->addFilter(new MultiFilter(MultiFilter::CONNECTION_AND, [
             new EqualsFilter('order.id', $lengowOrderId),
-            new EqualsFilter('type', $type),
+            new EqualsFilter(LengowOrderErrorDefinition::FIELD_TYPE, $type),
         ]));
         /** @var LengowOrderErrorCollection $LengowOrderErrorCollection */
         $LengowOrderErrorCollection = $this->lengowOrderErrorRepository->search($criteria, $context)->getEntities();
         foreach ($LengowOrderErrorCollection as $lengowOrderError) {
-            $success = $this->update($lengowOrderError->getId(), ['isFinished' => true]);
+            $success = $this->update($lengowOrderError->getId(), [
+                LengowOrderErrorDefinition::FIELD_IS_FINISHED => true,
+            ]);
             if (!$success) {
                 $result = false;
             }
@@ -236,8 +251,8 @@ class LengowOrderError
         $context = Context::createDefaultContext();
         $criteria = new Criteria();
         $criteria->addFilter(new MultiFilter(MultiFilter::CONNECTION_AND, [
-            new EqualsFilter('isFinished', false),
-            new EqualsFilter('mail', false),
+            new EqualsFilter(LengowOrderErrorDefinition::FIELD_IS_FINISHED, false),
+            new EqualsFilter(LengowOrderErrorDefinition::FIELD_MAIL, false),
         ]));
         $criteria->addAssociation('order');
         /** @var LengowOrderErrorCollection $LengowOrderErrorCollection */

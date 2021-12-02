@@ -33,7 +33,7 @@ class StringCleaner
         );
         $str = preg_replace('/[\s]+/', ' ', $str);
         $str = trim($str);
-        $str = str_replace(
+        return str_replace(
             [
                 '&nbsp;',
                 '|',
@@ -70,7 +70,6 @@ class StringCleaner
             ],
             $str
         );
-        return $str;
     }
 
     /**
@@ -91,7 +90,7 @@ class StringCleaner
         $str = preg_replace($pattern, ' ', $str);
         $str = preg_replace('/[\s]+/', ' ', $str);
         $str = trim($str);
-        $str = str_replace(
+        return str_replace(
             [
                 '&nbsp;',
                 '|',
@@ -115,11 +114,10 @@ class StringCleaner
             ],
             $str
         );
-        return $str;
     }
 
     /**
-     * Replace all accented chars by their equivalent non accented chars
+     * Replace all accented chars by their equivalent non-accented chars
      *
      * @param string $str the content
      *

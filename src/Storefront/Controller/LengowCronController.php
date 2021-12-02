@@ -3,7 +3,6 @@
 namespace Lengow\Connector\Storefront\Controller;
 
 use Shopware\Core\Framework\Routing\Annotation\RouteScope;
-use Shopware\Core\System\SalesChannel\SalesChannelContext;
 use Symfony\Component\HttpFoundation\Response;
 use Symfony\Component\Routing\Annotation\Route;
 use Symfony\Component\HttpFoundation\Request;
@@ -81,13 +80,12 @@ class LengowCronController extends LengowAbstractFrontController
      * Cron Process (Import orders, check actions and send stats)
      *
      * @param Request $request Http Request
-     * @param SalesChannelContext $context SalesChannel context
      *
      * @return Response
      *
      * @Route("/lengow/cron", name="frontend.lengow.cron", methods={"GET"})
      */
-    public function cron(Request $request, SalesChannelContext $context): Response
+    public function cron(Request $request): Response
     {
         $accessErrorMessage = $this->checkAccess($request);
         if ($accessErrorMessage !== null) {
@@ -97,7 +95,7 @@ class LengowCronController extends LengowAbstractFrontController
         if ($cronArgs[LengowImport::PARAM_GET_SYNC] === null || $cronArgs[LengowImport::PARAM_GET_SYNC]) {
             return new Response(json_encode($this->lengowSync->getSyncData()));
         }
-        // sync catalogs id between Lengow and Shopware
+        // sync catalogs' id between Lengow and Shopware
         if ($cronArgs[LengowImport::PARAM_SYNC] === null
             || $cronArgs[LengowImport::PARAM_SYNC] === LengowSync::SYNC_CATALOG
         ) {
@@ -169,19 +167,20 @@ class LengowCronController extends LengowAbstractFrontController
     /**
      * Get all parameters from request
      * List params
-     * string sync                Number of products exported
-     * bool   debug_mode          Activate debug mode
-     * bool   log_output          See logs (1) or not (0)
-     * int    days                Import period
-     * string created_from        import of orders since
-     * string created_to          import of orders until
-     * int    limit               Number of orders to import
-     * string marketplace_sku     Lengow marketplace order id to import
-     * string marketplace_name    Lengow marketplace name to import
-     * int    sales_channel_id    Sales channel id to import
-     * int    delivery_address_id Lengow delivery address id to import
-     * bool   get_sync            See synchronisation parameters in json format (1) or not (0)
-     * bool   force               Force synchronisation (1) or not (0)
+     * string sync                Data type to synchronize
+     * bool   debug_mode          Activate debug mode (1) or not (0)
+     * bool   log_output          Display log messages (1) or not (0)
+     * int    days                Synchronization interval time
+     * string created_from        Synchronization of orders since
+     * string created_to          Synchronization of orders until
+     * int    limit               Maximum number of new orders created
+     * string marketplace_sku     Lengow marketplace order id to synchronize
+     * string marketplace_name    Lengow marketplace name to synchronize
+     * int    sales_channel_id    Sales channel id to synchronize
+     * int    delivery_address_id Lengow delivery address id to synchronize
+     * bool   get_sync            See synchronization parameters in json format (1) or not (0)
+     * bool   force               Force synchronization (1) or not (0)
+     * bool   force_sync          Force import order even if there are errors
      *
      * @param Request $request Http request
      *
@@ -207,6 +206,7 @@ class LengowCronController extends LengowAbstractFrontController
             ),
             LengowImport::PARAM_GET_SYNC => $request->query->get(LengowImport::PARAM_GET_SYNC) === '1',
             LengowImport::PARAM_FORCE => $request->query->get(LengowImport::PARAM_FORCE) === '1',
+            LengowImport::PARAM_FORCE_SYNC => $request->query->get(LengowImport::PARAM_FORCE_SYNC) === '1',
             LengowImport::PARAM_TYPE => LengowImport::TYPE_CRON,
         ];
     }

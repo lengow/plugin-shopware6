@@ -2,7 +2,7 @@
 
 namespace Lengow\Connector\Service;
 
-use \Exception;
+use Exception;
 use Shopware\Core\Checkout\Order\OrderEntity;
 use Shopware\Core\Framework\Context;
 use Shopware\Core\Framework\DataAbstractionLayer\EntityCollection;
@@ -13,9 +13,11 @@ use Shopware\Core\Framework\DataAbstractionLayer\Search\Filter\MultiFilter;
 use Shopware\Core\Framework\DataAbstractionLayer\Search\Filter\RangeFilter;
 use Shopware\Core\Framework\Uuid\Uuid;
 use Lengow\Connector\Entity\Lengow\Action\ActionCollection as LengowActionCollection;
+use Lengow\Connector\Entity\Lengow\Action\ActionDefinition as LengowActionDefinition;
 use Lengow\Connector\Entity\Lengow\Action\ActionEntity as LengowActionEntity;
 use Lengow\Connector\Entity\Lengow\Order\OrderEntity as LengowOrderEntity;
 use Lengow\Connector\Exception\LengowException;
+use Lengow\Connector\Util\EnvironmentInfoProvider;
 
 /**
  * Class LengowAction
@@ -23,79 +25,25 @@ use Lengow\Connector\Exception\LengowException;
  */
 class LengowAction
 {
-    /**
-     * @var integer action state for new action
-     */
+    /* Action states */
     public const STATE_NEW = 0;
-
-    /**
-     * @var integer action state for action finished
-     */
     public const STATE_FINISH = 1;
 
-    /**
-     * @var string action type ship
-     */
+    /* Action types */
     public const TYPE_SHIP = 'ship';
-
-    /**
-     * @var string action type cancel
-     */
     public const TYPE_CANCEL = 'cancel';
 
-    /**
-     * @var string action argument action type
-     */
+    /* Action API arguments */
     public const ARG_ACTION_TYPE = 'action_type';
-
-    /**
-     * @var string action argument line
-     */
     public const ARG_LINE = 'line';
-
-    /**
-     * @var string action argument carrier
-     */
     public const ARG_CARRIER = 'carrier';
-
-    /**
-     * @var string action argument carrier name
-     */
     public const ARG_CARRIER_NAME = 'carrier_name';
-
-    /**
-     * @var string action argument custom carrier
-     */
     public const ARG_CUSTOM_CARRIER = 'custom_carrier';
-
-    /**
-     * @var string action argument shipping method
-     */
     public const ARG_SHIPPING_METHOD = 'shipping_method';
-
-    /**
-     * @var string action argument tracking number
-     */
     public const ARG_TRACKING_NUMBER = 'tracking_number';
-
-    /**
-     * @var string action argument tracking url
-     */
     public const ARG_TRACKING_URL = 'tracking_url';
-
-    /**
-     * @var string action argument shipping price
-     */
     public const ARG_SHIPPING_PRICE = 'shipping_price';
-
-    /**
-     * @var string action argument shipping date
-     */
     public const ARG_SHIPPING_DATE = 'shipping_date';
-
-    /**
-     * @var string action argument delivery date
-     */
     public const ARG_DELIVERY_DATE = 'delivery_date';
 
     /**
@@ -140,13 +88,34 @@ class LengowAction
      * updated  => Fields allowed when updating registration
      */
     private $fieldList = [
-        'orderId' => ['required' => true, 'updated' => false],
-        'actionId' => ['required' => true, 'updated' => false],
-        'orderLineSku' => ['required' => false, 'updated' => false],
-        'actionType' => ['required' => true, 'updated' => false],
-        'retry' => ['required' => false, 'updated' => true],
-        'parameters' => ['required' => true, 'updated' => false],
-        'state' => ['required' => false, 'updated' => true],
+        LengowActionDefinition::FIELD_ORDER_ID => [
+            EnvironmentInfoProvider::FIELD_REQUIRED => true,
+            EnvironmentInfoProvider::FIELD_CAN_BE_UPDATED => false,
+        ],
+        LengowActionDefinition::FIELD_ACTION_ID => [
+            EnvironmentInfoProvider::FIELD_REQUIRED => true,
+            EnvironmentInfoProvider::FIELD_CAN_BE_UPDATED => false,
+        ],
+        LengowActionDefinition::FIELD_ORDER_LINE_SKU => [
+            EnvironmentInfoProvider::FIELD_REQUIRED => false,
+            EnvironmentInfoProvider::FIELD_CAN_BE_UPDATED => false,
+        ],
+        LengowActionDefinition::FIELD_ACTION_TYPE => [
+            EnvironmentInfoProvider::FIELD_REQUIRED => true,
+            EnvironmentInfoProvider::FIELD_CAN_BE_UPDATED => false,
+        ],
+        LengowActionDefinition::FIELD_RETRY => [
+            EnvironmentInfoProvider::FIELD_REQUIRED => false,
+            EnvironmentInfoProvider::FIELD_CAN_BE_UPDATED => true,
+        ],
+        LengowActionDefinition::FIELD_PARAMETERS => [
+            EnvironmentInfoProvider::FIELD_REQUIRED => true,
+            EnvironmentInfoProvider::FIELD_CAN_BE_UPDATED => false,
+        ],
+        LengowActionDefinition::FIELD_STATE => [
+            EnvironmentInfoProvider::FIELD_REQUIRED => false,
+            EnvironmentInfoProvider::FIELD_CAN_BE_UPDATED => true,
+        ],
     ];
 
     /**
@@ -179,13 +148,13 @@ class LengowAction
      */
     public function create(array $data): bool
     {
-        $data = array_merge($data, ['id' => Uuid::randomHex()]);
-        if (empty($data['state'])) {
-            $data['state'] = self::STATE_NEW;
+        $data = array_merge($data, [LengowActionDefinition::FIELD_ID => Uuid::randomHex()]);
+        if (empty($data[LengowActionDefinition::FIELD_STATE])) {
+            $data[LengowActionDefinition::FIELD_STATE] = self::STATE_NEW;
         }
         // checks if all mandatory data is present
         foreach ($this->fieldList as $key => $value) {
-            if (!array_key_exists($key, $data) && $value['required']) {
+            if (!array_key_exists($key, $data) && $value[EnvironmentInfoProvider::FIELD_REQUIRED]) {
                 $this->lengowLog->write(
                     LengowLog::CODE_ORM,
                     $this->lengowLog->encodeMessage('log.orm.field_is_required', [
@@ -198,7 +167,8 @@ class LengowAction
         try {
             $this->lengowActionRepository->create([$data], Context::createDefaultContext());
         } catch (Exception $e) {
-            $errorMessage = '[Shopware error] "' . $e->getMessage() . '" ' . $e->getFile() . ' | ' . $e->getLine();
+            $errorMessage = '[Shopware error]: "' . $e->getMessage()
+                . '" in ' . $e->getFile() . ' on line ' . $e->getLine();
             $this->lengowLog->write(
                 LengowLog::CODE_ORM,
                 $this->lengowLog->encodeMessage('log.orm.record_insert_failed', [
@@ -222,15 +192,16 @@ class LengowAction
     {
         // update only authorized values
         foreach ($this->fieldList as $key => $value) {
-            if (array_key_exists($key, $data) && !$value['updated']) {
+            if (array_key_exists($key, $data) && !$value[EnvironmentInfoProvider::FIELD_CAN_BE_UPDATED]) {
                 unset($data[$key]);
             }
         }
-        $data = array_merge($data, ['id' => $actionId]);
+        $data = array_merge($data, [LengowActionDefinition::FIELD_ID => $actionId]);
         try {
             $this->lengowActionRepository->update([$data], Context::createDefaultContext());
         } catch (Exception $e) {
-            $errorMessage = '[Shopware error] "' . $e->getMessage() . '" ' . $e->getFile() . ' | ' . $e->getLine();
+            $errorMessage = '[Shopware error]: "' . $e->getMessage()
+                . '" in ' . $e->getFile() . ' on line ' . $e->getLine();
             $this->lengowLog->write(
                 LengowLog::CODE_ORM,
                 $this->lengowLog->encodeMessage('log.orm.record_insert_failed', [
@@ -253,7 +224,7 @@ class LengowAction
     {
         $context = Context::createDefaultContext();
         $criteria = new Criteria();
-        $criteria->addFilter(new EqualsFilter('actionId', $apiActionId));
+        $criteria->addFilter(new EqualsFilter(LengowActionDefinition::FIELD_ACTION_ID, $apiActionId));
         /** @var LengowActionCollection $lengowActionCollection */
         $lengowActionCollection = $this->lengowActionRepository->search($criteria, $context)->getEntities();
         return $lengowActionCollection->count() !== 0 ? $lengowActionCollection->first() : null;
@@ -268,7 +239,7 @@ class LengowAction
     {
         $context = Context::createDefaultContext();
         $criteria = new Criteria();
-        $criteria->addFilter(new EqualsFilter('state', self::STATE_NEW));
+        $criteria->addFilter(new EqualsFilter(LengowActionDefinition::FIELD_STATE, self::STATE_NEW));
         /** @var LengowActionCollection $lengowActionCollection */
         $lengowActionCollection = $this->lengowActionRepository->search($criteria, $context)->getEntities();
         return $lengowActionCollection->count() !== 0 ? $lengowActionCollection : null;
@@ -287,7 +258,7 @@ class LengowAction
         $criteria = new Criteria();
         $criteria->addFilter(new MultiFilter(MultiFilter::CONNECTION_AND, [
             new EqualsFilter('order.id', $orderId),
-            new EqualsFilter('state', self::STATE_NEW),
+            new EqualsFilter(LengowActionDefinition::FIELD_STATE, self::STATE_NEW),
         ]));
         /** @var LengowActionCollection $lengowActionCollection */
         $lengowActionCollection = $this->lengowActionRepository->search($criteria, $context)->getEntities();
@@ -309,7 +280,7 @@ class LengowAction
             new RangeFilter('createdAt', [
                 RangeFilter::LT => date('Y-m-d h:m:i', (time() - $intervalTime)),
             ]),
-            new EqualsFilter('state', self::STATE_NEW),
+            new EqualsFilter(LengowActionDefinition::FIELD_STATE, self::STATE_NEW),
         ]));
         /** @var LengowActionCollection $lengowActionCollection */
         $lengowActionCollection = $this->lengowActionRepository->search($criteria, $context)->getEntities();
@@ -371,25 +342,25 @@ class LengowAction
             if ($orderAction) {
                 if ($orderAction->getState() === self::STATE_NEW) {
                     $this->update($orderAction->getId(), [
-                        'retry' => $orderAction->getRetry() + 1,
+                        LengowActionDefinition::FIELD_RETRY => $orderAction->getRetry() + 1,
                     ]);
                     $sendAction = false;
                 }
             } else {
                 // if update doesn't work, create new action
                 $success = $this->create([
-                    'orderId' => $order->getId(),
-                    'actionType' => $params[self::ARG_ACTION_TYPE],
-                    'actionId' => $row->id,
-                    'orderLineSku' => (string) ($params[self::ARG_LINE] ?? ''),
-                    'parameters' => $params,
+                    LengowActionDefinition::FIELD_ORDER_ID => $order->getId(),
+                    LengowActionDefinition::FIELD_ACTION_TYPE => $params[self::ARG_ACTION_TYPE],
+                    LengowActionDefinition::FIELD_ACTION_ID => $row->id,
+                    LengowActionDefinition::FIELD_ORDER_LINE_SKU => (string) ($params[self::ARG_LINE] ?? ''),
+                    LengowActionDefinition::FIELD_PARAMETERS => $params,
                 ]);
                 if ($success) {
                     $this->lengowLog->write(
                         LengowLog::CODE_ACTION,
                         $this->lengowLog->encodeMessage('log.order_action.action_saved'),
                         false,
-                        $params['marketplace_order_id']
+                        $params[LengowImport::ARG_MARKETPLACE_ORDER_ID]
                     );
                 }
                 $sendAction = false;
@@ -417,18 +388,18 @@ class LengowAction
             );
             if (isset($result->id)) {
                 $success = $this->create([
-                    'orderId' => $order->getId(),
-                    'actionType' => $params[self::ARG_ACTION_TYPE],
-                    'actionId' => $result->id,
-                    'orderLineSku' => (string) ($params[self::ARG_LINE] ?? ''),
-                    'parameters' => $params,
+                    LengowActionDefinition::FIELD_ORDER_ID => $order->getId(),
+                    LengowActionDefinition::FIELD_ACTION_TYPE => $params[self::ARG_ACTION_TYPE],
+                    LengowActionDefinition::FIELD_ACTION_ID => $result->id,
+                    LengowActionDefinition::FIELD_ORDER_LINE_SKU => (string) ($params[self::ARG_LINE] ?? ''),
+                    LengowActionDefinition::FIELD_PARAMETERS => $params,
                 ]);
                 if ($success) {
                     $this->lengowLog->write(
                         LengowLog::CODE_ACTION,
                         $this->lengowLog->encodeMessage('log.order_action.action_saved'),
                         false,
-                        $params['marketplace_order_id']
+                        $params[LengowImport::ARG_MARKETPLACE_ORDER_ID]
                     );
                 }
                 unset($orderAction);
@@ -474,16 +445,16 @@ class LengowAction
         $criteria = new Criteria();
         $criteria->addFilter(new MultiFilter(MultiFilter::CONNECTION_AND, [
             new EqualsFilter('order.id', $orderId),
-            new EqualsFilter('state', self::STATE_NEW),
+            new EqualsFilter(LengowActionDefinition::FIELD_STATE, self::STATE_NEW),
         ]));
         if ($actionType) {
-            $criteria->addFilter(new EqualsFilter('actionType', $actionType));
+            $criteria->addFilter(new EqualsFilter(LengowActionDefinition::FIELD_ACTION_TYPE, $actionType));
         }
         /** @var LengowActionCollection $lengowActionCollection */
         $lengowActionCollection = $this->lengowActionRepository->search($criteria, $context)->getEntities();
         foreach ($lengowActionCollection as $lengowAction) {
             $success = $this->update($lengowAction->getId(), [
-                'state' => self::STATE_FINISH,
+                LengowActionDefinition::FIELD_STATE => self::STATE_FINISH,
             ]);
             if (!$success) {
                 $result = false;

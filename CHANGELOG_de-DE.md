@@ -1,6 +1,5 @@
-# v1.0.3
-
-
+# v1.1.0
+- Feature: Integration der Auftragssynchronisation in den Webservice der Toolbox
 # v1.0.2
 - Feature: Auslagerung der Toolbox über den Webservice
 - Feature: Kompatibilität mit Shopware 6.4 hinzugefügt

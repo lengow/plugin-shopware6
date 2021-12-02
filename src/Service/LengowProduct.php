@@ -32,45 +32,19 @@ use Lengow\Connector\Util\StringCleaner;
  */
 class LengowProduct
 {
-    /**
-     * @var string name of field id
-     */
+    /* Search product fields */
     private const FIELD_ID = 'id';
-
-    /**
-     * @var string name of field product number
-     */
     private const FIELD_PRODUCT_NUMBER = 'productNumber';
-
-    /**
-     * @var string name of field ean
-     */
     private const FIELD_EAN = 'ean';
-
-    /**
-     * @var string name of field manufacturer_number
-     */
     private const FIELD_MANUFACTURER_NUMBER = 'manufacturerNumber';
 
-    /**
-     * @var string measurement unit for all size field of a product
-     */
-    private const PRODUCT_WEIGHT_UNIT = 'kg';
-
-    /**
-     * @var string measurement unit for all weight field of a product
-     */
-    private const PRODUCT_SIZE_UNIT = 'mm';
-
-    /**
-     * @var float shipping price range quantity min
-     */
+    /* Shipping price range */
     private const SHIPPING_PRICE_RANGE_MIN = 0;
-
-    /**
-     * @var float shipping price range quantity max
-     */
     private const SHIPPING_PRICE_RANGE_MAX = 10000000000;
+
+    /* Product unit */
+    private const PRODUCT_WEIGHT_UNIT = 'kg';
+    private const PRODUCT_SIZE_UNIT = 'mm';
 
     /**
      * @var string Accepted mime type for product images
@@ -238,11 +212,11 @@ class LengowProduct
     /**
      * Extract cart data from API
      *
-     * @param object $api product data
+     * @param mixed $api product data
      *
      * @return array
      */
-    public function extractProductDataFromAPI(object $api): array
+    public function extractProductDataFromAPI($api): array
     {
         $productData = [];
         foreach ($this->productApiNodes as $node) {
@@ -441,7 +415,7 @@ class LengowProduct
                     $productData[$headerField] = $this->getUntranslatedField($headerField);
                     break;
                 case LengowExport::$defaultFields['status']:
-                    // get parent status > bug on child status which is null instead of boolean > issue created on Shopware's Github
+                    // get parent status > bug on child status which is null instead of boolean > issue created on Shopware's GitHub
                     $value = self::$parentProduct ? self::$parentProduct->getActive() : $this->product->getActive();
                     $productData[$headerField] = (string) $value === '1' ? 'Enabled' : 'Disabled';
                     break;
@@ -484,7 +458,7 @@ class LengowProduct
                         ? $this->shippingMethod->getDeliveryTime()->getName()
                         : '';
                     break;
-                case (preg_match('`image_url_([0-9]+)`', $headerField) ? true : false):
+                case (bool) preg_match('`image_url_([0-9]+)`', $headerField):
                     $productData[$headerField] = $this->images[$headerField];
                     break;
                 case LengowExport::$defaultFields['type']:
@@ -564,7 +538,7 @@ class LengowProduct
     private function getProductTranslation(ProductEntity $product) : ?ProductTranslationEntity
     {
         $productTranslation = null;
-        if ($this->language && $product && $product->getTranslations()) {
+        if ($this->language && $product->getTranslations()) {
             $productTranslation = $product->getTranslations()->filterByLanguageId($this->language->getId())->first();
         }
         return $productTranslation;
@@ -609,7 +583,7 @@ class LengowProduct
     }
 
     /**
-     * Get the product manufacturer if it exist or the parent product manufacturer
+     * Get the product manufacturer if it exists or the parent product manufacturer
      *
      * @return string
      */
@@ -741,7 +715,7 @@ class LengowProduct
     private function getPropertiesData(ProductEntity $product): array
     {
         $properties = [];
-        if ($product && $product->getProperties() === null) {
+        if ($product->getProperties() === null) {
             return $properties;
         }
         return $this->getAllPropertiesValues($product->getProperties());
@@ -798,7 +772,7 @@ class LengowProduct
     private function getCustomFieldData(ProductEntity $product): array
     {
         $customFields = [];
-        if ($product && $product->getCustomFields() === null) {
+        if ($product->getCustomFields() === null) {
             return $customFields;
         }
         $translationCustomFields = [];
@@ -1055,7 +1029,9 @@ class LengowProduct
         $breadcrumb = '';
         // get main category if exist
         if ($product->getMainCategories() && $product->getMainCategories()->count() > 0) {
-            $mainCategory = $product->getMainCategories()->first()->getCategory();
+            $mainCategory = $product->getMainCategories()->first()
+                ? $product->getMainCategories()->first()->getCategory()
+                : null;
         }
         // get first category by default
         if ($mainCategory === null && $product->getCategories() && $product->getCategories()->count() > 0) {

@@ -2,7 +2,7 @@
 
 namespace Lengow\Connector\Service;
 
-use \Exception;
+use Exception;
 use Lengow\Connector\Exception\LengowException;
 
 /**
@@ -22,110 +22,35 @@ class LengowConnector
      */
     private const API_ACCESS_TOKEN = '/access/get_token';
 
-    /**
-     * @var string url of order API
-     */
+    /* Lengow API routes */
     public const API_ORDER = '/v3.0/orders';
-
-    /**
-     * @var string url of order merchant order id API
-     */
     public const API_ORDER_MOI = '/v3.0/orders/moi/';
-
-    /**
-     * @var string url of order action API
-     */
     public const API_ORDER_ACTION = '/v3.0/orders/actions/';
-
-    /**
-     * @var string url of marketplace API
-     */
     public const API_MARKETPLACE = '/v3.0/marketplaces';
-
-    /**
-     * @var string url of plan API
-     */
     public const API_PLAN = '/v3.0/plans';
-
-    /**
-     * @var string url of cms API
-     */
     public const API_CMS = '/v3.1/cms';
-
-    /**
-     * @var string url of cms catalog API
-     */
     public const API_CMS_CATALOG = '/v3.1/cms/catalogs/';
-
-    /**
-     * @var string url of cms mapping API
-     */
     public const API_CMS_MAPPING = '/v3.1/cms/mapping/';
-
-    /**
-     * @var string url of plugin API
-     */
     public const API_PLUGIN = '/v3.0/plugins';
 
-    /**
-     * @var string request GET
-     */
+    /* Request actions */
     public const GET = 'GET';
-
-    /**
-     * @var string request POST
-     */
     public const POST = 'POST';
-
-    /**
-     * @var string request PUT
-     */
     public const PUT = 'PUT';
-
-    /**
-     * @var string request PATCH
-     */
     public const PATCH = 'PATCH';
 
-    /**
-     * @var string json format return
-     */
+    /* Return formats */
     public const FORMAT_JSON = 'json';
-
-    /**
-     * @var string stream format return
-     */
     public const FORMAT_STREAM = 'stream';
 
-    /**
-     * @var string success code
-     */
-    private const CODE_200 = 200;
-
-    /**
-     * @var string success create code
-     */
-    private const CODE_201 = 201;
-
-    /**
-     * @var string unauthorized access code
-     */
-    private const CODE_401 = 401;
-
-    /**
-     * @var string forbidden access code
-     */
-    private const CODE_403 = 403;
-
-    /**
-     * @var string error server code
-     */
-    private const CODE_500 = 500;
-
-    /**
-     * @var string timeout server code
-     */
-    private const CODE_504 = 504;
+    /* Http codes */
+    public const CODE_200 = 200;
+    public const CODE_201 = 201;
+    public const CODE_401 = 401;
+    public const CODE_403 = 403;
+    public const CODE_404 = 404;
+    public const CODE_500 = 500;
+    public const CODE_504 = 504;
 
     /**
      * @var int authorization token lifetime
@@ -229,7 +154,7 @@ class LengowConnector
     {
         $this->lengowConfiguration = $lengowConfiguration;
         $this->lengowLog = $lengowLog;
-        list($this->accountId, $this->accessToken, $this->secret) = $this->lengowConfiguration->getAccessIds();
+        [$this->accountId, $this->accessToken, $this->secret] = $this->lengowConfiguration->getAccessIds();
     }
 
     /**
@@ -239,7 +164,7 @@ class LengowConnector
      *
      * @return boolean
      */
-    public function isValidAuth($logOutput = false): bool
+    public function isValidAuth(bool $logOutput = false): bool
     {
         try {
             if ($this->accountId === null) {
@@ -291,7 +216,9 @@ class LengowConnector
                 );
             }
             $type = strtolower($type);
-            $args = $authorizationRequired ? array_merge(['account_id' => $this->accountId], $args) : $args;
+            $args = $authorizationRequired
+                ? array_merge([LengowImport::ARG_ACCOUNT_ID => $this->accountId], $args)
+                : $args;
             $results = $this->$type($api, $args, self::FORMAT_STREAM, $body, $logOutput);
         } catch (LengowException $e) {
             $message = $this->lengowLog->decodeMessage($e->getMessage(), LengowTranslation::DEFAULT_ISO_CODE);

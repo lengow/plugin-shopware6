@@ -2,7 +2,7 @@
 
 namespace Lengow\Connector\Service;
 
-use \Exception;
+use Exception;
 use Lengow\Connector\Factory\LengowFileFactory;
 use Lengow\Connector\Util\EnvironmentInfoProvider;
 

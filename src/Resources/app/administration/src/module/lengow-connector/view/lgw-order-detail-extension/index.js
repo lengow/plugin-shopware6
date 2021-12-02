@@ -215,8 +215,8 @@ Shopware.Component.register('lgw-order-detail-extension', {
                 lengowOrderId: this.lengowOrderId,
                 orderId: this.orderId
             }).then((response) => {
+                this.toggleModal();
                 if (response.success) {
-                    this.toggleModal();
                     this.modalLoading = false;
                     this.orderId = response.new_order_id;
                 }

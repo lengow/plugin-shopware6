@@ -1,5 +1,5 @@
-# v1.0.3
-
+# v1.1.0
+- Feature: Integration of order synchronization in the toolbox webservice
 
 # v1.0.2
 - Feature: Outsourcing of the toolbox via webservice

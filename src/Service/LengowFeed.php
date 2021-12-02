@@ -14,6 +14,17 @@ use Lengow\Connector\Exception\LengowException;
  */
 class LengowFeed
 {
+    /* Feed formats */
+    public const FORMAT_CSV = 'csv';
+    public const FORMAT_YAML = 'yaml';
+    public const FORMAT_XML = 'xml';
+    public const FORMAT_JSON = 'json';
+
+    /* Content types */
+    public const HEADER = 'header';
+    public const BODY = 'body';
+    public const FOOTER = 'footer';
+
     /**
      * @var string CSV Protection
      */
@@ -28,46 +39,6 @@ class LengowFeed
      * @var string end of line
      */
     public const EOL = "\r\n";
-
-    /**
-     * @var string csv format
-     */
-    public const FORMAT_CSV = 'csv';
-
-    /**
-     * @var string yaml format
-     */
-    public const FORMAT_YAML = 'yaml';
-
-    /**
-     * @var string xml format
-     */
-    public const FORMAT_XML = 'xml';
-
-    /**
-     * @var string json format
-     */
-    public const FORMAT_JSON = 'json';
-
-    /**
-     * @var string header content
-     */
-    public const HEADER = 'header';
-
-    /**
-     * @var string body content
-     */
-    public const BODY = 'body';
-
-    /**
-     * @var string footer content
-     */
-    public const FOOTER = 'footer';
-
-    /**
-     * @var string feed content
-     */
-    protected $content = '';
 
     /**
      * @var bool export is stream or file
@@ -159,14 +130,12 @@ class LengowFeed
     {
         $sep = DIRECTORY_SEPARATOR;
         $folderPath  = $this->environmentInfoProvider->getPluginPath() . $sep . EnvironmentInfoProvider::FOLDER_EXPORT;
-        if (!file_exists($folderPath)) {
-            if (!mkdir($folderPath) && !is_dir($folderPath)) {
-                throw new LengowException(
-                    $this->lengowLog->encodeMessage('log.export.error_unable_to_create_folder', [
-                        'folder_path' => $folderPath,
-                    ])
-                );
-            }
+        if (!file_exists($folderPath) && !mkdir($folderPath) && !is_dir($folderPath)) {
+            throw new LengowException(
+                $this->lengowLog->encodeMessage('log.export.error_unable_to_create_folder', [
+                    'folder_path' => $folderPath,
+                ])
+            );
         }
         $fileName = $this->salesChannelId . '-flux-' . time() . '.' . $this->format;
         $this->lengowFile = $this->lengowFileFactory->create(EnvironmentInfoProvider::FOLDER_EXPORT, $fileName);
@@ -378,7 +347,7 @@ class LengowFeed
      *
      * @return string
      */
-    public static function formatFields($str, $format) : string
+    public static function formatFields(string $str, string $format) : string
     {
         switch ($format) {
             case self::FORMAT_CSV:

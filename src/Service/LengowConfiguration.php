@@ -16,6 +16,7 @@ use Shopware\Core\Framework\DataAbstractionLayer\Event\EntityDeletedEvent;
 use Shopware\Core\System\SalesChannel\SalesChannelCollection;
 use Shopware\Core\System\SalesChannel\SalesChannelEntity;
 use Shopware\Core\Framework\Uuid\Uuid;
+use Lengow\Connector\Entity\Lengow\Settings\SettingsDefinition as LengowSettingsDefinition;
 use Lengow\Connector\Entity\Lengow\Settings\SettingsEntity as LengowSettingsEntity;
 use Lengow\Connector\Util\EnvironmentInfoProvider;
 
@@ -25,8 +26,6 @@ use Lengow\Connector\Util\EnvironmentInfoProvider;
  */
 class LengowConfiguration
 {
-    public const LENGOW_SETTING_PATH = 'Connector.config.';
-
     /* Settings database key */
     public const ACCOUNT_ID = 'lengowAccountId';
     public const ACCESS_TOKEN = 'lengowAccessToken';
@@ -75,6 +74,7 @@ class LengowConfiguration
     public const PARAM_EXPORT_TOOLBOX = 'export_toolbox';
     public const PARAM_GLOBAL = 'global';
     public const PARAM_LOG = 'log';
+    public const PARAM_RESET_TOKEN = 'reset_token';
     public const PARAM_RETURN = 'return';
     public const PARAM_SECRET = 'secret';
     public const PARAM_SHOP = 'shop';
@@ -85,30 +85,15 @@ class LengowConfiguration
     public const RETURN_TYPE_INTEGER = 'integer';
     public const RETURN_TYPE_ARRAY = 'array';
 
-    /* Lengow actions controller */
-    public const ACTION_EXPORT = 'export';
-    public const ACTION_CRON = 'cron';
-    public const ACTION_TOOLBOX = 'toolbox';
-
     /**
-     * @var string Name of Lengow front controller
+     * @var string Lengow base setting path
      */
-    public const LENGOW_CONTROLLER = 'lengow';
+    public const LENGOW_SETTING_PATH = 'Connector.config.';
 
     /**
      * @var string Lengow default timezone
      */
     public const DEFAULT_TIMEZONE = 'Etc/Greenwich';
-
-    /**
-     * @var string log date time format
-     */
-    public const DEFAULT_DATE_TIME_FORMAT = 'Y-m-d H:i:s';
-
-    /**
-     * @var string api date time format
-     */
-    public const API_DATE_TIME_FORMAT = 'c';
 
     /**
      * @var array params correspondence keys for toolbox
@@ -170,12 +155,14 @@ class LengowConfiguration
             self::PARAM_EXPORT => false,
             self::PARAM_SECRET => true,
             self::PARAM_DEFAULT_VALUE => '',
+            self::PARAM_RESET_TOKEN => true,
         ],
         self::SECRET => [
             self::PARAM_GLOBAL => true,
             self::PARAM_EXPORT => false,
             self::PARAM_SECRET => true,
             self::PARAM_DEFAULT_VALUE => '',
+            self::PARAM_RESET_TOKEN => true,
         ],
         self::CMS_TOKEN => [
             self::PARAM_GLOBAL => true,
@@ -436,7 +423,7 @@ class LengowConfiguration
      * @param string $key config name
      * @param string|null $salesChannelId sales channel
      *
-     * @return mixed
+     * @return array|bool|float|int|string|null
      */
     public function get(string $key, ?string $salesChannelId = null)
     {
@@ -462,7 +449,7 @@ class LengowConfiguration
             return $this->setInLengowConfig($key, $value, $salesChannelId);
         }
         // set a Shopware configuration
-        return $this->setInShopwareConfig($key, $value, $salesChannelId);
+        $this->setInShopwareConfig($key, $value, $salesChannelId);
     }
 
     /**
@@ -572,6 +559,16 @@ class LengowConfiguration
         }
     }
 
+
+    /**
+     * Reset authorization token
+     */
+    public function resetAuthorizationToken(): void
+    {
+        $this->set(self::AUTHORIZATION_TOKEN, '');
+        $this->set(self::LAST_UPDATE_AUTHORIZATION_TOKEN, '');
+    }
+
     /**
      * Check if new merchant
      *
@@ -579,7 +576,7 @@ class LengowConfiguration
      */
     public function isNewMerchant(): bool
     {
-        list($accountId, $accessToken, $secretToken) = $this->getAccessIds();
+        [$accountId, $accessToken, $secretToken] = $this->getAccessIds();
         return !($accountId !== null && $accessToken !== null && $secretToken !== null);
     }
 
@@ -707,7 +704,7 @@ class LengowConfiguration
      *
      * @return string
      */
-    public function date(int $timestamp = null, string $format = self::DEFAULT_DATE_TIME_FORMAT): string
+    public function date(int $timestamp = null, string $format = EnvironmentInfoProvider::DATE_FULL): string
     {
         $timestamp = $timestamp ?? time();
         $timezone = $this->getLengowTimezone();
@@ -723,7 +720,7 @@ class LengowConfiguration
      *
      * @return string
      */
-    public function gmtDate(int $timestamp = null, string $format = self::DEFAULT_DATE_TIME_FORMAT): string
+    public function gmtDate(int $timestamp = null, string $format = EnvironmentInfoProvider::DATE_FULL): string
     {
         $timestamp = $timestamp ?? time();
         $dateTime = new DateTime();
@@ -733,15 +730,20 @@ class LengowConfiguration
     /**
      * Get list of Shopware sales channel that have been activated in Lengow
      *
+     * @param string|null $salesChannelId Shopware sales channel id
+     *
      * @return array
      */
-    public function getLengowActiveSalesChannels(): array
+    public function getLengowActiveSalesChannels(string $salesChannelId = null): array
     {
         $result = [];
         /** @var SalesChannelCollection $salesChannelCollection */
         $salesChannelCollection = $this->environmentInfoProvider->getActiveSalesChannels();
         foreach ($salesChannelCollection as $salesChannel) {
             /** @var SalesChannelEntity $salesChannel */
+            if ($salesChannelId && $salesChannel->getId() !== $salesChannelId) {
+                continue;
+            }
             // get Lengow config for this sales channel
             if ($this->get(self::SHOP_ACTIVE, $salesChannel->getId())) {
                 $result[] = $salesChannel;
@@ -820,8 +822,8 @@ class LengowConfiguration
     {
         $criteria = new Criteria();
         $criteria->addFilter(new MultiFilter(MultiFilter::CONNECTION_AND, [
-            new EqualsFilter('salesChannelId', $salesChannelId),
-            new EqualsFilter('name', $key),
+            new EqualsFilter(LengowSettingsDefinition::FIELD_SALES_CHANNEL_ID, $salesChannelId),
+            new EqualsFilter(LengowSettingsDefinition::FIELD_NAME, $key),
         ]));
         $result = $this->settingsRepository->search($criteria, Context::createDefaultContext())
             ->getEntities()
@@ -858,10 +860,10 @@ class LengowConfiguration
     {
         $id = $this->getId($key, $salesChannelId, true);
         $data = [
-            'id' => $id ?? Uuid::randomHex(),
-            'sales_channel_id' => $salesChannelId,
-            'name' => $key,
-            'value' => $value,
+            LengowSettingsDefinition::FIELD_ID => $id ?? Uuid::randomHex(),
+            LengowSettingsDefinition::FIELD_SALES_CHANNEL_ID => $salesChannelId,
+            LengowSettingsDefinition::FIELD_NAME => $key,
+            LengowSettingsDefinition::FIELD_VALUE => $value,
         ];
         try {
             return $this->settingsRepository->upsert([$data], Context::createDefaultContext());
@@ -887,13 +889,13 @@ class LengowConfiguration
      *
      * @return string|null
      */
-    private function getId(string $key, ?string $salesChannelId = null, $lengowSetting = false): ?string
+    private function getId(string $key, ?string $salesChannelId = null, bool $lengowSetting = false): ?string
     {
         $criteria = new Criteria();
         if ($lengowSetting) {
             $criteria->addFilter(
-                new EqualsFilter('name', $key),
-                new EqualsFilter('salesChannelId', $salesChannelId)
+                new EqualsFilter(LengowSettingsDefinition::FIELD_NAME, $key),
+                new EqualsFilter(LengowSettingsDefinition::FIELD_SALES_CHANNEL_ID, $salesChannelId)
             );
             $ids = $this->settingsRepository->searchIds($criteria, Context::createDefaultContext())->getIds();
         } else {
@@ -932,19 +934,20 @@ class LengowConfiguration
                     if ($key === self::DEFAULT_IMPORT_CARRIER_ID
                         || $key === self::DEFAULT_EXPORT_CARRIER_ID) {
                         $config[] = [
-                            'salesChannelId' => $salesChannel->getId(),
-                            'name' => $key,
-                            'value' => EnvironmentInfoProvider::getShippingMethodDefaultValue(
-                                $salesChannel->getId(),
-                                $shippingMethodRepository
-                            )
+                            LengowSettingsDefinition::FIELD_SALES_CHANNEL_ID => $salesChannel->getId(),
+                            LengowSettingsDefinition::FIELD_NAME => $key,
+                            LengowSettingsDefinition::FIELD_VALUE =>
+                                EnvironmentInfoProvider::getShippingMethodDefaultValue(
+                                    $salesChannel->getId(),
+                                    $shippingMethodRepository
+                                )
                         ];
                         continue;
                     }
                     $config[] = [
-                        'salesChannelId' => $salesChannel->getId(),
-                        'name' => $key,
-                        'value' => $lengowSetting[self::PARAM_DEFAULT_VALUE],
+                        LengowSettingsDefinition::FIELD_SALES_CHANNEL_ID => $salesChannel->getId(),
+                        LengowSettingsDefinition::FIELD_NAME => $key,
+                        LengowSettingsDefinition::FIELD_VALUE => $lengowSetting[self::PARAM_DEFAULT_VALUE],
                     ];
                 }
             } else {
@@ -952,9 +955,9 @@ class LengowConfiguration
                     continue;
                 }
                 $config[] = [
-                    'salesChannelId' => null,
-                    'name' => $key,
-                    'value' => $lengowSetting[self::PARAM_DEFAULT_VALUE],
+                    LengowSettingsDefinition::FIELD_SALES_CHANNEL_ID => null,
+                    LengowSettingsDefinition::FIELD_NAME => $key,
+                    LengowSettingsDefinition::FIELD_VALUE => $lengowSetting[self::PARAM_DEFAULT_VALUE],
                 ];
             }
         }
@@ -979,9 +982,9 @@ class LengowConfiguration
     ): bool
     {
         $criteria = new Criteria();
-        $criteria->addFilter(new EqualsFilter('name', $key));
+        $criteria->addFilter(new EqualsFilter(LengowSettingsDefinition::FIELD_NAME, $key));
         if ($salesChannelId) {
-            $criteria->addFilter(new EqualsFilter('salesChannelId', $salesChannelId));
+            $criteria->addFilter(new EqualsFilter(LengowSettingsDefinition::FIELD_SALES_CHANNEL_ID, $salesChannelId));
         }
         $settingsCollection = $settingsRepository
             ->search($criteria, Context::createDefaultContext())
@@ -1000,7 +1003,7 @@ class LengowConfiguration
         foreach ($entityWriteResults as $entityWriteResult) {
             $lengowSettingsCriteria = new Criteria();
             $lengowSettingsCriteria->addFilter(
-                new EqualsFilter('salesChannelId', $entityWriteResult->getPrimaryKey())
+                new EqualsFilter(LengowSettingsDefinition::FIELD_SALES_CHANNEL_ID, $entityWriteResult->getPrimaryKey())
             );
             $salesChannelConfig = $this->settingsRepository->search(
                 $lengowSettingsCriteria,
@@ -1009,7 +1012,7 @@ class LengowConfiguration
             foreach ($salesChannelConfig->getEntities() as $lengowSettingEntity) {
                 $this->settingsRepository->delete(
                     [
-                        ['id' => $lengowSettingEntity->id],
+                        [LengowSettingsDefinition::FIELD_ID => $lengowSettingEntity->id],
                     ],
                     Context::createDefaultContext()
                 );
@@ -1028,7 +1031,7 @@ class LengowConfiguration
     {
         $sep = DIRECTORY_SEPARATOR;
         return $this->environmentInfoProvider->getBaseUrl($salesChannelId)
-            . $sep . self::LENGOW_CONTROLLER . $sep . self::ACTION_EXPORT . '?'
+            . $sep . EnvironmentInfoProvider::LENGOW_CONTROLLER . $sep . EnvironmentInfoProvider::ACTION_EXPORT . '?'
             . LengowExport::PARAM_SALES_CHANNEL_ID . '=' . $salesChannelId . '&'
             . LengowExport::PARAM_TOKEN . '=' . $this->getToken($salesChannelId);
     }
@@ -1042,7 +1045,7 @@ class LengowConfiguration
     {
         $sep = DIRECTORY_SEPARATOR;
         return $this->environmentInfoProvider->getBaseUrl()
-            . $sep . self::LENGOW_CONTROLLER . $sep . self::ACTION_CRON . '?'
+            . $sep . EnvironmentInfoProvider::LENGOW_CONTROLLER . $sep . EnvironmentInfoProvider::ACTION_CRON . '?'
             . LengowImport::PARAM_TOKEN . '=' . $this->getToken();
     }
 
@@ -1055,7 +1058,7 @@ class LengowConfiguration
     {
         $sep = DIRECTORY_SEPARATOR;
         return $this->environmentInfoProvider->getBaseUrl()
-            . $sep . self::LENGOW_CONTROLLER . $sep . self::ACTION_TOOLBOX . '?'
+            . $sep . EnvironmentInfoProvider::LENGOW_CONTROLLER . $sep . EnvironmentInfoProvider::ACTION_TOOLBOX . '?'
             . LengowToolbox::PARAM_TOKEN . '=' . $this->getToken();
     }
 }

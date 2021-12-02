@@ -7,9 +7,6 @@ use Shopware\Core\Checkout\Order\OrderEntity as ShopwareOrderEntity;
 use Shopware\Core\Framework\Context;
 use Shopware\Core\Framework\DataAbstractionLayer\EntityRepositoryInterface;
 use Shopware\Core\Framework\DataAbstractionLayer\Search\Criteria;
-use Shopware\Core\Framework\Struct\ArrayStruct;
-use Shopware\Core\System\Currency\CurrencyCollection;
-use Shopware\Core\System\Currency\CurrencyEntity;
 use Shopware\Core\System\SalesChannel\SalesChannelContext;
 use Shopware\Storefront\Page\Checkout\Finish\CheckoutFinishPageLoadedEvent;
 use Lengow\Connector\Service\LengowConfiguration;
@@ -78,7 +75,7 @@ class CheckoutFinishPageLoadedSubscriber implements EventSubscriberInterface
      */
     public function onCheckoutFinish(CheckoutFinishPageLoadedEvent $event) : void
     {
-        // if tracking is disable, no need for anything else
+        // if tracking is disabled, no need for anything else
         if (!$this->lengowConfiguration->get(LengowConfiguration::TRACKING_ENABLED)) {
             return;
         }
@@ -87,9 +84,7 @@ class CheckoutFinishPageLoadedSubscriber implements EventSubscriberInterface
             $this->lengowConfiguration->get(LengowConfiguration::TRACKING_ID) === self::TRACKING_WITH_ID
                 ? self::TRACKING_WITH_ID
                 : self::TRACKING_WITH_REFERENCE;
-        /** @var SalesChannelContext $salesChannelContext */
         $salesChannelContext = $event->getSalesChannelContext();
-        /** @var ShopwareOrderEntity $order */
         $order = $event->getPage()->getOrder();
         $trackerData = new CheckoutFinishTrackerData();
         $trackerData->assign([
@@ -161,7 +156,7 @@ class CheckoutFinishPageLoadedSubscriber implements EventSubscriberInterface
             Context::createDefaultContext()
         )->getEntities();
         if ($currenciesCollection->count() > 0) {
-            return $currenciesCollection->first()->getIsoCode();
+            return $currenciesCollection->first() ? $currenciesCollection->first()->getIsoCode() : '';
         }
         return '';
     }

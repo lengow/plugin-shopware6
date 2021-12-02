@@ -96,7 +96,7 @@ class LengowLog
             $value = str_replace(['|', '=='], ['', ''], $value);
             $allParams[] = $param . '==' . $value;
         }
-        return $key . '[' . join('|', $allParams) . ']';
+        return $key . '[' . implode('|', $allParams) . ']';
     }
 
     /**
@@ -110,19 +110,17 @@ class LengowLog
      */
     public function decodeMessage(string $message, string $isoCode = null, array $params = []): string
     {
-        if (preg_match('/^(([a-z\_]*\.){1,3}[a-z\_]*)(\[(.*)\]|)$/', $message, $result)) {
-            if ($result[1] ?? false) {
-                $key = $result[1];
-                if (isset($result[4]) && empty($params)) {
-                    $strParam = $result[4];
-                    $allParams = explode('|', $strParam);
-                    foreach ($allParams as $param) {
-                        $result = explode('==', $param);
-                        $params[$result[0]] = $result[1];
-                    }
+        if (preg_match('/^(([a-z\_]*\.){1,3}[a-z\_]*)(\[(.*)\]|)$/', $message, $result) && $result[1] ?? false) {
+            $key = $result[1];
+            if (isset($result[4]) && empty($params)) {
+                $strParam = $result[4];
+                $allParams = explode('|', $strParam);
+                foreach ($allParams as $param) {
+                    $result = explode('==', $param);
+                    $params[$result[0]] = $result[1];
                 }
-                $message = $this->lengowTranslation->t($key, $params, $isoCode);
             }
+            $message = $this->lengowTranslation->t($key, $params, $isoCode);
         }
         return $message;
     }
@@ -135,7 +133,12 @@ class LengowLog
      * @param boolean $display display on screen
      * @param string|null $marketplaceSku Lengow order id
      */
-    public function write(string $category, string $message = '', bool $display = false, $marketplaceSku = null): void
+    public function write(
+        string $category,
+        string $message = '',
+        bool $display = false,
+        string $marketplaceSku = null
+    ): void
     {
         $decodedMessage = $this->decodeMessage($message, LengowTranslation::DEFAULT_ISO_CODE);
         $log = $this->lengowConfiguration->date();
@@ -150,7 +153,7 @@ class LengowLog
         if ($this->lengowFile === null) {
             $this->lengowFile = $this->lengowFileFactory->create(
                 EnvironmentInfoProvider::FOLDER_LOG,
-                'logs-' . date('Y-m-d') . '.txt'
+                'logs-' . date(EnvironmentInfoProvider::DATE_DAY) . '.txt'
             );
         }
         $this->lengowFile->write($log);
@@ -161,9 +164,9 @@ class LengowLog
      */
     public function cleanLog(): void
     {
-        $days = ['logs-' . date('Y-m-d') . '.txt'];
+        $days = ['logs-' . date(EnvironmentInfoProvider::DATE_DAY) . '.txt'];
         for ($i = 1; $i < self::LOG_LIFE; $i++) {
-            $days[] = 'logs-' . date('Y-m-d', strtotime('-' . $i . 'day')) . '.txt';
+            $days[] = 'logs-' . date(EnvironmentInfoProvider::DATE_DAY, strtotime('-' . $i . 'day')) . '.txt';
         }
         $logFiles = $this->getFilesFromFolder();
         if (empty($logFiles)) {
@@ -229,7 +232,7 @@ class LengowLog
      *
      * @param string|null $date date for a specific log file
      */
-    public function download($date = null): void
+    public function download(string $date = null): void
     {
         /** @var LengowFile[] $logFiles */
         if ($date && preg_match('/^(\d{4}-\d{2}-\d{2})$/', $date)) {
@@ -249,7 +252,7 @@ class LengowLog
         $contents = '';
         foreach ($logFiles as $logFile) {
             $filePath = $logFile->getPath();
-            $handle = fopen($filePath, 'r');
+            $handle = fopen($filePath, 'rb');
             $fileSize = filesize($filePath);
             if ($fileSize > 0) {
                 $contents .= fread($handle, $fileSize);

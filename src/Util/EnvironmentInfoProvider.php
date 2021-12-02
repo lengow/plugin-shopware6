@@ -26,6 +26,20 @@ class EnvironmentInfoProvider
     public const FOLDER_EXPORT = 'Export';
     public const FOLDER_LOG = 'Logs';
 
+    /* Lengow actions controller */
+    public const ACTION_EXPORT = 'export';
+    public const ACTION_CRON = 'cron';
+    public const ACTION_TOOLBOX = 'toolbox';
+
+    /* Field database actions */
+    public const FIELD_REQUIRED = 'required';
+    public const FIELD_CAN_BE_UPDATED = 'updated';
+
+    /* Date formats */
+    public const DATE_FULL = 'Y-m-d H:i:s';
+    public const DATE_DAY = 'Y-m-d';
+    public const DATE_ISO_8601 = 'c';
+
     /**
      * @var string Default locale code
      */
@@ -39,7 +53,12 @@ class EnvironmentInfoProvider
     /**
      * @var string plugin version
      */
-    public const PLUGIN_VERSION = '1.0.3';
+    public const PLUGIN_VERSION = '1.1.0';
+
+    /**
+     * @var string Name of Lengow front controller
+     */
+    public const LENGOW_CONTROLLER = 'lengow';
 
     /**
      * @var Kernel $kernel
@@ -132,7 +151,8 @@ class EnvironmentInfoProvider
      */
     public function getPluginBasePath(): string
     {
-        return $this->kernel->getPluginLoader()->getPluginInstance(LengowConnector::class)->getBasePath();
+        $pluginInstance = $this->kernel->getPluginLoader()->getPluginInstance(LengowConnector::class);
+        return $pluginInstance ? $pluginInstance->getBasePath() : '';
     }
 
     /**
@@ -186,9 +206,13 @@ class EnvironmentInfoProvider
         if ($salesChannelId === null) {
             // get first domain available with default language
             $salesChannelDomain = $salesChannelDomainCollection->filterByProperty('languageId', $languageId)->first();
-            $baseUrl = $salesChannelDomain
-                ? $salesChannelDomain->getUrl()
-                : $salesChannelDomainCollection->first()->getUrl();
+            if ($salesChannelDomain) {
+                $baseUrl = $salesChannelDomain->getUrl();
+            } else {
+                $baseUrl = $salesChannelDomainCollection->first()
+                    ? $salesChannelDomainCollection->first()->getUrl()
+                    : '';
+            }
         } else {
             // get domain by sales channel id and language id
             $salesChannelDomain = $salesChannelDomainCollection->filterByProperty('salesChannelId', $salesChannelId)
@@ -259,7 +283,7 @@ class EnvironmentInfoProvider
         $result = $shippingMethodRepository
             ->search($shippingMethodCriteria, Context::createDefaultContext());
         if ($result->count() !== 0) {
-            return $result->first()->getId();
+            return $result->first() ? $result->first()->getId() : '';
         }
         return '';
     }

@@ -29,6 +29,16 @@ class ActionDefinition extends EntityDefinition
 {
     public const ENTITY_NAME = 'lengow_action';
 
+    /* Action fields */
+    public const FIELD_ID = 'id';
+    public const FIELD_ORDER_ID = 'orderId';
+    public const FIELD_ACTION_ID = 'actionId';
+    public const FIELD_ORDER_LINE_SKU = 'orderLineSku';
+    public const FIELD_ACTION_TYPE = 'actionType';
+    public const FIELD_RETRY = 'retry';
+    public const FIELD_PARAMETERS = 'parameters';
+    public const FIELD_STATE = 'state';
+
     /**
      * @return string
      */
@@ -51,7 +61,7 @@ class ActionDefinition extends EntityDefinition
     public function getDefaults(): array
     {
         return [
-            'retry' => 0,
+            self::FIELD_RETRY => 0,
         ];
     }
 
@@ -61,16 +71,16 @@ class ActionDefinition extends EntityDefinition
     protected function defineFields(): FieldCollection
     {
         return new FieldCollection([
-            (new IdField('id', 'id'))->addFlags(new Required(), new PrimaryKey()),
-            (new IdField('order_id', 'orderId')),
+            (new IdField('id', self::FIELD_ID))->addFlags(new Required(), new PrimaryKey()),
+            (new IdField('order_id', self::FIELD_ORDER_ID)),
             (new OneToOneAssociationField('order', 'order_id', 'id', ShopwareOrderDefinition::class))
                 ->addFlags(new setNullOnDelete()),
-            (new IntField('action_id', 'actionId'))->addFlags(new Required()),
-            (new StringField('order_line_sku', 'orderLineSku')),
-            (new StringField('action_type', 'actionType'))->addFlags(new Required()),
-            (new IntField('retry', 'retry'))->addFlags(new Required()),
-            (new JsonField('parameters', 'parameters'))->addFlags(new Required()),
-            (new IntField('state', 'state'))->addFlags(new Required()),
+            (new IntField('action_id', self::FIELD_ACTION_ID))->addFlags(new Required()),
+            (new StringField('order_line_sku', self::FIELD_ORDER_LINE_SKU)),
+            (new StringField('action_type', self::FIELD_ACTION_TYPE))->addFlags(new Required()),
+            (new IntField('retry', self::FIELD_RETRY))->addFlags(new Required()),
+            (new JsonField('parameters', self::FIELD_PARAMETERS))->addFlags(new Required()),
+            (new IntField('state', self::FIELD_STATE))->addFlags(new Required()),
         ]);
     }
 }

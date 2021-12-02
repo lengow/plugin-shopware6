@@ -139,6 +139,7 @@ class LengowConnectionController extends AbstractController
         // reset access ids if cms creation failed
         if (!$cmsExist && !$cmsConnected) {
             $this->lengowConfiguration->resetAccessIds();
+            $this->lengowConfiguration->resetAuthorizationToken();
         }
         return new JsonResponse([
             'success' => $cmsExist || $cmsConnected,
