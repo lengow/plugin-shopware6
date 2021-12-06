@@ -108,6 +108,8 @@ remove_files $FOLDER_TMP ".eslintrc.json"
 remove_files $FOLDER_TMP "package-lock.json"
 # remove phpunit
 remove_files $FOLDER_TMP "phpunit.xml.dist"
+# remove Jenkinsfile
+remove_files $FOLDER_TMP "Jenkinsfile"
 # clean Config Folder
 remove_files $FOLDER_CONFIG "marketplaces.json"
 # clean Log Folder
