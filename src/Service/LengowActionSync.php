@@ -177,7 +177,7 @@ class LengowActionSync
             return;
         }
         foreach ($unsentOrders as $order) {
-            $activeAction = $this->lengowAction->getActiveActionByOrderId($order->getId());
+            $activeAction = $this->lengowAction->getActionsByOrderId($order->getId(), true);
             if ($activeAction) {
                 continue;
             }

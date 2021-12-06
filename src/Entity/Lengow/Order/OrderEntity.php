@@ -2,6 +2,7 @@
 
 namespace Lengow\Connector\Entity\Lengow\Order;
 
+use DateTimeInterface;
 use Shopware\Core\Framework\DataAbstractionLayer\Entity;
 use Shopware\Core\Framework\DataAbstractionLayer\EntityIdTrait;
 // OneToOne association class
@@ -152,17 +153,17 @@ class OrderEntity extends Entity
     protected $message;
 
     /**
-     * @var \DateTimeInterface|null
+     * @var DateTimeInterface|null
      */
     protected $createdAt;
 
     /**
-     * @var \DateTimeInterface|null
+     * @var DateTimeInterface|null
      */
     protected $updatedAt;
 
     /**
-     * @var \DateTimeInterface|null
+     * @var DateTimeInterface|null
      */
     protected $importedAt;
 
@@ -332,17 +333,17 @@ class OrderEntity extends Entity
     }
 
     /**
-     * @return \DateTime
+     * @return DateTimeInterface
      */
-    public function getOrderDate(): \DateTime
+    public function getOrderDate(): DateTimeInterface
     {
         return $this->orderDate;
     }
 
     /**
-     * @param \DateTime $orderDate
+     * @param DateTimeInterface $orderDate
      */
-    public function setOrderDate(\DateTime $orderDate): void
+    public function setOrderDate(DateTimeInterface $orderDate): void
     {
         $this->orderDate = $orderDate;
     }
@@ -604,49 +605,49 @@ class OrderEntity extends Entity
     }
 
     /**
-     * @return \DateTimeInterface|null
+     * @return DateTimeInterface|null
      */
-    public function getCreatedAt(): ?\DateTimeInterface
+    public function getCreatedAt(): ?DateTimeInterface
     {
         return $this->createdAt;
     }
 
     /**
-     * @param \DateTimeInterface|null $createdAt
+     * @param DateTimeInterface|null $createdAt
      */
-    public function setCreatedAt(?\DateTimeInterface $createdAt): void
+    public function setCreatedAt(?DateTimeInterface $createdAt): void
     {
         $this->createdAt = $createdAt;
     }
 
     /**
-     * @return \DateTimeInterface|null
+     * @return DateTimeInterface|null
      */
-    public function getUpdatedAt(): ?\DateTimeInterface
+    public function getUpdatedAt(): ?DateTimeInterface
     {
         return $this->updatedAt;
     }
 
     /**
-     * @param \DateTimeInterface|null $updatedAt
+     * @param DateTimeInterface|null $updatedAt
      */
-    public function setUpdatedAt(?\DateTimeInterface $updatedAt): void
+    public function setUpdatedAt(?DateTimeInterface $updatedAt): void
     {
         $this->updatedAt = $updatedAt;
     }
 
     /**
-     * @return \DateTimeInterface|null
+     * @return DateTimeInterface|null
      */
-    public function getImportedAt(): ?\DateTimeInterface
+    public function getImportedAt(): ?DateTimeInterface
     {
         return $this->importedAt;
     }
 
     /**
-     * @param \DateTimeInterface|null $importedAt
+     * @param DateTimeInterface|null $importedAt
      */
-    public function setImportedAt(?\DateTimeInterface $importedAt): void
+    public function setImportedAt(?DateTimeInterface $importedAt): void
     {
         $this->importedAt = $importedAt;
     }

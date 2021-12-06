@@ -92,7 +92,15 @@ class LengowToolboxController extends LengowAbstractFrontController
                 $this->lengowToolbox->downloadLog($toolboxArgs[LengowToolbox::PARAM_DATE]);
                 break;
             case LengowToolbox::ACTION_ORDER:
-                $result = $this->lengowToolbox->syncOrders($toolboxArgs);
+                if ($toolboxArgs[LengowToolbox::PARAM_PROCESS] === LengowToolbox::PROCESS_TYPE_GET_DATA) {
+                    $result = $this->lengowToolbox->getOrderData(
+                        $toolboxArgs[LengowToolbox::PARAM_MARKETPLACE_SKU],
+                        $toolboxArgs[LengowToolbox::PARAM_MARKETPLACE_NAME],
+                        $toolboxArgs[LengowToolbox::PARAM_TYPE]
+                    );
+                } else {
+                    $result = $this->lengowToolbox->syncOrders($toolboxArgs);
+                }
                 $responseCode = Response::HTTP_OK;
                 if (isset($result[LengowToolbox::ERRORS][LengowToolbox::ERROR_CODE])) {
                     $errorCode = $result[LengowToolbox::ERRORS][LengowToolbox::ERROR_CODE];
@@ -133,6 +141,10 @@ class LengowToolboxController extends LengowAbstractFrontController
             LengowToolbox::PARAM_TOOLBOX_ACTION => $request->query->get(
                 LengowToolbox::PARAM_TOOLBOX_ACTION,
                 LengowToolbox::ACTION_DATA
+            ),
+            LengowToolbox::PARAM_PROCESS => $request->query->get(
+                LengowToolbox::PARAM_PROCESS,
+                LengowToolbox::PROCESS_TYPE_SYNC
             ),
             LengowToolbox::PARAM_TYPE => $request->query->get(LengowToolbox::PARAM_TYPE, LengowToolbox::DATA_TYPE_CMS),
             LengowToolbox::PARAM_DATE => $request->query->get(LengowToolbox::PARAM_DATE),

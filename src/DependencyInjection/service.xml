@@ -164,11 +164,13 @@
         </service>
 
         <service id="Lengow\Connector\Service\LengowToolbox">
+            <argument type="service" id="Lengow\Connector\Service\LengowAction"/>
             <argument type="service" id="Lengow\Connector\Service\LengowConfiguration"/>
             <argument type="service" id="Lengow\Connector\Service\LengowExport"/>
             <argument type="service" id="Lengow\Connector\Service\LengowImport"/>
             <argument type="service" id="Lengow\Connector\Service\LengowLog"/>
             <argument type="service" id="Lengow\Connector\Service\LengowOrder"/>
+            <argument type="service" id="Lengow\Connector\Service\LengowOrderError"/>
             <argument type="service" id="Lengow\Connector\Util\EnvironmentInfoProvider"/>
         </service>
 

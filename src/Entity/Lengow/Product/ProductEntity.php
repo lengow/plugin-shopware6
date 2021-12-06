@@ -2,6 +2,7 @@
 
 namespace Lengow\Connector\Entity\Lengow\Product;
 
+use DateTimeInterface;
 use Shopware\Core\Framework\DataAbstractionLayer\Entity;
 use Shopware\Core\Framework\DataAbstractionLayer\EntityIdTrait;
 // OneToOne association class
@@ -25,14 +26,14 @@ class ProductEntity extends Entity
     protected $salesChannel;
 
     /**
-     * @var \DateTimeInterface
+     * @var DateTimeInterface
      */
     protected $createdAt;
 
     /**
      * @return string
      */
-    public function getproductId(): string
+    public function getProductId(): string
     {
         return $this->productId;
     }
@@ -40,7 +41,7 @@ class ProductEntity extends Entity
     /**
      * @param string $productId
      */
-    public function setproductId(string $productId): void
+    public function setProductId(string $productId): void
     {
         $this->productId = $productId;
     }
@@ -62,17 +63,17 @@ class ProductEntity extends Entity
     }
 
     /**
-     * @return \DateTimeInterface
+     * @return DateTimeInterface
      */
-    public function getCreatedAt(): \DateTimeInterface
+    public function getCreatedAt(): DateTimeInterface
     {
         return $this->createdAt;
     }
 
     /**
-     * @param \DateTimeInterface $createdAt
+     * @param DateTimeInterface $createdAt
      */
-    public function setCreatedAt(\DateTimeInterface $createdAt): void
+    public function setCreatedAt(DateTimeInterface $createdAt): void
     {
         $this->createdAt = $createdAt;
     }

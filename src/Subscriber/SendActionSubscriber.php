@@ -136,7 +136,7 @@ class SendActionSubscriber implements EventSubscriberInterface
     private function actionCanBeSent(string $orderId): bool
     {
         $lengowOrder = $this->lengowOrder->getLengowOrderByOrderId($orderId);
-        $activeActions = $this->lengowAction->getActiveActionByOrderId($orderId);
+        $activeActions = $this->lengowAction->getActionsByOrderId($orderId, true);
         // if a Lengow order and order is not closed, action can be sent
         return $lengowOrder
             && $lengowOrder->getOrderProcessState() !== LengowOrder::PROCESS_STATE_FINISH

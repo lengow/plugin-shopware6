@@ -119,6 +119,7 @@ log.import.order_successfully_imported|order successfully imported (ORDER ID %{o
 log.import.order_synchronized_with_lengow|order successfully synchronised with Lengow webservice (ORDER ID %{order_id})
 log.import.order_not_synchronized_with_lengow|WARNING! Order could NOT be synchronised with Lengow webservice (ORDER ID %{order_id})
 log.import.unable_verify_date|unable to check if the order is too old
+log.import.unable_find_order|Unable to find the requested order
 log.order_action.check_completed_action|check completed actions
 log.order_action.check_old_action|check and finish old actions
 log.order_action.check_action_not_sent|check actions not sent

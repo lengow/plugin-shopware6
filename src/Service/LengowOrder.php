@@ -13,6 +13,7 @@ use Shopware\Core\Checkout\Order\OrderEntity;
 use Shopware\Core\Checkout\Order\OrderDefinition;
 use Shopware\Core\Checkout\Order\OrderStates;
 use Shopware\Core\Framework\Context;
+use Shopware\Core\Framework\DataAbstractionLayer\EntityCollection;
 use Shopware\Core\Framework\DataAbstractionLayer\EntityRepositoryInterface;
 use Shopware\Core\Framework\DataAbstractionLayer\Search\Criteria;
 use Shopware\Core\Framework\DataAbstractionLayer\Search\Filter\EqualsFilter;
@@ -562,6 +563,33 @@ class LengowOrder
             }
         }
         return null;
+    }
+
+    /**
+     * Retrieves all the Lengow order ids from a marketplace reference
+     *
+     * @param string $marketplaceSku marketplace order sku
+     * @param string $marketplaceName marketplace name
+     *
+     * @return EntityCollection|null
+     */
+    public function getAllLengowOrders(string $marketplaceSku, string $marketplaceName): ?EntityCollection
+    {
+        $context = Context::createDefaultContext();
+        $criteria = new Criteria();
+        $criteria->addFilter(new MultiFilter(MultiFilter::CONNECTION_AND, [
+            new EqualsFilter(LengowOrderDefinition::FIELD_MARKETPLACE_SKU, $marketplaceSku),
+            new EqualsFilter(LengowOrderDefinition::FIELD_MARKETPLACE_NAME, $marketplaceName),
+        ]));
+        $criteria->addAssociation('order.deliveries')
+            ->addAssociation('order.deliveries.shippingMethod')
+            ->addAssociation('order.deliveries.shippingOrderAddress.country')
+            ->addAssociation('order.transactions.paymentMethod')
+            ->addAssociation('order.lineItems')
+            ->addAssociation('order.currency')
+            ->addAssociation('order.addresses.country');
+        $lengowOrderCollection = $this->lengowOrderRepository->search($criteria, $context)->getEntities();
+        return $lengowOrderCollection->count() !== 0 ? $lengowOrderCollection : null;
     }
 
     /**

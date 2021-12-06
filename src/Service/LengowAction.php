@@ -249,17 +249,18 @@ class LengowAction
      * Get all active actions for a Shopware order
      *
      * @param string $orderId Shopware order id
+     * @param bool $onlyActive get only active actions
      *
      * @return EntityCollection|null
      */
-    public function getActiveActionByOrderId(string $orderId): ?EntityCollection
+    public function getActionsByOrderId(string $orderId, bool $onlyActive = false): ?EntityCollection
     {
         $context = Context::createDefaultContext();
         $criteria = new Criteria();
-        $criteria->addFilter(new MultiFilter(MultiFilter::CONNECTION_AND, [
-            new EqualsFilter('order.id', $orderId),
-            new EqualsFilter(LengowActionDefinition::FIELD_STATE, self::STATE_NEW),
-        ]));
+        $criteria->addFilter(new EqualsFilter('order.id', $orderId));
+        if ($onlyActive) {
+            $criteria->addFilter(new EqualsFilter(LengowActionDefinition::FIELD_STATE, self::STATE_NEW));
+        }
         /** @var LengowActionCollection $lengowActionCollection */
         $lengowActionCollection = $this->lengowActionRepository->search($criteria, $context)->getEntities();
         return $lengowActionCollection->count() !== 0 ? $lengowActionCollection : null;
