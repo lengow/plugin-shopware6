@@ -408,6 +408,7 @@
                 "title": "Plugin information",
                 "version": "Shopware version",
                 "plugin_version": "Plugin version",
+                "php_version": "PHP version",
                 "debug_disabled": "Debug Mode disabled",
                 "write_permission": "Read and write permission for media folder",
                 "server_ip": "Server IP",

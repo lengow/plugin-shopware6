@@ -1,5 +1,5 @@
 # v1.1.1
-
+- Feature: Adding the PHP version in the toolbox
 
 # v1.1.0
 - Feature: Integration of order synchronization in the toolbox webservice

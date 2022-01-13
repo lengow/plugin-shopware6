@@ -408,6 +408,7 @@
                 "title": "Information zum Plugin",
                 "version": "Version von Shopware",
                 "plugin_version": "Version des Plugins",
+                "php_version": "PHP-Version",
                 "debug_disabled": "Debug Mode ist deaktiviert",
                 "write_permission": "Genehmigung vom Mediumordner schreiben",
                 "server_ip": "Server IP",
