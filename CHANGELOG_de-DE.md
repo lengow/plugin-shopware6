@@ -1,5 +1,6 @@
 # v1.1.1
 - Feature: Hinzufügen der PHP-Version in der Toolbox
+- Feature: Änderung der Fallback-URLs des Lengow Help Centers
 
 # v1.1.0
 - Feature: Integration der Auftragssynchronisation in den Webservice der Toolbox

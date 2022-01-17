@@ -423,7 +423,7 @@
 /src/Resources/public/flag/GP.png|cc1fc719aa70170cf59aa97989f32fca
 /src/Service/LengowToolbox.php|61f58d161fb2c2a1cbabe956a675efbf
 /src/Service/LengowConnector.php|057dd8651c69912a4b8da981528593f0
-/src/Service/LengowSync.php|fed3bcc5abfdefa4b4bc72919584848c
+/src/Service/LengowSync.php|58bc8c38e0f6bc899665188a6acb43d6
 /src/Service/LengowProduct.php|a9b0760101786722768ed1a025e8aa5b
 /src/Service/LengowOrder.php|5d3eff62782b3e450f0dd02b0c715b71
 /src/Service/LengowActionSync.php|71c718f25f3f509f2dab30a6c1cf3e81
