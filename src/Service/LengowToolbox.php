@@ -158,6 +158,7 @@ class LengowToolbox
     public const ACTION_PARAMETERS = 'parameters';
     public const ACTION_RETRY = 'retry';
     public const ACTION_FINISH = 'is_finished';
+    public const EXTRA_UPDATED_AT = 'extra_updated_at';
 
     /* Process state labels */
     private const PROCESS_STATE_NEW = 'new';
@@ -955,7 +956,12 @@ class LengowToolbox
      */
     private function getOrderExtraData(LengowOrderEntity $lengowOrder): array
     {
-        return $lengowOrder->getExtra() ?: [];
+        $orderData = $lengowOrder->getExtra() ?: [];
+        $updatedAt = $lengowOrder->getUpdatedAt() ? $lengowOrder->getUpdatedAt()->getTimestamp() : 0;
+        $orderData[self::EXTRA_UPDATED_AT] = $lengowOrder->getImportedAt()
+            ? $lengowOrder->getImportedAt()->getTimestamp()
+            : $updatedAt;
+        return $orderData;
     }
 
     /**

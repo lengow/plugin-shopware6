@@ -1,6 +1,7 @@
 # v1.1.1
 - Feature: Adding the PHP version in the toolbox
 - Feature: Modification of the fallback urls of the Lengow Help Center
+- Feature: Adding extra field update date in external toolbox
 
 # v1.1.0
 - Feature: Integration of order synchronization in the toolbox webservice
