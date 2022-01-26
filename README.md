@@ -3,7 +3,7 @@
 - **Requires at least:** Shopware 6.2
 - **Tested up to:** Shopware 6.4
 - **Requires PHP:** 7.3.11
-- **Stable tag:** 1.1.0
+- **Stable tag:** 1.1.1
 - **License:** MIT
 - **License URI:** https://opensource.org/licenses/MIT
 
@@ -52,11 +52,11 @@ You can also start testing with lower permissions due to security reasons (644 f
 
 ### Where can I find Lengow documentation and user guides?
 
-For help setting up and configuring Lengow plugin please refer to our [user guide](https://support.lengow.com/kb/guide/en/shopware-6-1KEHaAuucG/Steps/98507)
+For help setting up and configuring Lengow plugin please refer to our [user guide](https://help.lengow.com/hc/en-us/articles/4411830779410)
 
 ## Where can I get support?
 
-To make a support request to Lengow, use [our helpdesk](https://support.lengow.com/hc/en-us/requests/new).
+To make a support request to Lengow, use [our helpdesk](https://help.lengow.com/hc/en-us/requests/new).
 
 
 ## Become a contributor

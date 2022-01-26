@@ -49,13 +49,12 @@
                                         :value="overviewData.plugin.plugin_version">
                                 </lgw-description-list-element>
                                 <lgw-description-list-element
-                                        :title="$tc('lengow-connector.toolbox.plugin.debug_disabled')"
-                                        :value="overviewData.plugin.debug_mode_disable"
-                                        :type="'bool'">
+                                    :title="$tc('lengow-connector.toolbox.plugin.php_version')"
+                                    :value="overviewData.plugin.php_version">
                                 </lgw-description-list-element>
                                 <lgw-description-list-element
-                                        :title="$tc('lengow-connector.toolbox.plugin.write_permission')"
-                                        :value="overviewData.plugin.write_permission"
+                                        :title="$tc('lengow-connector.toolbox.plugin.debug_disabled')"
+                                        :value="overviewData.plugin.debug_mode_disable"
                                         :type="'bool'">
                                 </lgw-description-list-element>
                             </sw-description-list>
@@ -73,6 +72,11 @@
                                         :title="$tc('lengow-connector.toolbox.plugin.authorized_ips')"
                                         :value="overviewData.plugin.authorized_ips"
                                         :type="'array'">
+                                </lgw-description-list-element>
+                                <lgw-description-list-element
+                                    :title="$tc('lengow-connector.toolbox.plugin.write_permission')"
+                                    :value="overviewData.plugin.write_permission"
+                                    :type="'bool'">
                                 </lgw-description-list-element>
                             </sw-description-list>
                         </sw-container>

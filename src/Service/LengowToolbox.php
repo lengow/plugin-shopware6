@@ -65,6 +65,7 @@ class LengowToolbox
     public const PLUGIN = 'plugin';
     public const PLUGIN_CMS_VERSION = 'cms_version';
     public const PLUGIN_VERSION = 'plugin_version';
+    public const PLUGIN_PHP_VERSION = 'php_version';
     public const PLUGIN_DEBUG_MODE_DISABLE = 'debug_mode_disable';
     public const PLUGIN_WRITE_PERMISSION = 'write_permission';
     public const PLUGIN_SERVER_IP = 'server_ip';
@@ -157,6 +158,7 @@ class LengowToolbox
     public const ACTION_PARAMETERS = 'parameters';
     public const ACTION_RETRY = 'retry';
     public const ACTION_FINISH = 'is_finished';
+    public const EXTRA_UPDATED_AT = 'extra_updated_at';
 
     /* Process state labels */
     private const PROCESS_STATE_NEW = 'new';
@@ -444,6 +446,7 @@ class LengowToolbox
         return [
             self::PLUGIN_CMS_VERSION => $this->environmentInfoProvider->getVersion(),
             self::PLUGIN_VERSION => $this->environmentInfoProvider->getPluginVersion(),
+            self::PLUGIN_PHP_VERSION => PHP_VERSION,
             self::PLUGIN_DEBUG_MODE_DISABLE => !$this->lengowConfiguration->debugModeIsActive(),
             self::PLUGIN_WRITE_PERMISSION => $this->testWritePermission(),
             self::PLUGIN_SERVER_IP => $_SERVER['SERVER_ADDR'],
@@ -953,7 +956,12 @@ class LengowToolbox
      */
     private function getOrderExtraData(LengowOrderEntity $lengowOrder): array
     {
-        return $lengowOrder->getExtra() ?: [];
+        $orderData = $lengowOrder->getExtra() ?: [];
+        $updatedAt = $lengowOrder->getUpdatedAt() ? $lengowOrder->getUpdatedAt()->getTimestamp() : 0;
+        $orderData[self::EXTRA_UPDATED_AT] = $lengowOrder->getImportedAt()
+            ? $lengowOrder->getImportedAt()->getTimestamp()
+            : $updatedAt;
+        return $orderData;
     }
 
     /**

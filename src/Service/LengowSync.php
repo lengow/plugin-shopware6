@@ -33,10 +33,10 @@ class LengowSync
     public const LINK_TYPE_SUPPORT = 'support';
 
     /* Default plugin links */
-    private const LINK_HELP_CENTER = 'https://support.lengow.com/kb/guide/en/1KEHaAuucG';
-    private const LINK_CHANGELOG = 'https://support.lengow.com/kb/guide/en/wxmN8B2Awk';
-    private const LINK_UPDATE_GUIDE = 'https://support.lengow.com/kb/guide/en/1KEHaAuucG/Steps/98507,123308';
-    private const LINK_SUPPORT = 'https://help-support.lengow.com/hc/en-us/requests/new';
+    private const LINK_HELP_CENTER = 'https://help.lengow.com/hc/en-us/articles/4411830779410';
+    private const LINK_CHANGELOG = 'https://help.lengow.com/hc/en-us/articles/360011089260';
+    private const LINK_UPDATE_GUIDE = 'https://help.lengow.com/hc/en-us/articles/4411830779410#updating-your-plugin-version';
+    private const LINK_SUPPORT = 'https://help.lengow.com/hc/en-us/requests/new';
 
     /* Api iso codes */
     private const API_ISO_CODE_EN = 'en';
