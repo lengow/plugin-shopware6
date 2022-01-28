@@ -34,7 +34,7 @@ class LengowSync
 
     /* Default plugin links */
     private const LINK_HELP_CENTER = 'https://help.lengow.com/hc/en-us/articles/4411830779410';
-    private const LINK_CHANGELOG = 'https://help.lengow.com/hc/en-us/articles/360011089260';
+    private const LINK_CHANGELOG = 'https://help.lengow.com/hc/en-us/articles/4411830853522';
     private const LINK_UPDATE_GUIDE = 'https://help.lengow.com/hc/en-us/articles/4411830779410#updating-your-plugin-version';
     private const LINK_SUPPORT = 'https://help.lengow.com/hc/en-us/requests/new';
 
