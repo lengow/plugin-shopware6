@@ -1,4 +1,4 @@
-/composer.json|a0d226863dbac6b8d76510fa09abe7f2
+/composer.json|86e6778aafbdf4abda0c624d447a1391
 /src/LengowConnector.php|adc6e6d93f0d8689b9b2bb255fb9ac9a
 /src/Resources/public/bag.png|d812d529e1b5404cf7b92d4f36ab7abd
 /src/Resources/public/clock.png|499ea8d7905f77624cb64b1af3f955b5
@@ -52,7 +52,7 @@
 /src/Factory/LengowMarketplaceFactory.php|312cf20a1178ce848562e948f266e550
 /src/Migration/Migration1606313662Init.php|94df85fa4924264a5625bdbae8486ae1
 /src/Migration/Migration1624606589Update102.php|b556625decfb9ab607d158b4fe936bd6
-/src/Resources/app/administration/src/module/const.js|ef2a248585d91656ead50018b4bed659
+/src/Resources/app/administration/src/module/const.js|bd5d223d2fe530f3a41ab9309af8124f
 /src/Resources/app/administration/src/module/lengow-connector/view/lgw-setting-general/lgw-setting-general.html.twig|d8e9342e491dbba23f7c61d3745009d6
 /src/Resources/app/administration/src/module/lengow-connector/view/lgw-setting-general/index.js|19a999074c04fb8860203fd2bf2d908a
 /src/Resources/app/administration/src/module/lengow-connector/view/lgw-setting-general/lgw-setting-general.scss|e72290464e8ffdc2a97ea6e19b793fc2
@@ -453,4 +453,4 @@
 /src/Subscriber/CheckoutFinishPageLoadedSubscriber.php|d96a88db69cebc7298870d2e77b58bc9
 /src/Subscriber/ProductExtensionSubscriber.php|ed70587d3746145b6f630640205f5bb9
 /src/Util/StringCleaner.php|752a3e6e13877fed16915d632418e386
-/src/Util/EnvironmentInfoProvider.php|3a06848841f4b179c8fd0a683ceebe55
+/src/Util/EnvironmentInfoProvider.php|a5a425cf6a8a635f2a841f92d3e2022a
