@@ -477,7 +477,7 @@ class LengowMarketplace
     {
         $result = '';
         foreach ($this->carriers as $key => $label) {
-            $keyCleaned = $this->cleanString($key);
+            $keyCleaned = $this->cleanString((string)$key);
             $labelCleaned = $this->cleanString($label);
             // search on the carrier key
             $found = $this->searchValue($keyCleaned, $nameCleaned, $strict);
@@ -489,7 +489,7 @@ class LengowMarketplace
                 $result = $key;
             }
         }
-        return $result;
+        return (string)$result;
     }
 
     /**
