@@ -188,6 +188,7 @@ class LengowMarketplace
                 return (string) $defaultValue;
             }
         }
+
         return '';
     }
 
@@ -212,9 +213,11 @@ class LengowMarketplace
                 && is_array($actions['optional_args'])
                 && in_array(LengowAction::ARG_LINE, $actions['optional_args'], true)
             ) {
+
                 return true;
             }
         }
+
         return false;
     }
 
@@ -260,6 +263,7 @@ class LengowMarketplace
             // send a new action on the order via the Lengow API
             $this->lengowAction->sendAction($params, $order, $lengowOrder);
         }
+
         return true;
     }
 
@@ -326,6 +330,7 @@ class LengowMarketplace
         if (isset($actions['optional_args'])) {
             $marketplaceArguments = array_merge($actions['optional_args'], $marketplaceArguments);
         }
+
         return $marketplaceArguments;
     }
 
@@ -391,6 +396,7 @@ class LengowMarketplace
                     break;
             }
         }
+
         return $params;
     }
 
@@ -425,6 +431,7 @@ class LengowMarketplace
                 }
             }
         }
+
         return $params;
     }
 
@@ -449,6 +456,7 @@ class LengowMarketplace
                 return $result;
             }
         }
+
         return $name;
     }
 
@@ -462,6 +470,7 @@ class LengowMarketplace
     private function cleanString(string $string): string
     {
         $cleanFilters = [' ', '-', '_', '.'];
+
         return strtolower(str_replace($cleanFilters, '', trim($string)));
     }
 
@@ -489,6 +498,7 @@ class LengowMarketplace
                 $result = $key;
             }
         }
+
         return (string)$result;
     }
 
@@ -504,8 +514,10 @@ class LengowMarketplace
     private function searchValue(string $pattern, string $subject, bool $strict = true): bool
     {
         if ($strict) {
+
             return $pattern === $subject;
         }
+
         return (bool) preg_match('`.*?' . $pattern . '.*?`i', $subject);
     }
 }
