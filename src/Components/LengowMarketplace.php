@@ -213,7 +213,6 @@ class LengowMarketplace
                 && is_array($actions['optional_args'])
                 && in_array(LengowAction::ARG_LINE, $actions['optional_args'], true)
             ) {
-
                 return true;
             }
         }
@@ -514,7 +513,6 @@ class LengowMarketplace
     private function searchValue(string $pattern, string $subject, bool $strict = true): bool
     {
         if ($strict) {
-
             return $pattern === $subject;
         }
 
