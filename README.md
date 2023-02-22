@@ -2,7 +2,7 @@
 
 - **Requires at least:** Shopware 6.4
 - **Tested up to:** Shopware 6.4
-- **Requires PHP:** 8.1
+- **Requires PHP:** 7.4
 - **Stable tag:** 1.1.2
 - **License:** MIT
 - **License URI:** https://opensource.org/licenses/MIT
