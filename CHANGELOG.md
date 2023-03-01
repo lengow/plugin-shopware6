@@ -1,5 +1,5 @@
 # v1.1.2
-
+- Bugfix: [import] fix search carrier code 
 
 # v1.1.1
 - Feature: Adding the PHP version in the toolbox

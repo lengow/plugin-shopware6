@@ -1,5 +1,5 @@
 # v1.1.2
-
+- Bugfix: [import] Korrektur des Suchträgercodes
 
 # v1.1.1
 - Feature: Hinzufügen der PHP-Version in der Toolbox
