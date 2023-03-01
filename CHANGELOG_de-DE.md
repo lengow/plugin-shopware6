@@ -1,3 +1,6 @@
+# v1.1.2
+- Bugfix: [import] Korrektur des Suchträgercodes
+
 # v1.1.1
 - Feature: Hinzufügen der PHP-Version in der Toolbox
 - Feature: Änderung der Fallback-URLs des Lengow Help Centers

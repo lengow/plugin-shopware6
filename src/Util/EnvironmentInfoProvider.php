@@ -53,7 +53,7 @@ class EnvironmentInfoProvider
     /**
      * @var string plugin version
      */
-    public const PLUGIN_VERSION = '1.1.1';
+    public const PLUGIN_VERSION = '1.1.2';
 
     /**
      * @var string Name of Lengow front controller
