@@ -130,7 +130,7 @@ class LengowImportOrder
     private $lengowAddress;
 
     /**
-     * @var EntityRepositoryInterface Shopware currency repository
+     * @var EntityRepository Shopware currency repository
      */
     private $currencyRepository;
 
@@ -335,7 +335,7 @@ class LengowImportOrder
      * @param LengowProduct $lengowProduct Lengow product service
      * @param LengowCustomer $lengowCustomer Lengow customer service
      * @param LengowAddress $lengowAddress Lengow address service
-     * @param EntityRepositoryInterface $currencyRepository Shopware currency repository
+     * @param EntityRepository $currencyRepository Shopware currency repository
      * @param SalesChannelContextFactory $salesChannelContextFactory Shopware sales channel context factory
      * @param CartService $cartService Shopware cart service
      * @param OrderConverter $orderConverter Shopware order converter service
@@ -352,7 +352,7 @@ class LengowImportOrder
         LengowProduct $lengowProduct,
         LengowCustomer $lengowCustomer,
         LengowAddress $lengowAddress,
-        EntityRepositoryInterface $currencyRepository,
+        EntityRepository $currencyRepository,
         $salesChannelContextFactory,
         CartService $cartService,
         OrderConverter $orderConverter,
@@ -871,7 +871,7 @@ class LengowImportOrder
                     'currency_iso' => $this->orderData->currency->iso_a3,
                 ]);
             } else {
-               $this->currency = $currencyCollection->first();
+                $this->currency = $currencyCollection->first();
             }
         }
         if ($this->orderData->total_order === -1) {

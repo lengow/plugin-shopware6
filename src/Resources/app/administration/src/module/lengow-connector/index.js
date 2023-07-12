@@ -36,7 +36,7 @@ import './view/lgw-toolbox-log';
 
 Shopware.Module.register('lengow-connector', {
     color: '#ff3d58',
-    icon: 'default-shopping-paper-bag-product',
+    icon: 'regular-shopping-bag-product',
     title: 'Lengow',
     description: 'Lengow',
 

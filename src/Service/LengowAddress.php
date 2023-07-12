@@ -3,7 +3,7 @@
 namespace Lengow\Connector\Service;
 
 use Shopware\Core\Framework\Context;
-use Shopware\Core\Framework\DataAbstractionLayer\EntityRepositoryInterface;
+use Shopware\Core\Framework\DataAbstractionLayer\EntityRepository;
 use Shopware\Core\Framework\DataAbstractionLayer\Search\Criteria;
 use Shopware\Core\Framework\DataAbstractionLayer\Search\Filter\EqualsFilter;
 use Shopware\Core\Framework\DataAbstractionLayer\Search\Filter\MultiFilter;
@@ -42,17 +42,17 @@ class LengowAddress
     private $lengowLog;
 
     /**
-     * @var EntityRepositoryInterface Shopware country repository
+     * @var EntityRepository Shopware country repository
      */
     private $countryRepository;
 
     /**
-     * @var EntityRepositoryInterface Shopware country state repository
+     * @var EntityRepository Shopware country state repository
      */
     private $countryStateRepository;
 
     /**
-     * @var EntityRepositoryInterface Shopware salutation repository
+     * @var EntityRepository Shopware salutation repository
      */
     private $salutationRepository;
 
@@ -380,16 +380,16 @@ class LengowAddress
      * LengowAddress constructor
      *
      * @param LengowLog $lengowLog Lengow Log service
-     * @param EntityRepositoryInterface $countryRepository Shopware country repository
-     * @param EntityRepositoryInterface $countryStateRepository Shopware country state repository
-     * @param EntityRepositoryInterface $salutationRepository Shopware salutation repository
+     * @param EntityRepository $countryRepository Shopware country repository
+     * @param EntityRepository $countryStateRepository Shopware country state repository
+     * @param EntityRepository $salutationRepository Shopware salutation repository
      *
      */
     public function __construct(
         LengowLog $lengowLog,
-        EntityRepositoryInterface $countryRepository,
-        EntityRepositoryInterface $countryStateRepository,
-        EntityRepositoryInterface $salutationRepository
+        EntityRepository $countryRepository,
+        EntityRepository $countryStateRepository,
+        EntityRepository $salutationRepository
     )
     {
         $this->lengowLog = $lengowLog;

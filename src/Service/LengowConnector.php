@@ -11,11 +11,6 @@ use Lengow\Connector\Exception\LengowException;
  */
 class LengowConnector
 {
-    /**
-     * @var string url of the Lengow API
-     */
-    // private const LENGOW_API_URL = 'https://api.lengow.io';
-    private const LENGOW_API_URL = 'https://api.lengow.net';
 
     /**
      * @var string url of access token API
@@ -517,7 +512,7 @@ class LengowConnector
             $opts[CURLOPT_TIMEOUT] = $this->lengowUrls[$api];
         }
         // get base url for a specific environment
-        $url = self::LENGOW_API_URL . $api;
+        $url =  $this->lengowConfiguration->getApiLengowUrl() . $api;
         $opts[CURLOPT_CUSTOMREQUEST] = strtoupper($type);
         $url = parse_url($url);
         if (isset($url['port'])) {

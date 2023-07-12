@@ -181,7 +181,7 @@ class Migration1606313662Init extends MigrationStep
             );
         ');
 
-        $statesAvailable = $connection->fetchAll('
+        $statesAvailable = $connection->fetchAllAssociative('
             SELECT id
             FROM state_machine_state
             WHERE state_machine_id IN (
@@ -248,7 +248,7 @@ class Migration1606313662Init extends MigrationStep
                 null
             )
         ');
-        $languageAvailable = $connection->fetchAll('SELECT id FROM `language`');
+        $languageAvailable = $connection->fetchAllAssociative('SELECT id FROM `language`');
         foreach ($languageAvailable as $language) {
             $languageId = Uuid::fromBytesToHex($language['id']);
             if ($languageId) {

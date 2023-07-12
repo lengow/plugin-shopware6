@@ -5,7 +5,7 @@ namespace Lengow\Connector\Service;
 use Shopware\Core\Framework\Context;
 use Shopware\Core\Framework\DataAbstractionLayer\Search\Criteria;
 use Shopware\Core\Framework\DataAbstractionLayer\Search\Filter\EqualsFilter;
-use Shopware\Core\Framework\DataAbstractionLayer\EntityRepositoryInterface;
+use Shopware\Core\Framework\DataAbstractionLayer\EntityRepository;
 use Shopware\Core\Framework\Uuid\Uuid;
 
 /**
@@ -53,7 +53,7 @@ class LengowAccess
     private $lengowConfiguration;
 
     /**
-     * @var EntityRepositoryInterface $salesChannelRepository sales channel repository
+     * @var EntityRepository $salesChannelRepository sales channel repository
      */
     private $salesChannelRepository;
 
@@ -61,11 +61,11 @@ class LengowAccess
      * LengowAccess constructor
      *
      * @param LengowConfiguration $lengowConfiguration configuration access service
-     * @param EntityRepositoryInterface $salesChannelRepository shopware sales channel repository
+     * @param EntityRepository $salesChannelRepository shopware sales channel repository
      */
     public function __construct(
         LengowConfiguration $lengowConfiguration,
-        EntityRepositoryInterface $salesChannelRepository
+        EntityRepository $salesChannelRepository
     )
     {
         $this->lengowConfiguration = $lengowConfiguration;

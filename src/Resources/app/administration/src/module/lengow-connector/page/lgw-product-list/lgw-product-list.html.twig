@@ -36,7 +36,7 @@
                                 <div>
                                     <a :href="downloadLink">
                                         <span class="lgw-download-icon">
-                                            <sw-icon name="default-action-cloud-download" color="#3498db"></sw-icon>
+                                            <sw-icon name="regular-cloud-download" color="#3498db"></sw-icon>
                                         </span>
                                     </a>
                                 </div>
@@ -121,8 +121,8 @@
                                             <template #column-active="{ item }">
                                                 {% block lgw_product_list_grid_columns_active_content %}
                                                     <template>
-                                                        <sw-icon v-if="item.active" name="small-default-checkmark-line-medium" small class="is--active"></sw-icon>
-                                                        <sw-icon v-else name="small-default-x-line-medium" small class="is--inactive"></sw-icon>
+                                                        <sw-icon v-if="item.active" name="solid-checkmark-s" small class="is--active"></sw-icon>
+                                                        <sw-icon v-else name="regular-times-xs" small class="is--inactive"></sw-icon>
                                                     </template>
                                                 {% endblock %}
                                             </template>
@@ -170,30 +170,30 @@
                     <sw-sidebar v-if="productSelection" class="sw-order-list__sidebar lengow-filter-sidebar">
                         {% block lgw_product_list_sidebar_refresh %}
                             <sw-sidebar-item
-                                icon="default-arrow-360-left"
-                                :title="$tc('sw-order.list.titleSidebarItemRefresh')"
-                                @click="resetFilters">
+                                    icon="solid-redo"
+                                    :title="$tc('sw-order.list.titleSidebarItemRefresh')"
+                                    @click="resetFilters">
                             </sw-sidebar-item>
                         {% endblock %}
                         {% block lgw_product_list_sidebar_filter %}
-                            <sw-sidebar-item icon="default-action-filter"
+                            <sw-sidebar-item icon="regular-filter"
                                              :title="$tc('sw-order.list.titleSidebarItemFilter')"
                                              class="lengow-filter-sidebar_item">
                                 {% block lgw_product_list_sidebar_filter_items %}
                                     {% block lgw_product_list_sidebar_filter_active %}
                                         <sw-single-select
-                                            v-model="activeFilterText"
-                                            :options="isActiveOptions"
-                                            :label="$tc('lengow-connector.product.filter.active_filter_label')"
-                                            @change="onActiveFilter">
+                                                v-model="activeFilterText"
+                                                :options="isActiveOptions"
+                                                :label="$tc('lengow-connector.product.filter.active_filter_label')"
+                                                @change="onActiveFilter">
                                         </sw-single-select>
                                     {% endblock %}
                                     {% block lgw_product_list_sidebar_filter_stock %}
                                         <sw-single-select
-                                            v-model="stockFilterText"
-                                            :options="isWithStockOptions"
-                                            :label="$tc('lengow-connector.product.filter.stock_filter_label')"
-                                            @change="onStockFilter">
+                                                v-model="stockFilterText"
+                                                :options="isWithStockOptions"
+                                                :label="$tc('lengow-connector.product.filter.stock_filter_label')"
+                                                @change="onStockFilter">
                                         </sw-single-select>
                                     {% endblock %}
                                 {% endblock %}

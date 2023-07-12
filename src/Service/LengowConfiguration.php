@@ -6,7 +6,7 @@ use DateTime;
 use DateTimeZone;
 use Exception;
 use Shopware\Core\System\SystemConfig\SystemConfigService;
-use Shopware\Core\Framework\DataAbstractionLayer\EntityRepositoryInterface;
+use Shopware\Core\Framework\DataAbstractionLayer\EntityRepository;
 use Shopware\Core\Framework\DataAbstractionLayer\Event\EntityWrittenContainerEvent;
 use Shopware\Core\Framework\DataAbstractionLayer\Search\Criteria;
 use Shopware\Core\Framework\Context;
@@ -30,6 +30,7 @@ class LengowConfiguration
     public const ACCOUNT_ID = 'lengowAccountId';
     public const ACCESS_TOKEN = 'lengowAccessToken';
     public const SECRET = 'lengowSecretToken';
+    public const ENVIRONEMENT_URL = 'lengowEnvironmentUrl';
     public const CMS_TOKEN = 'lengowGlobalToken';
     public const AUTHORIZED_IP_ENABLED = 'lengowIpEnabled';
     public const AUTHORIZED_IPS = 'lengowAuthorizedIp';
@@ -84,6 +85,7 @@ class LengowConfiguration
     public const RETURN_TYPE_BOOLEAN = 'boolean';
     public const RETURN_TYPE_INTEGER = 'integer';
     public const RETURN_TYPE_ARRAY = 'array';
+    public const RETURN_TYPE_STRING = 'string';
 
     /**
      * @var string Lengow base setting path
@@ -103,6 +105,7 @@ class LengowConfiguration
         self::ACCESS_TOKEN => 'access_token',
         self::SECRET => 'secret',
         self::CMS_TOKEN => 'cms_token',
+        self::ENVIRONEMENT_URL => 'lengowEnvironmentUrl',
         self::AUTHORIZED_IP_ENABLED => 'authorized_ip_enabled',
         self::AUTHORIZED_IPS => 'authorized_ips',
         self::TRACKING_ENABLED => 'tracking_enabled',
@@ -168,6 +171,12 @@ class LengowConfiguration
             self::PARAM_GLOBAL => true,
             self::PARAM_EXPORT_TOOLBOX => false,
             self::PARAM_DEFAULT_VALUE => '',
+        ],
+        self::ENVIRONEMENT_URL => [
+            self::PARAM_GLOBAL => true,
+            self::PARAM_EXPORT_TOOLBOX => false,
+            self::PARAM_RETURN => self::RETURN_TYPE_STRING,
+            self::PARAM_DEFAULT_VALUE => '.net',
         ],
         self::AUTHORIZED_IP_ENABLED => [
             self::PARAM_GLOBAL => true,
@@ -374,7 +383,7 @@ class LengowConfiguration
     ];
 
     /**
-     * @var EntityRepositoryInterface $settingsRepository Lengow settings access
+     * @var EntityRepository $settingsRepository Lengow settings access
      */
     private $settingsRepository;
 
@@ -384,7 +393,7 @@ class LengowConfiguration
     private $systemConfigService;
 
     /**
-     * @var EntityRepositoryInterface $systemConfigRepository shopware settings repository
+     * @var EntityRepository $systemConfigRepository shopware settings repository
      */
     private $systemConfigRepository;
 
@@ -401,15 +410,15 @@ class LengowConfiguration
     /**
      * LengowConfiguration constructor
      *
-     * @param EntityRepositoryInterface $settingsRepository Lengow settings access
+     * @param EntityRepository $settingsRepository Lengow settings access
      * @param SystemConfigService $systemConfigService Shopware settings access
-     * @param EntityRepositoryInterface $systemConfigRepository shopware settings repository
+     * @param EntityRepository $systemConfigRepository shopware settings repository
      * @param EnvironmentInfoProvider $environmentInfoProvider Environment info provider utility
      */
     public function __construct(
-        EntityRepositoryInterface $settingsRepository,
+        EntityRepository $settingsRepository,
         SystemConfigService $systemConfigService,
-        EntityRepositoryInterface $systemConfigRepository,
+        EntityRepository $systemConfigRepository,
         EnvironmentInfoProvider $environmentInfoProvider
     )
     {
@@ -579,6 +588,37 @@ class LengowConfiguration
         [$accountId, $accessToken, $secretToken] = $this->getAccessIds();
         return !($accountId !== null && $accessToken !== null && $secretToken !== null);
     }
+
+    /**
+     * Get the value of URL_ENVIRONNEMENT from the form
+     *
+     * @return string The URL suffix (e.g., ".io", ".net")
+     */
+    public function getUrlEnvironnement()
+    {
+        return $this->get(self::ENVIRONEMENT_URL);
+    }
+    /**
+     * Get the URL of the Lengow solution
+     *
+     * @return string
+     */
+    public function getLengowUrl()
+    {
+        $urlEnvironnement = $this->getUrlEnvironnement();
+        return 'lengow' . $urlEnvironnement;
+    }
+    /**
+     * Get the URL of the API Lengow solution
+     *
+     * @return string
+     */
+    public function getApiLengowUrl()
+    {
+        $urlEnvironnement = $this->getUrlEnvironnement();
+        return 'https://api.lengow' . $urlEnvironnement;
+    }
+
 
     /**
      * Get catalog ids for a specific shop
@@ -840,6 +880,8 @@ class LengowConfiguration
                     return (int) $value;
                 case self::RETURN_TYPE_ARRAY:
                     return $value ? explode(';', trim(str_replace(["\r\n", ',', ' '], ';', $value), ';')) : [];
+                case self::RETURN_TYPE_STRING:
+                    return (string) $value;
             }
         }
         return $value;
@@ -912,16 +954,15 @@ class LengowConfiguration
      * create default config linked to salesChannel in database
      * Since this method is static, you have to pass the repository as arguments
      *
-     * @param EntityRepositoryInterface $salesChannelRepository shopware sales channel repository
-     * @param EntityRepositoryInterface $shippingMethodRepository shopware shipping method repository
-     * @param EntityRepositoryInterface $settingsRepository lengow settings repository
+     * @param EntityRepository $salesChannelRepository shopware sales channel repository
+     * @param EntityRepository $shippingMethodRepository shopware shipping method repository
+     * @param EntityRepository $settingsRepository lengow settings repository
      */
     public static function createDefaultSalesChannelConfig(
-        EntityRepositoryInterface $salesChannelRepository,
-        EntityRepositoryInterface $shippingMethodRepository,
-        EntityRepositoryInterface $settingsRepository
-    ): void
-    {
+        EntityRepository $salesChannelRepository,
+        EntityRepository $shippingMethodRepository,
+        EntityRepository $settingsRepository
+    ): void {
         $salesChannels = $salesChannelRepository->search(new Criteria(), Context::createDefaultContext());
         $config = [];
         foreach(self::$lengowSettings as $key => $lengowSetting) {
@@ -937,10 +978,7 @@ class LengowConfiguration
                             LengowSettingsDefinition::FIELD_SALES_CHANNEL_ID => $salesChannel->getId(),
                             LengowSettingsDefinition::FIELD_NAME => $key,
                             LengowSettingsDefinition::FIELD_VALUE =>
-                                EnvironmentInfoProvider::getShippingMethodDefaultValue(
-                                    $salesChannel->getId(),
-                                    $shippingMethodRepository
-                                )
+                                $shippingMethodRepository->search(new Criteria([$salesChannel->getId()]), Context::createDefaultContext())->first()
                         ];
                         continue;
                     }
@@ -969,14 +1007,14 @@ class LengowConfiguration
     /**
      * Check if lengow setting already created
      *
-     * @param EntityRepositoryInterface $settingsRepository lengow settings repository
+     * @param EntityRepository $settingsRepository lengow settings repository
      * @param string $key config name
      * @param string|null $salesChannelId sales channel
      *
      * @return bool
      */
     public static function lengowSettingExist(
-        EntityRepositoryInterface $settingsRepository,
+        EntityRepository $settingsRepository,
         string $key,
         string $salesChannelId = null
     ): bool

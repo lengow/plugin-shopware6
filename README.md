@@ -3,7 +3,7 @@
 - **Requires at least:** Shopware 6.4
 - **Tested up to:** Shopware 6.4
 - **Requires PHP:** 7.4
-- **Stable tag:** 1.1.2
+- **Stable tag:** 1.1.3
 - **License:** MIT
 - **License URI:** https://opensource.org/licenses/MIT
 
@@ -66,10 +66,12 @@ Lengow for Shopware 6 is available under license (MIT). If you want to contribut
 The `master` branch contains the latest stable version of the plugin. The `dev` branch contains the version under development.
 All Pull requests must be made on the `dev` branch and must be validated by reviewers working at Lengow.
 
-By default the plugin is made to work on our pre-production environment (my.lengow.net).
-To change this environment, you must modify the two constants present in the file `path-to-api-connector-file`
+By default, the plugin is made to work on our pre-production environment (my.lengow.net).
+The environment can be changed to production (my.lengow.io) in the settings of this module.
 
-    const LENGOW_API_URL = 'https://api.lengow.net';
+If you want to record a new connection when you change environment, go to settings, then go to the import section and activate debug mode.
+Then go back to the general settings section, and delete the data from the Identifiers fields.
+Finally, open the Lengow module again and you can make a new connection.
 
 ### Translation
 

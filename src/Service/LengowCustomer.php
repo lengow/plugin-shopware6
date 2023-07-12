@@ -6,7 +6,7 @@ use Exception;
 use Shopware\Core\Checkout\Customer\CustomerCollection;
 use Shopware\Core\Checkout\Customer\CustomerEntity;
 use Shopware\Core\Framework\Context;
-use Shopware\Core\Framework\DataAbstractionLayer\EntityRepositoryInterface;
+use Shopware\Core\Framework\DataAbstractionLayer\EntityRepository;
 use Shopware\Core\Framework\DataAbstractionLayer\Search\Criteria;
 use Shopware\Core\Framework\DataAbstractionLayer\Search\Filter\EqualsFilter;
 use Shopware\Core\Framework\DataAbstractionLayer\Search\Filter\MultiFilter;
@@ -32,7 +32,7 @@ class LengowCustomer
     private $lengowLog;
 
     /**
-     * @var EntityRepositoryInterface Shopware customer repository
+     * @var EntityRepository Shopware customer repository
      */
     private $customerRepository;
 
@@ -51,14 +51,14 @@ class LengowCustomer
      *
      * @param LengowAddress $lengowAddress Lengow address service
      * @param LengowLog $lengowLog Lengow log service
-     * @param EntityRepositoryInterface $customerRepository Shopware customer repository
+     * @param EntityRepository $customerRepository Shopware customer repository
      * @param NumberRangeValueGeneratorInterface $numberRangeValueGenerator Shopware number generator service
      * @param EnvironmentInfoProvider $environmentInfoProvider Environment info provider utility
      */
     public function __construct(
         LengowAddress $lengowAddress,
         LengowLog $lengowLog,
-        EntityRepositoryInterface $customerRepository,
+        EntityRepository $customerRepository,
         NumberRangeValueGeneratorInterface $numberRangeValueGenerator,
         EnvironmentInfoProvider $environmentInfoProvider
     )

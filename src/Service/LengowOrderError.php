@@ -5,7 +5,7 @@ namespace Lengow\Connector\Service;
 use Exception;
 use Shopware\Core\Framework\Context;
 use Shopware\Core\Framework\DataAbstractionLayer\EntityCollection;
-use Shopware\Core\Framework\DataAbstractionLayer\EntityRepositoryInterface;
+use Shopware\Core\Framework\DataAbstractionLayer\EntityRepository;
 use Shopware\Core\Framework\DataAbstractionLayer\Search\Criteria;
 use Shopware\Core\Framework\DataAbstractionLayer\Search\Filter\EqualsFilter;
 use Shopware\Core\Framework\DataAbstractionLayer\Search\Filter\MultiFilter;
@@ -25,7 +25,7 @@ class LengowOrderError
     public const TYPE_ERROR_SEND = 2;
 
     /**
-     * @var EntityRepositoryInterface $orderErrorRepository Lengow order error repository
+     * @var EntityRepository $orderErrorRepository Lengow order error repository
      */
     private $lengowOrderErrorRepository;
 
@@ -65,10 +65,10 @@ class LengowOrderError
     /**
      * LengowOrderError constructor
      *
-     * @param EntityRepositoryInterface $lengowOrderErrorRepository Lengow order error repository access
+     * @param EntityRepository $lengowOrderErrorRepository Lengow order error repository access
      * @param LengowLog $lengowLog Lengow log service
      */
-    public function __construct(EntityRepositoryInterface $lengowOrderErrorRepository, LengowLog $lengowLog)
+    public function __construct(EntityRepository $lengowOrderErrorRepository, LengowLog $lengowLog)
     {
         $this->lengowOrderErrorRepository = $lengowOrderErrorRepository;
         $this->lengowLog = $lengowLog;

@@ -1,8 +1,11 @@
 import template from './lgw-connection-cms.html.twig';
 import './lgw-connection-cms.scss';
-import { LENGOW_URL } from '../../../const';
 
-const { Component } = Shopware;
+const {
+    Component,
+    Data: { Criteria }
+} = Shopware;
+
 const { mapState } = Shopware.Component.getComponentHelper();
 
 Component.register('lgw-connection-cms', {
@@ -10,13 +13,14 @@ Component.register('lgw-connection-cms', {
 
     inject: [
         'LengowConnectorConnectionService',
-        'LengowConnectorSyncService'
+        'LengowConnectorSyncService',
+        'repositoryFactory'
     ],
 
     data() {
         return {
             isLoading: false,
-            lengowUrl: LENGOW_URL,
+            lengowUrl: 'https://my.lengow.net',
             preprod: false,
             connectionButtonDisabled: true,
             showCredentialForm: true,
@@ -31,11 +35,14 @@ Component.register('lgw-connection-cms', {
     },
 
     computed: {
-        ...mapState('lgwConnection', ['catalogList'])
+        ...mapState('lgwConnection', ['catalogList']),
+        lengowConfigRepository() {
+            return this.repositoryFactory.create('lengow_settings');
+        }
     },
 
     created() {
-        this.createdComponent();
+        this.loadEnvironmentUrl();
     },
 
     methods: {
@@ -51,6 +58,17 @@ Component.register('lgw-connection-cms', {
                 }
             });
             this.isLoading = false;
+        },
+
+        loadEnvironmentUrl() {
+            const lengowConfigCriteria = new Criteria();
+            lengowConfigCriteria.addFilter(Criteria.equals('name', 'lengowEnvironmentUrl'));
+            this.lengowConfigRepository.search(lengowConfigCriteria, Shopware.Context.api).then(result => {
+                if (result.total > 0) {
+                    this.lengowUrl = 'https://my.lengow' + result[0].value;
+                    this.createdComponent();
+                }
+            });
         },
 
         connectCms() {

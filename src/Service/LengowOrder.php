@@ -14,7 +14,7 @@ use Shopware\Core\Checkout\Order\OrderDefinition;
 use Shopware\Core\Checkout\Order\OrderStates;
 use Shopware\Core\Framework\Context;
 use Shopware\Core\Framework\DataAbstractionLayer\EntityCollection;
-use Shopware\Core\Framework\DataAbstractionLayer\EntityRepositoryInterface;
+use Shopware\Core\Framework\DataAbstractionLayer\EntityRepository;
 use Shopware\Core\Framework\DataAbstractionLayer\Search\Criteria;
 use Shopware\Core\Framework\DataAbstractionLayer\Search\Filter\EqualsFilter;
 use Shopware\Core\Framework\DataAbstractionLayer\Search\Filter\MultiFilter;
@@ -66,17 +66,17 @@ class LengowOrder
     public const STATE_TECHNICAL_ERROR = 'technical_error';
 
     /**
-     * @var EntityRepositoryInterface Shopware order repository
+     * @var EntityRepository Shopware order repository
      */
     private $orderRepository;
 
     /**
-     * @var EntityRepositoryInterface Shopware order delivery repository
+     * @var EntityRepository Shopware order delivery repository
      */
     private $orderDeliveryRepository;
 
     /**
-     * @var EntityRepositoryInterface Shopware state machine state repository
+     * @var EntityRepository Shopware state machine state repository
      */
     private $stateMachineStateRepository;
 
@@ -86,7 +86,7 @@ class LengowOrder
     private $stateMachineRegistry;
 
     /**
-     * @var EntityRepositoryInterface $lengowOrderRepository Lengow order repository
+     * @var EntityRepository $lengowOrderRepository Lengow order repository
      */
     private $lengowOrderRepository;
 
@@ -288,11 +288,11 @@ class LengowOrder
     /**
      * LengowOrder constructor
      *
-     * @param EntityRepositoryInterface $orderRepository Shopware order repository
-     * @param EntityRepositoryInterface $orderDeliveryRepository Shopware order delivery repository
-     * @param EntityRepositoryInterface $stateMachineStateRepository Shopware state machine state repository
+     * @param EntityRepository $orderRepository Shopware order repository
+     * @param EntityRepository $orderDeliveryRepository Shopware order delivery repository
+     * @param EntityRepository $stateMachineStateRepository Shopware state machine state repository
      * @param StateMachineRegistry $stateMachineRegistry Shopware state machine registry service
-     * @param EntityRepositoryInterface $lengowOrderRepository Lengow order repository
+     * @param EntityRepository $lengowOrderRepository Lengow order repository
      * @param LengowLog $lengowLog Lengow log service
      * @param LengowConfiguration $lengowConfiguration Lengow configuration service
      * @param LengowConnector $lengowConnector Lengow connector service
@@ -302,11 +302,11 @@ class LengowOrder
      * @param LengowAction $lengowAction Lengow action service
      */
     public function __construct(
-        EntityRepositoryInterface $orderRepository,
-        EntityRepositoryInterface $orderDeliveryRepository,
-        EntityRepositoryInterface $stateMachineStateRepository,
+        EntityRepository $orderRepository,
+        EntityRepository $orderDeliveryRepository,
+        EntityRepository $stateMachineStateRepository,
         StateMachineRegistry $stateMachineRegistry,
-        EntityRepositoryInterface $lengowOrderRepository,
+        EntityRepository $lengowOrderRepository,
         LengowLog $lengowLog,
         LengowConfiguration $lengowConfiguration,
         LengowConnector $lengowConnector,

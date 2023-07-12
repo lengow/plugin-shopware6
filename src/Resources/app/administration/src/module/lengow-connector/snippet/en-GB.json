@@ -272,6 +272,7 @@
                 "import": "Import"
             },
             "title": {
+                "environment": "Environment",
                 "credentials": "Credentials",
                 "sales_channel": "Sales Channels",
                 "security": "Security & tracker",
@@ -286,6 +287,10 @@
                 "description": "Below you will find your Lengow login details.\nAccount ID, Access Token and Secret Token are automatically completed at your first connection : please do not change them.",
                 "saved_message_1": "Setting",
                 "saved_message_2": "saved",
+                "environment": {
+                    "label": "Environment",
+                    "description": "The environment to which you are connected"
+                },
                 "account": {
                     "label": "Account ID",
                     "description": "Your Lengow account ID. Please do not change it."

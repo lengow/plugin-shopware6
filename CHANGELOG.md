@@ -1,3 +1,10 @@
+# v1.1.3
+- Bugfix: [install] fix intallation plugin
+- Bugfix: [global] Replace class EntityRepositoryInterface by EntityRepository
+- Bugfix: [front] Use new class name for icon librairy of Shopware
+- Bugfix: [import & export] Use new annotation for route scope
+- Feature: Add configurable URL environment to connect to Lengow in setting and add accessible setting in home page of module
+
 # v1.1.2
 - Bugfix: [import] fix search carrier code 
 
