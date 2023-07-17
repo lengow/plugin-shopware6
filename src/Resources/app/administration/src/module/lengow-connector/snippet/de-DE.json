@@ -289,7 +289,7 @@
                 "saved_message_2": "gespeichert",
                 "environment": {
                     "label": "Umgebung",
-                    "description": "Die Umgebung mit der Sie verbunden sind"
+                    "description": "Die Umgebung mit der Sie verbunden sind."
                 },
                 "account": {
                     "label": "Account ID",

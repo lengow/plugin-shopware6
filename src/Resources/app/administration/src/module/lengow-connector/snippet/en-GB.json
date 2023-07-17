@@ -289,7 +289,7 @@
                 "saved_message_2": "saved",
                 "environment": {
                     "label": "Environment",
-                    "description": "The environment to which you are connected"
+                    "description": "The environment to which you are connected."
                 },
                 "account": {
                     "label": "Account ID",
