@@ -1578,7 +1578,6 @@ class LengowImportOrder
                     'id' => Uuid::fromHexToBytes($product->getId()),
                     'version' => Uuid::fromHexToBytes(Defaults::LIVE_VERSION),
                 ]);
-
                 $this->lengowLog->write(
                     LengowLog::CODE_IMPORT,
                     $this->lengowLog->encodeMessage('log.import.stock_decreased', [
