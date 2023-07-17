@@ -244,6 +244,7 @@ de:
           export: "Exporteinstellungen"
           import: "Importeinstellungen"
         title:
+          environment: "Umgebung"
           credentials: "Anmeldeinformationen"
           sales_channel: "Verkaufskanäle"
           security: "Sicherheit & Tracker"
@@ -257,6 +258,9 @@ de:
           description: "Im Folgenden finden Sie Ihre Lengow Zugangsdaten.\nKonto ID, Zugangstoken, Geheimtoken werden bei der ersten Anmeldung automatisch ausgefüllt: bitte keine Änderungen eingeben!"
           saved_message_1: "Einstellung"
           saved_message_2: "gespeichert"
+          environment:
+            label: "Umgebung"
+            description: "Die Umgebung mit der Sie verbunden sind."
           account:
             label: "Account ID"
             description: "Ihre Lengow Account ID. Bitte nicht ändern."
