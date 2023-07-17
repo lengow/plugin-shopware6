@@ -24,7 +24,7 @@ use Shopware\Core\Content\Product\ProductEntity;
 use Shopware\Core\Defaults;
 use Shopware\Core\Framework\Context;
 use Shopware\Core\Framework\DataAbstractionLayer\Doctrine\RetryableQuery;
-use Shopware\Core\Framework\DataAbstractionLayer\EntityRepositoryInterface;
+use Shopware\Core\Framework\DataAbstractionLayer\EntityRepository;
 use Shopware\Core\Framework\DataAbstractionLayer\Search\Criteria;
 use Shopware\Core\Framework\DataAbstractionLayer\Search\Filter\EqualsFilter;
 use Shopware\Core\Framework\Uuid\Uuid;
@@ -1565,21 +1565,20 @@ class LengowImportOrder
             $stock = $orderIsCompleted ? $product->getStock() - $productData['quantity'] : $product->getStock();
             $availableStock = $initialStock - $productData['quantity'];
             try {
-                // use SQL query because update via the product repository don't work
-                // and Shopware has not any service allowing to decrement properly a product
-                $query = new RetryableQuery(
-                    $this->connection->prepare('
-                        UPDATE product
-                        SET stock = :stock, available_stock = :available_stock, version_id = :version
-                        WHERE id = :id
-                    ')
-                );
-                $query->execute([
+                $sql = '
+                    UPDATE product
+                    SET stock = :stock, available_stock = :available_stock, version_id = :version
+                    WHERE id = :id
+                ';
+                $retryableQuery = new RetryableQuery($this->connection, $this->connection->prepare($sql));
+
+                $retryableQuery->execute([
                     'stock' => (int) $stock,
                     'available_stock' => (int) $availableStock,
                     'id' => Uuid::fromHexToBytes($product->getId()),
                     'version' => Uuid::fromHexToBytes(Defaults::LIVE_VERSION),
                 ]);
+
                 $this->lengowLog->write(
                     LengowLog::CODE_IMPORT,
                     $this->lengowLog->encodeMessage('log.import.stock_decreased', [
