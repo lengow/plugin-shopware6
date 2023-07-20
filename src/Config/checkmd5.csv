@@ -52,7 +52,7 @@
 /src/Factory/LengowFileFactory.php|8edb4841d5fe4896dfb1d8fae8b1ff03
 /src/Migration/Migration1624606589Update102.php|b556625decfb9ab607d158b4fe936bd6
 /src/Migration/Migration1606313662Init.php|1e14b8612743c33ad913c0958d9af1ef
-/src/Resources/app/administration/src/module/const.js|491ef3a73c930e541abedf3f0e6b001a
+/src/Resources/app/administration/src/module/const.js|24112dd19664f49d147516e3c8d4ce29
 /src/Resources/app/administration/src/module/lengow-connector/snippet/en-GB.json|0bc4092e024e7da2d3db36005532d799
 /src/Resources/app/administration/src/module/lengow-connector/snippet/fr-FR.json|a20433986312fed0bf7cb5f33e41bccd
 /src/Resources/app/administration/src/module/lengow-connector/snippet/de-DE.json|d8a664b55e13946a93358fb6a5c65a47
@@ -62,7 +62,7 @@
 /src/Resources/app/administration/src/module/lengow-connector/component/lgw-conditional-string-field/index.js|ecb8562130eed165061ca579476dc857
 /src/Resources/app/administration/src/module/lengow-connector/component/lgw-update-modal/lgw-update-modal.scss|1912ddd4f389d6f65dcde0878bf69d03
 /src/Resources/app/administration/src/module/lengow-connector/component/lgw-update-modal/lgw-update-modal.html.twig|d116ee7908aa664434386af428b34418
-/src/Resources/app/administration/src/module/lengow-connector/component/lgw-update-modal/index.js|f86586ebdfbcb90dbacd813bb5674882
+/src/Resources/app/administration/src/module/lengow-connector/component/lgw-update-modal/index.js|6a5666ac6f3586af5364179c96fee931
 /src/Resources/app/administration/src/module/lengow-connector/component/lgw-update-warning/lgw-update-warning.scss|ce1c3e1317acdfff69c03f8116c0bc1d
 /src/Resources/app/administration/src/module/lengow-connector/component/lgw-update-warning/index.js|93beaac4195fb1b393ed84d4ebee2272
 /src/Resources/app/administration/src/module/lengow-connector/component/lgw-update-warning/lgw-update-warning.html.twig|6c8d8dde814b5222eefc30f716c23068
@@ -79,7 +79,7 @@
 /src/Resources/app/administration/src/module/lengow-connector/component/lgw-description-list-element/index.js|c48e1f5e88557a407a04c42c98495673
 /src/Resources/app/administration/src/module/lengow-connector/component/lgw-footer/lgw-footer.html.twig|6e9c941e928e2d6193153e4d8d3f3bd2
 /src/Resources/app/administration/src/module/lengow-connector/component/lgw-footer/lgw-footer.css|e6f02c639d2d527e9e4afad0015eb643
-/src/Resources/app/administration/src/module/lengow-connector/component/lgw-footer/index.js|bf5b4d2b9d12d08fb6a020afb7c3aa9e
+/src/Resources/app/administration/src/module/lengow-connector/component/lgw-footer/index.js|b2a94db984610721b69b26e425fd5dd7
 /src/Resources/app/administration/src/module/lengow-connector/component/lgw-order-type-icon/lgw-order-type-icon.html.twig|0565c694d66a28a59ddedc4277594cb9
 /src/Resources/app/administration/src/module/lengow-connector/component/lgw-order-type-icon/lgw-order-type-icon.scss|4ef2ce175f976f30e9bd5743fa11cb01
 /src/Resources/app/administration/src/module/lengow-connector/component/lgw-order-type-icon/index.js|8ce908e7afd6d559b297ba7065a52815
@@ -94,7 +94,7 @@
 /src/Resources/app/administration/src/module/lengow-connector/component/lgw-country-icon/lgw-country-icon.scss|bfe5568c59d14586f4b8dfcded7ccb9e
 /src/Resources/app/administration/src/module/lengow-connector/component/lgw-free-trial-warning/lgw-free-trial-warning.scss|ad2a974507b4cc891e7b4a042ca1f906
 /src/Resources/app/administration/src/module/lengow-connector/component/lgw-free-trial-warning/lgw-free-trial-warning.html.twig|6f167f0a753c4c47536b909e72ee66e3
-/src/Resources/app/administration/src/module/lengow-connector/component/lgw-free-trial-warning/index.js|9384b9149e855ccd327a866fa97215b6
+/src/Resources/app/administration/src/module/lengow-connector/component/lgw-free-trial-warning/index.js|2b505f66f9f4b1b46e6519516990283a
 /src/Resources/app/administration/src/module/lengow-connector/component/lgw-action-label/lgw-action-label.html.twig|69bfaead93f70bedf643a7351a9b8514
 /src/Resources/app/administration/src/module/lengow-connector/component/lgw-action-label/index.js|be5aded324825865938819dea2a31420
 /src/Resources/app/administration/src/module/lengow-connector/component/lgw-action-label/lgw-action-label.scss|83f8c790aa1494c792808b6aed8394b5
@@ -129,7 +129,7 @@
 /src/Resources/app/administration/src/module/lengow-connector/view/lgw-toolbox-log/index.js|abf1dc1f380a56df693bb7bbcabff354
 /src/Resources/app/administration/src/module/lengow-connector/view/lgw-setting-general/lgw-setting-general.scss|e72290464e8ffdc2a97ea6e19b793fc2
 /src/Resources/app/administration/src/module/lengow-connector/view/lgw-setting-general/lgw-setting-general.html.twig|31fa8b95a5d726367121fdeb98fab9e3
-/src/Resources/app/administration/src/module/lengow-connector/view/lgw-setting-general/index.js|33c9526825d734745d37f16384035f72
+/src/Resources/app/administration/src/module/lengow-connector/view/lgw-setting-general/index.js|43aaf2bf8b4c879c6e6d48971f9b8cbe
 /src/Resources/app/administration/src/module/lengow-connector/view/lgw-toolbox-checksum/lgw-toolbox-checksum.html.twig|44c449201483ba0cfe00af83a753109b
 /src/Resources/app/administration/src/module/lengow-connector/view/lgw-toolbox-checksum/lgw-toolbox-checksum.scss|083a78ef5ff2fbc74c42ed53e5c4d6d2
 /src/Resources/app/administration/src/module/lengow-connector/view/lgw-toolbox-checksum/index.js|e37584874b578c1abd88900d54997ec4
@@ -139,12 +139,12 @@
 /src/Resources/app/administration/src/module/lengow-connector/view/lgw-connection-catalog/lgw-connection-catalog.html.twig|7ed4e96cdaa7d3c6c86b310cc7ece6ee
 /src/Resources/app/administration/src/module/lengow-connector/view/lgw-connection-catalog/index.js|f632fd157e78fd4320675883ea7fa1e2
 /src/Resources/app/administration/src/module/lengow-connector/view/lgw-dashboard-home/lgw-dashboard-home.html.twig|22a70bf106feab4fde4d5c9e5f473e84
-/src/Resources/app/administration/src/module/lengow-connector/view/lgw-dashboard-home/index.js|10d73f08619aedac3a78b8a29556a0a3
+/src/Resources/app/administration/src/module/lengow-connector/view/lgw-dashboard-home/index.js|b928e9a88b121b3b45e28707c40e9fdd
 /src/Resources/app/administration/src/module/lengow-connector/view/lgw-dashboard-home/lgw-dashboard-home.scss|dbf69ec9ba83f811ad3b5f2ccb0a7333
 /src/Resources/app/administration/src/module/lengow-connector/view/lgw-connection-home/lgw-connection-home.html.twig|2bda7c89d12d44d99ee86ef1086cede5
-/src/Resources/app/administration/src/module/lengow-connector/view/lgw-connection-home/index.js|8a9dd8afd49cdc0304770bf698df11b4
+/src/Resources/app/administration/src/module/lengow-connector/view/lgw-connection-home/index.js|fa40221aaa60088a4a5295b921d85fd0
 /src/Resources/app/administration/src/module/lengow-connector/view/lgw-dashboard-free-trial/lgw-dashboard-free-trial.html.twig|7beabbf6ece803f5273020438c87e85f
-/src/Resources/app/administration/src/module/lengow-connector/view/lgw-dashboard-free-trial/index.js|84e7e4bf166a81d033fe892d83c4b5e9
+/src/Resources/app/administration/src/module/lengow-connector/view/lgw-dashboard-free-trial/index.js|a842dbccc3b0770f47aeba71427c5bdb
 /src/Resources/app/administration/src/module/lengow-connector/view/lgw-dashboard-free-trial/lgw-dashboard-free-trial.scss|492dcd6aa1069fae2bb3b9f3aa1b0a65
 /src/Resources/app/administration/src/module/lengow-connector/view/lgw-setting-import/lgw-setting-import.html.twig|62a2bd13b57ba25885eb96ef1752d016
 /src/Resources/app/administration/src/module/lengow-connector/view/lgw-setting-import/lgw-setting-import.scss|1f4c4877c0e8702142fd81fc47e25ef5
@@ -153,7 +153,7 @@
 /src/Resources/app/administration/src/module/lengow-connector/view/lgw-setting-export/lgw-setting-export.scss|00ff90d8aca5ac3b9c38731c2c56f73b
 /src/Resources/app/administration/src/module/lengow-connector/view/lgw-setting-export/index.js|56ca4342195f15e78b40c1024e457d75
 /src/Resources/app/administration/src/module/lengow-connector/view/lgw-connection-cms/lgw-connection-cms.scss|f71217bee483274cbb93c41c2cf3bade
-/src/Resources/app/administration/src/module/lengow-connector/view/lgw-connection-cms/index.js|3fd05b97abf410d2bc0745c5040d6d10
+/src/Resources/app/administration/src/module/lengow-connector/view/lgw-connection-cms/index.js|7a1576cdca86a6459143f9ad1155caee
 /src/Resources/app/administration/src/module/lengow-connector/view/lgw-connection-cms/lgw-connection-cms.html.twig|22d2d5b8f25ef77ce5be39f11b28a363
 /src/Resources/app/administration/src/module/lengow-connector/view/lgw-toolbox-base/lgw-toolbox-base.html.twig|9f7d8a1bb9d6aa9830e40aaf187a6be2
 /src/Resources/app/administration/src/module/lengow-connector/view/lgw-toolbox-base/index.js|68ca042213ba3eabe807dad283855f16
@@ -424,7 +424,7 @@
 /src/Service/LengowProduct.php|72e518bf36ae9f452b69380f5c1d955e
 /src/Service/LengowOrderError.php|70bfdad80f09b0a823c2c1ae0fe1d58a
 /src/Service/LengowExport.php|eac853b31641acdac30f4917398bf9ab
-/src/Service/LengowConfiguration.php|1694734d2b3c01e8a2187d5e50ab2a13
+/src/Service/LengowConfiguration.php|0c0ab74215a3e78cd85ac3c475617465
 /src/Service/LengowImportOrder.php|342e7ea288378d4d6e5c616a0bec88c1
 /src/Service/LengowTranslation.php|db52a8157ae86bd49a6d6d9fc11da9b6
 /src/Service/LengowAccess.php|10819f326d3842d2ff34f3d5b26c49e3
@@ -441,7 +441,7 @@
 /src/Service/LengowLog.php|5c89aaa002da0421acb13c0acf3f223a
 /src/Service/LengowOrderLine.php|2ec18fc660fc755bb1e4fe00d52e7e1d
 /src/Service/LengowFeed.php|0946aef9107b853e4bd30f8532b29b62
-/src/Service/LengowConnector.php|d84b1ffa1bd857f7bca5a8a0f57841c1
+/src/Service/LengowConnector.php|0b407212a1db765d6d175574b33a2685
 /src/Storefront/Struct/CheckoutFinishTrackerData.php|fd7bcd1561829b653c853e39d46c083f
 /src/Storefront/Controller/LengowCronController.php|57a46ffbb0ce4a41f87cc2daabea8eaa
 /src/Storefront/Controller/LengowToolboxController.php|22740ac428f8e22a0d3aab0c24d105fa
@@ -450,7 +450,7 @@
 /src/Subscriber/CheckoutFinishPageLoadedSubscriber.php|df384bac519de0e24f69106d8379a7c1
 /src/Subscriber/SendActionSubscriber.php|286d1c6b22030030dbf5a2ae8d38fd00
 /src/Subscriber/LengowSettingUpdateSubscriber.php|b4e383d43a4ba125d3b95c681825e764
-/src/Subscriber/SalesChannelWrittenSubscriber.php|bfd734d4300bfa7cc3e936b878a01673
+/src/Subscriber/SalesChannelWrittenSubscriber.php|ed293f365f13171505469d64bb7510c3
 /src/Subscriber/ProductExtensionSubscriber.php|8800a75de535e30d14b80444f4534d70
 /src/Util/StringCleaner.php|752a3e6e13877fed16915d632418e386
 /src/Util/EnvironmentInfoProvider.php|da455b49d8d2e023b4c94406406f358b

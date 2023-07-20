@@ -383,11 +383,6 @@ class LengowConfiguration
     ];
 
     /**
-     * @var LengowConnector Lengow connector service
-     */
-    private $lengowConnector;
-
-    /**
      * @var EntityRepository $settingsRepository Lengow settings access
      */
     private $settingsRepository;
@@ -413,23 +408,25 @@ class LengowConfiguration
     private $lengowTimezone;
 
     /**
+     * @var string base url of the Lengow API
+     */
+    private const LENGOW_BASE_API_URL = 'https://api.lengow';
+
+    /**
      * LengowConfiguration constructor
      *
-     * @param LengowConnector $lengowConnector Lengow connector service
      * @param EntityRepository $settingsRepository Lengow settings access
      * @param SystemConfigService $systemConfigService Shopware settings access
      * @param EntityRepository $systemConfigRepository shopware settings repository
      * @param EnvironmentInfoProvider $environmentInfoProvider Environment info provider utility
      */
     public function __construct(
-        LengowConnector  $lengowConnector,
         EntityRepository $settingsRepository,
         SystemConfigService $systemConfigService,
         EntityRepository $systemConfigRepository,
         EnvironmentInfoProvider $environmentInfoProvider
     )
     {
-        $this->lengowConnector = $lengowConnector;
         $this->settingsRepository = $settingsRepository;
         $this->systemConfigService = $systemConfigService;
         $this->systemConfigRepository = $systemConfigRepository;
@@ -602,7 +599,7 @@ class LengowConfiguration
      *
      * @return string The URL suffix (e.g., ".io", ".net")
      */
-    public function getUrlEnvironement()
+    public function getUrlEnvironment()
     {
         return $this->get(self::ENVIRONMENT_URL);
     }
@@ -614,7 +611,7 @@ class LengowConfiguration
      */
     public function getApiLengowUrl(): string
     {
-        return $this->lengowConnector->getLengowBaseApiUrl() . $this->getUrlEnvironement();
+        return self::LENGOW_BASE_API_URL . $this->getUrlEnvironment();
     }
 
     /**
