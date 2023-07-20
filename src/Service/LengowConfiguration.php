@@ -383,6 +383,11 @@ class LengowConfiguration
     ];
 
     /**
+     * @var LengowConnector Lengow connector service
+     */
+    private $lengowConnector;
+
+    /**
      * @var EntityRepository $settingsRepository Lengow settings access
      */
     private $settingsRepository;
@@ -410,18 +415,21 @@ class LengowConfiguration
     /**
      * LengowConfiguration constructor
      *
+     * @param LengowConnector $lengowConnector Lengow connector service
      * @param EntityRepository $settingsRepository Lengow settings access
      * @param SystemConfigService $systemConfigService Shopware settings access
      * @param EntityRepository $systemConfigRepository shopware settings repository
      * @param EnvironmentInfoProvider $environmentInfoProvider Environment info provider utility
      */
     public function __construct(
+        LengowConnector  $lengowConnector,
         EntityRepository $settingsRepository,
         SystemConfigService $systemConfigService,
         EntityRepository $systemConfigRepository,
         EnvironmentInfoProvider $environmentInfoProvider
     )
     {
+        $this->lengowConnector = $lengowConnector;
         $this->settingsRepository = $settingsRepository;
         $this->systemConfigService = $systemConfigService;
         $this->systemConfigRepository = $systemConfigRepository;
@@ -606,9 +614,8 @@ class LengowConfiguration
      */
     public function getApiLengowUrl(): string
     {
-        return 'https://api.lengow' . $this->getUrlEnvironement();
+        return $this->lengowConnector->getLengowBaseApiUrl() . $this->getUrlEnvironement();
     }
-
 
     /**
      * Get catalog ids for a specific shop
