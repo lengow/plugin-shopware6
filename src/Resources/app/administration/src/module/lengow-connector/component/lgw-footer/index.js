@@ -44,11 +44,7 @@ Component.register('lgw-footer', {
         },
 
         checkPreprod() {
-            if (this.lengowEnvironmentUrl === LENGOW_URL) {
-                this.preprod = true;
-            } else {
-                this.preprod = false;
-            }
+            this.preprod = this.lengowEnvironmentUrl === 'https://my.lengow.net';
         },
     }
 });
