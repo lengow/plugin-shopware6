@@ -1,6 +1,6 @@
 import template from './lgw-footer.html.twig';
 import './lgw-footer.css';
-import { MODULE_VERSION } from '../../../const';
+import { MODULE_VERSION, LENGOW_URL, BASE_LENGOW_URL } from '../../../const';
 
 const {
     Component,
@@ -14,7 +14,7 @@ Component.register('lgw-footer', {
 
     data() {
         return {
-            lengowEnvironmentUrl: 'https://my.lengow.net',
+            lengowEnvironmentUrl: LENGOW_URL,
             moduleVersion: MODULE_VERSION,
             currentYear: new Date().getFullYear(),
             preprod: false
@@ -37,14 +37,14 @@ Component.register('lgw-footer', {
             lengowConfigCriteria.addFilter(Criteria.equals('name', 'lengowEnvironmentUrl'));
             this.lengowConfigRepository.search(lengowConfigCriteria, Shopware.Context.api).then(result => {
                 if (result.total > 0) {
-                    this.lengowEnvironmentUrl = 'https://my.lengow' + result[0].value;
+                    this.lengowEnvironmentUrl = BASE_LENGOW_URL + result[0].value;
                     this.checkPreprod();
                 }
             });
         },
 
         checkPreprod() {
-            if (this.lengowEnvironmentUrl === 'https://my.lengow.net') {
+            if (this.lengowEnvironmentUrl === LENGOW_URL) {
                 this.preprod = true;
             } else {
                 this.preprod = false;

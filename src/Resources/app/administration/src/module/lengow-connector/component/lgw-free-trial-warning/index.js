@@ -1,5 +1,6 @@
 import template from './lgw-free-trial-warning.html.twig';
 import './lgw-free-trial-warning.scss';
+import { LENGOW_URL, BASE_LENGOW_URL } from '../../../const';
 
 const {
     Component,
@@ -21,7 +22,7 @@ Component.register('lgw-free-trial-warning', {
     data() {
         return {
             dayLeft: '',
-            link: 'https://my.lengow.net',
+            link: LENGOW_URL,
         };
     },
 
@@ -46,7 +47,7 @@ Component.register('lgw-free-trial-warning', {
             lengowConfigCriteria.addFilter(Criteria.equals('name', 'lengowEnvironmentUrl'));
             this.lengowConfigRepository.search(lengowConfigCriteria, Shopware.Context.api).then(result => {
                 if (result.total > 0) {
-                    this.link = 'https://my.lengow' + result[0].value;
+                    this.link = BASE_LENGOW_URL + result[0].value;
                 }
             });
         }

@@ -1,5 +1,6 @@
 import template from './lgw-update-modal.html.twig';
 import './lgw-update-modal.scss';
+import { LENGOW_URL, BASE_LENGOW_URL } from '../../../const';
 
 const {
     Component,
@@ -33,7 +34,7 @@ Component.register('lgw-update-modal', {
             supportLink: '',
             downloadLink: '',
             showRemindMeLater: false,
-            lengowEnvironmentUrl: 'https://my.lengow.net',
+            lengowEnvironmentUrl: LENGOW_URL,
         };
     },
 
@@ -65,7 +66,7 @@ Component.register('lgw-update-modal', {
             lengowConfigCriteria.addFilter(Criteria.equals('name', 'lengowEnvironmentUrl'));
             this.lengowConfigRepository.search(lengowConfigCriteria, Shopware.Context.api).then(result => {
                 if (result.total > 0) {
-                    this.lengowEnvironmentUrl = 'https://my.lengow' + result[0].value;
+                    this.lengowEnvironmentUrl = BASE_LENGOW_URL + result[0].value;
                     this.createdComponent();
                 }
             });

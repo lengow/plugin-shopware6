@@ -1,3 +1,5 @@
+export const LENGOW_URL = 'https://my.lengow.net';
+export const BASE_LENGOW_URL = 'https://my.lengow';
 export const MODULE_VERSION = '1.1.3';
 
 export const ORDER_LENGOW_STATES = {

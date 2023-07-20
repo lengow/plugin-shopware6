@@ -1,11 +1,11 @@
 import template from './lgw-dashboard-home.html.twig';
 import './lgw-dashboard-home.scss';
+import { LENGOW_URL, BASE_LENGOW_URL } from '../../../const';
 
 const {
     Component,
     Data: { Criteria }
 } = Shopware;
-
 
 Component.register('lgw-dashboard-home', {
     template,
@@ -14,7 +14,7 @@ Component.register('lgw-dashboard-home', {
 
     data() {
         return {
-            lengowEnvironmentUrl: 'https://my.lengow.net',
+            lengowEnvironmentUrl: LENGOW_URL,
             helpCenterLink: ''
         };
     },
@@ -43,7 +43,7 @@ Component.register('lgw-dashboard-home', {
             lengowConfigCriteria.addFilter(Criteria.equals('name', 'lengowEnvironmentUrl'));
             this.lengowConfigRepository.search(lengowConfigCriteria, Shopware.Context.api).then(result => {
                 if (result.total > 0) {
-                    this.lengowEnvironmentUrl = 'https://my.lengow' + result[0].value;
+                    this.lengowEnvironmentUrl = BASE_LENGOW_URL + result[0].value;
                 }
             });
         }

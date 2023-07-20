@@ -1,5 +1,6 @@
 import template from './lgw-connection-cms.html.twig';
 import './lgw-connection-cms.scss';
+import { LENGOW_URL, BASE_LENGOW_URL } from '../../../const';
 
 const {
     Component,
@@ -20,7 +21,7 @@ Component.register('lgw-connection-cms', {
     data() {
         return {
             isLoading: false,
-            lengowUrl: 'https://my.lengow.net',
+            lengowUrl: LENGOW_URL,
             preprod: false,
             connectionButtonDisabled: true,
             showCredentialForm: true,
@@ -48,7 +49,7 @@ Component.register('lgw-connection-cms', {
     methods: {
         createdComponent() {
             this.isLoading = true;
-            if (this.lengowUrl === 'https://my.lengow.net') {
+            if (this.lengowUrl === LENGOW_URL) {
                 this.preprod = true;
             }
             this.LengowConnectorSyncService.getPluginLinks().then(result => {
@@ -65,7 +66,7 @@ Component.register('lgw-connection-cms', {
             lengowConfigCriteria.addFilter(Criteria.equals('name', 'lengowEnvironmentUrl'));
             this.lengowConfigRepository.search(lengowConfigCriteria, Shopware.Context.api).then(result => {
                 if (result.total > 0) {
-                    this.lengowUrl = 'https://my.lengow' + result[0].value;
+                    this.lengowUrl = BASE_LENGOW_URL + result[0].value;
                     this.createdComponent();
                 }
             });
