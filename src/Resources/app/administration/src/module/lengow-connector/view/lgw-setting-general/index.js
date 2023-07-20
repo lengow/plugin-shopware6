@@ -72,7 +72,6 @@ Component.register('lgw-setting-general', {
         this.credentialLocked = this.config.lengowDebugEnabled.value === '1';
     },
 
-
     computed: {
         systemConfigRepository() {
             return this.repositoryFactory.create('system_config');

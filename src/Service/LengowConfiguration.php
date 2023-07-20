@@ -30,7 +30,7 @@ class LengowConfiguration
     public const ACCOUNT_ID = 'lengowAccountId';
     public const ACCESS_TOKEN = 'lengowAccessToken';
     public const SECRET = 'lengowSecretToken';
-    public const ENVIRONEMENT_URL = 'lengowEnvironmentUrl';
+    public const ENVIRONMENT_URL = 'lengowEnvironmentUrl';
     public const CMS_TOKEN = 'lengowGlobalToken';
     public const AUTHORIZED_IP_ENABLED = 'lengowIpEnabled';
     public const AUTHORIZED_IPS = 'lengowAuthorizedIp';
@@ -105,7 +105,7 @@ class LengowConfiguration
         self::ACCESS_TOKEN => 'access_token',
         self::SECRET => 'secret',
         self::CMS_TOKEN => 'cms_token',
-        self::ENVIRONEMENT_URL => 'lengowEnvironmentUrl',
+        self::ENVIRONMENT_URL => 'lengowEnvironmentUrl',
         self::AUTHORIZED_IP_ENABLED => 'authorized_ip_enabled',
         self::AUTHORIZED_IPS => 'authorized_ips',
         self::TRACKING_ENABLED => 'tracking_enabled',
@@ -172,7 +172,7 @@ class LengowConfiguration
             self::PARAM_EXPORT_TOOLBOX => false,
             self::PARAM_DEFAULT_VALUE => '',
         ],
-        self::ENVIRONEMENT_URL => [
+        self::ENVIRONMENT_URL => [
             self::PARAM_GLOBAL => true,
             self::PARAM_EXPORT_TOOLBOX => false,
             self::PARAM_RETURN => self::RETURN_TYPE_STRING,
@@ -590,33 +590,23 @@ class LengowConfiguration
     }
 
     /**
-     * Get the value of URL_ENVIRONNEMENT from the form
+     * Get the value of URL_ENVIRONMENT from the form
      *
      * @return string The URL suffix (e.g., ".io", ".net")
      */
-    public function getUrlEnvironnement()
+    public function getUrlEnvironement()
     {
-        return $this->get(self::ENVIRONEMENT_URL);
+        return $this->get(self::ENVIRONMENT_URL);
     }
-    /**
-     * Get the URL of the Lengow solution
-     *
-     * @return string
-     */
-    public function getLengowUrl()
-    {
-        $urlEnvironnement = $this->getUrlEnvironnement();
-        return 'lengow' . $urlEnvironnement;
-    }
+
     /**
      * Get the URL of the API Lengow solution
      *
-     * @return string
+     * @return string Returns the URL of the API Lengow solution
      */
-    public function getApiLengowUrl()
+    public function getApiLengowUrl(): string
     {
-        $urlEnvironnement = $this->getUrlEnvironnement();
-        return 'https://api.lengow' . $urlEnvironnement;
+        return 'https://api.lengow' . $this->getUrlEnvironement();
     }
 
 
@@ -978,7 +968,9 @@ class LengowConfiguration
                             LengowSettingsDefinition::FIELD_SALES_CHANNEL_ID => $salesChannel->getId(),
                             LengowSettingsDefinition::FIELD_NAME => $key,
                             LengowSettingsDefinition::FIELD_VALUE =>
-                                $shippingMethodRepository->search(new Criteria([$salesChannel->getId()]), Context::createDefaultContext())->first()
+                                $shippingMethodRepository
+                                    ->search(new Criteria([$salesChannel->getId()]), Context::createDefaultContext())
+                                    ->first()
                         ];
                         continue;
                     }

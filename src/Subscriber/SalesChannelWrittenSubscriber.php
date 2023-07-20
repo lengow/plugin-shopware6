@@ -96,7 +96,7 @@ class SalesChannelWrittenSubscriber implements EventSubscriberInterface
                             'salesChannelId' => $entityWriteResult->getPrimaryKey(),
                             'name' => $key,
                             'value' => LengowConfiguration::$lengowSettings[$key][
-                            LengowConfiguration::PARAM_DEFAULT_VALUE
+                                LengowConfiguration::PARAM_DEFAULT_VALUE
                             ],
                         ];
                     }

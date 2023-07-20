@@ -3,6 +3,7 @@
 - Bugfix: [global] Ersetzen der Klasse EntityRepositoryInterface durch EntityRepository
 - Bugfix: [front] Verwenden Sie einen neuen Klassennamen für die Ikonenbibliothek von Shopware
 - Bugfix: [import & export] Neue Anmerkung für Routenbereich verwenden
+- Bugfix: [import] Verwendung der RetryableQuery-Methode korrigiert
 - Feature: Hinzufügen einer konfigurierbaren URL-Umgebung zur Verbindung mit Lengow in den Einstellungen und Hinzufügen einer zugänglichen Einstellung auf der Startseite des Moduls
 
 # v1.1.2

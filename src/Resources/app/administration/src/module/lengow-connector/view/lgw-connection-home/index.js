@@ -28,7 +28,6 @@ Component.register('lgw-connection-home', {
     },
 
     methods: {
-
         loadEnvironmentUrl() {
             const lengowConfigCriteria = new Criteria();
             lengowConfigCriteria.addFilter(Criteria.equals('name', 'lengowEnvironmentUrl'));
