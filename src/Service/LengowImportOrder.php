@@ -423,8 +423,7 @@ class LengowImportOrder
         /** @var LengowOrderEntity $lengowOrder */
         $lengowOrder = $this->lengowOrder->getLengowOrderByMarketplaceSku(
             $this->marketplaceSku,
-            $this->lengowMarketplace->getName(),
-            $this->deliveryAddressId
+            $this->lengowMarketplace->getName()
         );
         $this->lengowOrderId = $lengowOrder ? $lengowOrder->getId() : null;
         // checks if an order already has an error in progress
@@ -434,8 +433,7 @@ class LengowImportOrder
         // get a Shopware order id in the lengow order table
         $order = $this->lengowOrder->getOrderByMarketplaceSku(
             $this->marketplaceSku,
-            $this->lengowMarketplace->getName(),
-            $this->deliveryAddressId
+            $this->lengowMarketplace->getName()
         );
         // if order is already exist
         if ($order) {
@@ -530,7 +528,7 @@ class LengowImportOrder
     private function orderErrorAlreadyExist(): bool
     {
         // if order error exist and not finished -> stop import order
-        $orderErrors = $this->lengowOrderError->orderIsInError($this->marketplaceSku, $this->deliveryAddressId);
+        $orderErrors = $this->lengowOrderError->orderIsInError($this->marketplaceSku);
         if ($orderErrors === null) {
             return false;
         }
@@ -669,7 +667,7 @@ class LengowImportOrder
             return false;
         }
         foreach ($this->orderData->merchant_order_id as $externalId) {
-            if ($this->lengowOrder->getLengowOrderByOrderNumber($externalId, $this->deliveryAddressId)) {
+            if ($this->lengowOrder->getLengowOrderByOrderNumber($externalId, $this->marketplaceSku)) {
                 $message = $this->lengowLog->encodeMessage('log.import.external_id_exist', [
                     'order_id' => $externalId,
                 ]);
@@ -742,8 +740,7 @@ class LengowImportOrder
         // get lengow order
         $lengowOrder = $this->lengowOrder->getLengowOrderByMarketplaceSku(
             $this->marketplaceSku,
-            $this->lengowMarketplace->getName(),
-            $this->deliveryAddressId
+            $this->lengowMarketplace->getName()
         );
         if ($lengowOrder) {
             $this->lengowOrderId = $lengowOrder->getId();
@@ -1134,8 +1131,8 @@ class LengowImportOrder
             }
             $product = null;
             $productIds = [
-                'merchant_product_id' => (string) $productData['merchant_product_id']->id,
-                'marketplace_product_id' => (string) $productData['marketplace_product_id'],
+                'merchant_product_id' => (string) '11dc680240b04f469ccba354cbf0b967',
+                'marketplace_product_id' => (string) '11dc680240b04f469ccba354cbf0b967',
             ];
             foreach ($productIds as $attributeName => $attributeValue) {
                 $product = $this->lengowProduct->searchProduct(

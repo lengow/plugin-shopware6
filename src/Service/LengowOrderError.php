@@ -3,6 +3,7 @@
 namespace Lengow\Connector\Service;
 
 use Exception;
+use Lengow\Connector\Entity\Lengow\Order\OrderDefinition as LengowOrderDefinition;
 use Shopware\Core\Framework\Context;
 use Shopware\Core\Framework\DataAbstractionLayer\EntityCollection;
 use Shopware\Core\Framework\DataAbstractionLayer\EntityRepository;
@@ -153,17 +154,15 @@ class LengowOrderError
     }
 
     /**
-     * Get all order errors by marketplace sku and delivery address id
+     * Get all order errors by marketplace sku and marketplace name
      *
      * @param string $marketplaceSku Marketplace sku
-     * @param int $deliveryAddressId Lengow delivery address id
-     * @param int $type order error type (import or send)
+     * @param int $type Order error type (import or send)
      *
      * @return EntityCollection|null
      */
     public function orderIsInError(
         string $marketplaceSku,
-        int $deliveryAddressId,
         int $type = self::TYPE_ERROR_IMPORT
     ): ?EntityCollection
     {
@@ -171,7 +170,6 @@ class LengowOrderError
         $criteria = new Criteria();
         $criteria->addFilter(new MultiFilter(MultiFilter::CONNECTION_AND, [
             new EqualsFilter('order.marketplaceSku', $marketplaceSku),
-            new EqualsFilter('order.deliveryAddressId', $deliveryAddressId),
             new EqualsFilter(LengowOrderErrorDefinition::FIELD_TYPE, $type),
             new EqualsFilter(LengowOrderErrorDefinition::FIELD_IS_FINISHED, false),
         ]));

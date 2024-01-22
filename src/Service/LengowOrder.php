@@ -432,18 +432,16 @@ class LengowOrder
     }
 
     /**
-     * Get Lengow order from lengow order table by marketplace sku, marketplace name and delivery address id
+     * Get Lengow order from lengow order table by marketplace sku and marketplace name
      *
      * @param string $marketplaceSku marketplace order sku
      * @param string $marketplaceName marketplace name
-     * @param integer $deliveryAddressId Lengow delivery address id
      *
      * @return LengowOrderEntity|null
      */
     public function getLengowOrderByMarketplaceSku(
         string $marketplaceSku,
-        string $marketplaceName,
-        int $deliveryAddressId
+        string $marketplaceName
     ): ?LengowOrderEntity
     {
         $context = Context::createDefaultContext();
@@ -451,7 +449,6 @@ class LengowOrder
         $criteria->addFilter(new MultiFilter(MultiFilter::CONNECTION_AND, [
             new EqualsFilter(LengowOrderDefinition::FIELD_MARKETPLACE_SKU, $marketplaceSku),
             new EqualsFilter(LengowOrderDefinition::FIELD_MARKETPLACE_NAME, $marketplaceName),
-            new EqualsFilter(LengowOrderDefinition::FIELD_DELIVERY_ADDRESS_ID, $deliveryAddressId),
         ]));
         $criteria->addAssociation('order.deliveries')
             ->addAssociation('order.deliveries.shippingMethod')
@@ -496,17 +493,17 @@ class LengowOrder
      * Get lengow order from lengow order table by Shopware order number
      *
      * @param string $orderNumber Shopware order number
-     * @param int|null $deliveryAddressId Lengow delivery address id
+     * @param int|null $marketplaceSku Lengow sku order
      *
      * @return LengowOrderEntity|null
      */
-    public function getLengowOrderByOrderNumber(string $orderNumber, int $deliveryAddressId = null): ?LengowOrderEntity
+    public function getLengowOrderByOrderNumber(string $orderNumber, int $marketplaceSku = null): ?LengowOrderEntity
     {
         $context = Context::createDefaultContext();
         $criteria = new Criteria();
         $criteria->addFilter(new MultiFilter(MultiFilter::CONNECTION_AND, [
             new EqualsFilter('order.orderNumber', $orderNumber),
-            new EqualsFilter(LengowOrderDefinition::FIELD_DELIVERY_ADDRESS_ID, $deliveryAddressId),
+            new EqualsFilter(LengowOrderDefinition::FIELD_MARKETPLACE_SKU, $marketplaceSku),
         ]));
         $criteria->addAssociation('order.deliveries')
             ->addAssociation('order.deliveries.shippingMethod')
@@ -525,14 +522,12 @@ class LengowOrder
      *
      * @param string $marketplaceSku marketplace order sku
      * @param string $marketplaceName marketplace name
-     * @param integer $deliveryAddressId Lengow delivery address id
      *
      * @return OrderEntity|null
      */
     public function getOrderByMarketplaceSku(
         string $marketplaceSku,
-        string $marketplaceName,
-        int $deliveryAddressId
+        string $marketplaceName
     ): ?OrderEntity
     {
         $context = Context::createDefaultContext();
@@ -540,7 +535,6 @@ class LengowOrder
         $criteria->addFilter(new MultiFilter(MultiFilter::CONNECTION_AND, [
             new EqualsFilter(LengowOrderDefinition::FIELD_MARKETPLACE_SKU, $marketplaceSku),
             new EqualsFilter(LengowOrderDefinition::FIELD_MARKETPLACE_NAME, $marketplaceName),
-            new EqualsFilter(LengowOrderDefinition::FIELD_DELIVERY_ADDRESS_ID, $deliveryAddressId),
         ]));
         $criteria->addFilter(new MultiFilter(MultiFilter::CONNECTION_OR, [
             new EqualsFilter(LengowOrderDefinition::FIELD_ORDER_PROCESS_STATE, self::PROCESS_STATE_IMPORT),

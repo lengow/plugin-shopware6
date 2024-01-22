@@ -34,7 +34,7 @@ Component.register('lgw-setting-general', {
             lengowAccountId: '',
             lengowAccessToken: '',
             lengowSecretToken: '',
-            lengowEnvironmentUrl: '.net',
+            lengowEnvironmentUrl: '.io',
             lengowIpEnabled: false,
             lengowAuthorizedIp: '',
             lengowTrackingEnabled: false,

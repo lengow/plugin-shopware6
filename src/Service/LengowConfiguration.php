@@ -176,7 +176,7 @@ class LengowConfiguration
             self::PARAM_GLOBAL => true,
             self::PARAM_EXPORT_TOOLBOX => false,
             self::PARAM_RETURN => self::RETURN_TYPE_STRING,
-            self::PARAM_DEFAULT_VALUE => '.net',
+            self::PARAM_DEFAULT_VALUE => '.io',
         ],
         self::AUTHORIZED_IP_ENABLED => [
             self::PARAM_GLOBAL => true,
