@@ -501,7 +501,7 @@ class LengowOrder
      *
      * @return LengowOrderEntity|null
      */
-    public function getLengowOrderByOrderNumber(string $orderNumber, int $marketplaceSku = null): ?LengowOrderEntity
+    public function getLengowOrderByOrderNumber(string $orderNumber, string $marketplaceSku = null): ?LengowOrderEntity
     {
         $context = Context::createDefaultContext();
         $criteria = new Criteria();

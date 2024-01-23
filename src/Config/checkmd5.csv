@@ -433,9 +433,9 @@
 /src/Service/LengowAction.php|806156139b116242c2ff30dae297d87e
 /src/Service/LengowAccess.php|10819f326d3842d2ff34f3d5b26c49e3
 /src/Service/LengowOrderLine.php|2ec18fc660fc755bb1e4fe00d52e7e1d
-/src/Service/LengowImportOrder.php|a0121c18e0c362783850b8f7c775b29b
+/src/Service/LengowImportOrder.php|c557b1bf8424ea0570a8ffcfe82a019f
 /src/Service/LengowTranslation.php|db52a8157ae86bd49a6d6d9fc11da9b6
-/src/Service/LengowOrder.php|5b016424a991ae6fe4cb7116aaf697fc
+/src/Service/LengowOrder.php|922dc8c49bb7931b69405469a76fd204
 /src/Service/LengowConnector.php|06880546a771ab4c97eb25345b15afc2
 /src/Service/LengowCustomer.php|7d9619ec0c1d8f9e8ec3aa552fe32c5e
 /src/Service/LengowSync.php|6f2a1496731c05604e8bd17cba42e84f

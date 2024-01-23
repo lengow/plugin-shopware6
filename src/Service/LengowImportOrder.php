@@ -562,6 +562,7 @@ class LengowImportOrder
      * @param OrderEntity $order Shopware order instance
      *
      * @return bool
+     * @throws Exception
      */
     private function checkAndUpdateOrder(OrderEntity $order): bool
     {
@@ -574,9 +575,11 @@ class LengowImportOrder
             $this->logOutput,
             $this->marketplaceSku
         );
-        // get a record in the lengow order table
+
+        // Get a record in the Lengow order table
         /** @var LengowOrderEntity $lengowOrder */
         $lengowOrder = $this->lengowOrder->getLengowOrderByOrderId($order->getId());
+
         // Lengow -> Cancel and reimport order
         if ($lengowOrder->isReimported()) {
             $this->lengowLog->write(
@@ -588,34 +591,45 @@ class LengowImportOrder
                 $this->marketplaceSku
             );
             $this->isReimported = true;
+            unset($lengowOrder);
             return $orderUpdated;
         }
-        // load data for return
+
+        // Load data for return
         $this->orderId = $order->getId();
         $this->orderReference = $order->getOrderNumber();
         $this->previousOrderStateLengow = $lengowOrder->getOrderLengowState();
-        // try to update Shopware order, lengow order and finish actions if necessary
-        $orderUpdated = $this->lengowOrder->updateOrderState(
-            $order,
-            $lengowOrder,
-            $this->orderStateLengow,
-            $this->packageData
-        );
-        if ($orderUpdated) {
-            $this->lengowLog->write(
-                LengowLog::CODE_IMPORT,
-                $this->lengowLog->encodeMessage('log.import.order_state_updated', [
-                    'state_name' => $orderUpdated,
-                ]),
-                $this->logOutput,
-                $this->marketplaceSku
-            );
-            $orderUpdated = true;
-        } else {
-            $orderUpdated = false;
-        }
+
+        // Load VAT number from lengow order data
+        $this->loadVatNumberFromOrderData();
+
+        // Check and update VAT number data
+            if (!(
+                ($lengowOrder->getCustomerVatNumber() ?? '') ===
+                ($this->customerVatNumber ?? '')
+            )) {
+                $this->checkAndUpdateLengowOrderData();
+                $orderUpdated = true;
+                $this->lengowLog->write(
+                    LengowLog::CODE_IMPORT,
+                    $this->lengowLog->encodeMessage('log.import.lengow_order_updated'),
+                    $this->logOutput,
+                    $this->marketplaceSku
+                );
+            }
+
+            // Try to update Shopware order, Lengow order, and finish actions if necessary
+            if (!$orderUpdated) {
+                $orderUpdated = $this->lengowOrder->updateOrderState(
+                    $order,
+                    $lengowOrder,
+                    $this->orderStateLengow,
+                    $this->packageData
+                );
+            }
+
         unset($lengowOrder);
-        return $orderUpdated;
+        return (bool)$orderUpdated;
     }
 
     /**
@@ -832,6 +846,7 @@ class LengowImportOrder
             LengowOrderDefinition::FIELD_ORDER_ITEM => $this->orderItems,
             LengowOrderDefinition::FIELD_CUSTOMER_NAME => $this->getCustomerName(),
             LengowOrderDefinition::FIELD_CUSTOMER_EMAIL => $this->getCustomerEmail(),
+            LengowOrderDefinition::FIELD_CUSTOMER_VAT_NUMBER => $this->customerVatNumber,
             LengowOrderDefinition::FIELD_COMMISSION => (float) $this->orderData->commission,
             LengowOrderDefinition::FIELD_CARRIER => $this->carrierName,
             LengowOrderDefinition::FIELD_CARRIER_METHOD => $this->carrierMethod,
@@ -1132,8 +1147,8 @@ class LengowImportOrder
             }
             $product = null;
             $productIds = [
-                'merchant_product_id' => (string) '11dc680240b04f469ccba354cbf0b967',
-                'marketplace_product_id' => (string) '11dc680240b04f469ccba354cbf0b967',
+                'merchant_product_id' => (string) $productData['merchant_product_id']->id,
+                'marketplace_product_id' => (string) $productData['marketplace_product_id'],
             ];
             foreach ($productIds as $attributeName => $attributeValue) {
                 $product = $this->lengowProduct->searchProduct(

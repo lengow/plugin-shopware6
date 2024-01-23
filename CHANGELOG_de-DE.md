@@ -1,10 +1,14 @@
 # v1.1.3
-- Bugfix: [install] Plugin für die Installation reparieren
-- Bugfix: [global] Ersetzen der Klasse EntityRepositoryInterface durch EntityRepository
-- Bugfix: [front] Verwenden Sie einen neuen Klassennamen für die Ikonenbibliothek von Shopware
-- Bugfix: [import & export] Neue Anmerkung für Routenbereich verwenden
-- Bugfix: [import] Verwendung der RetryableQuery-Methode korrigiert
-- Feature: Hinzufügen einer konfigurierbaren URL-Umgebung zur Verbindung mit Lengow in den Einstellungen und Hinzufügen einer zugänglichen Einstellung auf der Startseite des Moduls
+- Bugfix: [install] Installations-Plugin korrigiert
+- Bugfix: [global] Ersetze Klasse EntityRepositoryInterface durch EntityRepository
+- Bugfix: [front] Verwendet neuen Klassennamen für die Icon-Bibliothek von Shopware
+- Bugfix: [import & export] Neue Annotation für Route Scope verwenden
+- Bugfix: [import] Verwendung der RetryableQuery Methode korrigiert
+- Bugfix: [import] id Lieferadresse nicht für DB Sharding verwenden
+- Bugfix: [import] Teilerstattungsstatus hinzufügen
+- Bugfix: [import] Bestellung neu importieren, wenn Mehrwertsteuernummer différent ist
+- Merkmal: Hinzufügen einer konfigurierbaren URL-Umgebung zur Verbindung mit Lengow in den Einstellungen und Hinzufügen einer zugänglichen Einstellung auf der Homepage des Moduls
+- Feature: Details der geänderten Datei in der Toolbox abrufen
 
 # v1.1.2
 - Bugfix: [import] Korrektur des Suchträgercodes
