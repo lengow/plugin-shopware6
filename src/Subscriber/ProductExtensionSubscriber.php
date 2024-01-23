@@ -18,14 +18,14 @@ use Lengow\Connector\EntityExtension\ExtensionStructure\ProductExtensionStructur
 class ProductExtensionSubscriber implements EventSubscriberInterface
 {
     /**
-     * @var EntityRepositoryInterface $lengowProductRepository shopware product repository
+     * @var EntityRepository $lengowProductRepository shopware product repository
      */
     private $lengowProductRepository;
 
     /**
      * ProductExtensionSubscriber constructor
      *
-     * @param EntityRepositoryInterface $lengowProductRepository Lengow product repository
+     * @param EntityRepository $lengowProductRepository Lengow product repository
      */
     public function __construct($lengowProductRepository) {
         $this->lengowProductRepository = $lengowProductRepository;

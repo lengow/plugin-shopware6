@@ -14,7 +14,7 @@ use Shopware\Core\Checkout\Order\OrderDefinition;
 use Shopware\Core\Checkout\Order\OrderStates;
 use Shopware\Core\Framework\Context;
 use Shopware\Core\Framework\DataAbstractionLayer\EntityCollection;
-use Shopware\Core\Framework\DataAbstractionLayer\EntityRepositoryInterface;
+use Shopware\Core\Framework\DataAbstractionLayer\EntityRepository;
 use Shopware\Core\Framework\DataAbstractionLayer\Search\Criteria;
 use Shopware\Core\Framework\DataAbstractionLayer\Search\Filter\EqualsFilter;
 use Shopware\Core\Framework\DataAbstractionLayer\Search\Filter\MultiFilter;
@@ -53,6 +53,7 @@ class LengowOrder
     public const STATE_REFUSED = 'refused';
     public const STATE_CANCELED = 'canceled';
     public const STATE_REFUNDED = 'refunded';
+    public const STATE_PARTIALLY_REFUNDED = 'partial_refunded';
 
     /* Order types */
     public const TYPE_PRIME = 'is_prime';
@@ -66,17 +67,17 @@ class LengowOrder
     public const STATE_TECHNICAL_ERROR = 'technical_error';
 
     /**
-     * @var EntityRepositoryInterface Shopware order repository
+     * @var EntityRepository Shopware order repository
      */
     private $orderRepository;
 
     /**
-     * @var EntityRepositoryInterface Shopware order delivery repository
+     * @var EntityRepository Shopware order delivery repository
      */
     private $orderDeliveryRepository;
 
     /**
-     * @var EntityRepositoryInterface Shopware state machine state repository
+     * @var EntityRepository Shopware state machine state repository
      */
     private $stateMachineStateRepository;
 
@@ -86,7 +87,7 @@ class LengowOrder
     private $stateMachineRegistry;
 
     /**
-     * @var EntityRepositoryInterface $lengowOrderRepository Lengow order repository
+     * @var EntityRepository $lengowOrderRepository Lengow order repository
      */
     private $lengowOrderRepository;
 
@@ -260,6 +261,7 @@ class LengowOrder
             self::STATE_CLOSED => OrderStates::STATE_COMPLETED,
             self::STATE_REFUSED => OrderStates::STATE_COMPLETED,
             self::STATE_CANCELED => OrderStates::STATE_CANCELLED,
+            self::STATE_PARTIALLY_REFUNDED => OrderStates::STATE_COMPLETED,
             self::STATE_REFUNDED => OrderStates::STATE_COMPLETED,
             self::TYPE_DELIVERED_BY_MARKETPLACE => OrderStates::STATE_COMPLETED,
         ],
@@ -270,6 +272,7 @@ class LengowOrder
             self::STATE_CLOSED => OrderTransactionStates::STATE_PAID,
             self::STATE_REFUSED => OrderTransactionStates::STATE_PAID,
             self::STATE_CANCELED => OrderTransactionStates::STATE_CANCELLED,
+            self::STATE_PARTIALLY_REFUNDED => OrderTransactionStates::STATE_REFUNDED,
             self::STATE_REFUNDED => OrderTransactionStates::STATE_REFUNDED,
             self::TYPE_DELIVERED_BY_MARKETPLACE => OrderTransactionStates::STATE_PAID,
         ],
@@ -280,6 +283,7 @@ class LengowOrder
             self::STATE_CLOSED => OrderDeliveryStates::STATE_SHIPPED,
             self::STATE_REFUSED => OrderDeliveryStates::STATE_CANCELLED,
             self::STATE_CANCELED => OrderDeliveryStates::STATE_CANCELLED,
+            self::STATE_PARTIALLY_REFUNDED => OrderDeliveryStates::STATE_CANCELLED,
             self::STATE_REFUNDED => OrderDeliveryStates::STATE_CANCELLED,
             self::TYPE_DELIVERED_BY_MARKETPLACE => OrderDeliveryStates::STATE_SHIPPED,
         ],
@@ -288,11 +292,11 @@ class LengowOrder
     /**
      * LengowOrder constructor
      *
-     * @param EntityRepositoryInterface $orderRepository Shopware order repository
-     * @param EntityRepositoryInterface $orderDeliveryRepository Shopware order delivery repository
-     * @param EntityRepositoryInterface $stateMachineStateRepository Shopware state machine state repository
+     * @param EntityRepository $orderRepository Shopware order repository
+     * @param EntityRepository $orderDeliveryRepository Shopware order delivery repository
+     * @param EntityRepository $stateMachineStateRepository Shopware state machine state repository
      * @param StateMachineRegistry $stateMachineRegistry Shopware state machine registry service
-     * @param EntityRepositoryInterface $lengowOrderRepository Lengow order repository
+     * @param EntityRepository $lengowOrderRepository Lengow order repository
      * @param LengowLog $lengowLog Lengow log service
      * @param LengowConfiguration $lengowConfiguration Lengow configuration service
      * @param LengowConnector $lengowConnector Lengow connector service
@@ -302,11 +306,11 @@ class LengowOrder
      * @param LengowAction $lengowAction Lengow action service
      */
     public function __construct(
-        EntityRepositoryInterface $orderRepository,
-        EntityRepositoryInterface $orderDeliveryRepository,
-        EntityRepositoryInterface $stateMachineStateRepository,
+        EntityRepository $orderRepository,
+        EntityRepository $orderDeliveryRepository,
+        EntityRepository $stateMachineStateRepository,
         StateMachineRegistry $stateMachineRegistry,
-        EntityRepositoryInterface $lengowOrderRepository,
+        EntityRepository $lengowOrderRepository,
         LengowLog $lengowLog,
         LengowConfiguration $lengowConfiguration,
         LengowConnector $lengowConnector,
@@ -432,18 +436,16 @@ class LengowOrder
     }
 
     /**
-     * Get Lengow order from lengow order table by marketplace sku, marketplace name and delivery address id
+     * Get Lengow order from lengow order table by marketplace sku and marketplace name
      *
      * @param string $marketplaceSku marketplace order sku
      * @param string $marketplaceName marketplace name
-     * @param integer $deliveryAddressId Lengow delivery address id
      *
      * @return LengowOrderEntity|null
      */
     public function getLengowOrderByMarketplaceSku(
         string $marketplaceSku,
-        string $marketplaceName,
-        int $deliveryAddressId
+        string $marketplaceName
     ): ?LengowOrderEntity
     {
         $context = Context::createDefaultContext();
@@ -451,7 +453,6 @@ class LengowOrder
         $criteria->addFilter(new MultiFilter(MultiFilter::CONNECTION_AND, [
             new EqualsFilter(LengowOrderDefinition::FIELD_MARKETPLACE_SKU, $marketplaceSku),
             new EqualsFilter(LengowOrderDefinition::FIELD_MARKETPLACE_NAME, $marketplaceName),
-            new EqualsFilter(LengowOrderDefinition::FIELD_DELIVERY_ADDRESS_ID, $deliveryAddressId),
         ]));
         $criteria->addAssociation('order.deliveries')
             ->addAssociation('order.deliveries.shippingMethod')
@@ -496,17 +497,17 @@ class LengowOrder
      * Get lengow order from lengow order table by Shopware order number
      *
      * @param string $orderNumber Shopware order number
-     * @param int|null $deliveryAddressId Lengow delivery address id
+     * @param int|null $marketplaceSku Lengow sku order
      *
      * @return LengowOrderEntity|null
      */
-    public function getLengowOrderByOrderNumber(string $orderNumber, int $deliveryAddressId = null): ?LengowOrderEntity
+    public function getLengowOrderByOrderNumber(string $orderNumber, string $marketplaceSku = null): ?LengowOrderEntity
     {
         $context = Context::createDefaultContext();
         $criteria = new Criteria();
         $criteria->addFilter(new MultiFilter(MultiFilter::CONNECTION_AND, [
             new EqualsFilter('order.orderNumber', $orderNumber),
-            new EqualsFilter(LengowOrderDefinition::FIELD_DELIVERY_ADDRESS_ID, $deliveryAddressId),
+            new EqualsFilter(LengowOrderDefinition::FIELD_MARKETPLACE_SKU, $marketplaceSku),
         ]));
         $criteria->addAssociation('order.deliveries')
             ->addAssociation('order.deliveries.shippingMethod')
@@ -525,14 +526,12 @@ class LengowOrder
      *
      * @param string $marketplaceSku marketplace order sku
      * @param string $marketplaceName marketplace name
-     * @param integer $deliveryAddressId Lengow delivery address id
      *
      * @return OrderEntity|null
      */
     public function getOrderByMarketplaceSku(
         string $marketplaceSku,
-        string $marketplaceName,
-        int $deliveryAddressId
+        string $marketplaceName
     ): ?OrderEntity
     {
         $context = Context::createDefaultContext();
@@ -540,7 +539,6 @@ class LengowOrder
         $criteria->addFilter(new MultiFilter(MultiFilter::CONNECTION_AND, [
             new EqualsFilter(LengowOrderDefinition::FIELD_MARKETPLACE_SKU, $marketplaceSku),
             new EqualsFilter(LengowOrderDefinition::FIELD_MARKETPLACE_NAME, $marketplaceName),
-            new EqualsFilter(LengowOrderDefinition::FIELD_DELIVERY_ADDRESS_ID, $deliveryAddressId),
         ]));
         $criteria->addFilter(new MultiFilter(MultiFilter::CONNECTION_OR, [
             new EqualsFilter(LengowOrderDefinition::FIELD_ORDER_PROCESS_STATE, self::PROCESS_STATE_IMPORT),
@@ -712,6 +710,7 @@ class LengowOrder
             case self::STATE_CLOSED:
             case self::STATE_REFUSED:
             case self::STATE_CANCELED:
+            case self::STATE_PARTIALLY_REFUNDED:
             case self::STATE_REFUNDED:
                 return self::PROCESS_STATE_FINISH;
             default:

@@ -3,6 +3,10 @@
         <div class="lgw-footer">
             <div>
                 <p>
+                    <routerLink class="lgw-router-link" :to="{ name: 'lengow.connector.setting' }" tag='span'>
+                        {{ $tc('lengow-connector.page.settings') }}
+                    </routerLink>
+                    |
                     <routerLink class="lgw-router-link" :to="{ name: 'lengow.connector.toolbox' }" tag='span'>
                         {{ $tc('lengow-connector.page.toolbox') }}
                     </routerLink>

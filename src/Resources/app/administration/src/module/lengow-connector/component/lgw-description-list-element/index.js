@@ -63,13 +63,13 @@ Component.register('lgw-description-list-element', {
                 case 'bool':
                     if (this.value) {
                         this.showIcon = true;
-                        this.iconName = 'small-default-checkmark-line-medium';
+                        this.iconName = 'solid-checkmark-s';
                         this.iconClass = 'is--active lgw-check-green';
                     } else if (this.helpText !== '') {
                         this.content = this.helpText;
                     } else {
                         this.showIcon = true;
-                        this.iconName = 'small-default-x-line-medium';
+                        this.iconName = 'regular-times-xs';
                         this.iconClass = 'is--inactive lgw-check-red';
                     }
                     break;

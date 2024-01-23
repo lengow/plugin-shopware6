@@ -3,7 +3,6 @@
 namespace Lengow\Connector\Controller;
 
 use Shopware\Core\Checkout\Order\OrderStates;
-use Shopware\Core\Framework\Routing\Annotation\RouteScope;
 use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\Routing\Annotation\Route;
@@ -20,7 +19,7 @@ use Lengow\Connector\Service\LengowOrderError;
 /**
  * Class LengowOrderController
  * @package Lengow\Connector\Controller
- * @RouteScope(scopes={"api"})
+ * @Route(defaults={"_routeScope"={"api"}})
  */
 class LengowOrderController extends AbstractController
 {

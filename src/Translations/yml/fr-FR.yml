@@ -170,6 +170,7 @@ fr:
           refunded: "Remboursé"
           closed: "Fermé"
           canceled: "Annulé"
+          partial_refunded: "Remboursement Partiel"
         type:
           express: "Livraison Express"
           delivered_by_marketplace: "Expédié par la marketplace"
@@ -244,6 +245,7 @@ fr:
           export: "Export"
           import: "Import"
         title:
+          environment: "Environnement"
           credentials: "Identifiants"
           sales_channel: "Canaux de vente"
           security: "Securité & tracker"
@@ -257,6 +259,9 @@ fr:
           description: "Vous trouverez ci-dessous vos identifiants de connexion à Lengow.\nLes ID Lengow, Access Token et Secret Token sont automatiquement complétés lors de votre première connexion : veuillez à ne pas les modifier."
           saved_message_1: "Paramètre"
           saved_message_2: "enregistré"
+          environment:
+            label: "Environnement"
+            description: "L'environnement auquel vous êtes connecté."
           account:
             label: "ID du compte"
             description: "Votre ID de compte Lengow. Veuillez ne pas le modifier."

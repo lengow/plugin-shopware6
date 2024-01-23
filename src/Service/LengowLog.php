@@ -93,7 +93,7 @@ class LengowLog
         }
         $allParams = [];
         foreach ($params as $param => $value) {
-            $value = str_replace(['|', '=='], ['', ''], $value);
+            $value = str_replace(['|', '=='], ['', ''], (string)$value);
             $allParams[] = $param . '==' . $value;
         }
         return $key . '[' . implode('|', $allParams) . ']';

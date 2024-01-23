@@ -4,7 +4,7 @@ namespace Lengow\Connector\Service;
 
 use Exception;
 use Shopware\Core\Framework\Context;
-use Shopware\Core\Framework\DataAbstractionLayer\EntityRepositoryInterface;
+use Shopware\Core\Framework\DataAbstractionLayer\EntityRepository;
 use Shopware\Core\Framework\DataAbstractionLayer\Search\Criteria;
 use Shopware\Core\Framework\DataAbstractionLayer\Search\Filter\EqualsFilter;
 use Shopware\Core\Framework\Uuid\Uuid;
@@ -20,7 +20,7 @@ use Lengow\Connector\Util\EnvironmentInfoProvider;
 class LengowOrderLine
 {
     /**
-     * @var EntityRepositoryInterface $lengowOrderLineRepository Lengow order line repository
+     * @var EntityRepository $lengowOrderLineRepository Lengow order line repository
      */
     private $lengowOrderLineRepository;
 
@@ -52,10 +52,10 @@ class LengowOrderLine
     /**
      * LengowOrderLine constructor
      *
-     * @param EntityRepositoryInterface $lengowOrderLineRepository Lengow order line repository
+     * @param EntityRepository $lengowOrderLineRepository Lengow order line repository
      * @param LengowLog $lengowLog Lengow log service
      */
-    public function __construct(EntityRepositoryInterface $lengowOrderLineRepository, LengowLog $lengowLog)
+    public function __construct(EntityRepository $lengowOrderLineRepository, LengowLog $lengowLog)
     {
         $this->lengowOrderLineRepository = $lengowOrderLineRepository;
         $this->lengowLog = $lengowLog;

@@ -1,13 +1,16 @@
 import template from './lgw-update-modal.html.twig';
 import './lgw-update-modal.scss';
-import { LENGOW_URL } from "../../../const";
+import { LENGOW_URL, BASE_LENGOW_URL } from '../../../const';
 
-const { Component } = Shopware;
+const {
+    Component,
+    Data: { Criteria }
+} = Shopware;
 
 Component.register('lgw-update-modal', {
     template,
 
-    inject: ['LengowConnectorSyncService'],
+    inject: ['LengowConnectorSyncService', 'repositoryFactory'],
 
     props: {
         pluginData: {
@@ -30,18 +33,25 @@ Component.register('lgw-update-modal', {
             updateGuideLink: '',
             supportLink: '',
             downloadLink: '',
-            showRemindMeLater: false
+            showRemindMeLater: false,
+            lengowEnvironmentUrl: LENGOW_URL,
         };
     },
 
+    computed: {
+        lengowConfigRepository() {
+            return this.repositoryFactory.create('lengow_settings');
+        }
+    },
+
     created() {
-        this.createdComponent()
+        this.loadEnvironmentUrl()
     },
 
     methods: {
         createdComponent() {
             this.version = this.pluginData.version;
-            this.downloadLink = LENGOW_URL + this.pluginData.download_link;
+            this.downloadLink = this.lengowEnvironmentUrl + this.pluginData.download_link;
             this.cmsMinVersion = this.pluginData.cms_min_version;
             this.cmsMaxVersion = this.pluginData.cms_max_version;
             this.extensions = this.pluginData.extensions;
@@ -49,6 +59,17 @@ Component.register('lgw-update-modal', {
             this.updateGuideLink = this.pluginData.links.update_guide;
             this.supportLink = this.pluginData.links.support;
             this.showRemindMeLater = this.pluginData.show_update_modal;
+        },
+
+        loadEnvironmentUrl() {
+            const lengowConfigCriteria = new Criteria();
+            lengowConfigCriteria.addFilter(Criteria.equals('name', 'lengowEnvironmentUrl'));
+            this.lengowConfigRepository.search(lengowConfigCriteria, Shopware.Context.api).then(result => {
+                if (result.total > 0) {
+                    this.lengowEnvironmentUrl = BASE_LENGOW_URL + result[0].value;
+                    this.createdComponent();
+                }
+            });
         },
 
         remindMeLater() {

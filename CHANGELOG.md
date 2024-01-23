@@ -1,3 +1,15 @@
+# v1.1.3
+- Bugfix: [install] fix intallation plugin
+- Bugfix: [global] Replace class EntityRepositoryInterface by EntityRepository
+- Bugfix: [front] Use new class name for icon librairy of Shopware
+- Bugfix: [import & export] Use new annotation for route scope
+- Bugfix: [import] Fix use of RetryableQuery method
+- Bugfix: [import] Not use id delivery address for DB Sharding
+- Bugfix: [import] Add partial refunded state
+- Bugfix: [import] Reimport order if VAT number is différent
+- Feature: Add configurable URL environment to connect to Lengow in setting and add accessible setting in footer of module
+- Feature: get details of modified file in toolbox
+
 # v1.1.2
 - Bugfix: [import] fix search carrier code 
 

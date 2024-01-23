@@ -30,6 +30,8 @@ class LengowToolbox
     public const PARAM_TOKEN = 'token';
     public const PARAM_TOOLBOX_ACTION = 'toolbox_action';
     public const PARAM_TYPE = 'type';
+    public const PARAM_SHORT_PATH = 'short_path';
+
 
     /* Toolbox Actions */
     public const ACTION_DATA = 'data';
@@ -95,6 +97,7 @@ class LengowToolbox
     public const SHOP_LAST_EXPORT = 'last_export';
     public const SHOP_OPTIONS = 'shop_options';
     public const CHECKSUM = 'checksum';
+    public const DATA_TYPE_MODIFIED_FILES = 'modified_files';
     public const CHECKSUM_AVAILABLE = 'available';
     public const CHECKSUM_SUCCESS = 'success';
     public const CHECKSUM_NUMBER_FILES_CHECKED = 'number_files_checked';
@@ -102,6 +105,7 @@ class LengowToolbox
     public const CHECKSUM_NUMBER_FILES_DELETED = 'number_files_deleted';
     public const CHECKSUM_FILE_MODIFIED = 'file_modified';
     public const CHECKSUM_FILE_DELETED = 'file_deleted';
+    public const CHECKSUM_FILE_DETAILS = 'file_details';
     public const LOGS = 'logs';
 
     /* Toolbox order data  */
@@ -276,6 +280,10 @@ class LengowToolbox
                 return $this->getChecklistData();
             case self::DATA_TYPE_CHECKSUM:
                 return $this->getChecksumData();
+            case self::DATA_TYPE_MODIFIED_FILES:
+                $shortPathParam = (string) Tools::getValue(self::PARAM_SHORT_PATH);
+                //FINISH TO
+                return self::getModifiedFilesData($shortPathParam);
             case self::DATA_TYPE_LOG:
                 return $this->getLogData();
             case self::DATA_TYPE_OPTION:
@@ -576,6 +584,7 @@ class LengowToolbox
             self::CHECKSUM_NUMBER_FILES_DELETED => $fileDeletedCounter,
             self::CHECKSUM_FILE_MODIFIED => $fileModified,
             self::CHECKSUM_FILE_DELETED => $fileDeleted,
+            self::CHECKSUM_FILE_DETAILS => 1,
         ];
     }
 
@@ -982,6 +991,62 @@ class LengowToolbox
             default:
                 return self::PROCESS_STATE_FINISH;
         }
+    }
+
+    /**
+     * Get files modified details
+     *
+     * @param string $shortPathParam the file short path
+     *
+     * @return array
+     */
+    private function getModifiedFilesData(string $shortPathParam): array
+    {
+        $fileCounter = 0;
+        $fileModified = [];
+        $fileDeleted = [];
+        $sep = DIRECTORY_SEPARATOR;
+        $pluginPath = $this->environmentInfoProvider->getPluginPath();
+        $fileName = $pluginPath . $sep . EnvironmentInfoProvider::FOLDER_CONFIG . $sep . self::FILE_CHECKMD5;
+
+        if (\file_exists($fileName)) {
+            $md5Available = true;
+
+            if (($file = \fopen($fileName, 'rb')) !== false) {
+                while (($data = \fgetcsv($file, 1000, '|')) !== false) {
+                    $fileCounter++;
+                    $shortPath = $data[0];
+                    $filePath = $pluginPath . $data[0];
+
+                    if (\file_exists($filePath)) {
+                        $fileMd = \md5_file($filePath);
+
+                        if ($fileMd !== $data[1]) {
+                            if ($shortPathParam && ($shortPathParam !== $shortPath)) {
+                                continue;
+                            }
+
+                            $fileModified[] = [
+                                'short_path' => $shortPath,
+                                'content_encoded' => \base64_encode(\file_get_contents($filePath)),
+                                'checksum' => $fileMd
+                            ];
+                        }
+                    } else {
+                        $fileDeleted[] = ['short_path' => $shortPath];
+                    }
+                }
+
+                \fclose($file);
+            }
+        } else {
+            $md5Available = false;
+        }
+
+        return [
+            self::CHECKSUM_FILE_MODIFIED => $fileModified,
+            self::CHECKSUM_FILE_DELETED => $fileDeleted,
+        ];
     }
 
     /**

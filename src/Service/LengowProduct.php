@@ -14,7 +14,7 @@ use Shopware\Core\Checkout\Shipping\Aggregate\ShippingMethodPrice\ShippingMethod
 use Shopware\Core\Checkout\Shipping\ShippingMethodEntity;
 use Shopware\Core\Defaults;
 use Shopware\Core\Framework\Context;
-use Shopware\Core\Framework\DataAbstractionLayer\EntityRepositoryInterface;
+use Shopware\Core\Framework\DataAbstractionLayer\EntityRepository;
 use Shopware\Core\Framework\DataAbstractionLayer\Pricing\Price;
 use Shopware\Core\Framework\DataAbstractionLayer\Search\Criteria;
 use Shopware\Core\Framework\DataAbstractionLayer\Search\Filter\EqualsFilter;
@@ -76,7 +76,7 @@ class LengowProduct
     ];
 
     /**
-     * @var EntityRepositoryInterface product repository
+     * @var EntityRepository product repository
      */
     private $productRepository;
 
@@ -194,12 +194,12 @@ class LengowProduct
     /**
      * LengowProduct Construct
      *
-     * @param EntityRepositoryInterface $productRepository product repository
+     * @param EntityRepository $productRepository product repository
      * @param LengowLog $lengowLog Lengow log service
      * @param EnvironmentInfoProvider $environmentInfoProvider lengow environmentInfoProvider
      */
     public function __construct(
-        EntityRepositoryInterface $productRepository,
+        EntityRepository $productRepository,
         LengowLog $lengowLog,
         EnvironmentInfoProvider $environmentInfoProvider
     )
@@ -468,11 +468,11 @@ class LengowProduct
                     $productData[$headerField] = $this->getVariation();
                     break;
                 case LengowExport::$defaultFields['language']:
-                        if ($this->language->getTranslationCode() && $this->language->getTranslationCode()->getCode()) {
-                            $productData[$headerField] = $this->language->getTranslationCode()->getCode();
-                        } else {
-                            $productData[$headerField] = '';
-                        }
+                    if ($this->language->getTranslationCode() && $this->language->getTranslationCode()->getCode()) {
+                        $productData[$headerField] = $this->language->getTranslationCode()->getCode();
+                    } else {
+                        $productData[$headerField] = '';
+                    }
                     break;
                 default:
                     $value = '';

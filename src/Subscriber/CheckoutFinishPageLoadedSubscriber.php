@@ -5,7 +5,7 @@ namespace Lengow\Connector\Subscriber;
 use Symfony\Component\EventDispatcher\EventSubscriberInterface;
 use Shopware\Core\Checkout\Order\OrderEntity as ShopwareOrderEntity;
 use Shopware\Core\Framework\Context;
-use Shopware\Core\Framework\DataAbstractionLayer\EntityRepositoryInterface;
+use Shopware\Core\Framework\DataAbstractionLayer\EntityRepository;
 use Shopware\Core\Framework\DataAbstractionLayer\Search\Criteria;
 use Shopware\Core\System\SalesChannel\SalesChannelContext;
 use Shopware\Storefront\Page\Checkout\Finish\CheckoutFinishPageLoadedEvent;
@@ -29,7 +29,7 @@ class CheckoutFinishPageLoadedSubscriber implements EventSubscriberInterface
     public const TRACKING_WITH_REFERENCE = "productNumber";
 
     /**
-     * @var EntityRepositoryInterface Shopware currency repository
+     * @var EntityRepository Shopware currency repository
      */
     private $currencyRepository;
 
@@ -46,10 +46,10 @@ class CheckoutFinishPageLoadedSubscriber implements EventSubscriberInterface
     /**
      * LengowSettingUpdateSubscriber constructor
      *
-     * @param EntityRepositoryInterface $currencyRepository Shopware currency repository
+     * @param EntityRepository $currencyRepository Shopware currency repository
      * @param LengowConfiguration $lengowConfiguration Lengow configuration service
      */
-    public function __construct(EntityRepositoryInterface $currencyRepository, LengowConfiguration $lengowConfiguration)
+    public function __construct(EntityRepository $currencyRepository, LengowConfiguration $lengowConfiguration)
     {
         $this->currencyRepository = $currencyRepository;
         $this->lengowConfiguration = $lengowConfiguration;

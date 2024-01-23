@@ -3,9 +3,10 @@
 namespace Lengow\Connector\Service;
 
 use Exception;
+use Lengow\Connector\Entity\Lengow\Order\OrderDefinition as LengowOrderDefinition;
 use Shopware\Core\Framework\Context;
 use Shopware\Core\Framework\DataAbstractionLayer\EntityCollection;
-use Shopware\Core\Framework\DataAbstractionLayer\EntityRepositoryInterface;
+use Shopware\Core\Framework\DataAbstractionLayer\EntityRepository;
 use Shopware\Core\Framework\DataAbstractionLayer\Search\Criteria;
 use Shopware\Core\Framework\DataAbstractionLayer\Search\Filter\EqualsFilter;
 use Shopware\Core\Framework\DataAbstractionLayer\Search\Filter\MultiFilter;
@@ -25,7 +26,7 @@ class LengowOrderError
     public const TYPE_ERROR_SEND = 2;
 
     /**
-     * @var EntityRepositoryInterface $orderErrorRepository Lengow order error repository
+     * @var EntityRepository $orderErrorRepository Lengow order error repository
      */
     private $lengowOrderErrorRepository;
 
@@ -65,10 +66,10 @@ class LengowOrderError
     /**
      * LengowOrderError constructor
      *
-     * @param EntityRepositoryInterface $lengowOrderErrorRepository Lengow order error repository access
+     * @param EntityRepository $lengowOrderErrorRepository Lengow order error repository access
      * @param LengowLog $lengowLog Lengow log service
      */
-    public function __construct(EntityRepositoryInterface $lengowOrderErrorRepository, LengowLog $lengowLog)
+    public function __construct(EntityRepository $lengowOrderErrorRepository, LengowLog $lengowLog)
     {
         $this->lengowOrderErrorRepository = $lengowOrderErrorRepository;
         $this->lengowLog = $lengowLog;
@@ -153,17 +154,15 @@ class LengowOrderError
     }
 
     /**
-     * Get all order errors by marketplace sku and delivery address id
+     * Get all order errors by marketplace sku and marketplace name
      *
      * @param string $marketplaceSku Marketplace sku
-     * @param int $deliveryAddressId Lengow delivery address id
-     * @param int $type order error type (import or send)
+     * @param int $type Order error type (import or send)
      *
      * @return EntityCollection|null
      */
     public function orderIsInError(
         string $marketplaceSku,
-        int $deliveryAddressId,
         int $type = self::TYPE_ERROR_IMPORT
     ): ?EntityCollection
     {
@@ -171,7 +170,6 @@ class LengowOrderError
         $criteria = new Criteria();
         $criteria->addFilter(new MultiFilter(MultiFilter::CONNECTION_AND, [
             new EqualsFilter('order.marketplaceSku', $marketplaceSku),
-            new EqualsFilter('order.deliveryAddressId', $deliveryAddressId),
             new EqualsFilter(LengowOrderErrorDefinition::FIELD_TYPE, $type),
             new EqualsFilter(LengowOrderErrorDefinition::FIELD_IS_FINISHED, false),
         ]));
