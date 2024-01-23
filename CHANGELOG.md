@@ -4,7 +4,11 @@
 - Bugfix: [front] Use new class name for icon librairy of Shopware
 - Bugfix: [import & export] Use new annotation for route scope
 - Bugfix: [import] Fix use of RetryableQuery method
+- Bugfix: [import] Not use id delivery address for DB Sharding
+- Bugfix: [import] Add partial refunded state
 - Feature: Add configurable URL environment to connect to Lengow in setting and add accessible setting in home page of module
+- Feature: get details of modified file in toolbox
+
 
 # v1.1.2
 - Bugfix: [import] fix search carrier code 

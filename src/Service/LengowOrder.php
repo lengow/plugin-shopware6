@@ -53,6 +53,7 @@ class LengowOrder
     public const STATE_REFUSED = 'refused';
     public const STATE_CANCELED = 'canceled';
     public const STATE_REFUNDED = 'refunded';
+    public const STATE_PARTIALLY_REFUNDED = 'partial_refunded';
 
     /* Order types */
     public const TYPE_PRIME = 'is_prime';
@@ -260,6 +261,7 @@ class LengowOrder
             self::STATE_CLOSED => OrderStates::STATE_COMPLETED,
             self::STATE_REFUSED => OrderStates::STATE_COMPLETED,
             self::STATE_CANCELED => OrderStates::STATE_CANCELLED,
+            self::STATE_PARTIALLY_REFUNDED => OrderStates::STATE_COMPLETED,
             self::STATE_REFUNDED => OrderStates::STATE_COMPLETED,
             self::TYPE_DELIVERED_BY_MARKETPLACE => OrderStates::STATE_COMPLETED,
         ],
@@ -270,6 +272,7 @@ class LengowOrder
             self::STATE_CLOSED => OrderTransactionStates::STATE_PAID,
             self::STATE_REFUSED => OrderTransactionStates::STATE_PAID,
             self::STATE_CANCELED => OrderTransactionStates::STATE_CANCELLED,
+            self::STATE_PARTIALLY_REFUNDED => OrderTransactionStates::STATE_REFUNDED,
             self::STATE_REFUNDED => OrderTransactionStates::STATE_REFUNDED,
             self::TYPE_DELIVERED_BY_MARKETPLACE => OrderTransactionStates::STATE_PAID,
         ],
@@ -280,6 +283,7 @@ class LengowOrder
             self::STATE_CLOSED => OrderDeliveryStates::STATE_SHIPPED,
             self::STATE_REFUSED => OrderDeliveryStates::STATE_CANCELLED,
             self::STATE_CANCELED => OrderDeliveryStates::STATE_CANCELLED,
+            self::STATE_PARTIALLY_REFUNDED => OrderDeliveryStates::STATE_CANCELLED,
             self::STATE_REFUNDED => OrderDeliveryStates::STATE_CANCELLED,
             self::TYPE_DELIVERED_BY_MARKETPLACE => OrderDeliveryStates::STATE_SHIPPED,
         ],
@@ -706,6 +710,7 @@ class LengowOrder
             case self::STATE_CLOSED:
             case self::STATE_REFUSED:
             case self::STATE_CANCELED:
+            case self::STATE_PARTIALLY_REFUNDED:
             case self::STATE_REFUNDED:
                 return self::PROCESS_STATE_FINISH;
             default:

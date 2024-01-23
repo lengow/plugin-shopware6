@@ -188,7 +188,8 @@
                 "shipped": "Versandt",
                 "refunded": "Erstattet",
                 "closed": "Abgeschlossen",
-                "canceled": "Abgebrochen"
+                "canceled": "Abgebrochen",
+                "partial_refunded": "Teilweise Rückerstattung"
             },
             "type": {
                 "express": "Expresszustellung",

@@ -8,7 +8,8 @@ export const ORDER_LENGOW_STATES = {
     shipped: 'shipped',
     refunded: 'refunded',
     closed: 'closed',
-    canceled: 'canceled'
+    canceled: 'canceled',
+    partial_refunded: 'partial_refunded'
 };
 
 export const ORDER_TYPES = {

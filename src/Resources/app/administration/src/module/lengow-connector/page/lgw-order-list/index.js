@@ -144,6 +144,10 @@ Component.register('lgw-order-list', {
                 {
                     label: this.$tc('lengow-connector.order.state.canceled'),
                     value: ORDER_LENGOW_STATES.canceled
+                },
+                {
+                    label: this.$tc('lengow-connector.order.state.partial_refunded'),
+                    value: ORDER_LENGOW_STATES.partial_refunded
                 }
             ];
         },

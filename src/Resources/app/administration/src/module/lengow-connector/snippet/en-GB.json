@@ -188,7 +188,8 @@
                 "shipped": "Shipped",
                 "refunded": "Refunded",
                 "closed": "Closed",
-                "canceled": "Canceled"
+                "canceled": "Canceled",
+                "partial_refunded": "Partial Refunded"
             },
             "type": {
                 "express": "Express delivery",

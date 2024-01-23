@@ -170,6 +170,7 @@ en:
           refunded: "Refunded"
           closed: "Closed"
           canceled: "Canceled"
+          partial_refunded: "Partial Refunded"
         type:
           express: "Express delivery"
           delivered_by_marketplace: "Shipped by Marketplace"

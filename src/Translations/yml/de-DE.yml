@@ -170,6 +170,7 @@ de:
           refunded: "Erstattet"
           closed: "Abgeschlossen"
           canceled: "Abgebrochen"
+          partial_refunded: "Teilweise Rückerstattung"
         type:
           express: "Expresszustellung"
           delivered_by_marketplace: "Versandt durch Marktplatz"

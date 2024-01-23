@@ -98,7 +98,6 @@ class LengowToolbox
     public const SHOP_OPTIONS = 'shop_options';
     public const CHECKSUM = 'checksum';
     public const DATA_TYPE_MODIFIED_FILES = 'modified_files';
-
     public const CHECKSUM_AVAILABLE = 'available';
     public const CHECKSUM_SUCCESS = 'success';
     public const CHECKSUM_NUMBER_FILES_CHECKED = 'number_files_checked';
@@ -107,7 +106,6 @@ class LengowToolbox
     public const CHECKSUM_FILE_MODIFIED = 'file_modified';
     public const CHECKSUM_FILE_DELETED = 'file_deleted';
     public const CHECKSUM_FILE_DETAILS = 'file_details';
-
     public const LOGS = 'logs';
 
     /* Toolbox order data  */
@@ -586,6 +584,7 @@ class LengowToolbox
             self::CHECKSUM_NUMBER_FILES_DELETED => $fileDeletedCounter,
             self::CHECKSUM_FILE_MODIFIED => $fileModified,
             self::CHECKSUM_FILE_DELETED => $fileDeleted,
+            self::CHECKSUM_FILE_DETAILS => 1,
         ];
     }
 

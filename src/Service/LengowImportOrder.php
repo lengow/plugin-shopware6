@@ -171,6 +171,7 @@ class LengowImportOrder
         LengowOrder::STATE_WAITING_SHIPMENT,
         LengowOrder::STATE_SHIPPED,
         LengowOrder::STATE_CLOSED,
+        LengowOrder::STATE_PARTIALLY_REFUNDED,
     ];
 
     /**
@@ -932,7 +933,7 @@ class LengowImportOrder
             // check whether the product is canceled for amount
             if ($product->marketplace_status !== null) {
                 $stateProduct = $this->lengowMarketplace->getStateLengow((string) $product->marketplace_status);
-                if ($stateProduct === LengowOrder::STATE_CANCELED || $stateProduct === LengowOrder::STATE_REFUSED) {
+                if ($stateProduct === LengowOrder::STATE_CANCELED || $stateProduct === LengowOrder:: STATE_REFUSED) {
                     continue;
                 }
             }
