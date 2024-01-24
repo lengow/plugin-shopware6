@@ -24,7 +24,7 @@ use Shopware\Core\Content\Product\ProductEntity;
 use Shopware\Core\Defaults;
 use Shopware\Core\Framework\Context;
 use Shopware\Core\Framework\DataAbstractionLayer\Doctrine\RetryableQuery;
-use Shopware\Core\Framework\DataAbstractionLayer\EntityRepositoryInterface;
+use Shopware\Core\Framework\DataAbstractionLayer\EntityRepository;
 use Shopware\Core\Framework\DataAbstractionLayer\Search\Criteria;
 use Shopware\Core\Framework\DataAbstractionLayer\Search\Filter\EqualsFilter;
 use Shopware\Core\Framework\Uuid\Uuid;
@@ -130,7 +130,7 @@ class LengowImportOrder
     private $lengowAddress;
 
     /**
-     * @var EntityRepositoryInterface Shopware currency repository
+     * @var EntityRepository Shopware currency repository
      */
     private $currencyRepository;
 
@@ -171,6 +171,7 @@ class LengowImportOrder
         LengowOrder::STATE_WAITING_SHIPMENT,
         LengowOrder::STATE_SHIPPED,
         LengowOrder::STATE_CLOSED,
+        LengowOrder::STATE_PARTIALLY_REFUNDED,
     ];
 
     /**
@@ -335,7 +336,7 @@ class LengowImportOrder
      * @param LengowProduct $lengowProduct Lengow product service
      * @param LengowCustomer $lengowCustomer Lengow customer service
      * @param LengowAddress $lengowAddress Lengow address service
-     * @param EntityRepositoryInterface $currencyRepository Shopware currency repository
+     * @param EntityRepository $currencyRepository Shopware currency repository
      * @param SalesChannelContextFactory $salesChannelContextFactory Shopware sales channel context factory
      * @param CartService $cartService Shopware cart service
      * @param OrderConverter $orderConverter Shopware order converter service
@@ -352,7 +353,7 @@ class LengowImportOrder
         LengowProduct $lengowProduct,
         LengowCustomer $lengowCustomer,
         LengowAddress $lengowAddress,
-        EntityRepositoryInterface $currencyRepository,
+        EntityRepository $currencyRepository,
         $salesChannelContextFactory,
         CartService $cartService,
         OrderConverter $orderConverter,
@@ -423,8 +424,7 @@ class LengowImportOrder
         /** @var LengowOrderEntity $lengowOrder */
         $lengowOrder = $this->lengowOrder->getLengowOrderByMarketplaceSku(
             $this->marketplaceSku,
-            $this->lengowMarketplace->getName(),
-            $this->deliveryAddressId
+            $this->lengowMarketplace->getName()
         );
         $this->lengowOrderId = $lengowOrder ? $lengowOrder->getId() : null;
         // checks if an order already has an error in progress
@@ -434,8 +434,7 @@ class LengowImportOrder
         // get a Shopware order id in the lengow order table
         $order = $this->lengowOrder->getOrderByMarketplaceSku(
             $this->marketplaceSku,
-            $this->lengowMarketplace->getName(),
-            $this->deliveryAddressId
+            $this->lengowMarketplace->getName()
         );
         // if order is already exist
         if ($order) {
@@ -530,7 +529,7 @@ class LengowImportOrder
     private function orderErrorAlreadyExist(): bool
     {
         // if order error exist and not finished -> stop import order
-        $orderErrors = $this->lengowOrderError->orderIsInError($this->marketplaceSku, $this->deliveryAddressId);
+        $orderErrors = $this->lengowOrderError->orderIsInError($this->marketplaceSku);
         if ($orderErrors === null) {
             return false;
         }
@@ -563,6 +562,7 @@ class LengowImportOrder
      * @param OrderEntity $order Shopware order instance
      *
      * @return bool
+     * @throws Exception
      */
     private function checkAndUpdateOrder(OrderEntity $order): bool
     {
@@ -575,9 +575,11 @@ class LengowImportOrder
             $this->logOutput,
             $this->marketplaceSku
         );
-        // get a record in the lengow order table
+
+        // Get a record in the Lengow order table
         /** @var LengowOrderEntity $lengowOrder */
         $lengowOrder = $this->lengowOrder->getLengowOrderByOrderId($order->getId());
+
         // Lengow -> Cancel and reimport order
         if ($lengowOrder->isReimported()) {
             $this->lengowLog->write(
@@ -589,34 +591,45 @@ class LengowImportOrder
                 $this->marketplaceSku
             );
             $this->isReimported = true;
+            unset($lengowOrder);
             return $orderUpdated;
         }
-        // load data for return
+
+        // Load data for return
         $this->orderId = $order->getId();
         $this->orderReference = $order->getOrderNumber();
         $this->previousOrderStateLengow = $lengowOrder->getOrderLengowState();
-        // try to update Shopware order, lengow order and finish actions if necessary
-        $orderUpdated = $this->lengowOrder->updateOrderState(
-            $order,
-            $lengowOrder,
-            $this->orderStateLengow,
-            $this->packageData
-        );
-        if ($orderUpdated) {
-            $this->lengowLog->write(
-                LengowLog::CODE_IMPORT,
-                $this->lengowLog->encodeMessage('log.import.order_state_updated', [
-                    'state_name' => $orderUpdated,
-                ]),
-                $this->logOutput,
-                $this->marketplaceSku
-            );
-            $orderUpdated = true;
-        } else {
-            $orderUpdated = false;
-        }
+
+        // Load VAT number from lengow order data
+        $this->loadVatNumberFromOrderData();
+
+        // Check and update VAT number data
+            if (!(
+                ($lengowOrder->getCustomerVatNumber() ?? '') ===
+                ($this->customerVatNumber ?? '')
+            )) {
+                $this->checkAndUpdateLengowOrderData();
+                $orderUpdated = true;
+                $this->lengowLog->write(
+                    LengowLog::CODE_IMPORT,
+                    $this->lengowLog->encodeMessage('log.import.lengow_order_updated'),
+                    $this->logOutput,
+                    $this->marketplaceSku
+                );
+            }
+
+            // Try to update Shopware order, Lengow order, and finish actions if necessary
+            if (!$orderUpdated) {
+                $orderUpdated = $this->lengowOrder->updateOrderState(
+                    $order,
+                    $lengowOrder,
+                    $this->orderStateLengow,
+                    $this->packageData
+                );
+            }
+
         unset($lengowOrder);
-        return $orderUpdated;
+        return (bool)$orderUpdated;
     }
 
     /**
@@ -669,7 +682,7 @@ class LengowImportOrder
             return false;
         }
         foreach ($this->orderData->merchant_order_id as $externalId) {
-            if ($this->lengowOrder->getLengowOrderByOrderNumber($externalId, $this->deliveryAddressId)) {
+            if ($this->lengowOrder->getLengowOrderByOrderNumber($externalId, $this->marketplaceSku)) {
                 $message = $this->lengowLog->encodeMessage('log.import.external_id_exist', [
                     'order_id' => $externalId,
                 ]);
@@ -742,8 +755,7 @@ class LengowImportOrder
         // get lengow order
         $lengowOrder = $this->lengowOrder->getLengowOrderByMarketplaceSku(
             $this->marketplaceSku,
-            $this->lengowMarketplace->getName(),
-            $this->deliveryAddressId
+            $this->lengowMarketplace->getName()
         );
         if ($lengowOrder) {
             $this->lengowOrderId = $lengowOrder->getId();
@@ -834,6 +846,7 @@ class LengowImportOrder
             LengowOrderDefinition::FIELD_ORDER_ITEM => $this->orderItems,
             LengowOrderDefinition::FIELD_CUSTOMER_NAME => $this->getCustomerName(),
             LengowOrderDefinition::FIELD_CUSTOMER_EMAIL => $this->getCustomerEmail(),
+            LengowOrderDefinition::FIELD_CUSTOMER_VAT_NUMBER => $this->customerVatNumber,
             LengowOrderDefinition::FIELD_COMMISSION => (float) $this->orderData->commission,
             LengowOrderDefinition::FIELD_CARRIER => $this->carrierName,
             LengowOrderDefinition::FIELD_CARRIER_METHOD => $this->carrierMethod,
@@ -871,7 +884,7 @@ class LengowImportOrder
                     'currency_iso' => $this->orderData->currency->iso_a3,
                 ]);
             } else {
-               $this->currency = $currencyCollection->first();
+                $this->currency = $currencyCollection->first();
             }
         }
         if ($this->orderData->total_order === -1) {
@@ -935,7 +948,7 @@ class LengowImportOrder
             // check whether the product is canceled for amount
             if ($product->marketplace_status !== null) {
                 $stateProduct = $this->lengowMarketplace->getStateLengow((string) $product->marketplace_status);
-                if ($stateProduct === LengowOrder::STATE_CANCELED || $stateProduct === LengowOrder::STATE_REFUSED) {
+                if ($stateProduct === LengowOrder::STATE_CANCELED || $stateProduct === LengowOrder:: STATE_REFUSED) {
                     continue;
                 }
             }
@@ -1565,16 +1578,14 @@ class LengowImportOrder
             $stock = $orderIsCompleted ? $product->getStock() - $productData['quantity'] : $product->getStock();
             $availableStock = $initialStock - $productData['quantity'];
             try {
-                // use SQL query because update via the product repository don't work
-                // and Shopware has not any service allowing to decrement properly a product
-                $query = new RetryableQuery(
-                    $this->connection->prepare('
-                        UPDATE product
-                        SET stock = :stock, available_stock = :available_stock, version_id = :version
-                        WHERE id = :id
-                    ')
-                );
-                $query->execute([
+                $sql = '
+                    UPDATE product
+                    SET stock = :stock, available_stock = :available_stock, version_id = :version
+                    WHERE id = :id
+                ';
+                $retryableQuery = new RetryableQuery($this->connection, $this->connection->prepare($sql));
+
+                $retryableQuery->execute([
                     'stock' => (int) $stock,
                     'available_stock' => (int) $availableStock,
                     'id' => Uuid::fromHexToBytes($product->getId()),

@@ -1,7 +1,6 @@
-// export const LENGOW_URL = 'https://my.lengow.io';
 export const LENGOW_URL = 'https://my.lengow.net';
-
-export const MODULE_VERSION = '1.1.2';
+export const BASE_LENGOW_URL = 'https://my.lengow';
+export const MODULE_VERSION = '1.1.3';
 
 export const ORDER_LENGOW_STATES = {
     accepted: 'accepted',
@@ -9,7 +8,8 @@ export const ORDER_LENGOW_STATES = {
     shipped: 'shipped',
     refunded: 'refunded',
     closed: 'closed',
-    canceled: 'canceled'
+    canceled: 'canceled',
+    partial_refunded: 'partial_refunded'
 };
 
 export const ORDER_TYPES = {

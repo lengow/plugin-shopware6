@@ -57,6 +57,10 @@ Component.register('lgw-order-state-label', {
                     translationKey = 'lengow-connector.order.state.canceled';
                     orderStateClass = 'mod-canceled';
                     break;
+                case ORDER_LENGOW_STATES.partial_refunded:
+                    translationKey = 'lengow-connector.order.state.partial_refunded';
+                    orderStateClass = 'mod-canceled';
+                    break;
                 default:
                     translationKey = this.orderLengowState;
                     orderStateClass = 'mod-default';

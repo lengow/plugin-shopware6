@@ -4,7 +4,7 @@ namespace Lengow\Connector;
 
 use Doctrine\DBAL\Connection;
 use Shopware\Core\Framework\Context;
-use Shopware\Core\Framework\DataAbstractionLayer\EntityRepositoryInterface;
+use Shopware\Core\Framework\DataAbstractionLayer\EntityRepository;
 use Shopware\Core\Framework\DataAbstractionLayer\Search\Criteria;
 use Shopware\Core\Framework\DataAbstractionLayer\Search\Filter\EqualsFilter;
 use Shopware\Core\Framework\Plugin;
@@ -89,7 +89,7 @@ class LengowConnector extends Plugin
             'pluginId' => $pluginId,
             'afterOrderEnabled' => false,
         ];
-        /** @var EntityRepositoryInterface $paymentRepository */
+        /** @var EntityRepository $paymentRepository */
         $paymentRepository = $this->container->get('payment_method.repository');
         $paymentRepository->upsert([$lengowPaymentData], $context);
         // Without this workaround, paymentMethod is activated by default
@@ -111,7 +111,7 @@ class LengowConnector extends Plugin
      */
     private function setPaymentMethodIsActive(bool $active, Context $context): void
     {
-        /** @var EntityRepositoryInterface $paymentRepository */
+        /** @var EntityRepository $paymentRepository */
         $paymentRepository = $this->container->get('payment_method.repository');
         $paymentMethodId = $this->getPaymentMethodId();
         // Payment does not even exist, so nothing to (de-)activate here
@@ -134,7 +134,7 @@ class LengowConnector extends Plugin
      */
     private function getPaymentMethodId(): ?string
     {
-        /** @var EntityRepositoryInterface $paymentRepository */
+        /** @var EntityRepository $paymentRepository */
         $paymentRepository = $this->container->get('payment_method.repository');
         // Fetch ID for update
         $paymentCriteria = (new Criteria())->addFilter(new EqualsFilter('handlerIdentifier', LengowPayment::class));

@@ -2,7 +2,6 @@
 
 namespace Lengow\Connector\Controller;
 
-use Shopware\Core\Framework\Routing\Annotation\RouteScope;
 use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
 use Symfony\Component\HttpFoundation\JsonResponse;
 use Symfony\Component\HttpFoundation\Request;
@@ -16,7 +15,7 @@ use Lengow\Connector\Service\LengowSync;
 /**
  * Class LengowConnectionController
  * @package Lengow\Connector\Controller
- * @RouteScope(scopes={"api"})
+ * @Route(defaults={"_routeScope"={"api"}})
  */
 class LengowConnectionController extends AbstractController
 {
@@ -75,7 +74,7 @@ class LengowConnectionController extends AbstractController
      * @Route("/api/_action/lengow/connection/check-api-credentials",
      *     name="api.action.lengow.connection.check-api-credentials",
      *     methods={"POST"})
-     * @Route("/api/v{version}/_action/lengow/connection/check-api-credentials",
+     * @Route("/api/v{version}/_action/lengow/connection/FF",
      *     name="api.action.lengow.connection.check-api-credentials-old",
      *     methods={"POST"})
      *

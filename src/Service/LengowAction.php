@@ -6,7 +6,7 @@ use Exception;
 use Shopware\Core\Checkout\Order\OrderEntity;
 use Shopware\Core\Framework\Context;
 use Shopware\Core\Framework\DataAbstractionLayer\EntityCollection;
-use Shopware\Core\Framework\DataAbstractionLayer\EntityRepositoryInterface;
+use Shopware\Core\Framework\DataAbstractionLayer\EntityRepository;
 use Shopware\Core\Framework\DataAbstractionLayer\Search\Criteria;
 use Shopware\Core\Framework\DataAbstractionLayer\Search\Filter\EqualsFilter;
 use Shopware\Core\Framework\DataAbstractionLayer\Search\Filter\MultiFilter;
@@ -63,7 +63,7 @@ class LengowAction
     ];
 
     /**
-     * @var EntityRepositoryInterface $lengowActionRepository Lengow action repository
+     * @var EntityRepository $lengowActionRepository Lengow action repository
      */
     private $lengowActionRepository;
 
@@ -121,13 +121,13 @@ class LengowAction
     /**
      * LengowAction constructor
      *
-     * @param EntityRepositoryInterface $lengowActionRepository Lengow action repository
+     * @param EntityRepository $lengowActionRepository Lengow action repository
      * @param LengowLog $lengowLog Lengow log service
      * @param LengowConnector $lengowConnector Lengow connector service
      * @param LengowConfiguration $lengowConfiguration Lengow configuration service
      */
     public function __construct(
-        EntityRepositoryInterface $lengowActionRepository,
+        EntityRepository $lengowActionRepository,
         LengowLog $lengowLog,
         LengowConnector $lengowConnector,
         LengowConfiguration $lengowConfiguration

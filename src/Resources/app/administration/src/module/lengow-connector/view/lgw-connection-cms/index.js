@@ -1,8 +1,12 @@
 import template from './lgw-connection-cms.html.twig';
 import './lgw-connection-cms.scss';
-import { LENGOW_URL } from '../../../const';
+import { LENGOW_URL, BASE_LENGOW_URL } from '../../../const';
 
-const { Component } = Shopware;
+const {
+    Component,
+    Data: { Criteria }
+} = Shopware;
+
 const { mapState } = Shopware.Component.getComponentHelper();
 
 Component.register('lgw-connection-cms', {
@@ -10,7 +14,8 @@ Component.register('lgw-connection-cms', {
 
     inject: [
         'LengowConnectorConnectionService',
-        'LengowConnectorSyncService'
+        'LengowConnectorSyncService',
+        'repositoryFactory'
     ],
 
     data() {
@@ -31,17 +36,20 @@ Component.register('lgw-connection-cms', {
     },
 
     computed: {
-        ...mapState('lgwConnection', ['catalogList'])
+        ...mapState('lgwConnection', ['catalogList']),
+        lengowConfigRepository() {
+            return this.repositoryFactory.create('lengow_settings');
+        }
     },
 
     created() {
-        this.createdComponent();
+        this.loadEnvironmentUrl();
     },
 
     methods: {
         createdComponent() {
             this.isLoading = true;
-            if (this.lengowUrl === 'https://my.lengow.net') {
+            if (this.lengowUrl === LENGOW_URL) {
                 this.preprod = true;
             }
             this.LengowConnectorSyncService.getPluginLinks().then(result => {
@@ -51,6 +59,17 @@ Component.register('lgw-connection-cms', {
                 }
             });
             this.isLoading = false;
+        },
+
+        loadEnvironmentUrl() {
+            const lengowConfigCriteria = new Criteria();
+            lengowConfigCriteria.addFilter(Criteria.equals('name', 'lengowEnvironmentUrl'));
+            this.lengowConfigRepository.search(lengowConfigCriteria, Shopware.Context.api).then(result => {
+                if (result.total > 0) {
+                    this.lengowUrl = BASE_LENGOW_URL + result[0].value;
+                    this.createdComponent();
+                }
+            });
         },
 
         connectCms() {

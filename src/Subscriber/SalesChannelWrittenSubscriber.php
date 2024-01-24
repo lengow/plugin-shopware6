@@ -3,7 +3,7 @@
 namespace Lengow\Connector\Subscriber;
 
 use Symfony\Component\EventDispatcher\EventSubscriberInterface;
-use Shopware\Core\Framework\DataAbstractionLayer\EntityRepositoryInterface;
+use Shopware\Core\Framework\DataAbstractionLayer\EntityRepository;
 use Shopware\Core\Framework\DataAbstractionLayer\Event\EntityWrittenEvent;
 use Shopware\Core\Framework\DataAbstractionLayer\Event\EntityDeletedEvent;
 use Shopware\Core\System\SalesChannel\SalesChannelEvents;
@@ -20,7 +20,7 @@ use Lengow\Connector\Service\LengowConfiguration;
 class SalesChannelWrittenSubscriber implements EventSubscriberInterface
 {
     /**
-     * @var EntityRepositoryInterface lengow settings repository
+     * @var EntityRepository lengow settings repository
      */
     private $lengowSettingsRepository;
 
@@ -32,10 +32,10 @@ class SalesChannelWrittenSubscriber implements EventSubscriberInterface
     /**
      * ProductExtensionSubscriber constructor
      *
-     * @param EntityRepositoryInterface $lengowSettingsRepository Lengow settings repository
+     * @param EntityRepository $lengowSettingsRepository Lengow settings repository
      * @param LengowConfiguration  $lengowConfiguration configuration service
      */
-    public function __construct(EntityRepositoryInterface $lengowSettingsRepository, LengowConfiguration $lengowConfiguration) {
+    public function __construct(EntityRepository $lengowSettingsRepository, LengowConfiguration $lengowConfiguration) {
         $this->lengowConfiguration = $lengowConfiguration;
         $this->lengowSettingsRepository = $lengowSettingsRepository;
     }

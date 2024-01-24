@@ -1,5 +1,21 @@
 {% block lgw_setting_general %}
     <sw-card-view class="lgw-setting-general">
+        {% block lgw_setting_general_environment %}
+            <sw-card :title="$tc('lengow-connector.setting.title.environment')">
+                <sw-help-text class="lgw-help-text"
+                              :text="$tc('lengow-connector.setting.lengow_main_setting.environment.description')"
+                              :width="200"
+                              tooltipPosition="right">
+                </sw-help-text>
+                <sw-select-field  class="text-center"
+                                  :label="$tc('lengow-connector.setting.lengow_main_setting.environment.label')"
+                                  v-model="lengowEnvironmentUrl"
+                                  @change="onSaveSettings($event, 'lengowEnvironmentUrl')">
+                    <option value=".net">Preprod</option>
+                    <option value=".io">Prod</option>
+                </sw-select-field >
+            </sw-card>
+        {% endblock %}
         {% block lgw_setting_general_credentials %}
             <sw-card :title="$tc('lengow-connector.setting.title.credentials')">
                 <lgw-lockable-string-field
@@ -97,9 +113,9 @@
         {% block lgw_setting_general_timezone %}
             <sw-card :title="$tc('lengow-connector.setting.title.timezone')">
                 <sw-help-text class="lgw-help-text"
-                    :text="$tc('lengow-connector.setting.lengow_main_setting.timezone.description')"
-                    :width="200"
-                    tooltipPosition="right"/>
+                              :text="$tc('lengow-connector.setting.lengow_main_setting.timezone.description')"
+                              :width="200"
+                              tooltipPosition="right"/>
                 <sw-select-field placeholder="Select timezone"
                                  :label="$tc('lengow-connector.setting.lengow_main_setting.timezone.label')"
                                  v-model="lengowTimezone"

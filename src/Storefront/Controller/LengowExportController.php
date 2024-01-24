@@ -2,7 +2,6 @@
 
 namespace Lengow\Connector\Storefront\Controller;
 
-use Shopware\Core\Framework\Routing\Annotation\RouteScope;
 use Symfony\Component\Routing\Annotation\Route;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\Response;
@@ -15,7 +14,7 @@ use Lengow\Connector\Service\LengowTranslation;
 /**
  * Class LengowExportController
  * @package Lengow\Connector\Storefront\Controller
- * @RouteScope(scopes={"storefront"})
+ * @Route(defaults={"_routeScope"={"storefront"}})
  */
 class LengowExportController extends LengowAbstractFrontController
 {

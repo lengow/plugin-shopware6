@@ -9,7 +9,7 @@ use Shopware\Core\Content\Product\Aggregate\ProductConfiguratorSetting\ProductCo
 use Shopware\Core\Content\Property\PropertyGroupCollection;
 use Shopware\Core\Content\Property\PropertyGroupEntity;
 use Shopware\Core\Framework\Context;
-use Shopware\Core\Framework\DataAbstractionLayer\EntityRepositoryInterface;
+use Shopware\Core\Framework\DataAbstractionLayer\EntityRepository;
 use Shopware\Core\Framework\DataAbstractionLayer\Search\Criteria;
 use Shopware\Core\Framework\DataAbstractionLayer\Search\Filter\EqualsFilter;
 use Shopware\Core\Framework\Uuid\Uuid;
@@ -58,42 +58,42 @@ class LengowExport
     private $lengowConfiguration;
 
     /**
-     * @var EntityRepositoryInterface productRepository
+     * @var EntityRepository productRepository
      */
     private $salesChannelRepository;
 
     /**
-     * @var EntityRepositoryInterface productRepository
+     * @var EntityRepository productRepository
      */
     private $lengowProductRepository;
 
     /**
-     * @var EntityRepositoryInterface shopware currency repository
+     * @var EntityRepository shopware currency repository
      */
     private $currencyRepository;
 
     /**
-     * @var EntityRepositoryInterface shopware languages repository
+     * @var EntityRepository shopware languages repository
      */
     private $languageRepository;
 
     /**
-     * @var EntityRepositoryInterface shopware custom field repository
+     * @var EntityRepository shopware custom field repository
      */
     private $customFieldRepository;
 
     /**
-     * @var EntityRepositoryInterface shopware product configurator setting repository
+     * @var EntityRepository shopware product configurator setting repository
      */
     private $productConfiguratorSettingRepository;
 
     /**
-     * @var EntityRepositoryInterface shopware property group repository
+     * @var EntityRepository shopware property group repository
      */
     private $propertyGroupRepository;
 
     /**
-     * @var EntityRepositoryInterface shopware shipping method repository
+     * @var EntityRepository shopware shipping method repository
      */
     private $shippingMethodRepository;
 
@@ -226,14 +226,14 @@ class LengowExport
     /**
      * LengowExport constructor
      * @param LengowConfiguration $lengowConfiguration lengow config access
-     * @param EntityRepositoryInterface $salesChannelRepository sales channel repository
-     * @param EntityRepositoryInterface $shippingMethodRepository shipping method repository
-     * @param EntityRepositoryInterface $lengowProductRepository lengow product repository
-     * @param EntityRepositoryInterface $currencyRepository currency repository
-     * @param EntityRepositoryInterface $languageRepository language repository
-     * @param EntityRepositoryInterface $productConfiguratorSettingRepository product configurator setting repository
-     * @param EntityRepositoryInterface $customFieldRepository custom field repository
-     * @param EntityRepositoryInterface $propertyGroupRepository property group repository
+     * @param EntityRepository $salesChannelRepository sales channel repository
+     * @param EntityRepository $shippingMethodRepository shipping method repository
+     * @param EntityRepository $lengowProductRepository lengow product repository
+     * @param EntityRepository $currencyRepository currency repository
+     * @param EntityRepository $languageRepository language repository
+     * @param EntityRepository $productConfiguratorSettingRepository product configurator setting repository
+     * @param EntityRepository $customFieldRepository custom field repository
+     * @param EntityRepository $propertyGroupRepository property group repository
      * @param LengowLog $lengowLog Lengow log service
      * @param LengowFeed $lengowFeed lengow feed service
      * @param LengowProduct $lengowProduct lengow product service
@@ -241,14 +241,14 @@ class LengowExport
      */
     public function __construct(
         LengowConfiguration $lengowConfiguration,
-        EntityRepositoryInterface $salesChannelRepository,
-        EntityRepositoryInterface $shippingMethodRepository,
-        EntityRepositoryInterface $lengowProductRepository,
-        EntityRepositoryInterface $currencyRepository,
-        EntityRepositoryInterface $languageRepository,
-        EntityRepositoryInterface $productConfiguratorSettingRepository,
-        EntityRepositoryInterface $customFieldRepository,
-        EntityRepositoryInterface $propertyGroupRepository,
+        EntityRepository $salesChannelRepository,
+        EntityRepository $shippingMethodRepository,
+        EntityRepository $lengowProductRepository,
+        EntityRepository $currencyRepository,
+        EntityRepository $languageRepository,
+        EntityRepository $productConfiguratorSettingRepository,
+        EntityRepository $customFieldRepository,
+        EntityRepository $propertyGroupRepository,
         LengowLog $lengowLog,
         LengowFeed $lengowFeed,
         LengowProduct $lengowProduct,
@@ -337,7 +337,7 @@ class LengowExport
             JOIN `product_category_tree` as pct ON p.`id` = pct.`product_id`
             WHERE pct.`category_id` = :categoryId
         ';
-        $products = $this->connexion->fetchAll($sql, [
+        $products = $this->connexion->fetchAllAssociative($sql, [
             'categoryId' => Uuid::fromHexToBytes($entryPoint),
         ]);
         return count($products);
@@ -473,7 +473,7 @@ class LengowExport
             JOIN `product_category_tree` as pct ON p.`id` = pct.`product_id`
             WHERE pct.`category_id` = :categoryId
         ';
-        $products = $this->connexion->fetchAll($sql, [
+        $products = $this->connexion->fetchAllAssociative($sql, [
             'categoryId' => Uuid::fromHexToBytes($entryPoint),
         ]);
         // clean result from db before sorting
@@ -539,7 +539,7 @@ class LengowExport
             JOIN `product_category_tree` as pct ON p.`id` = pct.`product_id`
             WHERE pct.`category_id` = :categoryId AND p.`parent_id` IS NULL
         ';
-        $products = $this->connexion->fetchAll($sql, [
+        $products = $this->connexion->fetchAllAssociative($sql, [
             'categoryId' => Uuid::fromHexToBytes($entryPoint),
         ]);
         // clean result from db before sorting

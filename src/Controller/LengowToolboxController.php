@@ -2,7 +2,6 @@
 
 namespace Lengow\Connector\Controller;
 
-use Shopware\Core\Framework\Routing\Annotation\RouteScope;
 use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\Response;
@@ -13,7 +12,7 @@ use Lengow\Connector\Service\LengowToolbox;
 /**
  * Class LengowToolboxController
  * @package Lengow\Connector\Controller
- * @RouteScope(scopes={"api"})
+ * @Route(defaults={"_routeScope"={"api"}})
  */
 class LengowToolboxController extends AbstractController
 {

@@ -7,7 +7,7 @@ use Shopware\Core\Checkout\Payment\PaymentMethodEntity;
 use Shopware\Core\Kernel;
 use Shopware\Core\Framework\Context;
 use Shopware\Core\Framework\DataAbstractionLayer\EntityCollection;
-use Shopware\Core\Framework\DataAbstractionLayer\EntityRepositoryInterface;
+use Shopware\Core\Framework\DataAbstractionLayer\EntityRepository;
 use Shopware\Core\Framework\DataAbstractionLayer\Search\Criteria;
 use Shopware\Core\Framework\DataAbstractionLayer\Search\Filter\EqualsFilter;
 use Shopware\Core\System\SalesChannel\Aggregate\SalesChannelDomain\SalesChannelDomainCollection;
@@ -53,7 +53,7 @@ class EnvironmentInfoProvider
     /**
      * @var string plugin version
      */
-    public const PLUGIN_VERSION = '1.1.2';
+    public const PLUGIN_VERSION = '1.1.3';
 
     /**
      * @var string Name of Lengow front controller
@@ -66,22 +66,22 @@ class EnvironmentInfoProvider
     private $kernel;
 
     /**
-     * @var EntityRepositoryInterface user repository
+     * @var EntityRepository user repository
      */
     private $userRepository;
 
     /**
-     * @var EntityRepositoryInterface sales channel repository
+     * @var EntityRepository sales channel repository
      */
     private $salesChannelRepository;
 
     /**
-     * @var EntityRepositoryInterface sales channel domain repository
+     * @var EntityRepository sales channel domain repository
      */
     private $salesChannelDomainRepository;
 
     /**
-     * @var EntityRepositoryInterface payment method repository
+     * @var EntityRepository payment method repository
      */
     private $paymentMethodRepository;
 
@@ -89,17 +89,17 @@ class EnvironmentInfoProvider
      * EnvironmentInfoProvider Construct
      *
      * @param Kernel $kernel Shopware kernel
-     * @param EntityRepositoryInterface $userRepository user repository
-     * @param EntityRepositoryInterface $salesChannelRepository sales channel repository
-     * @param EntityRepositoryInterface $salesChannelDomainRepository sales channel domain repository
-     * @param EntityRepositoryInterface $paymentMethodRepository payment method repository
+     * @param EntityRepository $userRepository user repository
+     * @param EntityRepository $salesChannelRepository sales channel repository
+     * @param EntityRepository $salesChannelDomainRepository sales channel domain repository
+     * @param EntityRepository $paymentMethodRepository payment method repository
      */
     public function __construct(
         Kernel $kernel,
-        EntityRepositoryInterface $userRepository,
-        EntityRepositoryInterface $salesChannelRepository,
-        EntityRepositoryInterface $salesChannelDomainRepository,
-        EntityRepositoryInterface $paymentMethodRepository
+        EntityRepository $userRepository,
+        EntityRepository $salesChannelRepository,
+        EntityRepository $salesChannelDomainRepository,
+        EntityRepository $paymentMethodRepository
     )
     {
         $this->kernel = $kernel;
@@ -268,13 +268,13 @@ class EnvironmentInfoProvider
      * Get default shipping method for given salesChannel
      *
      * @param string $salesChannelId shopware sales channel id
-     * @param EntityRepositoryInterface $shippingMethodRepository shopware shipping method repository
+     * @param EntityRepository $shippingMethodRepository shopware shipping method repository
      *
      * @return string
      */
     public static function getShippingMethodDefaultValue(
         string $salesChannelId,
-        EntityRepositoryInterface $shippingMethodRepository
+        EntityRepository $shippingMethodRepository
     ): string
     {
         $shippingMethodCriteria = new Criteria();
