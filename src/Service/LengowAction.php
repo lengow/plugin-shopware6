@@ -164,6 +164,8 @@ class LengowAction
                 return false;
             }
         }
+        $actionId = $data['actionId'];
+        $type = gettype($actionId);
         try {
             $this->lengowActionRepository->create([$data], Context::createDefaultContext());
         } catch (Exception $e) {
@@ -172,7 +174,7 @@ class LengowAction
             $this->lengowLog->write(
                 LengowLog::CODE_ORM,
                 $this->lengowLog->encodeMessage('log.orm.record_insert_failed', [
-                    'decoded_message' => str_replace(PHP_EOL, '', $errorMessage),
+                    'decoded_message' => str_replace(PHP_EOL, '', $errorMessage . $type),
                 ])
             );
             return false;
@@ -352,7 +354,7 @@ class LengowAction
                 $success = $this->create([
                     LengowActionDefinition::FIELD_ORDER_ID => $order->getId(),
                     LengowActionDefinition::FIELD_ACTION_TYPE => $params[self::ARG_ACTION_TYPE],
-                    LengowActionDefinition::FIELD_ACTION_ID => $row->id,
+                    LengowActionDefinition::FIELD_ACTION_ID => (int) $row->id,
                     LengowActionDefinition::FIELD_ORDER_LINE_SKU => (string) ($params[self::ARG_LINE] ?? ''),
                     LengowActionDefinition::FIELD_PARAMETERS => $params,
                 ]);
@@ -391,7 +393,7 @@ class LengowAction
                 $success = $this->create([
                     LengowActionDefinition::FIELD_ORDER_ID => $order->getId(),
                     LengowActionDefinition::FIELD_ACTION_TYPE => $params[self::ARG_ACTION_TYPE],
-                    LengowActionDefinition::FIELD_ACTION_ID => $result->id,
+                    LengowActionDefinition::FIELD_ACTION_ID => (int) $result->id,
                     LengowActionDefinition::FIELD_ORDER_LINE_SKU => (string) ($params[self::ARG_LINE] ?? ''),
                     LengowActionDefinition::FIELD_PARAMETERS => $params,
                 ]);

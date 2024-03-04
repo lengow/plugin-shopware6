@@ -604,29 +604,29 @@ class LengowImportOrder
         $this->loadVatNumberFromOrderData();
 
         // Check and update VAT number data
-            if (!(
-                ($lengowOrder->getCustomerVatNumber() ?? '') ===
-                ($this->customerVatNumber ?? '')
-            )) {
-                $this->checkAndUpdateLengowOrderData();
-                $orderUpdated = true;
-                $this->lengowLog->write(
-                    LengowLog::CODE_IMPORT,
-                    $this->lengowLog->encodeMessage('log.import.lengow_order_updated'),
-                    $this->logOutput,
-                    $this->marketplaceSku
-                );
-            }
+        if (!(
+            ($lengowOrder->getCustomerVatNumber() ?? '') ===
+            ($this->customerVatNumber ?? '')
+        )) {
+            $this->checkAndUpdateLengowOrderData();
+            $orderUpdated = true;
+            $this->lengowLog->write(
+                LengowLog::CODE_IMPORT,
+                $this->lengowLog->encodeMessage('log.import.lengow_order_updated'),
+                $this->logOutput,
+                $this->marketplaceSku
+            );
+        }
 
-            // Try to update Shopware order, Lengow order, and finish actions if necessary
-            if (!$orderUpdated) {
-                $orderUpdated = $this->lengowOrder->updateOrderState(
-                    $order,
-                    $lengowOrder,
-                    $this->orderStateLengow,
-                    $this->packageData
-                );
-            }
+        // Try to update Shopware order, Lengow order, and finish actions if necessary
+        if (!$orderUpdated) {
+            $orderUpdated = $this->lengowOrder->updateOrderState(
+                $order,
+                $lengowOrder,
+                $this->orderStateLengow,
+                $this->packageData
+            );
+        }
 
         unset($lengowOrder);
         return (bool)$orderUpdated;
@@ -1262,6 +1262,8 @@ class LengowImportOrder
         ]);
         // create a generic cart
         $cart = $this->createCart($token, $products, $salesChannelContext);
+
+
         // get and modify order data for Shopware order creation
         $orderData = $this->getOrderData($cart, $products, $salesChannelContext);
         // delete cart after order creation
@@ -1389,7 +1391,6 @@ class LengowImportOrder
             $definition = new QuantityPriceDefinition(
                 $productData['price_unit'],
                 $calculatedPrice->getTaxRules(),
-                $salesChannelContext->getCurrency()->getDecimalPrecision(),
                 $productData['quantity'],
                 true
             );
@@ -1422,9 +1423,7 @@ class LengowImportOrder
         $definition = new QuantityPriceDefinition(
             $shippingCosts,
             $calculatedPrice->getTaxRules(),
-            $salesChannelContext->getCurrency()->getDecimalPrecision(),
-            1,
-            true
+            1
         );
         $orderData['shippingCosts'] = $this->calculator->calculate($definition, $salesChannelContext);
         $orderData['deliveries'][0]['shippingCosts'] = $orderData['shippingCosts'];
@@ -1452,9 +1451,7 @@ class LengowImportOrder
         $definition = new QuantityPriceDefinition(
             $this->orderAmount,
             $cartPrice->getTaxRules(),
-            $salesChannelContext->getCurrency()->getDecimalPrecision(),
-            1,
-            true
+            1
         );
         $orderAmountCalculatedPrice = $this->calculator->calculate($definition, $salesChannelContext);
         // modify payment state to paid and change payment amount
