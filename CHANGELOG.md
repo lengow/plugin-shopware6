@@ -1,6 +1,8 @@
 # v1.1.4
 - Bugfix: [import] fix add product to Shopware Cart
-- Bugfix: [action] Fix id Action is not integer
+- Bugfix: [action] Fix id Action is not a integer
+- Feature: Add configurable option for create return_tracking_number field and send this data in order action
+
 
 # v1.1.3
 - Bugfix: [install] fix intallation plugin

@@ -19,6 +19,7 @@ use Shopware\Core\Framework\Uuid\Uuid;
 use Lengow\Connector\Entity\Lengow\Settings\SettingsDefinition as LengowSettingsDefinition;
 use Lengow\Connector\Entity\Lengow\Settings\SettingsEntity as LengowSettingsEntity;
 use Lengow\Connector\Util\EnvironmentInfoProvider;
+use Symfony\Component\DependencyInjection\ContainerBuilder;
 
 /**
  * Class LengowConfiguration
@@ -53,6 +54,7 @@ class LengowConfiguration
     public const CURRENCY_CONVERSION_ENABLED = 'lengowCurrencyConversion';
     public const B2B_WITHOUT_TAX_ENABLED = 'lengowImportB2b';
     public const SHIPPED_BY_MARKETPLACE_ENABLED = 'lengowImportShipMpEnabled';
+    public const ACTION_SEND_RETURN_TRACKING_NUMBER = 'lengowSendReturnTrackingNumber';
     public const SHIPPED_BY_MARKETPLACE_STOCK_ENABLED = 'lengowImportStockShipMp';
     public const SYNCHRONIZATION_IN_PROGRESS = 'lengowImportInProgress';
     public const DEFAULT_IMPORT_CARRIER_ID = 'lengowImportDefaultShippingMethod';
@@ -128,6 +130,7 @@ class LengowConfiguration
         self::CURRENCY_CONVERSION_ENABLED => 'currency_conversion_enabled',
         self::B2B_WITHOUT_TAX_ENABLED => 'b2b_without_tax_enabled',
         self::SHIPPED_BY_MARKETPLACE_ENABLED => 'shipped_by_marketplace_enabled',
+        self::ACTION_SEND_RETURN_TRACKING_NUMBER => 'action_send_return_tracking_number',
         self::SHIPPED_BY_MARKETPLACE_STOCK_ENABLED => 'shipped_by_marketplace_stock_enabled',
         self::SYNCHRONIZATION_IN_PROGRESS => 'synchronization_in_progress',
         self::LAST_UPDATE_EXPORT => 'last_update_export',
@@ -176,7 +179,7 @@ class LengowConfiguration
             self::PARAM_GLOBAL => true,
             self::PARAM_EXPORT_TOOLBOX => false,
             self::PARAM_RETURN => self::RETURN_TYPE_STRING,
-            self::PARAM_DEFAULT_VALUE => '.io',
+            self::PARAM_DEFAULT_VALUE => '.fr',
         ],
         self::AUTHORIZED_IP_ENABLED => [
             self::PARAM_GLOBAL => true,
@@ -290,6 +293,11 @@ class LengowConfiguration
             self::PARAM_DEFAULT_VALUE => '0',
         ],
         self::SHIPPED_BY_MARKETPLACE_ENABLED => [
+            self::PARAM_GLOBAL => true,
+            self::PARAM_RETURN => self::RETURN_TYPE_BOOLEAN,
+            self::PARAM_DEFAULT_VALUE => '0',
+        ],
+        self::ACTION_SEND_RETURN_TRACKING_NUMBER => [
             self::PARAM_GLOBAL => true,
             self::PARAM_RETURN => self::RETURN_TYPE_BOOLEAN,
             self::PARAM_DEFAULT_VALUE => '0',
@@ -410,7 +418,7 @@ class LengowConfiguration
     /**
      * @var string base url of the Lengow API
      */
-    private const LENGOW_BASE_API_URL = 'https://api.lengow';
+    private const LENGOW_BASE_API_URL = 'https://mockapi.weblabprototype';
 
     /**
      * LengowConfiguration constructor
@@ -1095,4 +1103,15 @@ class LengowConfiguration
             . $sep . EnvironmentInfoProvider::LENGOW_CONTROLLER . $sep . EnvironmentInfoProvider::ACTION_TOOLBOX . '?'
             . LengowToolbox::PARAM_TOKEN . '=' . $this->getToken();
     }
+
+    /**
+     * Check if send return tracking number is enabled
+     *
+     * @return bool
+     */
+    public function isSendReturnTrackingNumberEnabled(): bool
+    {
+        return (bool) $this->get(self::ACTION_SEND_RETURN_TRACKING_NUMBER);
+    }
+
 }

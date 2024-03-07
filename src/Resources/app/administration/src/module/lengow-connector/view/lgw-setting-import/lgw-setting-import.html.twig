@@ -17,9 +17,17 @@
                               tooltipPosition="right"/>
                 <sw-switch-field class="text-center"
                                  :label="$tc('lengow-connector.setting.lengow_import_setting.decrease_stock.label')"
-                                 :disabled="!lengowImportShipMpEnabled"
                                  v-model="lengowImportStockShipMp"
                                  @change="onSaveSettings($event, 'lengowImportStockShipMp')">
+                </sw-switch-field>
+                <sw-help-text class="lgw-help-text"
+                              :text="$tc('lengow-connector.setting.lengow_import_setting.import_days.label')"
+                              :width="200"
+                              tooltipPosition="right"/>
+                <sw-switch-field class="text-center"
+                                 :label="$tc('lengow-connector.setting.lengow_import_setting.import_days.label')"
+                                 v-model="lengowSendReturnTrackingNumber"
+                                 @change="onSaveSettings($event, 'lengowSendReturnTrackingNumber');onChangeStatus($event, 'lengowSendReturnTrackingNumber')">
                 </sw-switch-field>
             </sw-card>
         {% endblock %}

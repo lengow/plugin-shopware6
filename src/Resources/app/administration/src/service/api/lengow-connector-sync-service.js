@@ -64,6 +64,20 @@ class LengowConnectorSyncService extends ApiService {
                 return ApiService.handleResponse(response);
             });
     }
+    onChangeStatus() {
+        const headers = this.getBasicHeaders();
+
+        return this.httpClient
+            .get(
+                `_action/${this.getApiBasePath()}/sync/create-custom-field`,
+                {
+                    headers: headers
+                }
+            )
+            .then((response) => {
+                return ApiService.handleResponse(response);
+            });
+    }
 }
 
 export default LengowConnectorSyncService;

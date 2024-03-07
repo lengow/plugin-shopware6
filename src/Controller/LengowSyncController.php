@@ -2,6 +2,16 @@
 
 namespace Lengow\Connector\Controller;
 
+use Psr\Container\ContainerExceptionInterface;
+use Psr\Container\NotFoundExceptionInterface;
+use Shopware\Core\Defaults;
+use Shopware\Core\Framework\Context;
+use Shopware\Core\Framework\DataAbstractionLayer\EntityRepository;
+use Shopware\Core\Framework\DataAbstractionLayer\Search\Criteria;
+use Shopware\Core\Framework\DataAbstractionLayer\Search\Filter\EqualsFilter;
+use Shopware\Core\Framework\Test\CustomField\CustomFieldRepositoryTest;
+use Shopware\Core\System\CustomField\CustomFieldEntity;
+use Shopware\Core\System\CustomField\CustomFieldTypes;
 use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\Routing\Annotation\Route;
@@ -9,6 +19,7 @@ use Symfony\Component\HttpFoundation\JsonResponse;
 use Lengow\Connector\Service\LengowConfiguration;
 use Lengow\Connector\Service\LengowSync;
 use Lengow\Connector\Util\EnvironmentInfoProvider;
+use Lengow\Connector\LengowConnector;
 
 /**
  * Class LengowSyncController
@@ -158,5 +169,111 @@ class LengowSyncController extends AbstractController
         }
         $this->lengowConfiguration->set(LengowConfiguration::LAST_UPDATE_PLUGIN_MODAL, (string) time());
         return true;
+    }
+
+    /**
+     * Create custom field
+     *
+     * @Route("/api/_action/lengow/sync/create-custom-field",
+     *      name="api.action.lengow.sync.create-custom-field",
+     *      methods={"GET"})
+     * @Route("/api/v{version}/_action/lengow/sync/create-custom-field",
+     *      name="api.action.lengow.sync.create-custom-field-old",
+     *      methods={"GET"})
+     *
+     * @param Request $request
+     * @param Context $context
+     * @return JsonResponse
+     */
+    public function askToCreateCustomField(Context $context): JsonResponse
+    {
+        try {
+            $success = $this->createCustomField($context, $this->lengowConfiguration);
+            if ($success) {
+                return new JsonResponse(['success' => false, 'message' => 'Erreur lors de la création du champ personnalisé'], 500);
+            }
+
+            return new JsonResponse(['success' => true]);
+        } catch (\Exception $e) {
+            return new JsonResponse(['success' => false, 'message' => $e->getMessage()], 500);
+        } catch (NotFoundExceptionInterface | ContainerExceptionInterface $e) {
+            return new JsonResponse(['success' => false, 'message' => 'Erreur lors de l\'accès au conteneur de services'], 500);
+        }
+    }
+
+    /**
+     * Create custom field
+     *
+     * @param Context $context
+     * @param LengowConfiguration $config
+     * @return bool True si la création du champ personnalisé a réussi, sinon false
+     * @throws \Exception Si une erreur se produit lors de la création ou de la suppression du champ personnalisé
+     */
+    public function createCustomField(Context $context, LengowConfiguration $config): bool
+    {
+        /** @var EntityRepository $customFieldSetRepository */
+        $customFieldSetRepository = $this->container->get('custom_field_set.repository');
+        /** @var EntityRepository $customFieldGetRepository */
+        $customFieldGetRepository = $this->container->get('custom_field.repository');
+        if (!$config->isSendReturnTrackingNumberEnabled()) {
+            $paymentCriteria = (new Criteria())->addFilter(new EqualsFilter('name', 'return_tracking_number'));
+            $existingCustomField = $customFieldGetRepository->searchIds($paymentCriteria, $context);
+
+            if ($existingCustomField->getTotal() === 0) {
+                try {
+                    $customFieldSetRepository->create([
+                        [
+                            'name' => 'Lengow_Connector_set',
+                            'config' => [
+                                'label' => [
+                                    'en-GB' => 'Return tracking number',
+                                    'de-DE' => 'Rücksendekontrollnummer',
+                                    Defaults::LANGUAGE_SYSTEM => 'Return tracking number'
+                                ]
+                            ],
+                            'relations' => [
+                                [
+                                    'entityName' => 'order'
+                                ]
+                            ],
+                            'customFields' => [
+                                [
+                                    'name' => 'return_tracking_number',
+                                    'type' => CustomFieldTypes::TEXT,
+                                    'config' => [
+                                        'label' => [
+                                            'en-GB' => 'Return Tracking Number',
+                                            'de-DE' => 'Rücksendungsverfolgungsnummer',
+                                            Defaults::LANGUAGE_SYSTEM => 'Return tracking number'
+                                        ],
+                                        'customFieldPosition' => 1
+                                    ]
+                                ]
+                            ]
+                        ]
+                    ], $context);
+                    return false;
+                } catch (\Exception $e) {
+                    throw new \Exception('Erreur lors de la création du champ personnalisé : ' . $e->getMessage());
+                }
+            }
+        } else {
+            $paymentCriteria = (new Criteria())->addFilter(new EqualsFilter('name', "Lengow_Connector_set"));
+            $existingCustomField = $customFieldSetRepository->searchIds($paymentCriteria, $context);
+            if ($existingCustomField->getTotal() > 0) {
+                try {
+                    $customFieldIds = $existingCustomField->getIds();
+
+                    foreach ($customFieldIds as $customFieldId) {
+                        $customFieldSetRepository->delete([['id' => $customFieldId]], $context);
+                    }
+                    echo 'Champ personnalisé supprimé avec succès:' . json_encode($customFieldIds, JSON_THROW_ON_ERROR);
+                } catch (\Exception $e) {
+                    // La suppression du champ personnalisé a échoué, lever une exception avec le message d'erreur
+                    throw new \Exception('Erreur lors de la suppression du champ personnalisé : ' . $e->getMessage());
+                }
+            }
+        }
+        return false;
     }
 }
