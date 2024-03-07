@@ -22,11 +22,11 @@
                                  @change="onSaveSettings($event, 'lengowImportStockShipMp')">
                 </sw-switch-field>
                 <sw-help-text class="lgw-help-text"
-                              :text="$tc('lengow-connector.setting.lengow_import_setting.import_days.label')"
+                              :text="$tc('lengow-connector.setting.lengow_import_setting.return_tracking_number.description')"
                               :width="200"
                               tooltipPosition="right"/>
                 <sw-switch-field class="text-center"
-                                 :label="$tc('lengow-connector.setting.lengow_import_setting.import_days.label')"
+                                 :label="$tc('lengow-connector.setting.lengow_import_setting.return_tracking_number.label')"
                                  v-model="lengowSendReturnTrackingNumber"
                                  @change="onSaveSettings($event, 'lengowSendReturnTrackingNumber');onChangeStatus($event, 'lengowSendReturnTrackingNumber')">
                 </sw-switch-field>

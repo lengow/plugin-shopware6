@@ -316,6 +316,9 @@ de:
           decrease_stock:
             label: "Lagerbestand verringern für Bestellungen, die durch einen Marktplatz versandt werden"
             description: "Verwenden Sie diese Option, damit Bestellungen auf Marktplätzen in Ihrem Shopware-Backoffice miteinbezogen werden"
+          return_tracking_number:
+            label: "Erstellen oder Löschen des Feldes für die Trackingnummer von Rücksendungen"
+            description: "Aktivieren Sie diese Option, um ein Feld zu generieren, in dem der Wert der Trackingnummer für die Rücksendung ausgefüllt und beim Versand der Bestellung gesendet werden kann."
           shipping:
             label: "Standard-Versandmethode"
             description: "Wählen Sie die Standardversandmethode, die Sie auf Ihre Bestellungen anwenden möchten"

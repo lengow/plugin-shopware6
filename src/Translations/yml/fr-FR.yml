@@ -316,6 +316,9 @@ fr:
           decrease_stock:
             label: "Diminuer mon stock avec les commandes expédiées par les marketplaces"
             description: "Activez cette option pour prendre en compte les commandes des marketplaces sur les stocks de votre backoffice Shopware."
+          return_tracking_number:
+            label: "Création ou suppression du champ du numéro de suivi de retours"
+            description: "Activez cette option pour générer un champ permettant de remplir la valeur du numéro de suivi du retour et de l'envoyer au moment de l'expédition de la commande."
           shipping:
             label: "Méthode de livraison par défaut"
             description: "Sélectionnez le transporteur par défaut à appliquer à vos commandes"

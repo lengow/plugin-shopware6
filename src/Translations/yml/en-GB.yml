@@ -316,6 +316,9 @@ en:
           decrease_stock:
             label: "Decrease my stock with the orders shipped by marketplaces"
             description: "Use this option to take into account your orders sent by marketplaces on your stock in your Shopware backoffice"
+          return_tracking_number:
+            label: "Creation or deletion of the returns tracking number field"
+            description: "Activate this option to generate a field to fill in the value of the return tracking number and send it to when the order is dispatched."
           shipping:
             label: "Default shipping method"
             description: "Select the default shipping method that you would like to apply to your orders"

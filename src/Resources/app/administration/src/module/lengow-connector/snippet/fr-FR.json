@@ -365,8 +365,8 @@
                     "description": "Activez cette option pour prendre en compte les commandes des marketplaces sur les stocks de votre backoffice Shopware."
                 },
                 "return_tracking_number": {
-                    "label": "Création ou suppresion d'un champ pour le code de suivi de retour",
-                    "description": "Activez cette option pour pouvoir envoyer le numéro de suivi de retour à la marketplace au moment de valider les informations d'envoi d'une commande."
+                    "label": "Création ou suppression du champ du numéro de suivi de retours",
+                    "description": "Activez cette option pour générer un champ permettant de remplir la valeur du numéro de suivi du retour et de l'envoyer au moment de l'expédition de la commande."
                 },
                 "shipping": {
                     "label": "Méthode de livraison par défaut",

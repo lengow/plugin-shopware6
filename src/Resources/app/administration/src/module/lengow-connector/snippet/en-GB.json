@@ -365,8 +365,8 @@
                     "description": "Use this option to take into account your orders sent by marketplaces on your stock in your Shopware backoffice"
                 },
                 "return_tracking_number": {
-                    "label": "Create or delete a field for the return tracking code",
-                    "description": "Activate this option to be able to send the returns tracking number to the marketplace when you validate the shipping information for an order."
+                    "label": "Creation or deletion of the returns tracking number field",
+                    "description": "Activate this option to generate a field to fill in the value of the return tracking number and send it to when the order is dispatched."
                 },
                 "shipping": {
                     "label": "Default shipping method",
