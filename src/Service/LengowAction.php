@@ -164,8 +164,7 @@ class LengowAction
                 return false;
             }
         }
-        $actionId = $data['actionId'];
-        $type = gettype($actionId);
+
         try {
             $this->lengowActionRepository->create([$data], Context::createDefaultContext());
         } catch (Exception $e) {
@@ -174,7 +173,7 @@ class LengowAction
             $this->lengowLog->write(
                 LengowLog::CODE_ORM,
                 $this->lengowLog->encodeMessage('log.orm.record_insert_failed', [
-                    'decoded_message' => str_replace(PHP_EOL, '', $errorMessage . $type),
+                    'decoded_message' => str_replace(PHP_EOL, '', $errorMessage),
                 ])
             );
             return false;

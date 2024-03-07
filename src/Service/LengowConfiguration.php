@@ -179,7 +179,7 @@ class LengowConfiguration
             self::PARAM_GLOBAL => true,
             self::PARAM_EXPORT_TOOLBOX => false,
             self::PARAM_RETURN => self::RETURN_TYPE_STRING,
-            self::PARAM_DEFAULT_VALUE => '.fr',
+            self::PARAM_DEFAULT_VALUE => '.io',
         ],
         self::AUTHORIZED_IP_ENABLED => [
             self::PARAM_GLOBAL => true,
@@ -418,7 +418,7 @@ class LengowConfiguration
     /**
      * @var string base url of the Lengow API
      */
-    private const LENGOW_BASE_API_URL = 'https://mockapi.weblabprototype';
+    private const LENGOW_BASE_API_URL = 'https://api.lengow';
 
     /**
      * LengowConfiguration constructor

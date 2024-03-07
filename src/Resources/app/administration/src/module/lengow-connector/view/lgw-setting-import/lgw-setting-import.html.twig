@@ -8,6 +8,7 @@
                               tooltipPosition="right"/>
                 <sw-switch-field class="text-center"
                                  :label="$tc('lengow-connector.setting.lengow_import_setting.ship_mp_enabled.label')"
+                                 :disabled="!lengowImportShipMpEnabled"
                                  v-model="lengowImportShipMpEnabled"
                                  @change="onSaveSettings($event, 'lengowImportShipMpEnabled')">
                 </sw-switch-field>

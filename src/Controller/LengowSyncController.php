@@ -19,7 +19,6 @@ use Symfony\Component\HttpFoundation\JsonResponse;
 use Lengow\Connector\Service\LengowConfiguration;
 use Lengow\Connector\Service\LengowSync;
 use Lengow\Connector\Util\EnvironmentInfoProvider;
-use Lengow\Connector\LengowConnector;
 
 /**
  * Class LengowSyncController
