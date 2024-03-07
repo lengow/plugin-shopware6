@@ -364,6 +364,10 @@
                     "label": "Decrease my stock with the orders shipped by marketplaces",
                     "description": "Use this option to take into account your orders sent by marketplaces on your stock in your Shopware backoffice"
                 },
+                "return_tracking_number": {
+                    "label": "Create or delete a field for the return tracking code",
+                    "description": "Activate this option to be able to send the returns tracking number to the marketplace when you validate the shipping information for an order."
+                },
                 "shipping": {
                     "label": "Default shipping method",
                     "description": "Select the default shipping method that you would like to apply to your orders"

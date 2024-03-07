@@ -124,10 +124,11 @@ Component.register('lgw-setting-import', {
                 return result.total !== 0 ? result.first().id : 'Not found';
             });
         },
+
         onChangeStatus(event, key) {
             this.LengowConnectorSyncService.onChangeStatus().then(result => {
-                if (result.success) {
-                    console.log(result)
+                if (!result.success) {
+                    console.error("Failure to create custom field :", result.error);
                 }
             });
         }

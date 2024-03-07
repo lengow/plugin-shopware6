@@ -364,6 +364,10 @@
                     "label": "Lagerbestand verringern für Bestellungen, die durch einen Marktplatz versandt werden",
                     "description": "Verwenden Sie diese Option, damit Bestellungen auf Marktplätzen in Ihrem Shopware-Backoffice miteinbezogen werden"
                 },
+                "return_tracking_number": {
+                    "label": "Erstellen oder Löschen eines Feldes für den Retouren-Tracking-Code",
+                    "description": "Aktivieren Sie diese Option, damit Sie die Trackingnummer für die Rücksendung an den Marketplace senden können, wenn Sie die Versandinformationen für eine Bestellung bestätigen."
+                },
                 "shipping": {
                     "label": "Standard-Versandmethode",
                     "description": "Wählen Sie die Standardversandmethode, die Sie auf Ihre Bestellungen anwenden möchten"
