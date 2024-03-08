@@ -1,8 +1,12 @@
-<?php declare(strict_types=1);
+<?php
+
+declare(strict_types=1);
 
 namespace Lengow\Connector\Controller;
 
-use Exception;
+use Lengow\Connector\Service\LengowConfiguration;
+use Lengow\Connector\Service\LengowSync;
+use Lengow\Connector\Util\EnvironmentInfoProvider;
 use Psr\Container\ContainerExceptionInterface;
 use Psr\Container\NotFoundExceptionInterface;
 use Shopware\Core\Defaults;
@@ -10,30 +14,26 @@ use Shopware\Core\Framework\Context;
 use Shopware\Core\Framework\DataAbstractionLayer\EntityRepository;
 use Shopware\Core\Framework\DataAbstractionLayer\Search\Criteria;
 use Shopware\Core\Framework\DataAbstractionLayer\Search\Filter\EqualsFilter;
-use Shopware\Core\System\CustomField\CustomFieldEntity;
 use Shopware\Core\System\CustomField\CustomFieldTypes;
 use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
+use Symfony\Component\HttpFoundation\JsonResponse;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\Routing\Annotation\Route;
-use Symfony\Component\HttpFoundation\JsonResponse;
-use Lengow\Connector\Service\LengowConfiguration;
-use Lengow\Connector\Service\LengowSync;
-use Lengow\Connector\Util\EnvironmentInfoProvider;
 
 /**
- * Class LengowSyncController
- * @package Lengow\Connector\Controller
+ * Class LengowSyncController.
+ *
  * @Route(defaults={"_routeScope"={"api"}})
  */
 class LengowSyncController extends AbstractController
 {
     /**
-     * @var LengowConfiguration $lengowConfiguration Lengow configuration service
+     * @var LengowConfiguration Lengow configuration service
      */
     private $lengowConfiguration;
 
     /**
-     * @var LengowSync $lengowSync Lengow synchronisation service
+     * @var LengowSync Lengow synchronisation service
      */
     private $lengowSync;
 
@@ -43,25 +43,24 @@ class LengowSyncController extends AbstractController
     private $environmentInfoProvider;
 
     /**
-     * LengowSyncController constructor
+     * LengowSyncController constructor.
      *
-     * @param LengowConfiguration $lengowConfiguration Lengow configuration service
-     * @param LengowSync $lengowSync lengow sync service
+     * @param LengowConfiguration     $lengowConfiguration     Lengow configuration service
+     * @param LengowSync              $lengowSync              lengow sync service
      * @param EnvironmentInfoProvider $environmentInfoProvider Environment info provider utility
      */
     public function __construct(
         LengowConfiguration $lengowConfiguration,
         LengowSync $lengowSync,
         EnvironmentInfoProvider $environmentInfoProvider
-    )
-    {
+    ) {
         $this->lengowConfiguration = $lengowConfiguration;
         $this->lengowSync = $lengowSync;
         $this->environmentInfoProvider = $environmentInfoProvider;
     }
 
     /**
-     * Get plugin data
+     * Get plugin data.
      *
      * @Route("/api/_action/lengow/sync/get-plugin-data",
      *      name="api.action.lengow.sync.get-plugin-data",
@@ -69,8 +68,6 @@ class LengowSyncController extends AbstractController
      * @Route("/api/v{version}/_action/lengow/sync/get-plugin-data",
      *      name="api.action.lengow.sync.get-plugin-data-old",
      *      methods={"GET"})
-     *
-     * @return JsonResponse
      */
     public function getPluginData(): JsonResponse
     {
@@ -82,6 +79,7 @@ class LengowSyncController extends AbstractController
         $pluginData['new_version_is_available'] = $newVersionIsAvailable;
         $pluginData['show_update_modal'] = $newVersionIsAvailable && $this->showUpdateModal();
         $pluginData['links'] = $this->lengowSync->getPluginLinks($this->environmentInfoProvider->getLocaleCode());
+
         return new JsonResponse([
             'success' => true,
             'plugin_data' => $pluginData,
@@ -89,7 +87,7 @@ class LengowSyncController extends AbstractController
     }
 
     /**
-     * Get plugin links
+     * Get plugin links.
      *
      * @Route("/api/_action/lengow/sync/get-plugin-links",
      *      name="api.action.lengow.sync.get-plugin-links",
@@ -97,8 +95,6 @@ class LengowSyncController extends AbstractController
      * @Route("/api/v{version}/_action/lengow/sync/get-plugin-links",
      *      name="api.action.lengow.sync.get-plugin-links-old",
      *      methods={"GET"})
-     *
-     * @return JsonResponse
      */
     public function getPluginLinks(): JsonResponse
     {
@@ -109,7 +105,7 @@ class LengowSyncController extends AbstractController
     }
 
     /**
-     * Get Account data
+     * Get Account data.
      *
      * @Route("/api/_action/lengow/sync/get-account-status",
      *     name="api.action.lengow.sync.get-account-status",
@@ -117,14 +113,10 @@ class LengowSyncController extends AbstractController
      * @Route("/api/v{version}/_action/lengow/sync/get-account-status",
      *     name="api.action.lengow.sync.get-account-status-old",
      *     methods={"GET"})
-     *
-     * @param Request $request
-     *
-     * @return JsonResponse
      */
     public function getAccountStatus(Request $request): JsonResponse
     {
-        if ($request->get('force') && $request->get('force') === 'true') {
+        if ($request->get('force') && 'true' === $request->get('force')) {
             $accountStatus = $this->lengowSync->getAccountStatus(true);
         } else {
             $accountStatus = $this->lengowSync->getAccountStatus();
@@ -133,11 +125,12 @@ class LengowSyncController extends AbstractController
             return new JsonResponse(['success' => false]);
         }
         $accountStatus['success'] = true;
+
         return new JsonResponse($accountStatus);
     }
 
     /**
-     * Set back the display date of the update modal by 7 days
+     * Set back the display date of the update modal by 7 days.
      *
      * @Route("/api/v{version}/_action/lengow/sync/remind-me-later",
      *     name="api.action.lengow.sync.remind-me-later",
@@ -145,33 +138,31 @@ class LengowSyncController extends AbstractController
      * @Route("/api/_action/lengow/sync/remind-me-later",
      *     name="api.action.lengow.sync.remind-me-later-old",
      *     methods={"GET"})
-     *
-     * @return JsonResponse
      */
     public function remindMeLater(): JsonResponse
     {
         $timestamp = time() + (7 * 86400);
         $this->lengowConfiguration->set(LengowConfiguration::LAST_UPDATE_PLUGIN_MODAL, (string) $timestamp);
+
         return new JsonResponse(['success' => true]);
     }
 
     /**
-     * Checks if the plugin update modal should be displayed or not
-     *
-     * @return bool
+     * Checks if the plugin update modal should be displayed or not.
      */
     private function showUpdateModal(): bool
     {
         $updatedAt = $this->lengowConfiguration->get(LengowConfiguration::LAST_UPDATE_PLUGIN_MODAL);
-        if ($updatedAt !== null && (time() - (int) $updatedAt) < 86400) {
+        if (null !== $updatedAt && (time() - (int) $updatedAt) < 86400) {
             return false;
         }
         $this->lengowConfiguration->set(LengowConfiguration::LAST_UPDATE_PLUGIN_MODAL, (string) time());
+
         return true;
     }
 
     /**
-     * Create custom field
+     * Create custom field.
      *
      * @Route("/api/_action/lengow/sync/create-custom-field",
      *      name="api.action.lengow.sync.create-custom-field",
@@ -179,10 +170,6 @@ class LengowSyncController extends AbstractController
      * @Route("/api/v{version}/_action/lengow/sync/create-custom-field",
      *      name="api.action.lengow.sync.create-custom-field-old",
      *      methods={"GET"})
-     *
-     * @param Request $request
-     * @param Context $context
-     * @return JsonResponse
      */
     public function askToCreateCustomField(Context $context): JsonResponse
     {
@@ -193,23 +180,19 @@ class LengowSyncController extends AbstractController
             }
 
             return new JsonResponse(['success' => true]);
-        } catch (Exception $e) {
+        } catch (\Exception $e) {
             return new JsonResponse(['success' => false, 'message' => $e->getMessage()], 500);
-        } catch (NotFoundExceptionInterface | ContainerExceptionInterface $e) {
+        } catch (NotFoundExceptionInterface|ContainerExceptionInterface $e) {
             return new JsonResponse(['success' => false, 'message' => 'Error accessing service container'], 500);
         }
     }
 
     /**
-     * Create custom field
-     *
-     * @param Context $context
-     * @param LengowConfiguration $config
-     * @return bool
+     * Create custom field.
      */
     public function createCustomField(Context $context, LengowConfiguration $config): bool
     {
-        /** @var EntityRepository $customFieldSetRepository */
+        /* @var EntityRepository $customFieldSetRepository */
         try {
             $customFieldSetRepository = $this->container->get('custom_field_set.repository');
         } catch (NotFoundExceptionInterface|ContainerExceptionInterface $e) {
@@ -219,47 +202,48 @@ class LengowSyncController extends AbstractController
             $paymentCriteria = (new Criteria())->addFilter(new EqualsFilter('name', 'Return_Tracking_Number_set'));
             $existingCustomField = $customFieldSetRepository->searchIds($paymentCriteria, $context);
 
-            if ($existingCustomField->getTotal() === 0) {
+            if (0 === $existingCustomField->getTotal()) {
                 try {
                     $customFieldSetRepository->create([
                         [
                             'name' => 'Return_Tracking_Number_set',
                             'config' => [
                                 'label' => [
-                                    'en-GB' => "Return tracking number",
-                                    'fr-FR' => "Numéro de suivi de retour",
-                                    'de-DE' => "Rücksendekontrollnummer",
-                                    Defaults::LANGUAGE_SYSTEM => "Return tracking number"
-                                ]
+                                    'en-GB' => 'Return tracking number',
+                                    'fr-FR' => 'Numéro de suivi de retour',
+                                    'de-DE' => 'Rücksendekontrollnummer',
+                                    Defaults::LANGUAGE_SYSTEM => 'Return tracking number',
+                                ],
                             ],
                             'relations' => [
                                 [
-                                    'entityName' => 'order'
-                                ]
+                                    'entityName' => 'order',
+                                ],
                             ],
                             'customFields' => [
                                 [
-                                    'name' => "return_tracking_number",
+                                    'name' => 'return_tracking_number',
                                     'type' => CustomFieldTypes::TEXT,
                                     'config' => [
                                         'label' => [
-                                            'en-GB' => "Return Tracking Number",
+                                            'en-GB' => 'Return Tracking Number',
                                             'de-DE' => 'Rücksendungsverfolgungsnummer',
-                                            Defaults::LANGUAGE_SYSTEM => 'Return tracking number'
+                                            Defaults::LANGUAGE_SYSTEM => 'Return tracking number',
                                         ],
-                                        'customFieldPosition' => 1
-                                    ]
-                                ]
-                            ]
-                        ]
+                                        'customFieldPosition' => 1,
+                                    ],
+                                ],
+                            ],
+                        ],
                     ], $context);
+
                     return false;
-                } catch (Exception $e) {
-                    throw new \RuntimeException('Error creating custom field : ' . $e->getMessage());
+                } catch (\Exception $e) {
+                    throw new \RuntimeException('Error creating custom field : '.$e->getMessage());
                 }
             }
         } else {
-            $paymentCriteria = (new Criteria())->addFilter(new EqualsFilter('name', "Return_Tracking_Number_set"));
+            $paymentCriteria = (new Criteria())->addFilter(new EqualsFilter('name', 'Return_Tracking_Number_set'));
             $existingCustomField = $customFieldSetRepository->searchIds($paymentCriteria, $context);
             if ($existingCustomField->getTotal() > 0) {
                 try {
@@ -268,8 +252,8 @@ class LengowSyncController extends AbstractController
                     foreach ($customFieldIds as $customFieldId) {
                         $customFieldSetRepository->delete([['id' => $customFieldId]], $context);
                     }
-                } catch (Exception $e) {
-                    throw new \RuntimeException('Error deleting custom field :' . $e->getMessage());
+                } catch (\Exception $e) {
+                    throw new \RuntimeException('Error deleting custom field :'.$e->getMessage());
                 }
             }
         }

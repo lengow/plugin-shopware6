@@ -1,3 +1,9 @@
+# v1.1.4
+- Bugfix: [import] Produkt fest in den Shopware-Wagen legen
+- Bugfix: [action] Fix id Aktion ist keine ganze Zahl
+- Bugfix: [install] Plugin deinstallieren, wenn der Benutzer alle Daten löschen möchte
+- Feature: Hinzufügen einer konfigurierbaren Option für die Erstellung des Feldes return_tracking_number und Senden dieser Daten in der Auftragsaktion
+
 # v1.1.3
 - Bugfix: [install] Installations-Plugin korrigiert
 - Bugfix: [global] Ersetze Klasse EntityRepositoryInterface durch EntityRepository

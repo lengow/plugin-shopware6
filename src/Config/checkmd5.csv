@@ -1,4 +1,4 @@
-/composer.json|d5ca8807cecaca4c48ba52ffdd60aeed
+/composer.json|bd481d307ace63b6eeca60f904a9271d
 /src/LengowConnector.php|6c14d38892316b7aeabe909454710d99
 /src/Resources/public/bag.png|d812d529e1b5404cf7b92d4f36ab7abd
 /src/Resources/public/clock.png|499ea8d7905f77624cb64b1af3f955b5
@@ -16,7 +16,7 @@
 /src/Controller/LengowExportController.php|c43ad9d1ea0ae500b447d156545a1eab
 /src/Controller/LengowConnectionController.php|4b5fe81b8734b34aa5bb504a02f7b224
 /src/Controller/LengowToolboxController.php|e8fd031bb56e1f09fa6ed7297df5de30
-/src/Controller/LengowSyncController.php|314152e074fa56a732858e85b0519fde
+/src/Controller/LengowSyncController.php|bc921ace051c36452c511de21679447a
 /src/Controller/LengowOrderController.php|ce7aa87ecc917bb06be8959121a16097
 /src/DependencyInjection/factory.xml|b0a2f519ba5efaecfd49bdb176c525db
 /src/DependencyInjection/controller.xml|ea4024763bd52802bcce7ffe21db6614
@@ -24,7 +24,7 @@
 /src/DependencyInjection/front_controller.xml|e6ac859a8b7001032c4fe21dfd92afee
 /src/DependencyInjection/subscriber.xml|fd9d0fec5c9cafaab0cd28d368c348a1
 /src/DependencyInjection/util.xml|4f70a2ee0a67540f2dc9c5aa890bd263
-/src/DependencyInjection/extension.xml|79fbe100a33040059637219033c1b8ab
+/src/DependencyInjection/extension.xml|d3371b4999560d73926cf82d58206b53
 /src/DependencyInjection/entity.xml|ad9ae9476355be71e3446aff28ab6189
 /src/Entity/Shopware/index.php|8f9b37e592c52a914e031592d38fd12e
 /src/Entity/Lengow/Order/OrderDefinition.php|a6be91def79d75af8250068c1194f040
@@ -53,7 +53,7 @@
 /src/Migration/Migration1606313662Init.php|1e14b8612743c33ad913c0958d9af1ef
 /src/Migration/Migration1624606589Update102.php|b556625decfb9ab607d158b4fe936bd6
 /src/Resources/app/administration/src/init/api-service-init.js|e674dbfc62c6353347c43e15a9d4644b
-/src/Resources/app/administration/src/module/const.js|36f57296d6f49643a1da5fbc69451def
+/src/Resources/app/administration/src/module/const.js|785042fa2f8eff9d6cb63af9d1bbd491
 /src/Resources/app/administration/src/module/lengow-connector/page/lgw-dashboard/index.js|388959c788e0c33fe042528e08ef1541
 /src/Resources/app/administration/src/module/lengow-connector/page/lgw-dashboard/lgw-dashboard.html.twig|c4e49d4acfcf929cdc7d167a5a398900
 /src/Resources/app/administration/src/module/lengow-connector/page/lgw-order-list/lgw-order-list.html.twig|6dc3c4083cca7abae9308f80ff318425
@@ -440,7 +440,7 @@
 /src/Service/LengowCustomer.php|7d9619ec0c1d8f9e8ec3aa552fe32c5e
 /src/Service/LengowSync.php|6f2a1496731c05604e8bd17cba42e84f
 /src/Service/LengowLog.php|5c89aaa002da0421acb13c0acf3f223a
-/src/Service/LengowConfiguration.php|3fa68e3e91c7e6a851e50256267db79e
+/src/Service/LengowConfiguration.php|86d11116ac1a0ab88ceb53032d3801fd
 /src/Service/LengowExport.php|eac853b31641acdac30f4917398bf9ab
 /src/Storefront/Controller/LengowCronController.php|57a46ffbb0ce4a41f87cc2daabea8eaa
 /src/Storefront/Controller/LengowExportController.php|66fa9db017728ea0f38db488cc1e9307
