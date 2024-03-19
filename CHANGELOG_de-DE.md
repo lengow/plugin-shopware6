@@ -1,3 +1,7 @@
+# v1.1.4
+- Bugfix: [import] fix Produkt zum Shopware Warenkorb hinzufügen
+- Bugfix: [action] Fix id Action ist keine ganze Zahl
+
 # v1.1.3
 - Bugfix: [install] Installations-Plugin korrigiert
 - Bugfix: [global] Ersetze Klasse EntityRepositoryInterface durch EntityRepository
