@@ -38,10 +38,12 @@ class LengowAction
     public const ARG_LINE = 'line';
     public const ARG_CARRIER = 'carrier';
     public const ARG_CARRIER_NAME = 'carrier_name';
+    public const ARG_RETURN_CARRIER = 'return_carrier';
     public const ARG_CUSTOM_CARRIER = 'custom_carrier';
     public const ARG_SHIPPING_METHOD = 'shipping_method';
     public const ARG_TRACKING_NUMBER = 'tracking_number';
     public const ARG_TRACKING_URL = 'tracking_url';
+    public const ARG_RETURN_TRACKING_NUMBER = 'return_tracking_number';
     public const ARG_SHIPPING_PRICE = 'shipping_price';
     public const ARG_SHIPPING_DATE = 'shipping_date';
     public const ARG_DELIVERY_DATE = 'delivery_date';
@@ -164,6 +166,7 @@ class LengowAction
                 return false;
             }
         }
+
         try {
             $this->lengowActionRepository->create([$data], Context::createDefaultContext());
         } catch (Exception $e) {
@@ -352,7 +355,7 @@ class LengowAction
                 $success = $this->create([
                     LengowActionDefinition::FIELD_ORDER_ID => $order->getId(),
                     LengowActionDefinition::FIELD_ACTION_TYPE => $params[self::ARG_ACTION_TYPE],
-                    LengowActionDefinition::FIELD_ACTION_ID => $row->id,
+                    LengowActionDefinition::FIELD_ACTION_ID => (int) $row->id,
                     LengowActionDefinition::FIELD_ORDER_LINE_SKU => (string) ($params[self::ARG_LINE] ?? ''),
                     LengowActionDefinition::FIELD_PARAMETERS => $params,
                 ]);
@@ -391,7 +394,7 @@ class LengowAction
                 $success = $this->create([
                     LengowActionDefinition::FIELD_ORDER_ID => $order->getId(),
                     LengowActionDefinition::FIELD_ACTION_TYPE => $params[self::ARG_ACTION_TYPE],
-                    LengowActionDefinition::FIELD_ACTION_ID => $result->id,
+                    LengowActionDefinition::FIELD_ACTION_ID => (int) $result->id,
                     LengowActionDefinition::FIELD_ORDER_LINE_SKU => (string) ($params[self::ARG_LINE] ?? ''),
                     LengowActionDefinition::FIELD_PARAMETERS => $params,
                 ]);

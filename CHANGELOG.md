@@ -1,3 +1,11 @@
+# v1.2.1
+- Bugfix: [install] Fix uninstall plugin when user want delete all data
+- Feature: Add return_tracking_number and return_carrier field if is optional argument and send this data in order action
+
+# v1.2.0
+- Bugfix: [import] fix add product to Shopware Cart
+- Bugfix: [action] Fix id Action is not integer
+
 # v1.1.3
 - Bugfix: [install] fix intallation plugin
 - Bugfix: [global] Replace class EntityRepositoryInterface by EntityRepository
