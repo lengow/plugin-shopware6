@@ -1,4 +1,4 @@
-# v1.1.4
+# v1.2.0
 - Bugfix: [import] fix add product to Shopware Cart
 - Bugfix: [action] Fix id Action is not integer
 

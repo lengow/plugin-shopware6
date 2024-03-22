@@ -1,4 +1,4 @@
-# v1.1.4
+# v1.2.0
 - Bugfix: [import] fix Produkt zum Shopware Warenkorb hinzufügen
 - Bugfix: [action] Fix id Action ist keine ganze Zahl
 
