@@ -228,6 +228,10 @@
                 "action_ship_sent": "action ship sent",
                 "action_cancel_sent": "action cancel sent",
                 "action_waiting_return": "Action sent, waiting for response"
+            },
+            "action_data": {
+                "return_tracking_number": "Return tracking number",
+                "return_carrier": "Return carrier"
             }
         },
         "order_tab": {

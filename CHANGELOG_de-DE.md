@@ -1,8 +1,10 @@
-# v1.1.4
+# v1.2.1
+- Bugfix: [install] Plugin deinstallieren, wenn der Benutzer alle Daten löschen möchte
+- Feature: Fügen Sie das Feld return_tracking_number und return_carrier hinzu, wenn es sich um ein optionales Argument handelt, und senden Sie diese Daten in der Auftragsaktion
+
+# v1.2.0
 - Bugfix: [import] Produkt fest in den Shopware-Wagen legen
 - Bugfix: [action] Fix id Aktion ist keine ganze Zahl
-- Bugfix: [install] Plugin deinstallieren, wenn der Benutzer alle Daten löschen möchte
-- Feature: Hinzufügen einer konfigurierbaren Option für die Erstellung des Feldes return_tracking_number und Senden dieser Daten in der Auftragsaktion
 
 # v1.1.3
 - Bugfix: [install] Installations-Plugin korrigiert

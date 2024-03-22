@@ -4,7 +4,14 @@ declare(strict_types=1);
 
 namespace Lengow\Connector\Controller;
 
+use JsonException;
+use Shopware\Core\Checkout\Shipping\ShippingMethodEntity;
+use Lengow\Connector\Components\LengowMarketplace;
+use Lengow\Connector\Exception\LengowException;
+use Lengow\Connector\Factory\LengowMarketplaceFactory;
+use Lengow\Connector\Service\LengowAction;
 use Lengow\Connector\Service\LengowConfiguration;
+use Lengow\Connector\Service\LengowOrder;
 use Lengow\Connector\Service\LengowSync;
 use Lengow\Connector\Util\EnvironmentInfoProvider;
 use Psr\Container\ContainerExceptionInterface;
@@ -43,6 +50,16 @@ class LengowSyncController extends AbstractController
     private $environmentInfoProvider;
 
     /**
+     * @var LengowMarketplace Lengow marketplace instance
+     */
+    private $lengowMarketplace;
+
+    /**
+     * @var LengowMarketplaceFactory Lengow marketplace factory
+     */
+    private $lengowMarketplaceFactory;
+
+    /**
      * LengowSyncController constructor.
      *
      * @param LengowConfiguration     $lengowConfiguration     Lengow configuration service
@@ -52,11 +69,13 @@ class LengowSyncController extends AbstractController
     public function __construct(
         LengowConfiguration $lengowConfiguration,
         LengowSync $lengowSync,
-        EnvironmentInfoProvider $environmentInfoProvider
+        EnvironmentInfoProvider $environmentInfoProvider,
+        LengowMarketplaceFactory $lengowMarketplaceFactory
     ) {
         $this->lengowConfiguration = $lengowConfiguration;
         $this->lengowSync = $lengowSync;
         $this->environmentInfoProvider = $environmentInfoProvider;
+        $this->lengowMarketplaceFactory = $lengowMarketplaceFactory;
     }
 
     /**
@@ -162,102 +181,111 @@ class LengowSyncController extends AbstractController
     }
 
     /**
-     * Create custom field.
+     * Load return tracking numbers for a specific order ID
      *
-     * @Route("/api/_action/lengow/sync/create-custom-field",
-     *      name="api.action.lengow.sync.create-custom-field",
-     *      methods={"GET"})
-     * @Route("/api/v{version}/_action/lengow/sync/create-custom-field",
-     *      name="api.action.lengow.sync.create-custom-field-old",
-     *      methods={"GET"})
+     * @Route("/api/_action/lengow/sync/load-return-tracking-numbers", name="api.action.lengow.sync.load-return-tracking-numbers", methods={"POST"})
+     * @Route("/api/v{version}/_action/lengow/sync/load-return-tracking-numbers", name="api.action.lengow.sync.load-return-tracking-numbers-old", methods={"POST"})
      */
-    public function askToCreateCustomField(Context $context): JsonResponse
+    public function loadReturnTrackingNumbers(Request $request, LengowOrder $lengowOrder): JsonResponse
     {
-        try {
-            $success = $this->createCustomField($context, $this->lengowConfiguration);
-            if ($success) {
-                return new JsonResponse(['success' => false, 'message' => 'Error creating custom field'], 500);
-            }
+        $orderId = $request->request->get('order_id');
 
-            return new JsonResponse(['success' => true]);
-        } catch (\Exception $e) {
-            return new JsonResponse(['success' => false, 'message' => $e->getMessage()], 500);
-        } catch (NotFoundExceptionInterface|ContainerExceptionInterface $e) {
-            return new JsonResponse(['success' => false, 'message' => 'Error accessing service container'], 500);
-        }
+        $returnTrackingNumber = $lengowOrder->getReturnTrackingNumberByOrderId($orderId);
+
+        return new JsonResponse(['success' => true, 'return_tracking_number' => $returnTrackingNumber]);
     }
 
     /**
-     * Create custom field.
+     * Save return tracking numbers for a specific order ID
+     *
+     * @Route("/api/_action/lengow/sync/save-return-tracking-numbers", name="api.action.lengow.sync.save-return-tracking-numbers", methods={"POST"})
+     * @Route("/api/v{version}/_action/lengow/sync/save-return-tracking-numbers", name="api.action.lengow.sync.save-return-tracking-numbers-old", methods={"POST"})
+     * @throws JsonException
      */
-    public function createCustomField(Context $context, LengowConfiguration $config): bool
+    public function saveReturnTrackingNumbers(Request $request, LengowOrder $lengowOrder): JsonResponse
     {
-        /* @var EntityRepository $customFieldSetRepository */
-        try {
-            $customFieldSetRepository = $this->container->get('custom_field_set.repository');
-        } catch (NotFoundExceptionInterface|ContainerExceptionInterface $e) {
+        $data = json_decode($request->getContent(), true, 512, JSON_THROW_ON_ERROR);
+
+        if (!is_array($data) || !isset($data['order_id']) || !isset($data['return_tracking_numbers'])) {
+            return new JsonResponse("Error");
         }
 
-        if (!$config->isSendReturnTrackingNumberEnabled()) {
-            $paymentCriteria = (new Criteria())->addFilter(new EqualsFilter('name', 'Return_Tracking_Number_set'));
-            $existingCustomField = $customFieldSetRepository->searchIds($paymentCriteria, $context);
+        $orderId = $data['order_id'];
+        $returnTrackingNumbers = json_encode($data['return_tracking_numbers']);
 
-            if (0 === $existingCustomField->getTotal()) {
-                try {
-                    $customFieldSetRepository->create([
-                        [
-                            'name' => 'Return_Tracking_Number_set',
-                            'config' => [
-                                'label' => [
-                                    'en-GB' => 'Return tracking number',
-                                    'fr-FR' => 'Numéro de suivi de retour',
-                                    'de-DE' => 'Rücksendekontrollnummer',
-                                    Defaults::LANGUAGE_SYSTEM => 'Return tracking number',
-                                ],
-                            ],
-                            'relations' => [
-                                [
-                                    'entityName' => 'order',
-                                ],
-                            ],
-                            'customFields' => [
-                                [
-                                    'name' => 'return_tracking_number',
-                                    'type' => CustomFieldTypes::TEXT,
-                                    'config' => [
-                                        'label' => [
-                                            'en-GB' => 'Return Tracking Number',
-                                            'de-DE' => 'Rücksendungsverfolgungsnummer',
-                                            Defaults::LANGUAGE_SYSTEM => 'Return tracking number',
-                                        ],
-                                        'customFieldPosition' => 1,
-                                    ],
-                                ],
-                            ],
-                        ],
-                    ], $context);
+        $lengowOrder->updateReturnTrackingNumber($orderId, $returnTrackingNumbers);
 
-                    return false;
-                } catch (\Exception $e) {
-                    throw new \RuntimeException('Error creating custom field : '.$e->getMessage());
-                }
-            }
-        } else {
-            $paymentCriteria = (new Criteria())->addFilter(new EqualsFilter('name', 'Return_Tracking_Number_set'));
-            $existingCustomField = $customFieldSetRepository->searchIds($paymentCriteria, $context);
-            if ($existingCustomField->getTotal() > 0) {
-                try {
-                    $customFieldIds = $existingCustomField->getIds();
-
-                    foreach ($customFieldIds as $customFieldId) {
-                        $customFieldSetRepository->delete([['id' => $customFieldId]], $context);
-                    }
-                } catch (\Exception $e) {
-                    throw new \RuntimeException('Error deleting custom field :'.$e->getMessage());
-                }
-            }
-        }
-
-        return false;
+        return new JsonResponse(['success' => true]);
     }
+
+    /**
+     * Load return carrier for a specific order ID
+     *
+     * @Route("/api/_action/lengow/sync/load-return-carrier", name="api.action.lengow.sync.load-return-carrier", methods={"POST"})
+     * @Route("/api/v{version}/_action/lengow/sync/load-return-carrier", name="api.action.lengow.sync.load-return-carrier-old", methods={"POST"})
+     */
+    public function loadReturnCarrier(Request $request, LengowOrder $lengowOrder): JsonResponse
+    {
+        $orderId = $request->request->get('order_id');
+
+        $returnCarrier = $lengowOrder->getReturnCarrierByOrderId($orderId);
+
+        return new JsonResponse(['success' => true, 'return_carrier' => $returnCarrier]);
+    }
+
+    /**
+     * Save return carrier for a specific order ID
+     *
+     * @Route("/api/_action/lengow/sync/save-return-carrier", name="api.action.lengow.sync.save-return-carrier", methods={"POST"})
+     * @Route("/api/v{version}/_action/lengow/sync/save-return-carrier", name="api.action.lengow.sync.save-return-carrier-old", methods={"POST"})
+     * @throws JsonException
+     */
+    public function saveReturnCarrier(Request $request, LengowOrder $lengowOrder): JsonResponse
+    {
+        $data = json_decode($request->getContent(), true, 512, JSON_THROW_ON_ERROR);
+
+        if (!is_array($data) || !isset($data['order_id']) || !isset($data['return_carrier'])) {
+            return new JsonResponse($data);
+        }
+
+        $orderId = $data['order_id'];
+        $returnCarrier = json_encode($data['return_carrier']);
+        $lengowOrder->updateReturnCarrier($orderId, $returnCarrier);
+
+        return new JsonResponse(['success' => $data]);
+    }
+
+    /**
+     * Check the marketplace of the order by order ID
+     *
+     * @Route("/api/_action/lengow/sync/verifyArgRtn", name="api.action.lengow.sync.verifyArgRtn", methods={"POST"})
+     * @Route("/api/v{version}/_action/lengow/sync/verifyArgRtn", name="api.action.lengow.sync.verifyArgRtn-old", methods={"POST"})
+     * @throws JsonException
+     * @throws LengowException
+     */
+    public function verifyMarketplaceByOrderId(Request $request, LengowOrder $lengowOrder): JsonResponse
+    {
+        $data = json_decode($request->getContent(), true, 512, JSON_THROW_ON_ERROR);
+
+        if (!is_array($data) || !isset($data['order_id'])) {
+            return new JsonResponse(['success' => false, 'message' => 'Invalid request']);
+        }
+
+        $orderId = $data['order_id'];
+
+        $order = $lengowOrder->getLengowOrderByOrderId((string)$orderId);
+        $action = LengowAction::TYPE_SHIP;
+        $lengowMarketplace = $this->lengowMarketplaceFactory->create($order->getMarketplaceName());
+        $arg = $lengowMarketplace->getMarketplaceArguments($action);
+
+        $returnTrackingNumberExists = array_key_exists('return_tracking_number', $arg);
+        $returnCarrierExists = array_key_exists('return_carrier', $arg);
+
+        return new JsonResponse([
+            'success' => true,
+            'return_tracking_number_exists' => $returnTrackingNumberExists,
+            'return_carrier_exists' => $returnCarrierExists,
+        ]);
+    }
+
 }

@@ -13,6 +13,7 @@ import './component/lgw-order-type-icon';
 import './component/lgw-update-modal';
 import './component/lgw-update-warning';
 import './extension/sw-order-detail';
+import './extension/sw_order-detail-details';
 import './page/lgw-connection';
 import './page/lgw-contact';
 import './page/lgw-dashboard';

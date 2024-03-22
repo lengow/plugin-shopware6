@@ -1,0 +1,38 @@
+{% block sw_order_detail_details_shipping_tracking_codes %}
+    {% parent %}
+
+         {% block lengow_connector_return_tracking_number %}
+            <sw-multi-tag-select
+                    v-if="returnTrackingNumberSet"
+                    {% if VUE3 %}
+                        v-model:value="localReturnTrackingNumber"
+                    {% else %}
+                        v-model="localReturnTrackingNumber"
+                    {% endif %}
+                    class="sw-order-user-card__tracking-code-select"
+                    :disabled="!acl.can('order.editor')"
+                    :placeholder="$t('lengow-connector.order.action_data.return_tracking_number')"
+                    :label="$t('lengow-connector.order.action_data.return_tracking_number')"
+                    {% if VUE3 %}
+                        @update:value="updateReturnTrackingNumber"
+                    {% else %}
+                        @change="updateReturnTrackingNumber"
+                    {% endif %}
+            >
+            </sw-multi-tag-select>
+         {% endblock %}
+
+         {% block lengow_connector_return_carrier %}
+                <sw-entity-single-select
+                        v-if="returnCarrierSet"
+                        v-model="localReturnCarrier"
+                        entity="shipping_method"
+                        @change="updateReturnCarrier"
+                        :label="$t('lengow-connector.order.action_data.return_carrier')"
+                        :placeholder="$t('lengow-connector.order.action_data.return_carrier')"
+                        show-clearable-button
+                >
+                </sw-entity-single-select>
+         {% endblock %}
+
+{% endblock %}

@@ -204,6 +204,9 @@ de:
           action_ship_sent: "Versand-Aktion gesendet"
           action_cancel_sent: "Stornierungs-Aktion gesendet"
           action_waiting_return: "Aktion gesendet, warten auf Antwort"
+        action_data:
+          return_tracking_number: "Rücksendungsverfolgungsnummer"
+          return_carrier: "Rückgabeträger"
       order_tab:
         title: "Lengow Bestell-Detailseite"
         order_id: "Bestellungs-ID"
