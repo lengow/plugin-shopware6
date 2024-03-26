@@ -1,4 +1,4 @@
-/composer.json|d5ca8807cecaca4c48ba52ffdd60aeed
+/composer.json|bd481d307ace63b6eeca60f904a9271d
 /src/LengowConnector.php|90f3ce5df17a6bf6bc47e96d0f4248b3
 /src/Resources/public/bag.png|d812d529e1b5404cf7b92d4f36ab7abd
 /src/Resources/public/clock.png|499ea8d7905f77624cb64b1af3f955b5
@@ -53,7 +53,7 @@
 /src/Migration/Migration1606313662Init.php|1e14b8612743c33ad913c0958d9af1ef
 /src/Migration/Migration1624606589Update102.php|b556625decfb9ab607d158b4fe936bd6
 /src/Resources/app/administration/src/init/api-service-init.js|e674dbfc62c6353347c43e15a9d4644b
-/src/Resources/app/administration/src/module/const.js|36f57296d6f49643a1da5fbc69451def
+/src/Resources/app/administration/src/module/const.js|785042fa2f8eff9d6cb63af9d1bbd491
 /src/Resources/app/administration/src/module/lengow-connector/page/lgw-dashboard/index.js|388959c788e0c33fe042528e08ef1541
 /src/Resources/app/administration/src/module/lengow-connector/page/lgw-dashboard/lgw-dashboard.html.twig|c4e49d4acfcf929cdc7d167a5a398900
 /src/Resources/app/administration/src/module/lengow-connector/page/lgw-order-list/lgw-order-list.html.twig|6dc3c4083cca7abae9308f80ff318425
@@ -430,10 +430,10 @@
 /src/Service/LengowFeed.php|0946aef9107b853e4bd30f8532b29b62
 /src/Service/LengowAddress.php|0f76f7f33d30a4aad419293f697090bf
 /src/Service/LengowImport.php|c1d4f6e6975459594c392f63f3a8dad1
-/src/Service/LengowAction.php|806156139b116242c2ff30dae297d87e
+/src/Service/LengowAction.php|3e9dbaf916ad647fc0ea2891aa6f6c92
 /src/Service/LengowAccess.php|10819f326d3842d2ff34f3d5b26c49e3
 /src/Service/LengowOrderLine.php|2ec18fc660fc755bb1e4fe00d52e7e1d
-/src/Service/LengowImportOrder.php|c557b1bf8424ea0570a8ffcfe82a019f
+/src/Service/LengowImportOrder.php|0453edcee4aa09ba33d9d4b8e884c109
 /src/Service/LengowTranslation.php|db52a8157ae86bd49a6d6d9fc11da9b6
 /src/Service/LengowOrder.php|922dc8c49bb7931b69405469a76fd204
 /src/Service/LengowConnector.php|06880546a771ab4c97eb25345b15afc2
@@ -453,4 +453,4 @@
 /src/Subscriber/LengowSettingUpdateSubscriber.php|b4e383d43a4ba125d3b95c681825e764
 /src/Subscriber/ProductExtensionSubscriber.php|8800a75de535e30d14b80444f4534d70
 /src/Util/StringCleaner.php|752a3e6e13877fed16915d632418e386
-/src/Util/EnvironmentInfoProvider.php|da455b49d8d2e023b4c94406406f358b
+/src/Util/EnvironmentInfoProvider.php|16ea7ffe68bd26a1111795b6844869b7

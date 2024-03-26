@@ -1389,7 +1389,6 @@ class LengowImportOrder
             $definition = new QuantityPriceDefinition(
                 $productData['price_unit'],
                 $calculatedPrice->getTaxRules(),
-                $salesChannelContext->getCurrency()->getDecimalPrecision(),
                 $productData['quantity'],
                 true
             );
@@ -1422,9 +1421,7 @@ class LengowImportOrder
         $definition = new QuantityPriceDefinition(
             $shippingCosts,
             $calculatedPrice->getTaxRules(),
-            $salesChannelContext->getCurrency()->getDecimalPrecision(),
-            1,
-            true
+            1
         );
         $orderData['shippingCosts'] = $this->calculator->calculate($definition, $salesChannelContext);
         $orderData['deliveries'][0]['shippingCosts'] = $orderData['shippingCosts'];
@@ -1452,9 +1449,7 @@ class LengowImportOrder
         $definition = new QuantityPriceDefinition(
             $this->orderAmount,
             $cartPrice->getTaxRules(),
-            $salesChannelContext->getCurrency()->getDecimalPrecision(),
-            1,
-            true
+            1
         );
         $orderAmountCalculatedPrice = $this->calculator->calculate($definition, $salesChannelContext);
         // modify payment state to paid and change payment amount
