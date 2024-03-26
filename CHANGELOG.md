@@ -1,3 +1,7 @@
+# v1.2.0
+- Bugfix: [import] fix add product to Shopware Cart
+- Bugfix: [action] Fix id Action is not integer
+
 # v1.1.3
 - Bugfix: [install] fix intallation plugin
 - Bugfix: [global] Replace class EntityRepositoryInterface by EntityRepository

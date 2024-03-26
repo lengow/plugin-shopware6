@@ -352,7 +352,7 @@ class LengowAction
                 $success = $this->create([
                     LengowActionDefinition::FIELD_ORDER_ID => $order->getId(),
                     LengowActionDefinition::FIELD_ACTION_TYPE => $params[self::ARG_ACTION_TYPE],
-                    LengowActionDefinition::FIELD_ACTION_ID => $row->id,
+                    LengowActionDefinition::FIELD_ACTION_ID => (int) $row->id,
                     LengowActionDefinition::FIELD_ORDER_LINE_SKU => (string) ($params[self::ARG_LINE] ?? ''),
                     LengowActionDefinition::FIELD_PARAMETERS => $params,
                 ]);
@@ -391,7 +391,7 @@ class LengowAction
                 $success = $this->create([
                     LengowActionDefinition::FIELD_ORDER_ID => $order->getId(),
                     LengowActionDefinition::FIELD_ACTION_TYPE => $params[self::ARG_ACTION_TYPE],
-                    LengowActionDefinition::FIELD_ACTION_ID => $result->id,
+                    LengowActionDefinition::FIELD_ACTION_ID => (int) $result->id,
                     LengowActionDefinition::FIELD_ORDER_LINE_SKU => (string) ($params[self::ARG_LINE] ?? ''),
                     LengowActionDefinition::FIELD_PARAMETERS => $params,
                 ]);
