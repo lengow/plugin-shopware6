@@ -604,10 +604,7 @@ class LengowImportOrder
         $this->loadVatNumberFromOrderData();
 
         // Check and update VAT number data
-        if (!(
-            ($lengowOrder->getCustomerVatNumber() ?? '') ===
-            ($this->customerVatNumber ?? '')
-        )) {
+        if ($lengowOrder->getCustomerVatNumber() !== $this->customerVatNumber) {
             $this->checkAndUpdateLengowOrderData();
             $orderUpdated = true;
             $this->lengowLog->write(
