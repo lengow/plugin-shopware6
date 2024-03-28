@@ -408,7 +408,7 @@ class LengowConfiguration
     /**
      * @var string base url of the Lengow API
      */
-    private const LENGOW_BASE_API_URL = 'https://mockapi.weblabprototype';
+    private const LENGOW_BASE_API_URL = 'https://api.lengow';
 
     /**
      * LengowConfiguration constructor.
