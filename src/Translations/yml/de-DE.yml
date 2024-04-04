@@ -336,6 +336,9 @@ de:
           import_btob:
             label: "Import von B2B-Bestellungen ohne Steuern ermöglichen"
             description: "Aktivieren Sie diese Option, um B2B-Bestellungen ohne Steuer zu importieren"
+          anonymize_email:
+            label: "Aktivieren Sie die E-Mail-Anonymisierung"
+            description: "Anonymisieren Sie die E-Mail-Adressen Ihrer Kunden"
       toolbox:
         menu:
           overview: "Übersicht"

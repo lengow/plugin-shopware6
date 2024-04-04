@@ -35,7 +35,8 @@ Component.register('lgw-setting-import', {
             lengowDebugEnabled: false,
             salesChannels: [],
             shippingMethods: [],
-            render: false
+            render: false,
+            lengowAnonymizeEmail: false,
         };
     },
 
@@ -77,6 +78,7 @@ Component.register('lgw-setting-import', {
         this.lengowCurrencyConversion = this.config.lengowCurrencyConversion.value === '1';
         this.lengowImportB2b = this.config.lengowImportB2b.value === '1';
         this.lengowDebugEnabled = this.config.lengowDebugEnabled.value === '1';
+        this.lengowAnonymizeEmail = this.config.lengowAnonymizeEmail.value === '1';
     },
 
     computed: {

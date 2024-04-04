@@ -69,6 +69,8 @@ class LengowConfiguration
     public const LAST_UPDATE_AUTHORIZATION_TOKEN = 'lengowLastAuthorizationTokenUpdate';
     public const LAST_UPDATE_PLUGIN_MODAL = 'lengowLastUpdatePluginModal';
 
+    public const ANONYMIZE_EMAIL = 'lengowAnonymizeEmail';
+
     /* Configuration parameters */
     public const PARAM_DEFAULT_VALUE = 'default_value';
     public const PARAM_EXPORT = 'export';
@@ -142,6 +144,7 @@ class LengowConfiguration
         self::LAST_UPDATE_PLUGIN_DATA => 'last_update_plugin_data',
         self::LAST_UPDATE_AUTHORIZATION_TOKEN => 'last_update_authorization_token',
         self::LAST_UPDATE_PLUGIN_MODAL => 'last_update_plugin_modal',
+        self::ANONYMIZE_EMAIL => 'anonymize_email',
     ];
 
     /**
@@ -379,6 +382,12 @@ class LengowConfiguration
             self::PARAM_RETURN => self::RETURN_TYPE_INTEGER,
             self::PARAM_LOG => false,
             self::PARAM_DEFAULT_VALUE => '',
+        ],
+        self::ANONYMIZE_EMAIL => [
+            self::PARAM_GLOBAL => true,
+            self::PARAM_EXPORT_TOOLBOX => false,
+            self::PARAM_RETURN => self::RETURN_TYPE_BOOLEAN,
+            self::PARAM_DEFAULT_VALUE => '0',
         ],
     ];
 
@@ -714,6 +723,16 @@ class LengowConfiguration
     public function debugModeIsActive(): bool
     {
         return $this->get(self::DEBUG_MODE_ENABLED);
+    }
+
+    /**
+     * Returns true if we should anonymize email addresses
+     *
+     * @return bool
+     */
+    public function isEmailAnonymization(): bool
+    {
+        return $this->get(self::ANONYMIZE_EMAIL);
     }
 
     /**
