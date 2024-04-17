@@ -3,8 +3,9 @@
 - Feature: Fügen Sie das Feld return_tracking_number und return_carrier hinzu, wenn es sich um ein optionales Argument handelt, und senden Sie diese Daten in der Auftragsaktion
 
 # v1.2.0
-- Bugfix: [import] Produkt fest in den Shopware-Wagen legen
-- Bugfix: [action] Fix id Aktion ist keine ganze Zahl
+- Bugfix: [import] fix Produkt zum Shopware Warenkorb hinzufügen
+- Bugfix: [action] Fix id Action ist keine ganze Zahl
+>>>>>>> dev
 
 # v1.1.3
 - Bugfix: [install] Installations-Plugin korrigiert
