@@ -457,4 +457,4 @@
 /src/Subscriber/LengowSettingUpdateSubscriber.php|b4e383d43a4ba125d3b95c681825e764
 /src/Subscriber/ProductExtensionSubscriber.php|8800a75de535e30d14b80444f4534d70
 /src/Util/StringCleaner.php|752a3e6e13877fed16915d632418e386
-/src/Util/EnvironmentInfoProvider.php|0f9a70e494860b04babd1d4b34cc7d16
+/src/Util/EnvironmentInfoProvider.php|cf20b5df69c6684a2f598b24e67166fa
