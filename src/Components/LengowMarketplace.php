@@ -319,7 +319,7 @@ class LengowMarketplace
      *
      * @return array
      */
-    private function getMarketplaceArguments(string $action): array
+    public function getMarketplaceArguments(string $action): array
     {
         $marketplaceArguments = [];
         $actions = $this->getAction($action);
@@ -343,6 +343,7 @@ class LengowMarketplace
      * @param OrderDeliveryEntity|null $orderDelivery Shopware order delivery instance
      *
      * @return array
+     * @throws \JsonException
      */
     private function getAllParams(
         string $action,
@@ -360,6 +361,15 @@ class LengowMarketplace
                 case LengowAction::ARG_TRACKING_NUMBER:
                     $trackingCodes = $orderDelivery ? $orderDelivery->getTrackingCodes() : [];
                     $params[$arg] = !empty($trackingCodes) ? end($trackingCodes) : '';
+                    break;
+                case LengowAction::ARG_RETURN_TRACKING_NUMBER:
+                    $returnTrackingCodes = $lengowOrder->getReturnTrackingNumber() ?? [];
+                    $decodedTrackingCodes = json_decode($returnTrackingCodes[0], true, 512, JSON_THROW_ON_ERROR);
+                    $params[$arg] = !empty($decodedTrackingCodes) ? end($decodedTrackingCodes) : '';
+                    break;
+                case LengowAction::ARG_RETURN_CARRIER:
+                    $returnCarrier = $lengowOrder->getReturnCarrier() ?? "";
+                    $params[$arg] = !empty($returnCarrier) ? str_replace('"', '', $returnCarrier) : '';
                     break;
                 case LengowAction::ARG_CARRIER:
                 case LengowAction::ARG_CARRIER_NAME:

@@ -113,6 +113,16 @@ class OrderEntity extends Entity
     protected $customerVatNumber;
 
     /**
+     * @var array|null
+     */
+    protected $returnTrackingNumber;
+
+    /**
+     * @var string|null
+     */
+    protected $returnCarrier;
+
+    /**
      * @var string|null
      */
     protected $carrier;
@@ -474,6 +484,38 @@ class OrderEntity extends Entity
     public function setCustomerVatNumber(?string $customerVatNumber): void
     {
         $this->customerVatNumber = $customerVatNumber;
+    }
+
+    /**
+     * @return array|null
+     */
+    public function getReturnTrackingNumber(): ?array
+    {
+        return $this->returnTrackingNumber;
+    }
+
+    /**
+     * @param array|null $returnTrackingNumber
+     */
+    public function setReturnTrackingNumber(?array $returnTrackingNumber): void
+    {
+        $this->returnTrackingNumber = $returnTrackingNumber;
+    }
+
+    /**
+     * @return string|null
+     */
+    public function getReturnCarrier(): ?string
+    {
+        return $this->returnCarrier;
+    }
+
+    /**
+     * @param string|null $returnCarrier
+     */
+    public function setReturnCarrier(?string $returnCarrier): void
+    {
+        $this->returnCarrier = $returnCarrier;
     }
 
     /**

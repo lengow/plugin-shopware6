@@ -281,9 +281,8 @@ class LengowToolbox
             case self::DATA_TYPE_CHECKSUM:
                 return $this->getChecksumData();
             case self::DATA_TYPE_MODIFIED_FILES:
-                $shortPathParam = (string) Tools::getValue(self::PARAM_SHORT_PATH);
-                //FINISH TO
-                return self::getModifiedFilesData($shortPathParam);
+                $shortPathParam = isset($_GET[self::PARAM_SHORT_PATH]) ? (string) $_GET[self::PARAM_SHORT_PATH] : null;
+                return $this->getModifiedFilesData($shortPathParam);
             case self::DATA_TYPE_LOG:
                 return $this->getLogData();
             case self::DATA_TYPE_OPTION:
