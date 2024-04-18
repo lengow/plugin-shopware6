@@ -43,6 +43,7 @@
             <argument type="service" id="Lengow\Connector\Service\LengowConfiguration"/>
             <argument type="service" id="Lengow\Connector\Service\LengowSync"/>
             <argument type="service" id="Lengow\Connector\Util\EnvironmentInfoProvider"/>
+            <argument type="service" id="Lengow\Connector\Factory\LengowMarketplaceFactory"/>
             <tag name="controller.service_arguments"/>
             <call method="setContainer">
                 <argument type="service" id="service_container"/>

@@ -1,3 +1,10 @@
+# v1.2.1
+- Bugfix: [install] Fix Deinstallation des Plugins, wenn der Benutzer alle Daten löschen möchte
+- Bugfix: [install] Korrigiert falsche Definition der Cron- und Toolbox-Url
+- Bugfix: [toolbox] Funktion für geänderte Dateien repariert
+- Eigenschaft: Hinzufügen von return_tracking_number und return_carrier Feld, wenn es ein optionales Argument ist und diese Daten in der Bestell-Aktion senden
+- Eigenschaft: Hinzufügen der Kompatibilität für Shopware 6.5.8
+
 # v1.2.0
 - Bugfix: [import] fix Produkt zum Shopware Warenkorb hinzufügen
 - Bugfix: [action] Fix id Action ist keine ganze Zahl

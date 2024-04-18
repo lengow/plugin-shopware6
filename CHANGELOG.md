@@ -1,3 +1,10 @@
+# v1.2.1
+- Bugfix: [install] Fix uninstall plugin when user want delete all data
+- Bugfix: [install] Fix wrong definition of cron url and toolbox url
+- Bugfix: [toolbox] Fix modified files feature
+- Feature: Add return_tracking_number and return_carrier field if is optional argument and send this data in order action
+- Feature: Add compatibility for Shopware 6.5.8
+
 # v1.2.0
 - Bugfix: [import] fix add product to Shopware Cart
 - Bugfix: [action] Fix id Action is not integer
@@ -15,7 +22,7 @@
 - Feature: get details of modified file in toolbox
 
 # v1.1.2
-- Bugfix: [import] fix search carrier code 
+- Bugfix: [import] fix search carrier code
 
 # v1.1.1
 - Feature: Adding the PHP version in the toolbox

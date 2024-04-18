@@ -604,29 +604,26 @@ class LengowImportOrder
         $this->loadVatNumberFromOrderData();
 
         // Check and update VAT number data
-            if (!(
-                ($lengowOrder->getCustomerVatNumber() ?? '') ===
-                ($this->customerVatNumber ?? '')
-            )) {
-                $this->checkAndUpdateLengowOrderData();
-                $orderUpdated = true;
-                $this->lengowLog->write(
-                    LengowLog::CODE_IMPORT,
-                    $this->lengowLog->encodeMessage('log.import.lengow_order_updated'),
-                    $this->logOutput,
-                    $this->marketplaceSku
-                );
-            }
+        if ($lengowOrder->getCustomerVatNumber() !== $this->customerVatNumber) {
+            $this->checkAndUpdateLengowOrderData();
+            $orderUpdated = true;
+            $this->lengowLog->write(
+                LengowLog::CODE_IMPORT,
+                $this->lengowLog->encodeMessage('log.import.lengow_order_updated'),
+                $this->logOutput,
+                $this->marketplaceSku
+            );
+        }
 
-            // Try to update Shopware order, Lengow order, and finish actions if necessary
-            if (!$orderUpdated) {
-                $orderUpdated = $this->lengowOrder->updateOrderState(
-                    $order,
-                    $lengowOrder,
-                    $this->orderStateLengow,
-                    $this->packageData
-                );
-            }
+        // Try to update Shopware order, Lengow order, and finish actions if necessary
+        if (!$orderUpdated) {
+            $orderUpdated = $this->lengowOrder->updateOrderState(
+                $order,
+                $lengowOrder,
+                $this->orderStateLengow,
+                $this->packageData
+            );
+        }
 
         unset($lengowOrder);
         return (bool)$orderUpdated;
@@ -1262,6 +1259,8 @@ class LengowImportOrder
         ]);
         // create a generic cart
         $cart = $this->createCart($token, $products, $salesChannelContext);
+
+
         // get and modify order data for Shopware order creation
         $orderData = $this->getOrderData($cart, $products, $salesChannelContext);
         // delete cart after order creation

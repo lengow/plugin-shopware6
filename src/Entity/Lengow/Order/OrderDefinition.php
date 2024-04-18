@@ -55,6 +55,8 @@ class OrderDefinition extends EntityDefinition
     public const FIELD_CUSTOMER_NAME = 'customerName';
     public const FIELD_CUSTOMER_EMAIL = 'customerEmail';
     public const FIELD_CUSTOMER_VAT_NUMBER = 'customerVatNumber';
+    public const FIELD_RETURN_TRACKING_NUMBER = 'returnTrackingNumber';
+    public const FIELD_RETURN_CARRIER = 'returnCarrier';
     public const FIELD_CARRIER = 'carrier';
     public const FIELD_CARRIER_METHOD = 'carrierMethod';
     public const FIELD_CARRIER_TRACKING = 'carrierTracking';
@@ -125,6 +127,8 @@ class OrderDefinition extends EntityDefinition
                 (new StringField('customer_name', self::FIELD_CUSTOMER_NAME)),
                 (new StringField('customer_email', self::FIELD_CUSTOMER_EMAIL)),
                 (new StringField('customer_vat_number', self::FIELD_CUSTOMER_VAT_NUMBER)),
+                (new JsonField('return_tracking_number', self::FIELD_RETURN_TRACKING_NUMBER)),
+                (new StringField('return_carrier', self::FIELD_RETURN_CARRIER)),
                 (new StringField('carrier', self::FIELD_CARRIER)),
                 (new StringField('carrier_method', self::FIELD_CARRIER_METHOD)),
                 (new StringField('carrier_tracking', self::FIELD_CARRIER_TRACKING)),

@@ -15,6 +15,8 @@ use Shopware\Core\Checkout\Order\OrderStates;
 use Shopware\Core\Framework\Context;
 use Shopware\Core\Framework\DataAbstractionLayer\EntityCollection;
 use Shopware\Core\Framework\DataAbstractionLayer\EntityRepository;
+use Shopware\Core\Framework\DataAbstractionLayer\Exception\InconsistentCriteriaIdsException;
+use Shopware\Core\Framework\DataAbstractionLayer\Exception\InconsistentEntityIdException;
 use Shopware\Core\Framework\DataAbstractionLayer\Search\Criteria;
 use Shopware\Core\Framework\DataAbstractionLayer\Search\Filter\EqualsFilter;
 use Shopware\Core\Framework\DataAbstractionLayer\Search\Filter\MultiFilter;
@@ -132,6 +134,10 @@ class LengowOrder
      * updated  => Fields allowed when updating registration
      */
     private $fieldList = [
+        LengowOrderDefinition::FIELD_RETURN_TRACKING_NUMBER => [
+            EnvironmentInfoProvider::FIELD_REQUIRED => false,
+            EnvironmentInfoProvider::FIELD_CAN_BE_UPDATED => true,
+        ],
         LengowOrderDefinition::FIELD_ORDER_ID => [
             EnvironmentInfoProvider::FIELD_REQUIRED => false,
             EnvironmentInfoProvider::FIELD_CAN_BE_UPDATED => true,
@@ -1288,5 +1294,104 @@ class LengowOrder
         );
         /** @var LengowOrderCollection $lengowOrderCollection */
         return $this->lengowOrderRepository->search($criteria, $context)->getEntities()->count();
+    }
+
+    /**
+     * Get return tracking number by order ID
+     *
+     * @param string $orderId
+     * @return string|null
+     *
+     */
+    public function getReturnTrackingNumberByOrderId(string $orderId): ?array
+    {
+        $context = Context::createDefaultContext();
+        $criteria = new Criteria();
+        $criteria->addFilter(new EqualsFilter('order.id', $orderId));
+
+        $lengowOrder = $this->lengowOrderRepository->search($criteria, $context)->first();
+
+        if ($lengowOrder instanceof LengowOrderEntity) {
+            return $lengowOrder->getReturnTrackingNumber();
+        }
+
+        return null;
+    }
+
+    /**
+     * Update return tracking number for a specific order ID
+     *
+     * @param string $orderId
+     * @param string|null $returnTrackingNumber
+     * @param Context $context
+     * @throws \Shopware\Core\Framework\DataAbstractionLayer\Exception\InconsistentCriteriaIdsException
+     * @throws \Shopware\Core\Framework\DataAbstractionLayer\Exception\InconsistentEntityIdException
+     */
+    public function updateReturnTrackingNumber(string $orderId, ?string $returnTrackingNumber): void
+    {
+
+        $context = Context::createDefaultContext();
+        // Load Lengow\OrderEntity by order ID
+        $criteria = new Criteria();
+        $criteria->addFilter(new EqualsFilter('order.id', $orderId));
+
+        /** @var LengowOrderEntity|null $lengowOrder */
+        $lengowOrder = $this->lengowOrderRepository->search($criteria, $context)->first();
+
+
+        if ($lengowOrder instanceof LengowOrderEntity) {
+
+            $this->update($lengowOrder->getId(), [
+                LengowOrderDefinition::FIELD_RETURN_TRACKING_NUMBER => [$returnTrackingNumber],
+            ]);
+        }
+    }
+
+    /**
+     * Get return carrier by order ID
+     *
+     * @param string $orderId
+     * @return string|null
+     *
+     */
+    public function getReturnCarrierByOrderId(string $orderId): ?string
+    {
+        $context = Context::createDefaultContext();
+        $criteria = new Criteria();
+        $criteria->addFilter(new EqualsFilter('order.id', $orderId));
+
+        $lengowOrder = $this->lengowOrderRepository->search($criteria, $context)->first();
+        if ($lengowOrder instanceof LengowOrderEntity) {
+            $returnCarrierName = $lengowOrder->getReturnCarrier();
+
+            return $lengowOrder->getReturnCarrier();
+        }
+
+        return null;
+    }
+
+    /**
+     * Update return carrier for a specific order ID
+     *
+     * @param string $orderId
+     * @param string|null $returnCarrier
+     * @param Context $context
+     * @throws \Shopware\Core\Framework\DataAbstractionLayer\Exception\InconsistentCriteriaIdsException
+     * @throws \Shopware\Core\Framework\DataAbstractionLayer\Exception\InconsistentEntityIdException
+     */
+    public function updateReturnCarrier(string $orderId, ?string $returnCarrier): void
+    {
+        $context = Context::createDefaultContext();
+        $criteria = new Criteria();
+        $criteria->addFilter(new EqualsFilter('order.id', $orderId));
+
+        /** @var LengowOrderEntity|null $lengowOrder */
+        $lengowOrder = $this->lengowOrderRepository->search($criteria, $context)->first();
+
+        if ($lengowOrder instanceof LengowOrderEntity) {
+            $this->update($lengowOrder->getId(), [
+                LengowOrderDefinition::FIELD_RETURN_CARRIER => $returnCarrier,
+            ]);
+        }
     }
 }

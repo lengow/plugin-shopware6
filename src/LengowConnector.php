@@ -64,7 +64,28 @@ class LengowConnector extends Plugin
 
     public function uninstall(UninstallContext $uninstallContext): void
     {
+        parent::uninstall($uninstallContext);
         $this->setPaymentMethodIsActive(false, $uninstallContext->getContext());
+
+        if (!$uninstallContext->keepUserData()) {
+            $connection = $this->container->get(Connection::class);
+
+            $connection->executeUpdate('DROP TABLE IF EXISTS `lengow_order`, `lengow_order_line`, `lengow_order_error`, `lengow_action`, `lengow_settings`, `lengow_product`;');
+
+            $connection->executeUpdate('
+            DELETE FROM state_machine_transition 
+            WHERE to_state_id = (
+                SELECT id FROM state_machine_state WHERE technical_name = "lengow_technical_error"
+            ) OR from_state_id = (
+                SELECT id FROM state_machine_state WHERE technical_name = "lengow_technical_error"
+            );
+        ');
+
+            $connection->executeUpdate('
+            DELETE FROM state_machine_state 
+            WHERE technical_name = "lengow_technical_error";
+        ');
+        }
     }
 
     /**
