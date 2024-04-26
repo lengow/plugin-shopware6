@@ -14,14 +14,16 @@
             </template>
         {% endblock %}
         {% block lgw_connection_content %}
-            <sw-card-view v-if="isNew && !isLoading" slot="content">
-                {% block lgw_connection_content_view %}
-                    <router-view></router-view>
-                {% endblock %}
-                {% block lgw_toolbox_content_footer %}
-                    <lgw-footer v-if="!isLoading"></lgw-footer>
-                {% endblock %}
-            </sw-card-view>
+            <template #content>
+                <sw-card-view v-if="isNew && !isLoading">
+                    {% block lgw_connection_content_view %}
+                        <router-view></router-view>
+                    {% endblock %}
+                    {% block lgw_toolbox_content_footer %}
+                        <lgw-footer v-if="!isLoading"></lgw-footer>
+                    {% endblock %}
+                </sw-card-view>
+            </template>
         {% endblock %}
     </sw-page>
 {% endblock %}
