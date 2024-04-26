@@ -38,7 +38,7 @@ class LengowExportController extends LengowAbstractFrontController
         $this->lengowExport = $lengowExport;
     }
 
-    #[Route('/lengow/export', name: 'frontend.lengow.export', methods: ['GET'])]
+    #[Route('/lengow/export', name: 'frontend.lengow.export', methods: ['GET'], description: 'Export Process')]
     public function export(Request $request): Response
     {
         $salesChannelName = $this->getSalesChannelName($request);

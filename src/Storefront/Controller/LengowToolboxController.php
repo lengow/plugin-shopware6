@@ -54,7 +54,7 @@ class LengowToolboxController extends LengowAbstractFrontController
         $this->lengowToolbox = $lengowToolbox;
     }
 
-    #[Route('/lengow/toolbox', name: 'frontend.lengow.toolbox', methods: ['GET'])]
+    #[Route('/lengow/toolbox', name: 'frontend.lengow.toolbox', methods: ['GET'], description: 'Toolbox Process')]
     public function toolbox(Request $request): Response
     {
         $accessErrorMessage = $this->checkAccess($request);
