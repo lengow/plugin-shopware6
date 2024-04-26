@@ -9,11 +9,7 @@ use Symfony\Component\HttpFoundation\JsonResponse;
 use Lengow\Connector\Service\LengowConfiguration;
 use Lengow\Connector\Service\LengowExport;
 
-/**
- * Class LengowExportController
- * @package Lengow\Connector\Controller
- * @Route(defaults={"_routeScope"={"api"}})
- */
+#[Route(defaults: ['_routeScope' => ['api']])]
 class LengowExportController extends AbstractController
 {
     /**
@@ -38,19 +34,8 @@ class LengowExportController extends AbstractController
         $this->lengowExport = $lengowExport;
     }
 
-    /**
-     * Get feed url for a specific sales channel
-     *
-     * @Route("/api/_action/lengow/export/get-export-link",
-     *     name="api.action.lengow.export.get-export-link",
-     *     methods={"GET"})
-     * @Route("/api/v{version}/_action/lengow/export/get-export-link",
-     *     name="api.action.lengow.export.get-export-link-old",
-     *     methods={"GET"})
-     *
-     * @param Request $request
-     * @return JsonResponse
-     */
+    #[Route('/api/_action/lengow/export/get-export-link', name: 'api.action.lengow.export.get-export-link', methods: ['GET'])]
+    #[Route('/api/v{version}/_action/lengow/export/get-export-link', name: 'api.action.lengow.export.get-export-link-old', methods: ['GET'])]
     public function getExportLink(Request $request) : JsonResponse
     {
         if ($request->get('salesChannelId')) {
@@ -65,19 +50,8 @@ class LengowExportController extends AbstractController
         return new JsonResponse(['success' => false]);
     }
 
-    /**
-     * Get sales channel export count
-     *
-     * @Route("/api/_action/lengow/export/get-export-count",
-     *     name="api.action.lengow.export.get-export-count",
-     *     methods={"GET"})
-     * @Route("/api/v{version}/_action/lengow/export/get-export-count",
-     *     name="api.action.lengow.export.get-export-count-old",
-     *     methods={"GET"})
-     *
-     * @param Request $request
-     * @return JsonResponse
-     */
+    #[Route('/api/_action/lengow/export/get-export-count', name: 'api.action.lengow.export.get-export-count', methods: ['GET'])]
+    #[Route('/api/v{version}/_action/lengow/export/get-export-count', name: 'api.action.lengow.export.get-export-count-old', methods: ['GET'])]
     public function getExportCount(Request $request) : JsonResponse
     {
         if ($request->get('salesChannelId')) {
@@ -95,19 +69,8 @@ class LengowExportController extends AbstractController
         return new JsonResponse(['success' => false]);
     }
 
-    /**
-     * Get product count value (parent + all variants)
-     *
-     * @Route("/api/_action/lengow/export/get-product-count",
-     *     name="api.action.lengow.export.get-product-count",
-     *     methods={"GET"})
-     * @Route("/api/v{version}/_action/lengow/export/get-product-count",
-     *     name="api.action.lengow.export.get-product-count-old",
-     *     methods={"GET"})
-     *
-     * @param Request $request
-     * @return JsonResponse
-     */
+    #[Route('/api/_action/lengow/export/get-product-count', name: 'api.action.lengow.export.get-product-count', methods: ['GET'])]
+    #[Route('/api/v{version}/_action/lengow/export/get-product-count', name: 'api.action.lengow.export.get-product-count-old', methods: ['GET'])]
     public function getProductCount(Request $request) : JsonResponse
     {
         if ($request->get('productId') && $request->get('salesChannelId')) {
@@ -127,19 +90,8 @@ class LengowExportController extends AbstractController
         return new JsonResponse($response);
     }
 
-    /**
-     * Get product list for salesChannelId
-     *
-     * @Route("/api/_action/lengow/export/get-product-list",
-     *     name="api.action.lengow.export.get-product-list",
-     *     methods={"GET"})
-     * @Route("/api/v{version}/_action/lengow/export/get-product-list",
-     *     name="api.action.lengow.export.get-product-list-old",
-     *     methods={"GET"})
-     *
-     * @param Request $request
-     * @return JsonResponse
-     */
+    #[Route('/api/_action/lengow/export/get-product-list', name: 'api.action.lengow.export.get-product-list', methods: ['GET'])]
+    #[Route('/api/v{version}/_action/lengow/export/get-product-list', name: 'api.action.lengow.export.get-product-list-old', methods: ['GET'])]
     public function getProductList(Request $request) : JsonResponse
     {
         if ($request->get('salesChannelId')) {

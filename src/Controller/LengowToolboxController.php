@@ -9,11 +9,7 @@ use Symfony\Component\Routing\Annotation\Route;
 use Symfony\Component\HttpFoundation\JsonResponse;
 use Lengow\Connector\Service\LengowToolbox;
 
-/**
- * Class LengowToolboxController
- * @package Lengow\Connector\Controller
- * @Route(defaults={"_routeScope"={"api"}})
- */
+#[Route(defaults: ['_routeScope' => ['api']])]
 class LengowToolboxController extends AbstractController
 {
     /**
@@ -32,18 +28,8 @@ class LengowToolboxController extends AbstractController
         $this->lengowToolbox = $lengowToolbox;
     }
 
-    /**
-     * Get overview data
-     *
-     * @Route("/api/_action/lengow/toolbox/get-overview-data",
-     *     name="api.action.lengow.toolbox.get-overview-data",
-     *     methods={"GET"})
-     * @Route("/api/v{version}/_action/lengow/toolbox/get-overview-data",
-     *     name="api.action.lengow.toolbox.get-overview-data-old",
-     *     methods={"GET"})
-     *
-     * @return JsonResponse
-     */
+    #[Route('/api/_action/lengow/toolbox/get-overview-data', name: 'api.action.lengow.toolbox.get-overview-data', methods: ['GET'])]
+    #[Route('/api/v{version}/_action/lengow/toolbox/get-overview-data', name: 'api.action.lengow.toolbox.get-overview-data-old', methods: ['GET'])]
     public function getOverviewData(): JsonResponse
     {
         return new JsonResponse([
@@ -54,56 +40,22 @@ class LengowToolboxController extends AbstractController
         ]);
     }
 
-    /**
-     * Get checksum data
-     *
-     * @Route("/api/_action/lengow/toolbox/get-checksum-data",
-     *     name="api.action.lengow.toolbox.get-checksum-data",
-     *     methods={"GET"})
-     * @Route("/api/v{version}/_action/lengow/toolbox/get-checksum-data",
-     *     name="api.action.lengow.toolbox.get-checksum-data-old",
-     *     methods={"GET"})
-     *
-     * @return JsonResponse
-     */
+    #[Route('/api/_action/lengow/toolbox/get-checksum-data', name: 'api.action.lengow.toolbox.get-checksum-data', methods: ['GET'])]
+    #[Route('/api/v{version}/_action/lengow/toolbox/get-checksum-data', name: 'api.action.lengow.toolbox.get-checksum-data-old', methods: ['GET'])]
     public function getChecksumData(): JsonResponse
     {
         return new JsonResponse($this->lengowToolbox->getData(LengowToolbox::DATA_TYPE_CHECKSUM));
     }
 
-    /**
-     * Get log data
-     *
-     * @Route("/api/_action/lengow/toolbox/get-log-data",
-     *     name="api.action.lengow.toolbox.get-log-data",
-     *     methods={"GET"})
-     * @Route("/api/v{version}/_action/lengow/toolbox/get-log-data",
-     *     name="api.action.lengow.toolbox.get-log-data-old",
-     *     methods={"GET"})
-     *
-     * @return JsonResponse
-     */
+    #[Route('/api/_action/lengow/toolbox/get-log-data', name: 'api.action.lengow.toolbox.get-log-data', methods: ['GET'])]
+    #[Route('/api/v{version}/_action/lengow/toolbox/get-log-data', name: 'api.action.lengow.toolbox.get-log-data-old', methods: ['GET'])]
     public function getLogData(): JsonResponse
     {
         return new JsonResponse($this->lengowToolbox->getData(LengowToolbox::DATA_TYPE_LOG));
     }
 
-    /**
-     * Download log file individually or globally
-     *
-     * @Route("/api/_action/lengow/order/download-log",
-     *     defaults={"auth_enabled"=true},
-     *     name="api.action.lengow.toolbox.download-log",
-     *     methods={"POST"})
-     * @Route("/api/v{version}/_action/lengow/order/download-log",
-     *     defaults={"auth_enabled"=true},
-     *     name="api.action.lengow.toolbox.download-log-old",
-     *     methods={"POST"})
-     *
-     * @param Request $request
-     *
-     * @return Response
-     */
+    #[Route('/api/_action/lengow/order/download-log', defaults: ['auth_enabled' => true], name: 'api.action.lengow.toolbox.download-log', methods: ['POST'])]
+    #[Route('/api/v{version}/_action/lengow/order/download-log', defaults: ['auth_enabled' => true], name: 'api.action.lengow.toolbox.download-log-old', methods: ['POST'])]
     public function downloadLog(Request $request): Response
     {
         $date = $request->get('date');

@@ -11,11 +11,7 @@ use Lengow\Connector\Service\LengowExport;
 use Lengow\Connector\Service\LengowLog;
 use Lengow\Connector\Service\LengowTranslation;
 
-/**
- * Class LengowExportController
- * @package Lengow\Connector\Storefront\Controller
- * @Route(defaults={"_routeScope"={"storefront"}})
- */
+#[Route(defaults: ['_routeScope' => 'storefront'])]
 class LengowExportController extends LengowAbstractFrontController
 {
     /**
@@ -42,15 +38,7 @@ class LengowExportController extends LengowAbstractFrontController
         $this->lengowExport = $lengowExport;
     }
 
-    /**
-     * Export Process
-     *
-     * @param Request $request Http request
-     *
-     * @Route("/lengow/export", name="frontend.lengow.export", methods={"GET"})
-     *
-     * @return Response
-     */
+    #[Route('/lengow/export', name: 'frontend.lengow.export', methods: ['GET'])]
     public function export(Request $request): Response
     {
         $salesChannelName = $this->getSalesChannelName($request);

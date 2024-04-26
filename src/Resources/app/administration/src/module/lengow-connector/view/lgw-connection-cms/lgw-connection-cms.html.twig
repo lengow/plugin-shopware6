@@ -2,7 +2,7 @@
     <sw-card class="lgw-connection-cms">
         <div class="lgw-content-section">
             <div class="lgw-text-center lgw-logo">
-                <img :src="'lengowconnector/lengow-blue.png' | asset" alt="lengow">
+                <img :src="assetFilter('lengowconnector/lengow-blue.png')" alt="lengow">
             </div>
         </div>
         <div v-if="showCredentialForm">
@@ -54,9 +54,9 @@
                         </h2>
                     </div>
                     <div class="lgw-module-illu mod-connected">
-                        <img :src="'lengowconnector/connected-shopware.png' | asset" class="lgw-module-illu-module" alt="">
-                        <img :src="'lengowconnector/connected-lengow.png' | asset" class="lgw-module-illu-lengow" alt="">
-                        <img :src="'lengowconnector/connection-module.png' | asset" class="lgw-module-illu-plug" alt="">
+                        <img :src="assetFilter('lengowconnector/connected-shopware.png')" class="lgw-module-illu-module" alt="">
+                        <img :src="assetFilter('lengowconnector/connected-lengow.png')" class="lgw-module-illu-lengow" alt="">
+                        <img :src="assetFilter('lengowconnector/connection-module.png')" class="lgw-module-illu-plug" alt="">
                     </div>
                     <template v-if="hasCatalogToLink">
                         {% block lgw_connection_cms_success_catalog %}
@@ -105,9 +105,9 @@
                         </h2>
                     </div>
                     <div class="lgw-module-illu mod-disconnected">
-                        <img :src="'lengowconnector/connected-shopware.png' | asset" class="lgw-module-illu-module" alt="">
-                        <img :src="'lengowconnector/connected-lengow.png' | asset" class="lgw-module-illu-lengow" alt="">
-                        <img :src="'lengowconnector/unplugged.png' | asset" class="lgw-module-illu-plug" alt="">
+                        <img :src="assetFilter('lengowconnector/connected-shopware.png')" class="lgw-module-illu-module" alt="">
+                        <img :src="assetFilter('lengowconnector/connected-lengow.png')" class="lgw-module-illu-lengow" alt="">
+                        <img :src="assetFilter('lengowconnector/unplugged.png')" class="lgw-module-illu-plug" alt="">
                     </div>
                     <div class="lgw-content-section">
                         <template v-if="credentialsValid">
