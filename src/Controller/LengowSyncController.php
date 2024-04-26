@@ -74,7 +74,8 @@ class LengowSyncController extends AbstractController
         $this->lengowMarketplaceFactory = $lengowMarketplaceFactory;
     }
 
-    #[Route('/api/_action/lengow/sync/get-plugin-data', name: 'api.action.lengow.sync.get-plugin-data', methods: ['GET'], description: 'Get plugin data')]
+    //Get plugin data
+    #[Route('/api/_action/lengow/sync/get-plugin-data', name: 'api.action.lengow.sync.get-plugin-data', methods: ['GET'])]
     #[Route('/api/v{version}/_action/lengow/sync/get-plugin-data', name: 'api.action.lengow.sync.get-plugin-data-old', methods: ['GET'])]
     public function getPluginData(): JsonResponse
     {
@@ -93,7 +94,8 @@ class LengowSyncController extends AbstractController
         ]);
     }
 
-    #[Route('/api/_action/lengow/sync/get-plugin-links', name: 'api.action.lengow.sync.get-plugin-links', methods: ['GET'], description: 'Get plugin links')]
+    //Get plugin links
+    #[Route('/api/_action/lengow/sync/get-plugin-links', name: 'api.action.lengow.sync.get-plugin-links', methods: ['GET'])]
     #[Route('/api/v{version}/_action/lengow/sync/get-plugin-links', name: 'api.action.lengow.sync.get-plugin-links-old', methods: ['GET'])]
     public function getPluginLinks(): JsonResponse
     {
@@ -103,7 +105,8 @@ class LengowSyncController extends AbstractController
         ]);
     }
 
-    #[Route('/api/_action/lengow/sync/get-account-status', name: 'api.action.lengow.sync.get-account-status', methods: ['GET'], description: 'Get Account data')]
+    //Get Account data
+    #[Route('/api/_action/lengow/sync/get-account-status', name: 'api.action.lengow.sync.get-account-status', methods: ['GET'])]
     #[Route('/api/v{version}/_action/lengow/sync/get-account-status', name: 'api.action.lengow.sync.get-account-status-old', methods: ['GET'])]
     public function getAccountStatus(Request $request): JsonResponse
     {
@@ -120,7 +123,8 @@ class LengowSyncController extends AbstractController
         return new JsonResponse($accountStatus);
     }
 
-    #[Route('/api/v{version}/_action/lengow/sync/remind-me-later', name: 'api.action.lengow.sync.remind-me-later', methods: ['GET'], description: 'Set back the display date of the update modal by 7 days')]
+    //Set back the display date of the update modal by 7 days
+    #[Route('/api/v{version}/_action/lengow/sync/remind-me-later', name: 'api.action.lengow.sync.remind-me-later', methods: ['GET'])]
     #[Route('/api/_action/lengow/sync/remind-me-later', name: 'api.action.lengow.sync.remind-me-later-old', methods: ['GET'])]
     public function remindMeLater(): JsonResponse
     {
@@ -144,7 +148,8 @@ class LengowSyncController extends AbstractController
         return true;
     }
 
-    #[Route('/api/_action/lengow/sync/load-return-tracking-numbers', name: 'api.action.lengow.sync.load-return-tracking-numbers', methods: ['POST'], description: 'Load return tracking numbers for a specific order ID')]
+    //Load return tracking numbers for a specific order ID
+    #[Route('/api/_action/lengow/sync/load-return-tracking-numbers', name: 'api.action.lengow.sync.load-return-tracking-numbers', methods: ['POST'])]
     #[Route('/api/v{version}/_action/lengow/sync/load-return-tracking-numbers', name: 'api.action.lengow.sync.load-return-tracking-numbers-old', methods: ['POST'])]
     public function loadReturnTrackingNumbers(Request $request, LengowOrder $lengowOrder): JsonResponse
     {
@@ -155,7 +160,8 @@ class LengowSyncController extends AbstractController
         return new JsonResponse(['success' => true, 'return_tracking_number' => $returnTrackingNumber]);
     }
 
-    #[Route('/api/_action/lengow/sync/save-return-tracking-numbers', name: 'api.action.lengow.sync.save-return-tracking-numbers', methods: ['POST'], description: 'Save return tracking numbers for a specific order ID')]
+    //Save return tracking numbers for a specific order ID
+    #[Route('/api/_action/lengow/sync/save-return-tracking-numbers', name: 'api.action.lengow.sync.save-return-tracking-numbers', methods: ['POST'])]
     #[Route('/api/v{version}/_action/lengow/sync/save-return-tracking-numbers', name: 'api.action.lengow.sync.save-return-tracking-numbers-old', methods: ['POST'])]
     public function saveReturnTrackingNumbers(Request $request, LengowOrder $lengowOrder): JsonResponse
     {
@@ -173,7 +179,8 @@ class LengowSyncController extends AbstractController
         return new JsonResponse(['success' => true]);
     }
 
-    #[Route('/api/_action/lengow/sync/load-return-carrier', name: 'api.action.lengow.sync.load-return-carrier', methods: ['POST'], description: 'Load return carrier for a specific order ID')]
+    //Load return carrier for a specific order ID
+    #[Route('/api/_action/lengow/sync/load-return-carrier', name: 'api.action.lengow.sync.load-return-carrier', methods: ['POST'])]
     #[Route('/api/v{version}/_action/lengow/sync/load-return-carrier', name: 'api.action.lengow.sync.load-return-carrier-old', methods: ['POST'])]
     public function loadReturnCarrier(Request $request, LengowOrder $lengowOrder): JsonResponse
     {
@@ -184,7 +191,8 @@ class LengowSyncController extends AbstractController
         return new JsonResponse(['success' => true, 'return_carrier' => $returnCarrier]);
     }
 
-    #[Route('/api/_action/lengow/sync/save-return-carrier', name: 'api.action.lengow.sync.save-return-carrier', methods: ['POST'], description: 'Save return carrier for a specific order ID')]
+    //Save return carrier for a specific order ID
+    #[Route('/api/_action/lengow/sync/save-return-carrier', name: 'api.action.lengow.sync.save-return-carrier', methods: ['POST'])]
     #[Route('/api/v{version}/_action/lengow/sync/save-return-carrier', name: 'api.action.lengow.sync.save-return-carrier-old', methods: ['POST'])]
     public function saveReturnCarrier(Request $request, LengowOrder $lengowOrder): JsonResponse
     {
@@ -201,7 +209,8 @@ class LengowSyncController extends AbstractController
         return new JsonResponse(['success' => $data]);
     }
 
-    #[Route('/api/_action/lengow/sync/verifyArgRtn', name: 'api.action.lengow.sync.verifyArgRtn', methods: ['POST'], description: 'Check the marketplace of the order by order ID')]
+    //Check the marketplace of the order by order ID
+    #[Route('/api/_action/lengow/sync/verifyArgRtn', name: 'api.action.lengow.sync.verifyArgRtn', methods: ['POST'])]
     #[Route('/api/v{version}/_action/lengow/sync/verifyArgRtn', name: 'api.action.lengow.sync.verifyArgRtn-old', methods: ['POST'])]
     public function verifyMarketplaceByOrderId(Request $request, LengowOrder $lengowOrder): JsonResponse
     {

@@ -71,7 +71,8 @@ class LengowCronController extends LengowAbstractFrontController
         $this->lengowActionSync = $lengowActionSync;
     }
 
-    #[Route('/lengow/cron', name: 'frontend.lengow.cron', methods: ['GET'], description: 'Cron Process (Import orders, check actions and send stats)')]
+    //Cron Process (Import orders, check actions and send stats)
+    #[Route('/lengow/cron', name: 'frontend.lengow.cron', methods: ['GET'])]
     public function cron(Request $request): Response
     {
         $accessErrorMessage = $this->checkAccess($request);
