@@ -29,11 +29,5 @@
             <tag name="kernel.event_subscriber"/>
         </service>
 
-        <service id="Lengow\Connector\Subscriber\CheckoutFinishPageLoadedSubscriber">
-            <argument type="service" id="currency.repository"/>
-            <argument type="service" id="Lengow\Connector\Service\LengowConfiguration"/>
-            <tag name="kernel.event_subscriber"/>
-        </service>
-
     </services>
 </container>

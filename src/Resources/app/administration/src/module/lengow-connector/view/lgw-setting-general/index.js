@@ -37,8 +37,6 @@ Component.register('lgw-setting-general', {
             lengowEnvironmentUrl: '.io',
             lengowIpEnabled: false,
             lengowAuthorizedIp: '',
-            lengowTrackingEnabled: false,
-            lengowTrackingId: '',
             lengowTimezone: '',
             credentialLocked: true,
             render: false
@@ -66,8 +64,6 @@ Component.register('lgw-setting-general', {
         this.lengowEnvironmentUrl = this.config.lengowEnvironmentUrl.value;
         this.lengowIpEnabled = this.config.lengowIpEnabled.value === '1';
         this.lengowAuthorizedIp = this.config.lengowAuthorizedIp.value;
-        this.lengowTrackingEnabled = this.config.lengowTrackingEnabled.value === '1';
-        this.lengowTrackingId = this.config.lengowTrackingId.value;
         this.lengowTimezone = this.config.lengowTimezone.value;
         this.credentialLocked = this.config.lengowDebugEnabled.value === '1';
     },

@@ -251,7 +251,7 @@ fr:
           environment: "Environnement"
           credentials: "Identifiants"
           sales_channel: "Canaux de vente"
-          security: "Securité & tracker"
+          security: "Securité"
           timezone: "Timezone"
           exclusions: "Exclusions"
           shipping: "Méthode de transport par defaut"
@@ -286,15 +286,6 @@ fr:
           ip:
             label: "IP autorisée(s)"
             description: "IP autorisée(s) à accéder à votre flux d'export.\nSéparez-les par ' ; '"
-          tracking_enable:
-            label: "Activer le tracker Lengow"
-            description: "Ce tracker vous permet de récupérer les statistiques de commandes de votre site directement sur la plateforme Lengow."
-          tracking_id:
-            label: "Tracker ID produit"
-            description: "Le nom de l'identifiant unique indiqué dans Lengow"
-          tracking_value:
-            traking_id: "Id produit"
-            traking_reference: "Numéro produit"
           timezone:
             label: "Timezone"
             description: "Choix de la Timezone. Attention, ce paramètre est utilisé lors de l'import de vos commandes depuis l'API Lengow"
