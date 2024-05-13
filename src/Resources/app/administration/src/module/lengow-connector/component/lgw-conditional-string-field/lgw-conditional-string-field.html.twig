@@ -10,7 +10,9 @@
             <sw-switch-field class="text-center"
                              :label="switchLabel"
                              v-model="locked"
-                             @change="onSaveSettings($event, switchSettingsKey, settingsSalesChannelId)">
+                            @update:value="onSaveSettings($event, switchSettingsKey, settingsSalesChannelId)"
+                            @change="onSaveSettings($event, switchSettingsKey, settingsSalesChannelId)"
+            >
             </sw-switch-field>
             <lgw-lockable-string-field :fieldContent="fieldContent"
                                        :locked="isLocked"

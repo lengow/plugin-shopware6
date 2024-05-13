@@ -1,11 +1,9 @@
 import template from './lgw-setting-general.html.twig';
 import './lgw-setting-general.scss';
-
 const {
     Component,
     Data: { Criteria }
 } = Shopware;
-
 Component.register('lgw-setting-general', {
     template,
 
@@ -41,7 +39,7 @@ Component.register('lgw-setting-general', {
             lengowTrackingId: '',
             lengowTimezone: '',
             credentialLocked: true,
-            render: false
+            render: false,
         };
     },
 

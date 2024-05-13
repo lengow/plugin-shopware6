@@ -13,12 +13,16 @@
                     </h2>
                 </div>
                 <div class="lgw-content-input">
-                    <sw-text-field @change="handleChangeCredentials('accessToken', $event)"
+                    <sw-text-field
+                                    @update:value="handleChangeCredentials('accessToken', $event)"
+                                    @change="handleChangeCredentials('accessToken', $event)"
                                    :value="accessToken"
                                    :disabled="isLoading"
                                    :placeholder="$tc('lengow-connector.connection.cms.credentials_placeholder_access_token')">
                     </sw-text-field>
-                    <sw-text-field @change="handleChangeCredentials('secret', $event)"
+                    <sw-text-field
+                                    @update:value="handleChangeCredentials('secret', $event)"
+                                    @change="handleChangeCredentials('secret', $event)"
                                    :value="secret"
                                    :disabled="isLoading"
                                    :placeholder="$tc('lengow-connector.connection.cms.credentials_placeholder_secret')">

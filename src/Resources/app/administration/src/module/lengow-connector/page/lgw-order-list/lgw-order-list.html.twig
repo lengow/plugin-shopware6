@@ -219,7 +219,9 @@
                                                 :options="availableOrderLengowStates"
                                                 :isLoading="filterLoading"
                                                 :value="orderLengowStateFilter"
-                                                @change="onChangeOrderLengowStateFilter">
+                                                    @update:value="onChangeOrderLengowStateFilter"
+                                                    @change="onChangeOrderLengowStateFilter"
+                                        >
                                         </sw-multi-select>
                                     {% endblock %}
 
@@ -229,7 +231,9 @@
                                                 :options="availableOrderTypes"
                                                 :isLoading="filterLoading"
                                                 :value="orderTypeFilter"
-                                                @change="onChangeOrderTypeFilter">
+                                                @update:value="onChangeOrderTypeFilter"
+                                                @change="onChangeOrderTypeFilter"
+                                        >
                                         </sw-single-select>
                                     {% endblock %}
 
@@ -239,7 +243,9 @@
                                                 :options="availableMarketplaces"
                                                 :isLoading="filterLoading"
                                                 :value="marketplaceFilter"
-                                                @change="onChangeMarketplaceFilter">
+                                                @update:value="onChangeMarketplaceFilter"
+                                                @change="onChangeMarketplaceFilter"
+                                        >
                                         </sw-multi-select>
                                     {% endblock %}
 
