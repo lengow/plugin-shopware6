@@ -13,7 +13,8 @@
             </template>
         {% endblock %}
         {% block lgw_toolbox_content %}
-            <sw-card-view slot="content">
+        <template #content>
+            <sw-card-view>
                 {% block lgw_toolbox_content_tabs %}
                     <sw-tabs v-if="!isLoading">
                         {% block lgw_toolbox_content_tabs_base %}
@@ -43,6 +44,7 @@
                     <lgw-footer v-if="!isLoading"></lgw-footer>
                 {% endblock %}
             </sw-card-view>
+        </template>
         {% endblock %}
     </sw-page>
 {% endblock %}

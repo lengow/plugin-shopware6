@@ -53,6 +53,7 @@
                             v-if="render"
                             v-for="salesChannel in salesChannels"
                             switchSettingsKey="lengowStoreEnabled"
+                            :fieldContent.sync="salesChannel.catalogId"
                             fieldSettingsKey="lengowCatalogId"
                             :settingsSalesChannelId="salesChannel.salesChannelId"
                             :onSaveSettings="onSaveSettings"

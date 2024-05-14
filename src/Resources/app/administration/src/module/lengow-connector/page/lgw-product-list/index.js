@@ -125,7 +125,6 @@ Component.register('lgw-product-list', {
                     property: `price-${item.isoCode}`,
                     dataIndex: `price.${item.id}`,
                     label: `${item.name}`,
-                    //routerLink: 'lengow.export.detail',
                     allowResize: true,
                     currencyId: item.id,
                     visible: item.isSystemDefault,

@@ -33,7 +33,7 @@
                             </p>
                             <p v-if="Object.keys(lastSynchronisation).length !== 0">
                                 {{ $tc('lengow-connector.order.last_synchronisation') }}
-                                {{ lastSynchronisation.date | date({hour: '2-digit', minute: '2-digit'}) }}
+                                {{ formatDate(lastSynchronisation.date) }}
                             </p>
                             <p v-else>
                                 {{ $tc('lengow-connector.order.no_synchronisation') }}
@@ -76,14 +76,14 @@
                 <div id="lgw-order-grid">
                     {% block lgw_order_list_grid %}
                         <sw-data-grid ref="swLengowOrderGrid"
-                                           :items="lengowOrders"
+                                            :dataSource="lengowOrders"
                                            :columns="lengowOrderColumns"
                                            :repository="lengowOrderRepository"
                                            :showSelection="true"
                                            :showActions="false"
                                            :allowDelete="false"
                                            @selection-change="updateSelection">
-                            <template slot="bulk">
+                            <template #bulk>
                                 {% block sw_data_grid_bulk_selected_actions_content %}
                                     <span class="sw-data-grid__bulk-selected bulk-link">
                                         <a class="link link-default" @click="massReImportOrders">
@@ -148,7 +148,7 @@
                                 {% endblock %}
                                 {% block lgw_order_list_grid_columns_order_date %}
                                     <template #column-orderDate="{ item }">
-                                        {{ item.orderDate | date({hour: '2-digit', minute: '2-digit'}) }}
+                                        {{ formatDate(item.orderDate) }}
                                     </template>
                                 {% endblock %}
                                 {% block lgw_order_list_grid_columns_delivery_country_iso %}
@@ -160,7 +160,7 @@
                                 {% block lgw_order_list_grid_columns_total_paid %}
                                     <template #column-totalPaid="{ item }">
                                         <span :title="getOrderItemTooltip(item)">
-                                            {{ item.totalPaid | currency(item.currency) }}
+                                          {{ currency(item.totalPaid, item.currency) }}
                                         </span>
                                     </template>
                                 {% endblock %}
