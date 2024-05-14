@@ -12,7 +12,7 @@ use Lengow\Connector\Service\LengowLog;
 use Lengow\Connector\Service\LengowToolbox;
 use Lengow\Connector\Service\LengowTranslation;
 
-#[Route(defaults: ['_routeScope' => 'storefront'])]
+#[Route(defaults: ['_routeScope' => ['storefront']])]
 class LengowToolboxController extends LengowAbstractFrontController
 {
     /**

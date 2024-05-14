@@ -26,7 +26,7 @@
                     <!-- Sales channel selector -->
                     {% block lgw_product_list_choose_sales_channel %}
                         <div class="sw-system-config__global-sales-channel-switch">
-                            <sw-sales-channel-switch  ref="lgwSalesChannelSwitch" @change-sales-channel-id="onSalesChannelChanged">
+                            <sw-sales-channel-switch ref="lgwSalesChannelSwitch" @change-sales-channel-id="onSalesChannelChanged">
                             </sw-sales-channel-switch>
                         </div>
                     {% endblock %}
@@ -78,20 +78,20 @@
                     {% block lgw_product_list_content_section %}
                         <div class="lgw-product-grid"  v-if="(salesChannelSelected && productSelection)">
                             {% block lgw_product_list_content_grid %}
-                                <sw-entity-listing ref="swProductGrid"
-                                                   :items="products"
+                                <sw-data-grid
+                                                    ref="swProductGrid"
+                                                    :dataSource="products"
                                                    :columns="productColumns"
                                                    :repository="productRepository"
                                                    detailRoute="sw.product.detail"
                                                    :showSelection="true"
                                                    :isLoading="isLoading"
                                                    @column-sort="onStartSorting"
-                                                   @selection-change="updateSelection"
-                                                   @update-records="onColumnSort">
+                                                   @selections="updateSelection"
+                                                   @update-records="onColumnSort"
+                                >
                                     <template #delete-action>
                                         <span></span> <!-- Remove delete action from entity listing -->
-                                    </template>
-                                    <template #>
                                     </template>
                                     <template slot="bulk">
                                         {% block sw_data_grid_bulk_selected_count %}
@@ -160,7 +160,7 @@
                                             </template>
                                         {% endblock %}
                                     {% endblock %}
-                                </sw-entity-listing>
+                                </sw-data-grid>
                             {% endblock %}
                             {% block lgw_product_list_grid_loader %}
                                 <sw-loader v-if="isLoading || !salesChannelSelected"></sw-loader>

@@ -62,7 +62,7 @@ Component.register('lgw-product-list', {
             salesChannelName: '',
             salesChannelDomain: '',
             tempListActivated: [],
-            downloadLink: ''
+            downloadLink: '',
         };
     },
 
@@ -125,7 +125,7 @@ Component.register('lgw-product-list', {
                     property: `price-${item.isoCode}`,
                     dataIndex: `price.${item.id}`,
                     label: `${item.name}`,
-                    routerLink: 'lengow.export.detail',
+                    //routerLink: 'lengow.export.detail',
                     allowResize: true,
                     currencyId: item.id,
                     visible: item.isSystemDefault,
@@ -309,6 +309,8 @@ Component.register('lgw-product-list', {
                     const salesChannelCriteria = new Criteria();
                     salesChannelCriteria.setIds([this.currentSalesChannelId]);
                     salesChannelCriteria.addAssociation('domains');
+
+
                     return this.salesChannelRepository
                         .search(salesChannelCriteria, Shopware.Context.api)
                         .then(salesChannelCollection => {
@@ -351,7 +353,7 @@ Component.register('lgw-product-list', {
                         product.extensions.activeInLengow.active =
                             typeof product.extensions.activeInLengow.activeArray[
                                 this.currentSalesChannelId
-                            ] !== 'undefined';
+                                ] !== 'undefined';
                     });
                     this.products = products;
                     this.baseProducts = this.products;
@@ -383,6 +385,7 @@ Component.register('lgw-product-list', {
                 .search(lengowSettingsCriteria, Shopware.Context.api)
                 .then(result => {
                     if (result.total !== 0) {
+
                         const lengowSettings = this.lengowSettingsRepository.create(Shopware.Context.api);
                         lengowSettings.id = result.first().id;
                         lengowSettings.salesChannelsId = this.currentSalesChannelId;
@@ -433,6 +436,8 @@ Component.register('lgw-product-list', {
 
         OnActivateOnLengow(selected) {
             const selectedItem = Object.values(selected)[0];
+            const newActiveValue = !selectedItem.extensions.activeInLengow.active;
+            selectedItem.extensions.activeInLengow.active = newActiveValue;
             if (selectedItem.extensions.activeInLengow.active) {
                 const lengowProduct = this.lengowProductRepository.create(Shopware.Context.api);
                 lengowProduct.productId = selectedItem.id;
@@ -454,7 +459,10 @@ Component.register('lgw-product-list', {
             lengowProductCriteria.addFilter(Criteria.equals('salesChannelId', this.currentSalesChannelId));
             this.lengowProductRepository
                 .searchIds(lengowProductCriteria, Shopware.Context.api)
-                .then(result => this.lengowProductRepository.delete(result.data[0], Shopware.Context.api));
+                .then(result => {
+                    this.lengowProductRepository.delete(result.data[0], Shopware.Context.api)
+                }
+                );
             this.countLoading = true;
             this.LengowConnectorExportService
                 .getProductCountValue(selectedItem.id, this.currentSalesChannelId)
@@ -527,26 +535,26 @@ Component.register('lgw-product-list', {
         },
 
         onStartSorting() {
-            this.$refs.swProductGrid.records.forEach(item => {
-                if (this.$refs.swProductGrid.isSelected(item.id) !== true &&
-                    item.extensions.activeInLengow.active
-                ) {
-                    this.tempListActivated.push(item.id);
-                }
-            });
+                this.$refs.swProductGrid.records.forEach(item => {
+                    if (this.$refs.swProductGrid.isSelected(item.id) !== true &&
+                        item.extensions.activeInLengow.active
+                    ) {
+                        this.tempListActivated.push(item.id);
+                    }
+                });
         },
 
         onColumnSort() {
-            this.$refs.swProductGrid.records.forEach(item => {
-                if (this.$refs.swProductGrid.isSelected(item.id) !== true &&
-                    this.tempListActivated.includes(item.id)
-                ) {
-                    item.extensions.activeInLengow.active = true;
-                } else {
-                    item.extensions.activeInLengow.active =
-                        typeof item.extensions.activeInLengow.activeArray[this.currentSalesChannelId] !== 'undefined';
-                }
-            });
+                this.$refs.swProductGrid.records.forEach(item => {
+                    if (this.$refs.swProductGrid.isSelected(item.id) !== true &&
+                        this.tempListActivated.includes(item.id)
+                    ) {
+                        item.extensions.activeInLengow.active = true;
+                    } else {
+                        item.extensions.activeInLengow.active =
+                            typeof item.extensions.activeInLengow.activeArray[this.currentSalesChannelId] !== 'undefined';
+                    }
+                });
         }
     }
 });

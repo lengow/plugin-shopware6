@@ -13,7 +13,7 @@ use Lengow\Connector\Service\LengowLog;
 use Lengow\Connector\Service\LengowSync;
 use Lengow\Connector\Service\LengowTranslation;
 
-#[Route(defaults: ['_routeScope' => 'storefront'])]
+#[Route(defaults: ['_routeScope' => ['storefront']])]
 class LengowCronController extends LengowAbstractFrontController
 {
     /**

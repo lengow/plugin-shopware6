@@ -11,7 +11,7 @@ use Lengow\Connector\Service\LengowExport;
 use Lengow\Connector\Service\LengowLog;
 use Lengow\Connector\Service\LengowTranslation;
 
-#[Route(defaults: ['_routeScope' => 'storefront'])]
+#[Route(defaults: ['_routeScope' => ['storefront']])]
 class LengowExportController extends LengowAbstractFrontController
 {
     /**
@@ -37,6 +37,7 @@ class LengowExportController extends LengowAbstractFrontController
         parent::__construct($lengowAccess, $lengowConfiguration, $lengowLog);
         $this->lengowExport = $lengowExport;
     }
+
 
     //Export Process
     #[Route('/lengow/export', name: 'frontend.lengow.export', methods: ['GET'])]

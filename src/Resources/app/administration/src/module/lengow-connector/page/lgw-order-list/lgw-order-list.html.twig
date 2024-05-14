@@ -75,7 +75,7 @@
             <template #content>
                 <div id="lgw-order-grid">
                     {% block lgw_order_list_grid %}
-                        <sw-entity-listing ref="swLengowOrderGrid"
+                        <sw-data-grid ref="swLengowOrderGrid"
                                            :items="lengowOrders"
                                            :columns="lengowOrderColumns"
                                            :repository="lengowOrderRepository"
@@ -165,7 +165,7 @@
                                     </template>
                                 {% endblock %}
                             {% endblock %}
-                        </sw-entity-listing>
+                        </sw-data-grid>
                     {% endblock %}
 
                     {% block lgw_order_list_empty_state %}
