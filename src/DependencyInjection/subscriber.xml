@@ -26,6 +26,7 @@
         <service id="Lengow\Connector\Subscriber\SendActionSubscriber">
             <argument type="service" id="Lengow\Connector\Service\LengowAction"/>
             <argument type="service" id="Lengow\Connector\Service\LengowOrder"/>
+            <argument type="service" id="state_machine_state.repository"/>
             <tag name="kernel.event_subscriber"/>
         </service>
 
