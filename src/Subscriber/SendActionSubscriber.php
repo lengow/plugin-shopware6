@@ -5,7 +5,11 @@ namespace Lengow\Connector\Subscriber;
 use Shopware\Core\Checkout\Order\Aggregate\OrderDelivery\OrderDeliveryStates;
 use Shopware\Core\Checkout\Order\OrderEvents;
 use Shopware\Core\Checkout\Order\OrderStates;
+use Shopware\Core\Framework\Context;
+use Shopware\Core\Framework\DataAbstractionLayer\EntityRepository;
 use Shopware\Core\Framework\DataAbstractionLayer\Event\EntityWrittenEvent;
+use Shopware\Core\Framework\DataAbstractionLayer\Search\Criteria;
+use Shopware\Core\Framework\DataAbstractionLayer\Search\Filter\EqualsFilter;
 use Shopware\Core\System\StateMachine\Event\StateMachineTransitionEvent;
 use Symfony\Component\EventDispatcher\EventSubscriberInterface;
 use Lengow\Connector\Service\LengowAction;
@@ -24,6 +28,11 @@ class SendActionSubscriber implements EventSubscriberInterface
     private $lengowAction;
 
     /**
+     * @var EntityRepository Order state repository
+     */
+    private EntityRepository $orderStateRepository;
+
+    /**
      * @var LengowOrder Lengow order service
      */
     private $lengowOrder;
@@ -33,10 +42,15 @@ class SendActionSubscriber implements EventSubscriberInterface
      * @param LengowAction $lengowAction Lengow action service
      * @param LengowOrder $lengowOrder Lengow order service
      */
-    public function __construct(LengowAction $lengowAction, LengowOrder $lengowOrder)
+    public function __construct(
+        LengowAction $lengowAction,
+        LengowOrder $lengowOrder,
+        EntityRepository $orderStateRepository
+    )
     {
         $this->lengowAction = $lengowAction;
         $this->lengowOrder = $lengowOrder;
+        $this->orderStateRepository = $orderStateRepository;
     }
 
     /**
@@ -56,6 +70,7 @@ class SendActionSubscriber implements EventSubscriberInterface
      * Detects when an action on Lengow orders should be sent
      *
      * @param StateMachineTransitionEvent $event Shopware state machine transition event
+     * @throws \JsonException
      */
     public function detectOrderStateUpdate(StateMachineTransitionEvent $event): void
     {
@@ -70,6 +85,7 @@ class SendActionSubscriber implements EventSubscriberInterface
      * Detects when a tracking number is added
      *
      * @param EntityWrittenEvent $event Shopware entity written event
+     * @throws \JsonException
      */
     public function detectTrackingNumberUpdate(EntityWrittenEvent $event): void
     {
@@ -88,6 +104,7 @@ class SendActionSubscriber implements EventSubscriberInterface
      *
      * @param string $orderDeliveryId Shopware order delivery id
      * @param array $trackingCodes Shopware tracking codes
+     * @throws \JsonException
      */
     private function checkAndSendShipAction(string $orderDeliveryId, array $trackingCodes = []): void
     {
@@ -100,10 +117,16 @@ class SendActionSubscriber implements EventSubscriberInterface
             return;
         }
         $order = $this->lengowOrder->getOrderById($orderDelivery->getOrderId());
-        $currentOrderDeliveryState = $orderDelivery->getStateMachineState();
+        $stateId = $orderDelivery->getStateId();
+        $criteria = new Criteria();
+        $criteria->addFilter(new EqualsFilter('id', $stateId));
+        $context = Context::createDefaultContext();
+        $orderState = $this->orderStateRepository->search($criteria, $context)->first();
+        $orderStateName = $orderState->getTechnicalName();
+
         if ($order
-            && $currentOrderDeliveryState
-            && $currentOrderDeliveryState->getTechnicalName() === OrderDeliveryStates::STATE_SHIPPED
+            && $orderStateName
+            && $orderStateName === OrderDeliveryStates::STATE_SHIPPED
         ) {
             $this->lengowOrder->callAction(LengowAction::TYPE_SHIP, $order, $orderDelivery);
         }
