@@ -1,3 +1,11 @@
+- Bugfix: [VueJs] Vorlage wird nicht angezeigt
+- Bugfix: [Symfony] Annotation-Route in Attribut-Route ändern
+- Bugfix: [VueJs] Fix Vuejs Kompatibilität für v2 und v3
+- Bugfix: [VueJs] Fix Grid für Bestell- und Produktseite mit Ersetzen von sw-select-selection-list durch sw-data-grid Komponente
+- Bugfix: [VueJs] Fix Filter für Datum und Bild im Template
+- Bugfix: [Action] Fix kein Name für Auslieferungszustand für getTechnicalName() in deliveryOrder wenn Status order für send action geändert wird
+- Bugfix: Tracker aus dem Plugin entfernen
+
 # v1.2.1
 - Bugfix: [install] Fix Deinstallation des Plugins, wenn der Benutzer alle Daten löschen möchte
 - Bugfix: [install] Korrigiert falsche Definition der Cron- und Toolbox-Url
