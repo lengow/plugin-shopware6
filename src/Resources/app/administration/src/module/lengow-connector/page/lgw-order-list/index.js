@@ -189,11 +189,9 @@ Component.register('lgw-order-list', {
         },
         getList() {
             this.isLoading = true;
-            console.log('test')
             return this.lengowOrderRepository
                 .search(this.lengowOrderCriteria, Shopware.Context.api)
                 .then(response => {
-                    console.log(response)
                     this.total = response.total;
                     this.lengowOrders = response;
                     return response;
