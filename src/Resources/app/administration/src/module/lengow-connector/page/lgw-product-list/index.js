@@ -447,7 +447,6 @@ Component.register('lgw-product-list', {
                         lengowProduct.productId = selectedItem.id;
                         lengowProduct.salesChannelId = this.currentSalesChannelId;
                         return this.lengowProductRepository.save(lengowProduct, Shopware.Context.api).then(() => {
-                            selectedItem.extensions.activeInLengow.active = true;
                             this.countLoading = true;
                             this.LengowConnectorExportService
                                 .getProductCountValue(selectedItem.id, this.currentSalesChannelId)
@@ -462,7 +461,6 @@ Component.register('lgw-product-list', {
                     if (productExists) {
                         return this.lengowProductRepository.delete(result.first().id, Shopware.Context.api)
                             .then(() => {
-                                selectedItem.extensions.activeInLengow.active = false;
                                 this.countLoading = true;
                                 this.LengowConnectorExportService
                                     .getProductCountValue(selectedItem.id, this.currentSalesChannelId)
@@ -475,8 +473,8 @@ Component.register('lgw-product-list', {
                             });
                     }
                 }).catch(error => {
-                    console.error("Error:", error);
-                });
+                console.error("Error:", error);
+            });
         },
 
         getCurrencyPriceByCurrencyId(currencyId, prices) {
@@ -540,26 +538,26 @@ Component.register('lgw-product-list', {
         },
 
         onStartSorting() {
-                this.$refs.swProductGrid.records.forEach(item => {
-                    if (this.$refs.swProductGrid.isSelected(item.id) !== true &&
-                        item.extensions.activeInLengow.active
-                    ) {
-                        this.tempListActivated.push(item.id);
-                    }
-                });
+            this.$refs.swProductGrid.records.forEach(item => {
+                if (this.$refs.swProductGrid.isSelected(item.id) !== true &&
+                    item.extensions.activeInLengow.active
+                ) {
+                    this.tempListActivated.push(item.id);
+                }
+            });
         },
 
         onColumnSort() {
-                this.$refs.swProductGrid.records.forEach(item => {
-                    if (this.$refs.swProductGrid.isSelected(item.id) !== true &&
-                        this.tempListActivated.includes(item.id)
-                    ) {
-                        item.extensions.activeInLengow.active = true;
-                    } else {
-                        item.extensions.activeInLengow.active =
-                            typeof item.extensions.activeInLengow.activeArray[this.currentSalesChannelId] !== 'undefined';
-                    }
-                });
+            this.$refs.swProductGrid.records.forEach(item => {
+                if (this.$refs.swProductGrid.isSelected(item.id) !== true &&
+                    this.tempListActivated.includes(item.id)
+                ) {
+                    item.extensions.activeInLengow.active = true;
+                } else {
+                    item.extensions.activeInLengow.active =
+                        typeof item.extensions.activeInLengow.activeArray[this.currentSalesChannelId] !== 'undefined';
+                }
+            });
         }
     }
 });
