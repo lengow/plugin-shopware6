@@ -421,7 +421,6 @@ Component.register('lgw-product-list', {
 
         onUnpublishOnLengow() {
             const lengowProductCriteria = new Criteria();
-            conesole.log(this.selection )
             lengowProductCriteria.addFilter(Criteria.equalsAny('productId', this.selection));
             lengowProductCriteria.addFilter(Criteria.equals('salesChannelId', this.currentSalesChannelId));
             this.lengowProductRepository
@@ -436,41 +435,47 @@ Component.register('lgw-product-list', {
 
         OnActivateOnLengow(selected) {
             const selectedItem = Object.values(selected)[0];
-            const newActiveValue = selectedItem.extensions.activeInLengow.active;
-            selectedItem.extensions.activeInLengow.active = newActiveValue;
-            if (selectedItem.extensions.activeInLengow.active) {
-                const lengowProduct = this.lengowProductRepository.create(Shopware.Context.api);
-                lengowProduct.productId = selectedItem.id;
-                lengowProduct.salesChannelId = this.currentSalesChannelId;
-                this.lengowProductRepository.save(lengowProduct, Shopware.Context.api);
-                this.countLoading = true;
-                this.LengowConnectorExportService
-                    .getProductCountValue(selectedItem.id, this.currentSalesChannelId)
-                    .then(response => {
-                        if (response.success) {
-                            this.exportedCount += response.countValue;
-                        }
-                        this.countLoading = false;
-                    });
-                return;
-            }
             const lengowProductCriteria = new Criteria();
             lengowProductCriteria.addFilter(Criteria.equals('productId', selectedItem.id));
             lengowProductCriteria.addFilter(Criteria.equals('salesChannelId', this.currentSalesChannelId));
-            this.lengowProductRepository
-                .searchIds(lengowProductCriteria, Shopware.Context.api)
+
+            this.lengowProductRepository.search(lengowProductCriteria, Shopware.Context.api)
                 .then(result => {
-                        this.lengowProductRepository.delete(result.data[0], Shopware.Context.api);
-                }
-                );
-            this.countLoading = true;
-            this.LengowConnectorExportService
-                .getProductCountValue(selectedItem.id, this.currentSalesChannelId)
-                .then(response => {
-                    if (response.success) {
-                        this.exportedCount -= response.countValue;
+                    const productExists = result.total > 0;
+                    if (!productExists) {
+                        const lengowProduct = this.lengowProductRepository.create(Shopware.Context.api);
+                        lengowProduct.productId = selectedItem.id;
+                        lengowProduct.salesChannelId = this.currentSalesChannelId;
+                        return this.lengowProductRepository.save(lengowProduct, Shopware.Context.api).then(() => {
+                            selectedItem.extensions.activeInLengow.active = true;
+                            this.countLoading = true;
+                            this.LengowConnectorExportService
+                                .getProductCountValue(selectedItem.id, this.currentSalesChannelId)
+                                .then(response => {
+                                    if (response.success) {
+                                        this.exportedCount += response.countValue;
+                                    }
+                                    this.countLoading = false;
+                                });
+                        });
                     }
-                    this.countLoading = false;
+                    if (productExists) {
+                        return this.lengowProductRepository.delete(result.first().id, Shopware.Context.api)
+                            .then(() => {
+                                selectedItem.extensions.activeInLengow.active = false;
+                                this.countLoading = true;
+                                this.LengowConnectorExportService
+                                    .getProductCountValue(selectedItem.id, this.currentSalesChannelId)
+                                    .then(response => {
+                                        if (response.success) {
+                                            this.exportedCount -= response.countValue;
+                                        }
+                                        this.countLoading = false;
+                                    });
+                            });
+                    }
+                }).catch(error => {
+                    console.error("Error:", error);
                 });
         },
 
