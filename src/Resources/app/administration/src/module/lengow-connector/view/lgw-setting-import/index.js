@@ -126,7 +126,7 @@ Component.register('lgw-setting-import', {
         onChangeStatus(event, key) {
             this.LengowConnectorSyncService.onChangeStatus().then(result => {
                 if (!result.success) {
-                    console.error("Failure to create custom field :", result.error);
+                    console.error("Failure to change value :", result.error);
                 }
             });
         }
