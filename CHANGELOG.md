@@ -1,9 +1,10 @@
 # v2.0.0
-- Bugfix: [VueJs] Fix template not display
 - Bugfix: [Symfony] Change annotation route to attribute route
+- Bugfix: [VueJs] Fix template not display
 - Bugfix: [VueJs] Fix Vuejs comptability for v2 and v3
 - Bugfix: [VueJs] Fix grid for order and product page with replace sw-select-selection-list by sw-data-grid component
 - Bugfix: [VueJs] Fix filter for date and image in template
+- Bugfix: [VueJs] Fix lgw-lockable-string-field not asynchrone
 - Bugfix: [Action] Fix no name for delivery state for getTechnicalName() in deliveryOrder when status order is changed for send action
 - Bugfix: [Export] Fix wrong value for delivery delay by product
 - Bugfix: Remove Tracker from plugin

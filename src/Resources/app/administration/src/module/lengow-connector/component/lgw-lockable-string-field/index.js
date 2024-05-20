@@ -50,6 +50,12 @@ Component.register('lgw-lockable-string-field', {
         }
     },
 
+    watch: {
+        fieldContent(newVal) {
+            this.newFieldContent = newVal;
+        }
+    },
+
     data(){
         return {
             newFieldContent: this.fieldContent

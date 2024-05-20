@@ -1,11 +1,12 @@
 # v2.0.0
-- Bugfix: [VueJs] Fix Template wird nicht angezeigt 
-- Bugfix: [Symfony] Annotationsroute auf Attributroute ändern 
-- Bugfix: [VueJs] Vuejs-Kompatibilität für v2 und v3 fixiert 
-- Bugfix: [VueJs] Fix Grid für Bestellung und Produktseite mit replace sw-select-selection-list durch sw-data-grid Komponente 
-- Bugfix: [VueJs] Filter für Datum und Bild im Template fixiert 
-- Bugfix: [Action] Fix kein Name für den Lieferstatus für getTechnicalName() in deliveryOrder, wenn die Statusreihenfolge für die Sendeaktion geändert wird 
-- Bugfix: [Export] Falscher Wert für Lieferverzögerung nach Produkt behoben 
+- Bugfix: [Symfony] Ändern der Annotation-Route in eine Attribut-Route
+- Bugfix: [VueJs] Fix Template wird nicht angezeigt
+- Bugfix: [VueJs] Fix Vuejs Kompatibilität für v2 und v3
+- Bugfix: [VueJs] Fix Grid für Bestell- und Produktseite mit replace sw-select-selection-list durch sw-data-grid Komponente
+- Bugfix: [VueJs] Filter für Datum und Bild im Template repariert
+- Bugfix: [VueJs] Fix lgw-lockable-string-field nicht asynchron
+- Bugfix: [Action] Fix kein Name für Auslieferungszustand für getTechnicalName() in deliveryOrder bei Änderung der Statusreihenfolge für send action
+- Bugfix: [Export] Korrigiert falschen Wert für Lieferverzögerung nach Produkt
 - Bugfix: Tracker aus dem Plugin entfernen
 
 # v1.2.1
