@@ -93,6 +93,10 @@ Component.register('lgw-setting-general', {
             return this.config.lengowStoreEnabled.some(
                 elem => elem.salesChannel.id === salesChannelId && elem.value === '1'
             );
+        },
+
+        onSwitchChange(newValue) {
+            this.lengowIpEnabled = newValue;
         }
     }
 });
