@@ -9,7 +9,6 @@
 - Bugfix: [Export] Fix wrong value for delivery delay by product
 - Feature: Remove Tracker from plugin
 
-
 # v1.2.1
 - Bugfix: [install] Fix uninstall plugin when user want delete all data
 - Bugfix: [install] Fix wrong definition of cron url and toolbox url
