@@ -91,32 +91,6 @@
                                            settingsKey="lengowAuthorizedIp"
                                            :helpText="$tc('lengow-connector.setting.lengow_main_setting.ip.description')">
                 </lgw-lockable-string-field>
-                <sw-help-text class="lgw-help-text"
-                              :text="$tc('lengow-connector.setting.lengow_main_setting.tracking_enable.description')"
-                              :width="200"
-                              tooltipPosition="right">
-                </sw-help-text>
-                <sw-switch-field class="text-center"
-                                 :label="$tc('lengow-connector.setting.lengow_main_setting.tracking_enable.label')"
-                                 v-model="lengowTrackingEnabled"
-                                @update:value="onSaveSettings($event, 'lengowTrackingEnabled')"
-                                @change="onSaveSettings($event, 'lengowTrackingEnabled')"
-                >
-                </sw-switch-field>
-                <sw-help-text class="lgw-help-text"
-                              :text="$tc('lengow-connector.setting.lengow_main_setting.tracking_id.description')"
-                              :width="200"
-                              tooltipPosition="right">
-                </sw-help-text>
-                <sw-select-field :label="$tc('lengow-connector.setting.lengow_main_setting.tracking_id.label')"
-                                 v-model="lengowTrackingId"
-                                 :disabled="!lengowTrackingEnabled"
-                                @update:value="onSaveSettings($event, 'lengowTrackingId')"
-                                @change="onSaveSettings($event, 'lengowTrackingId')"
-                >
-                    <option value="productId">{{ $tc('lengow-connector.setting.lengow_main_setting.tracking_value.traking_id') }}</option>
-                    <option value="productNumber">{{ $tc('lengow-connector.setting.lengow_main_setting.tracking_value.traking_reference') }}</option>
-                </sw-select-field>
             </sw-card>
         {% endblock %}
         {% block lgw_setting_general_timezone %}
