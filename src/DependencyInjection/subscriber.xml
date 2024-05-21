@@ -26,12 +26,7 @@
         <service id="Lengow\Connector\Subscriber\SendActionSubscriber">
             <argument type="service" id="Lengow\Connector\Service\LengowAction"/>
             <argument type="service" id="Lengow\Connector\Service\LengowOrder"/>
-            <tag name="kernel.event_subscriber"/>
-        </service>
-
-        <service id="Lengow\Connector\Subscriber\CheckoutFinishPageLoadedSubscriber">
-            <argument type="service" id="currency.repository"/>
-            <argument type="service" id="Lengow\Connector\Service\LengowConfiguration"/>
+            <argument type="service" id="state_machine_state.repository"/>
             <tag name="kernel.event_subscriber"/>
         </service>
 

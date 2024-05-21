@@ -11,10 +11,11 @@
                 :copyable="false"
                 :copyableTooltip="false"
                 :disabled="locked"
+                @update:value="handleChange($event)"
                 @change="handleChange($event)"
                 :placeholder="fieldPlaceholder"
                 :label="fieldLabel"
-                :value="fieldContent">
+                :value="newFieldContent">
             </sw-text-field>
         </div>
     </template>

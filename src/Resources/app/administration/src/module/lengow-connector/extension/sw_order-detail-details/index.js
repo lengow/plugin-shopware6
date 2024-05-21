@@ -114,7 +114,6 @@ Component.override('sw-order-detail-details', {
                                 this.localReturnCarrier = id;
                             })
                             .catch(error => {
-                                console.log(id)
                                 console.error("Error fetching shipping method id:", error);
                             });
                     } else {

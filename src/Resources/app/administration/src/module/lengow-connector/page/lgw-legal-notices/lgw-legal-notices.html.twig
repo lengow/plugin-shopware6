@@ -13,7 +13,8 @@
             </template>
         {% endblock %}
         {% block lgw_legal_notices_content %}
-            <sw-card-view slot="content">
+            <template #content>
+            <sw-card-view>
                 <sw-card>
                     {% block lgw_legal_notices_content_company_infos %}
                         <div><br/>
@@ -49,6 +50,7 @@
                 </sw-card>
                 <lgw-footer></lgw-footer>
             </sw-card-view>
+            </template>
         {% endblock %}
     </sw-page>
 {% endblock %}

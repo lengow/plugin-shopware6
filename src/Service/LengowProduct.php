@@ -81,6 +81,11 @@ class LengowProduct
     private $productRepository;
 
     /**
+     * @var EntityRepository delivery time repository
+     */
+    private $deliveryRepository;
+
+    /**
      * @var LengowLog Lengow log service
      */
     private $lengowLog;
@@ -195,16 +200,19 @@ class LengowProduct
      * LengowProduct Construct
      *
      * @param EntityRepository $productRepository product repository
+     * @param EntityRepository $deliveryRepository delivery time repository
      * @param LengowLog $lengowLog Lengow log service
      * @param EnvironmentInfoProvider $environmentInfoProvider lengow environmentInfoProvider
      */
     public function __construct(
         EntityRepository $productRepository,
+        EntityRepository $deliveryRepository,
         LengowLog $lengowLog,
         EnvironmentInfoProvider $environmentInfoProvider
     )
     {
         $this->productRepository = $productRepository;
+        $this->deliveryRepository = $deliveryRepository;
         $this->lengowLog = $lengowLog;
         $this->environmentInfoProvider = $environmentInfoProvider;
     }
@@ -454,9 +462,23 @@ class LengowProduct
                     $productData[$headerField] = $this->getShippingPrice();
                     break;
                 case LengowExport::$defaultFields['shipping_delay']:
-                    $productData[$headerField] = $this->shippingMethod->getDeliveryTime() !== null
-                        ? $this->shippingMethod->getDeliveryTime()->getName()
-                        : '';
+                    $context = Context::createDefaultContext();
+                    $deliveryTimeId = $this->product->getDeliveryTimeId();
+                    if ($deliveryTimeId !== null) {
+                        $criteria = new Criteria([$deliveryTimeId]);
+                        $deliveryTimeEntity = $this->deliveryRepository->search($criteria, $context)->first();
+
+                        if ($deliveryTimeEntity !== null) {
+                            $deliveryTimeName = $deliveryTimeEntity->getTranslated('name');
+                            if ($deliveryTimeName !== null) {
+                                $productData[$headerField] = $deliveryTimeName['name'] ?? "";
+                            }
+                        }
+                    } else {
+                        $productData[$headerField] = $this->shippingMethod->getDeliveryTime() !== null
+                            ? $this->shippingMethod->getDeliveryTime()->getName()
+                            : '';
+                    }
                     break;
                 case (bool) preg_match('`image_url_([0-9]+)`', $headerField):
                     $productData[$headerField] = $this->images[$headerField];

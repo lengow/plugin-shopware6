@@ -13,11 +13,7 @@ use Lengow\Connector\Service\LengowLog;
 use Lengow\Connector\Service\LengowSync;
 use Lengow\Connector\Service\LengowTranslation;
 
-/**
- * Class LengowCronController
- * @package Lengow\Connector\Storefront\Controller
- * @Route(defaults={"_routeScope"={"storefront"}})
- */
+#[Route(defaults: ['_routeScope' => ['storefront']])]
 class LengowCronController extends LengowAbstractFrontController
 {
     /**
@@ -75,15 +71,8 @@ class LengowCronController extends LengowAbstractFrontController
         $this->lengowActionSync = $lengowActionSync;
     }
 
-    /**
-     * Cron Process (Import orders, check actions and send stats)
-     *
-     * @param Request $request Http Request
-     *
-     * @return Response
-     *
-     * @Route("/lengow/cron", name="frontend.lengow.cron", methods={"GET"})
-     */
+    //Cron Process (Import orders, check actions and send stats)
+    #[Route('/lengow/cron', name: 'frontend.lengow.cron', methods: ['GET'])]
     public function cron(Request $request): Response
     {
         $accessErrorMessage = $this->checkAccess($request);

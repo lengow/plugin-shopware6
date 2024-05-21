@@ -13,7 +13,8 @@
             </template>
         {% endblock %}
         {% block lgw_setting_content %}
-            <sw-card-view slot="content">
+            <template #content>
+            <sw-card-view>
                 {% block lgw_setting_content_tabs %}
                     <sw-tabs v-if="configLoaded">
                         {% block lgw_toolbox_content_tabs_general %}
@@ -38,25 +39,28 @@
                 {% endblock %}
                 {% block lgw_setting_content_view %}
                     <keep-alive v-if="configLoaded">
-                        <lgw-setting-general v-if="selectedTabGeneral"
-                                             :config="config"
-                                             :onSaveSettings="onSaveSettings"
-                                             :key="generalSettingsKey">
-                        </lgw-setting-general>
-                        <lgw-setting-export v-if="selectedTabExport"
-                                            :config="config"
-                                            :onSaveSettings="onSaveSettings">
-                        </lgw-setting-export>
-                        <lgw-setting-import v-if="selectedTabImport"
-                                            :config="config"
-                                            :onSaveSettings="onSaveSettings">
-                        </lgw-setting-import>
+                        <div>
+                            <lgw-setting-general v-if="selectedTabGeneral"
+                                                 :config="config"
+                                                 :onSaveSettings="onSaveSettings"
+                                                 :key="generalSettingsKey">
+                            </lgw-setting-general>
+                            <lgw-setting-export v-if="selectedTabExport"
+                                                :config="config"
+                                                :onSaveSettings="onSaveSettings">
+                            </lgw-setting-export>
+                            <lgw-setting-import v-if="selectedTabImport"
+                                                :config="config"
+                                                :onSaveSettings="onSaveSettings">
+                            </lgw-setting-import>
+                        </div>
                     </keep-alive>
                 {% endblock %}
                 {% block lgw_setting_content_loader %}
                     <sw-loader v-if="!configLoaded"></sw-loader>
                 {% endblock %}
             </sw-card-view>
+            </template>
         {% endblock %}
     </sw-page>
 {% endblock %}

@@ -2,7 +2,7 @@
     <sw-card class="lgw-connection-home">
         <div class="lgw-content-section">
             <div class="lgw-text-center lgw-logo">
-                <img :src="'lengowconnector/lengow-blue.png' | asset" alt="lengow">
+                <img :src="assetFilter('lengowconnector/lengow-blue.png')" alt="lengow">
             </div>
             <p class="lgw-text-center">
                 {{ $tc('lengow-connector.connection.home.description_first') }}
@@ -15,9 +15,9 @@
             </p>
         </div>
         <div class="lgw-module-illu">
-            <img :src="'lengowconnector/connected-shopware.png' | asset" class="lgw-module-illu-module" alt="">
-            <img :src="'lengowconnector/connected-lengow.png' | asset" class="lgw-module-illu-lengow" alt="">
-            <img :src="'lengowconnector/plug-grey.png' | asset" class="lgw-module-illu-plug" alt="">
+            <img :src="assetFilter('lengowconnector/connected-shopware.png')" class="lgw-module-illu-module" alt="">
+            <img :src="assetFilter('lengowconnector/connected-lengow.png')" class="lgw-module-illu-lengow" alt="">
+            <img :src="assetFilter('lengowconnector/plug-grey.png')" class="lgw-module-illu-plug" alt="">
         </div>
         <p class="lgw-text-center">
             {{ $tc('lengow-connector.connection.home.description_fourth') }}

@@ -175,9 +175,20 @@ Component.register('lgw-order-list', {
     },
 
     methods: {
+        currency(value, currency) {
+            return new Intl.NumberFormat('en-US', {
+                style: 'currency',
+                currency: currency
+            }).format(value);
+        },
+        formatDate(date) {
+            if (!(date instanceof Date) || isNaN(date.getTime())) {
+                return "";
+            }
+            return new Intl.DateTimeFormat(navigator.language.substring(0, 2), { hour: '2-digit', minute: '2-digit' }).format(date);
+        },
         getList() {
             this.isLoading = true;
-
             return this.lengowOrderRepository
                 .search(this.lengowOrderCriteria, Shopware.Context.api)
                 .then(response => {

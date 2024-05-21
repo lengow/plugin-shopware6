@@ -4,6 +4,7 @@ import { LENGOW_URL, BASE_LENGOW_URL } from '../../../const';
 
 const {
     Component,
+    Filter,
     Data: { Criteria }
 } = Shopware;
 
@@ -36,6 +37,9 @@ Component.register('lgw-connection-cms', {
     },
 
     computed: {
+        assetFilter() {
+            return Filter.getByName('asset');
+        },
         ...mapState('lgwConnection', ['catalogList']),
         lengowConfigRepository() {
             return this.repositoryFactory.create('lengow_settings');
@@ -43,6 +47,7 @@ Component.register('lgw-connection-cms', {
     },
 
     created() {
+        this.assetFilter();
         this.loadEnvironmentUrl();
     },
 

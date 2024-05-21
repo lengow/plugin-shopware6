@@ -1,6 +1,6 @@
 export const LENGOW_URL = 'https://my.lengow.net';
 export const BASE_LENGOW_URL = 'https://my.lengow';
-export const MODULE_VERSION = '1.2.1';
+export const MODULE_VERSION = '2.0.0';
 
 export const ORDER_LENGOW_STATES = {
     accepted: 'accepted',
