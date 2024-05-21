@@ -31,7 +31,6 @@ Component.register('lgw-setting-import', {
         return {
             lengowImportShipMpEnabled: false,
             lengowImportStockShipMp: false,
-            lengowSendReturnTrackingNumber: false,
             lengowImportDays: 3,
             lengowReportMailEnabled: null,
             lengowReportMailAddress: [],
@@ -76,7 +75,6 @@ Component.register('lgw-setting-import', {
         });
         this.lengowImportShipMpEnabled = this.config.lengowImportShipMpEnabled.value === '1';
         this.lengowImportStockShipMp = this.config.lengowImportStockShipMp.value === '1';
-        this.lengowSendReturnTrackingNumber = this.config.lengowSendReturnTrackingNumber.value === '1';
         this.lengowImportDays = this.config.lengowImportDays.value;
         this.lengowReportMailEnabled = this.config.lengowReportMailEnabled.value === '1';
         this.lengowReportMailAddress = this.config.lengowReportMailAddress.value;
@@ -128,7 +126,7 @@ Component.register('lgw-setting-import', {
         onChangeStatus(event, key) {
             this.LengowConnectorSyncService.onChangeStatus().then(result => {
                 if (!result.success) {
-                    console.error("Failure to create custom field :", result.error);
+                    console.error("Failure to change value :", result.error);
                 }
             });
         }

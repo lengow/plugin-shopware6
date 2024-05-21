@@ -61,9 +61,15 @@ Component.register('lgw-conditional-string-field', {
         }
     },
 
-    computed: {
-        isLocked() {
-            return !this.locked;
+    data(){
+        return {
+            newLocked: this.locked
+        }
+    },
+
+    methods: {
+        onSwitchChange(newValue) {
+            this.newLocked = newValue;
         }
     }
 });

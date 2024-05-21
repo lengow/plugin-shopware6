@@ -32,8 +32,6 @@ class LengowConfiguration
     public const CMS_TOKEN = 'lengowGlobalToken';
     public const AUTHORIZED_IP_ENABLED = 'lengowIpEnabled';
     public const AUTHORIZED_IPS = 'lengowAuthorizedIp';
-    public const TRACKING_ENABLED = 'lengowTrackingEnabled';
-    public const TRACKING_ID = 'lengowTrackingId';
     public const DEBUG_MODE_ENABLED = 'lengowDebugEnabled';
     public const REPORT_MAIL_ENABLED = 'lengowReportMailEnabled';
     public const REPORT_MAILS = 'lengowReportMailAddress';
@@ -106,8 +104,6 @@ class LengowConfiguration
         self::ENVIRONMENT_URL => 'lengowEnvironmentUrl',
         self::AUTHORIZED_IP_ENABLED => 'authorized_ip_enabled',
         self::AUTHORIZED_IPS => 'authorized_ips',
-        self::TRACKING_ENABLED => 'tracking_enabled',
-        self::TRACKING_ID => 'tracking_id',
         self::DEBUG_MODE_ENABLED => 'debug_mode_enabled',
         self::REPORT_MAIL_ENABLED => 'report_mail_enabled',
         self::REPORT_MAILS => 'report_mails',
@@ -187,15 +183,6 @@ class LengowConfiguration
             self::PARAM_EXPORT_TOOLBOX => false,
             self::PARAM_RETURN => self::RETURN_TYPE_ARRAY,
             self::PARAM_DEFAULT_VALUE => '',
-        ],
-        self::TRACKING_ENABLED => [
-            self::PARAM_GLOBAL => true,
-            self::PARAM_RETURN => self::RETURN_TYPE_BOOLEAN,
-            self::PARAM_DEFAULT_VALUE => '0',
-        ],
-        self::TRACKING_ID => [
-            self::PARAM_GLOBAL => true,
-            self::PARAM_DEFAULT_VALUE => 'productId',
         ],
         self::DEBUG_MODE_ENABLED => [
             self::PARAM_GLOBAL => true,

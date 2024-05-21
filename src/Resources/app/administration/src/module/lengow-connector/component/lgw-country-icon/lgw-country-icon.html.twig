@@ -3,7 +3,7 @@
         <div v-if="countryIso !== ''" class="lgw-country-icon">
             <img v-show="!isLoading"
                  @load="loaded"
-                 :src="'lengowconnector/flag/'+countryIso+'.png' | asset"
+                 :src="assetFilter('lengowconnector/flag/'+countryIso+'.png')"
                  :alt="countryName"
                  :title="countryName">
             <sw-loader v-show="isLoading" size="14px"></sw-loader>

@@ -4,6 +4,7 @@ import { LENGOW_URL, BASE_LENGOW_URL } from '../../../const';
 
 const {
     Component,
+    Filter,
     Data: { Criteria }
 } = Shopware;
 
@@ -19,12 +20,16 @@ Component.register('lgw-dashboard-free-trial', {
     },
 
     computed: {
+        assetFilter() {
+            return Filter.getByName('asset');
+        },
         lengowConfigRepository() {
             return this.repositoryFactory.create('lengow_settings');
         }
     },
 
     created() {
+        this.assetFilter();
         this.loadEnvironmentUrl();
     },
 

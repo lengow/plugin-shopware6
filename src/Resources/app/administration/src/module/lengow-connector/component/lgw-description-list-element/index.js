@@ -56,6 +56,12 @@ Component.register('lgw-description-list-element', {
     computed: {},
 
     methods: {
+        formatDate(date) {
+            if (!(date instanceof Date) || isNaN(date.getTime())) {
+                return "";
+            }
+            return new Intl.DateTimeFormat(navigator.language.substring(0, 2), { hour: '2-digit', minute: '2-digit' }).format(date);
+        },
         createdComponent() {
             this.isLoading = true;
             const emptyValue = this.$tc('lengow-connector.toolbox.none');

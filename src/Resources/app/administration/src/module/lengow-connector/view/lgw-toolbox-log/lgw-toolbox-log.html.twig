@@ -7,7 +7,9 @@
                                   :options="availableLogs"
                                   :isLoading="isLoading"
                                   :value="logFilter"
-                                  @change="onChangeLogFilter">
+                                @update:value="onChangeLogFilter"
+                                @change="onChangeLogFilter"
+                >
                 </sw-single-select>
                 <sw-button v-if="showButton"
                            variant="primary"

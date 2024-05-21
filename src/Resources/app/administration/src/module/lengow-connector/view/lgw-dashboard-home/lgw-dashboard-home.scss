@@ -85,7 +85,7 @@
 
 .lgw-dashboard-home .lgw-btn {
   margin: 15px 0;
-  color: white;
+  color: white !important;
   background: #00aeef;
   transition: all 100ms ease;
   border: 0;
@@ -106,6 +106,10 @@
 .lgw-dashboard-home .lgw-btn:active {
 background: #019ce2;
 color: white;
+}
+
+.lgw-dashboard-home .lgw-btn:after {
+  background-color: white!important;
 }
 
 .lgw-dashboard-home .text-center {

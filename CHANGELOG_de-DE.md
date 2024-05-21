@@ -1,3 +1,14 @@
+# v2.0.0
+- Bugfix: [Symfony] Ändern der Annotation-Route in eine Attribut-Route
+- Bugfix: [VueJs] Fix Template wird nicht angezeigt
+- Bugfix: [VueJs] Fix Vuejs Kompatibilität für v2 und v3
+- Bugfix: [VueJs] Fix Grid für Bestell- und Produktseite mit replace sw-select-selection-list durch sw-data-grid Komponente
+- Bugfix: [VueJs] Filter für Datum und Bild im Template repariert
+- Bugfix: [VueJs] Fix lgw-lockable-string-field nicht reaktiv
+- Bugfix: [Action] Fix kein Name für Auslieferungszustand für getTechnicalName() in deliveryOrder bei Änderung der Statusreihenfolge für send action
+- Bugfix: [Export] Korrigiert falschen Wert für Lieferverzögerung nach Produkt
+- Feature: Tracker aus dem Plugin entfernen
+
 # v1.2.1
 - Bugfix: [install] Fix Deinstallation des Plugins, wenn der Benutzer alle Daten löschen möchte
 - Bugfix: [install] Korrigiert falsche Definition der Cron- und Toolbox-Url

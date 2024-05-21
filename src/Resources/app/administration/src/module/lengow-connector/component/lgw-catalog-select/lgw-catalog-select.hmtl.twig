@@ -7,7 +7,9 @@
                     :value="filter"
                     :disabled="disabled"
                     :placeholder="$tc('lengow-connector.connection.catalog.link_placeholder_catalog')"
-                    @change="onChange">
+                    @update:value="onChange"
+                    @change="onChange"
+            >
             </sw-multi-select>
         </div>
     </template>

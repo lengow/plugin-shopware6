@@ -5,7 +5,7 @@
             <dd>
                 <sw-icon v-if="showIcon" :name="iconName" small :class="iconClass"></sw-icon>
                 <div v-else-if="isDate">
-                    {{ content | date({hour: '2-digit', minute: '2-digit'}) }}
+                    {{ formatDate(content) }}
                 </div>
                 <div v-else-if="isArray">
                     <sw-button v-for="value in content"
