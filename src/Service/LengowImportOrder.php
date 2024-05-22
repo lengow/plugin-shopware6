@@ -310,6 +310,12 @@ class LengowImportOrder
     private $relayId;
 
     /**
+     *
+     * @var LengowTranslation $translation
+     */
+    private $translation;
+
+    /**
      * @var bool re-import order
      */
     private $isReimported = false;
@@ -342,6 +348,7 @@ class LengowImportOrder
      * @param OrderConverter $orderConverter Shopware order converter service
      * @param QuantityPriceCalculator $calculator Shopware quantity price calculator service
      * @param Connection $connection Doctrine connection service
+     * @param LengowTranslation $translation
      */
     public function __construct(
         LengowConfiguration $lengowConfiguration,
@@ -358,7 +365,8 @@ class LengowImportOrder
         CartService $cartService,
         OrderConverter $orderConverter,
         QuantityPriceCalculator $calculator,
-        Connection $connection
+        Connection $connection,
+        LengowTranslation $translation
     )
     {
         $this->lengowConfiguration = $lengowConfiguration;
@@ -376,6 +384,7 @@ class LengowImportOrder
         $this->orderConverter = $orderConverter;
         $this->calculator = $calculator;
         $this->connection = $connection;
+        $this->translation = $translation;
     }
 
     /**
@@ -1030,6 +1039,59 @@ class LengowImportOrder
     }
 
     /**
+     * hydrates address data from api
+     *
+     * @param type $orderData
+     * @param type $address
+     * @return type
+     */
+    private function hydrateAddress($orderData, $address)
+    {
+
+        $notProvided = $this->translation->t('lengow-connector.order_tab.not_provided');
+        $notPhone = '0000000000';
+        $status = (string) $orderData->lengow_status;
+        $isDeliveredByMp = false;
+        if ($status !== LengowOrder::STATE_SHIPPED) {
+            return $address;
+        }
+
+        $types = $orderData->order_types;
+
+        foreach ($types as $orderType) {
+            if ($orderType->type === LengowOrder::TYPE_DELIVERED_BY_MARKETPLACE) {
+                $isDeliveredByMp = true;
+            }
+        }
+
+        if (!$isDeliveredByMp) {
+            return $address;
+        }
+
+        if (is_null($address->first_name)
+                && is_null($address->last_name)
+                && is_null($address->full_name)) {
+            $address->first_name = $notProvided;
+            $address->last_name = $notProvided;
+            $address->full_name = $notProvided;
+        }
+
+        if (is_null($address->first_line)
+                && is_null($address->full_address)) {
+            $address->first_line = $notProvided;
+            $address->full_address = $notProvided;
+        }
+
+        if (is_null($address->phone_home)
+                && is_null($address->phone_mobile)) {
+            $address->phone_home = $notPhone;
+            $address->phone_mobile = $notPhone;
+        }
+
+        return $address;
+    }
+
+    /**
      * Create a Shopware order
      *
      * @return bool
@@ -1040,9 +1102,17 @@ class LengowImportOrder
             // search and get all products
             $products = $this->getProducts();
             // get lengow address to create all specific Shopware addresses for customer and order
+            $billingAddressApi = $this->hydrateAddress(
+                $this->orderData,
+                $this->orderData->billing_address
+            );
+            $shippingAddressApi = $this->hydrateAddress(
+                $this->orderData,
+                $this->packageData->delivery
+            );
             $this->lengowAddress->init([
-                'billing_data' => $this->orderData->billing_address,
-                'shipping_data' => $this->packageData->delivery,
+                'billing_data' => $billingAddressApi,
+                'shipping_data' => $shippingAddressApi,
                 'relay_id' => $this->relayId,
                 'vat_number' => $this->customerVatNumber,
             ]);

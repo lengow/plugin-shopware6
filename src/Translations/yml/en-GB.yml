@@ -241,6 +241,7 @@ en:
         extra: "Order JSON format"
         status_yes: "Yes"
         status_no: "No"
+        not_provided: "Not provided by the marketplace"
       setting:
         nav_bar:
           title: "Settings"
