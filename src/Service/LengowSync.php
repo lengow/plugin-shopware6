@@ -475,7 +475,7 @@ class LengowSync
         $status = null;
         $accountData = $this->lengowConnector->queryApi(
             LengowConnector::GET,
-            LengowConnector::API_PLAN,
+            LengowConnector::API_RESTRICTIONS,
             [],
             '',
             $logOutput
