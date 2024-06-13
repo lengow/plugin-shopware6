@@ -47,7 +47,6 @@ class LengowAccessTest extends TestCase
 
     public function testCheckSalesChannelWithValidId(): void
     {
-        // Define the expected sales channel ID and name
         $salesChannelId = '9f4906f1e8b14b7d86d5b7f4ebd3c57d';
         $expectedName = 'Test Channel';
 
@@ -55,17 +54,15 @@ class LengowAccessTest extends TestCase
         $salesChannelEntity->setName($expectedName);
         $salesChannelEntity->setUniqueIdentifier($salesChannelId);
 
-        // Create an EntityCollection containing the mock SalesChannelEntity
         $entityCollection = new EntityCollection([$salesChannelEntity]);
 
-        // Create an EntitySearchResult with the entity name (empty string for entity), total count, entity collection, criteria, and context
         $searchResult = new EntitySearchResult(
-            'sales_channel', // Empty string for entity name
-            $entityCollection->count(), // Total count of entities
-            $entityCollection, // Entity collection
-            null, // Facets (can be null if not used)
-            new Criteria(), // Criteria
-            Context::createDefaultContext() // Default context
+            'sales_channel',
+            $entityCollection->count(),
+            $entityCollection,
+            null,
+            new Criteria(),
+            Context::createDefaultContext()
         );
 
         $result = $searchResult->first()->getName();
