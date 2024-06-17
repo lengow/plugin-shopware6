@@ -1,105 +1,108 @@
 <?php declare(strict_types=1);
 
-namespace Lengow\Connector\tests;
+namespace Lengow\Connector\Service;
 
 use PHPUnit\Framework\TestCase;
-use Lengow\Connector\Service\LengowAccess;
-use Lengow\Connector\Service\LengowConfiguration;
 use Shopware\Core\Framework\Context;
 use Shopware\Core\Framework\DataAbstractionLayer\EntityRepository;
 use Shopware\Core\Framework\DataAbstractionLayer\Search\Criteria;
 use Shopware\Core\Framework\DataAbstractionLayer\Search\EntitySearchResult;
 use Shopware\Core\Framework\DataAbstractionLayer\EntityCollection;
-use Shopware\Core\Framework\DataAbstractionLayer\Entity;
-use PHPUnit\Framework\MockObject\MockObject;
+use Shopware\Core\Framework\Uuid\Uuid;
 use Shopware\Core\System\SalesChannel\SalesChannelEntity;
+use Shopware\Core\Test\Stub\DataAbstractionLayer\StaticEntityRepository;
 
 class LengowAccessTest extends TestCase
 {
-    /**
-     * @var LengowConfiguration|MockObject
-     */
     private $lengowConfiguration;
-
-    /**
-     * @var EntityRepository|MockObject
-     */
     private $salesChannelRepository;
-
-    /**
-     * @var LengowAccess
-     */
     private $lengowAccess;
 
     protected function setUp(): void
     {
-        $this->entityRepositoryMock = $this->createMock(EntityRepository::class);
         $this->lengowConfiguration = $this->createMock(LengowConfiguration::class);
-        $this->salesChannelRepository = $this->createMock(EntityRepository::class);
+        $this->salesChannelRepository = new StaticEntityRepository([]);
         $this->lengowAccess = new LengowAccess($this->lengowConfiguration, $this->salesChannelRepository);
     }
 
-    public function testCheckSalesChannelWithInvalidId(): void
+    public function testCheckSalesChannelWithInvalidUuid(): void
     {
         $result = $this->lengowAccess->checkSalesChannel('invalid-uuid');
         $this->assertNull($result);
     }
 
-    public function testCheckSalesChannelWithValidId(): void
+    public function testCheckSalesChannelWithValidUuidButNoMatch(): void
     {
-        $salesChannelId = '9f4906f1e8b14b7d86d5b7f4ebd3c57d';
-        $expectedName = 'Test Channel';
+        $salesChannelId = Uuid::randomHex();
+        $this->salesChannelRepository = new StaticEntityRepository([
+            new EntitySearchResult(
+                'sales_channel',
+                0,
+                new EntityCollection([]),
+                null,
+                new Criteria(),
+                Context::createDefaultContext()
+            )
+        ]);
 
-        $salesChannelEntity = new SalesChannelEntity();
-        $salesChannelEntity->setName($expectedName);
-        $salesChannelEntity->setUniqueIdentifier($salesChannelId);
+        $this->lengowAccess = new LengowAccess($this->lengowConfiguration, $this->salesChannelRepository);
 
-        $entityCollection = new EntityCollection([$salesChannelEntity]);
-
-        $searchResult = new EntitySearchResult(
-            'sales_channel',
-            $entityCollection->count(),
-            $entityCollection,
-            null,
-            new Criteria(),
-            Context::createDefaultContext()
-        );
-
-        $result = $searchResult->first()->getName();
-
-        // Assert that the result matches the expected name
-        $this->assertEquals($expectedName, $result);
+        $result = $this->lengowAccess->checkSalesChannel($salesChannelId);
+        $this->assertNull($result);
     }
 
-    public function testCheckWebserviceAccessWithAuthorizedIp(): void
+    public function testCheckSalesChannelWithValidUuidAndMatch(): void
     {
-        $_SERVER['REMOTE_ADDR'] = '10.0.4.150';
-        $this->lengowConfiguration->method('get')
-            ->willReturn(false);
+        $salesChannelId = Uuid::randomHex();
+        $salesChannel = $this->createMock(SalesChannelEntity::class);
+        $salesChannel->method('getName')->willReturn('Test Channel');
+        $salesChannel->method('getId')->willReturn($salesChannelId);
 
-        $result = $this->lengowAccess->checkWebserviceAccess(null, null);
-        $this->assertTrue($result);
+        $this->salesChannelRepository = new StaticEntityRepository([
+            new EntitySearchResult(
+                'sales_channel',
+                1,
+                new EntityCollection([$salesChannel]),
+                null,
+                new Criteria(),
+                Context::createDefaultContext()
+            )
+        ]);
+
+        $this->lengowAccess = new LengowAccess($this->lengowConfiguration, $this->salesChannelRepository);
+
+        $result = $this->lengowAccess->checkSalesChannel($salesChannelId);
+        $this->assertEquals('Test Channel', $result);
     }
-
-    public function testCheckWebserviceAccessWithValidToken(): void
+    public function testCheckWebserviceAccessWithInvalidIpAndToken(): void
     {
-        $_SERVER['REMOTE_ADDR'] = '127.0.0.1';
-        $this->lengowConfiguration->method('get')
-            ->willReturn(false);
-        $this->lengowConfiguration->method('getToken')
-            ->willReturn('valid-token');
+        $_SERVER['REMOTE_ADDR'] = 'invalid-ip';
 
-        $result = $this->lengowAccess->checkWebserviceAccess('valid-token', null);
-        $this->assertTrue($result);
-    }
+        $lengowAccess = $this->getMockBuilder(LengowAccess::class)
+            ->setConstructorArgs([$this->lengowConfiguration, $this->salesChannelRepository])
+            ->onlyMethods(['checkIp'])
+            ->getMock();
 
-    public function testCheckIpWithUnauthorizedIp(): void
-    {
-        $result = $this->lengowAccess->checkIp('127.0.0.1');
+        $lengowAccess->method('checkIp')->willReturn(false);
+
+        $result = $lengowAccess->checkWebserviceAccess('invalid-token');
         $this->assertFalse($result);
     }
 
-    public function testCheckIpWithAuthorizedIp(): void
+    public function testCheckWebserviceAccessWithValidIp(): void
+    {
+        $_SERVER['REMOTE_ADDR'] = '10.0.4.150';
+        $result = $this->lengowAccess->checkWebserviceAccess();
+        $this->assertTrue($result);
+    }
+
+    public function testCheckIpWithInvalidIp(): void
+    {
+        $result = $this->lengowAccess->checkIp('invalid-ip');
+        $this->assertFalse($result);
+    }
+
+    public function testCheckIpWithValidIp(): void
     {
         $result = $this->lengowAccess->checkIp('10.0.4.150');
         $this->assertTrue($result);
@@ -107,31 +110,65 @@ class LengowAccessTest extends TestCase
 
     public function testGetAuthorizedIps(): void
     {
-        $this->lengowConfiguration->method('get')
-            ->willReturnMap([
-                [LengowConfiguration::AUTHORIZED_IPS, []],
-                [LengowConfiguration::AUTHORIZED_IP_ENABLED, true]
-            ]);
+        $customIps = ['185.61.176.142', '46.19.183.204'];
 
-        $result = $this->lengowAccess->getAuthorizedIps();
-        $this->assertContains('10.0.4.150', $result);
-    }
+        $mockConfig = $this->createMock(LengowConfiguration::class);
 
-    public function testCheckTokenWithInvalidToken(): void
-    {
-        $this->lengowConfiguration->method('getToken')
-            ->willReturn('valid-token');
+        $mockConfig->method('get')
+            ->willReturnOnConsecutiveCalls(
+                $customIps,
+                true
+            );
 
-        $result = $this->lengowAccess->checkToken('invalid-token');
-        $this->assertFalse($result);
+        $lengowAccess = new LengowAccess($mockConfig, $this->salesChannelRepository);
+
+        $result = $lengowAccess->getAuthorizedIps();
+
+        foreach ($customIps as $ip) {
+            $this->assertContains($ip, $result);
+        }
     }
 
     public function testCheckTokenWithValidToken(): void
     {
-        $this->lengowConfiguration->method('getToken')
-            ->willReturn('valid-token');
+        $salesChannelId = Uuid::randomHex();
+        $tokenFromConfig = 'valid-token';
+        $tokenToCheck = 'valid-token';
 
-        $result = $this->lengowAccess->checkToken('valid-token');
+        // Créer un mock pour LengowConfiguration
+        $mockConfig = $this->createMock(LengowConfiguration::class);
+        $mockConfig->method('getToken')
+            ->willReturn($tokenFromConfig);
+
+        // Créer une instance de LengowAccess avec le mock de LengowConfiguration
+        $lengowAccess = new LengowAccess($mockConfig, $this->salesChannelRepository);
+
+        // Appeler la méthode à tester avec un token valide
+        $result = $lengowAccess->checkToken($tokenToCheck, $salesChannelId);
+
+        // Vérifier que la méthode retourne true lorsque les tokens correspondent
         $this->assertTrue($result);
     }
+
+    public function testCheckTokenWithInvalidToken(): void
+    {
+        $salesChannelId = Uuid::randomHex();
+        $tokenFromConfig = 'valid-token';
+        $tokenToCheck = 'invalid-token';
+
+        // Créer un mock pour LengowConfiguration
+        $mockConfig = $this->createMock(LengowConfiguration::class);
+        $mockConfig->method('getToken')
+            ->willReturn($tokenFromConfig);
+
+        // Créer une instance de LengowAccess avec le mock de LengowConfiguration
+        $lengowAccess = new LengowAccess($mockConfig, $this->salesChannelRepository);
+
+        // Appeler la méthode à tester avec un token invalide
+        $result = $lengowAccess->checkToken($tokenToCheck, $salesChannelId);
+
+        // Vérifier que la méthode retourne false lorsque les tokens ne correspondent pas
+        $this->assertFalse($result);
+    }
+
 }
