@@ -135,18 +135,14 @@ class LengowAccessTest extends TestCase
         $tokenFromConfig = 'valid-token';
         $tokenToCheck = 'valid-token';
 
-        // Créer un mock pour LengowConfiguration
         $mockConfig = $this->createMock(LengowConfiguration::class);
         $mockConfig->method('getToken')
             ->willReturn($tokenFromConfig);
 
-        // Créer une instance de LengowAccess avec le mock de LengowConfiguration
         $lengowAccess = new LengowAccess($mockConfig, $this->salesChannelRepository);
 
-        // Appeler la méthode à tester avec un token valide
         $result = $lengowAccess->checkToken($tokenToCheck, $salesChannelId);
 
-        // Vérifier que la méthode retourne true lorsque les tokens correspondent
         $this->assertTrue($result);
     }
 
@@ -156,18 +152,13 @@ class LengowAccessTest extends TestCase
         $tokenFromConfig = 'valid-token';
         $tokenToCheck = 'invalid-token';
 
-        // Créer un mock pour LengowConfiguration
         $mockConfig = $this->createMock(LengowConfiguration::class);
         $mockConfig->method('getToken')
             ->willReturn($tokenFromConfig);
 
-        // Créer une instance de LengowAccess avec le mock de LengowConfiguration
         $lengowAccess = new LengowAccess($mockConfig, $this->salesChannelRepository);
-
-        // Appeler la méthode à tester avec un token invalide
         $result = $lengowAccess->checkToken($tokenToCheck, $salesChannelId);
 
-        // Vérifier que la méthode retourne false lorsque les tokens ne correspondent pas
         $this->assertFalse($result);
     }
 
