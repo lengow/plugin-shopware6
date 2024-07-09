@@ -1,9 +1,9 @@
 # Lengow for Shopware 6
 
-- **Requires at least:** Shopware 6.4
-- **Tested up to:** Shopware 6.5.8
+- **Requires at least:** Shopware 6.5
+- **Tested up to:** Shopware 6.6.2.0
 - **Requires PHP:** 7.4
-- **Stable tag:** 1.2.0
+- **Stable tag:** 2.0.0
 - **License:** MIT
 - **License URI:** https://opensource.org/licenses/MIT
 
@@ -19,7 +19,7 @@ Major features in Lengow include:
 
 - Easily import your product data from your cms
 - Use Lengow to target and exclude the right products for the right channels and tools (marketplaces, price comparison engines, product ads, retargeting, affiliation) and automate the process of product diffusion.
-- Manipulate your feeds (categories, titles, descriptions, rules…) - no need for technical knowledge.
+- Manipulate your feeds (categories, titles, descriptions, rules�) - no need for technical knowledge.
 - Lengow takes care of the centralisation of orders received from marketplaces and synchronises inventory data with your backoffice. Track your demands accurately and set inventory rules to avoid running out of stock.
 - Monitor and control your ecommerce activity using detailed, yet easy to understand graphs and statistics. Track clicks, sales, CTR, ROI and tweak your campaigns with automatic rules according to your cost of sales / profitability targets.
 - Thanks to our API, Lengow is compatible with many applications so you can access the functionality of all your ecommerce tools on a single platform. There are already more than 40 available applications: marketing platform, translation, customer review, email, merchandise, price watch, web-to-store, product recommendation and many more

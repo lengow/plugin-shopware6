@@ -2,6 +2,7 @@ import template from './lgw-connection-catalog.html.twig';
 
 const {
     Component,
+    Filter,
     Data: { Criteria }
 } = Shopware;
 const { mapState } = Shopware.Component.getComponentHelper();
@@ -31,12 +32,17 @@ Component.register('lgw-connection-catalog', {
     computed: {
         ...mapState('lgwConnection', ['catalogList', 'catalogSelected', 'optionIsLoading']),
 
+        assetFilter() {
+            return Filter.getByName('asset');
+        },
+
         salesChannelRepository() {
             return this.repositoryFactory.create('sales_channel');
         }
     },
 
     created() {
+        this.assetFilter();
         this.createdComponent();
     },
 

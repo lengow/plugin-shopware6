@@ -3,7 +3,8 @@ import './lgw-country-icon.scss';
 
 const {
     Component,
-    Data: { Criteria }
+    Data: { Criteria },
+    Filter,
 } = Shopware;
 
 Component.register('lgw-country-icon', {
@@ -31,12 +32,16 @@ Component.register('lgw-country-icon', {
     },
 
     computed: {
+        assetFilter() {
+            return Filter.getByName('asset');
+        },
         countryRepository() {
             return this.repositoryFactory.create('country');
         }
     },
 
     created() {
+        this.assetFilter();
         this.createdComponent();
     },
 

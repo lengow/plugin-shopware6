@@ -9,7 +9,7 @@ const {
 Component.register('lgw-setting-import', {
     template,
 
-    inject: ['repositoryFactory'],
+    inject: ['repositoryFactory','LengowConnectorSyncService'],
 
     props: {
         config: {
@@ -18,6 +18,10 @@ Component.register('lgw-setting-import', {
             default: {}
         },
         onSaveSettings: {
+            type: Object,
+            required: true
+        },
+        onChangeStatus: {
             type: Object,
             required: true
         }
@@ -118,6 +122,14 @@ Component.register('lgw-setting-import', {
             shippingMethodCriteria.addFilter(Criteria.equals('id', defaultShippingMethodId));
             return this.shippingMethodRepository.search(shippingMethodCriteria, Shopware.Context.api).then(result => {
                 return result.total !== 0 ? result.first().id : 'Not found';
+            });
+        },
+
+        onChangeStatus(event, key) {
+            this.LengowConnectorSyncService.onChangeStatus().then(result => {
+                if (!result.success) {
+                    console.error("Failure to change value :", result.error);
+                }
             });
         }
     }

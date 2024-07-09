@@ -1,3 +1,21 @@
+# v2.0.0
+- Bugfix: [Symfony] Change annotation route to attribute route
+- Bugfix: [VueJs] Fix template not display
+- Bugfix: [VueJs] Fix Vuejs comptability for v2 and v3
+- Bugfix: [VueJs] Fix grid for order and product page with replace sw-select-selection-list by sw-data-grid component
+- Bugfix: [VueJs] Fix filter for date and image in template
+- Bugfix: [VueJs] Fix lgw-lockable-string-field not reactive
+- Bugfix: [Action] Fix no name for delivery state for getTechnicalName() in deliveryOrder when status order is changed for send action
+- Bugfix: [Export] Fix wrong value for delivery delay by product
+- Feature: Remove Tracker from plugin
+
+# v1.2.1
+- Bugfix: [install] Fix uninstall plugin when user want delete all data
+- Bugfix: [install] Fix wrong definition of cron url and toolbox url
+- Bugfix: [toolbox] Fix modified files feature
+- Feature: Add return_tracking_number and return_carrier field if is optional argument and send this data in order action
+- Feature: Add compatibility for Shopware 6.5.8
+
 # v1.2.0
 - Bugfix: [import] fix add product to Shopware Cart
 - Bugfix: [action] Fix id Action is not integer
@@ -15,7 +33,7 @@
 - Feature: get details of modified file in toolbox
 
 # v1.1.2
-- Bugfix: [import] fix search carrier code 
+- Bugfix: [import] fix search carrier code
 
 # v1.1.1
 - Feature: Adding the PHP version in the toolbox

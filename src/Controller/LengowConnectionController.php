@@ -12,11 +12,7 @@ use Lengow\Connector\Service\LengowConnector;
 use Lengow\Connector\Service\LengowLog;
 use Lengow\Connector\Service\LengowSync;
 
-/**
- * Class LengowConnectionController
- * @package Lengow\Connector\Controller
- * @Route(defaults={"_routeScope"={"api"}})
- */
+#[Route(defaults: ['_routeScope' => ['api']])]
 class LengowConnectionController extends AbstractController
 {
     /**
@@ -68,20 +64,9 @@ class LengowConnectionController extends AbstractController
         $this->lengowSync = $lengowSync;
     }
 
-    /**
-     * Check API credentials and save them in Database
-     *
-     * @Route("/api/_action/lengow/connection/check-api-credentials",
-     *     name="api.action.lengow.connection.check-api-credentials",
-     *     methods={"POST"})
-     * @Route("/api/v{version}/_action/lengow/connection/FF",
-     *     name="api.action.lengow.connection.check-api-credentials-old",
-     *     methods={"POST"})
-     *
-     * @param Request $request
-     *
-     * @return JsonResponse
-     */
+    //Check API credentials and save them in Database
+    #[Route('/api/_action/lengow/connection/check-api-credentials', name: 'api.action.lengow.connection.check-api-credentials', methods: ['POST'])]
+    #[Route('/api/v{version}/_action/lengow/connection/FF', name: 'api.action.lengow.connection.check-api-credentials-old', methods: ['POST'])]
     public function checkApiCredentials(Request $request): JsonResponse
     {
         $accessIdsSaved = false;
@@ -100,18 +85,9 @@ class LengowConnectionController extends AbstractController
         ]);
     }
 
-    /**
-     * Connect cms with Lengow
-     *
-     * @Route("/api/_action/lengow/connection/connect-cms",
-     *     name="api.action.lengow.connection.connect-cms",
-     *     methods={"GET"})
-     * @Route("/api/v{version}/_action/lengow/connection/connect-cms",
-     *     name="api.action.lengow.connection.connect-cms-old",
-     *     methods={"GET"})
-     *
-     * @return JsonResponse
-     */
+    //Connect cms with Lengow
+    #[Route('/api/_action/lengow/connection/connect-cms', name: 'api.action.lengow.connection.connect-cms', methods: ['GET'])]
+    #[Route('/api/v{version}/_action/lengow/connection/connect-cms', name: 'api.action.lengow.connection.connect-cms-old', methods: ['GET'])]
     public function connectCms(): JsonResponse
     {
         $cmsConnected = false;
@@ -145,18 +121,9 @@ class LengowConnectionController extends AbstractController
         ]);
     }
 
-    /**
-     * Get all catalogs available in Lengow
-     *
-     * @Route("/api/_action/lengow/connection/get-catalog-list",
-     *     name="api.action.lengow.connection.get-catalog-list",
-     *     methods={"GET"})
-     * @Route("/api/v{version}/_action/lengow/connection/get-catalog-list",
-     *     name="api.action.lengow.connection.get-catalog-list-old",
-     *     methods={"GET"})
-     *
-     * @return JsonResponse
-     */
+    //Get all catalogs available in Lengow
+    #[Route('/api/_action/lengow/connection/get-catalog-list', name: 'api.action.lengow.connection.get-catalog-list', methods: ['GET'])]
+    #[Route('/api/v{version}/_action/lengow/connection/get-catalog-list', name: 'api.action.lengow.connection.get-catalog-list-old', methods: ['GET'])]
     public function getCatalogList(): JsonResponse
     {
         $LengowActiveSalesChannels = $this->lengowConfiguration->getLengowActiveSalesChannels();
@@ -169,20 +136,9 @@ class LengowConnectionController extends AbstractController
         return new JsonResponse($catalogList);
     }
 
-    /**
-     * Save catalogs linked in database and send data to Lengow with call API
-     *
-     * @Route("/api/_action/lengow/connection/save-catalogs-linked",
-     *     name="api.action.lengow.connection.save-catalogs-linked",
-     *     methods={"POST"})
-     * @Route("/api/v{version}/_action/lengow/connection/save-catalogs-linked",
-     *     name="api.action.lengow.connection.save-catalogs-linked-old",
-     *     methods={"POST"})
-     *
-     * @param Request $request
-     *
-     * @return JsonResponse
-     */
+    //Save catalogs linked in database and send data to Lengow with call API
+    #[Route('/api/_action/lengow/connection/save-catalogs-linked', name: 'api.action.lengow.connection.save-catalogs-linked', methods: ['POST'])]
+    #[Route('/api/v{version}/_action/lengow/connection/save-catalogs-linked', name: 'api.action.lengow.connection.save-catalogs-linked-old', methods: ['POST'])]
     public function saveCatalogsLinked(Request $request): JsonResponse
     {
         $catalogsLinked = true;

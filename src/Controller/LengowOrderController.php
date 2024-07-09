@@ -16,11 +16,7 @@ use Lengow\Connector\Service\LengowLog;
 use Lengow\Connector\Service\LengowOrder;
 use Lengow\Connector\Service\LengowOrderError;
 
-/**
- * Class LengowOrderController
- * @package Lengow\Connector\Controller
- * @Route(defaults={"_routeScope"={"api"}})
- */
+#[Route(defaults: ['_routeScope' => ['api']])]
 class LengowOrderController extends AbstractController
 {
     /**
@@ -72,18 +68,9 @@ class LengowOrderController extends AbstractController
         $this->lengowAction = $lengowAction;
     }
 
-    /**
-     * Synchronise all orders
-     *
-     * @Route("/api/_action/lengow/order/synchronise-orders",
-     *     name="api.action.lengow.order.synchronise-order",
-     *     methods={"GET"})
-     * @Route("/api/v{version}/_action/lengow/order/synchronise-orders",
-     *     name="api.action.lengow.order.synchronise-order-old",
-     *     methods={"GET"})
-     *
-     * @return JsonResponse
-     */
+    //Synchronise all orders
+    #[Route('/api/_action/lengow/order/synchronise-orders', name: 'api.action.lengow.order.synchronise-order', methods: ['GET'])]
+    #[Route('/api/v{version}/_action/lengow/order/synchronise-orders', name: 'api.action.lengow.order.synchronise-order-old', methods: ['GET'])]
     public function synchroniseOrders(): JsonResponse
     {
         $this->lengowImport->init();
@@ -92,19 +79,9 @@ class LengowOrderController extends AbstractController
         return new JsonResponse($messages);
     }
 
-    /**
-     * re-synchronise specific order
-     *
-     * @Route("/api/_action/lengow/order/re-synchronise-order",
-     *     name="api.action.lengow.order.re-synchronise-order",
-     *     methods={"POST"})
-     * @Route("/api/v{version}/_action/lengow/order/re-synchronise-order",
-     *     name="api.action.lengow.order.re-synchronise-order-old",
-     *     methods={"POST"})
-     *
-     * @param Request $request
-     * @return JsonResponse
-     */
+    //re-synchronise specific order
+    #[Route('/api/_action/lengow/order/re-synchronise-order', name: 'api.action.lengow.order.re-synchronise-order', methods: ['POST'])]
+    #[Route('/api/v{version}/_action/lengow/order/re-synchronise-order', name: 'api.action.lengow.order.re-synchronise-order-old', methods: ['POST'])]
     public function reSynchroniseOrder(Request $request): JsonResponse
     {
         $orderId = $request->get('orderId');
@@ -128,21 +105,9 @@ class LengowOrderController extends AbstractController
         ]);
     }
 
-    /**
-     * Re-import a specific order
-     *
-     * @Route("/api/_action/lengow/order/reimport-order",
-     *     defaults={"auth_enabled"=true},
-     *     name="api.action.lengow.order.reimport-order",
-     *     methods={"POST"})
-     * @Route("/api/v{version}/_action/lengow/order/reimport-order",
-     *     defaults={"auth_enabled"=true},
-     *     name="api.action.lengow.order.reimport-order-old",
-     *     methods={"POST"})
-     *
-     * @param Request $request
-     * @return JsonResponse
-     */
+    //Re-import a specific order
+    #[Route('/api/_action/lengow/order/reimport-order', defaults: ['auth_enabled' => true], name: 'api.action.lengow.order.reimport-order', methods: ['POST'])]
+    #[Route('/api/v{version}/_action/lengow/order/reimport-order', defaults: ['auth_enabled' => true], name: 'api.action.lengow.order.reimport-order-old', methods: ['POST'])]
     public function reImportOrder(Request $request): JsonResponse
     {
         $result = false;
@@ -155,21 +120,9 @@ class LengowOrderController extends AbstractController
         ]);
     }
 
-    /**
-     * Re-import a specific failed order
-     *
-     * @Route("/api/_action/lengow/order/reimport-failed-order",
-     *     defaults={"auth_enabled"=true},
-     *     name="api.action.lengow.order.reimport-failed-order",
-     *     methods={"POST"})
-     * @Route("/api/v{version}/_action/lengow/order/reimport-failed-order",
-     *     defaults={"auth_enabled"=true},
-     *     name="api.action.lengow.order.reimport-failed-order-old",
-     *     methods={"POST"})
-     *
-     * @param Request $request
-     * @return JsonResponse
-     */
+    //Re-import a specific failed order
+    #[Route('/api/_action/lengow/order/reimport-failed-order', defaults: ['auth_enabled' => true], name: 'api.action.lengow.order.reimport-failed-order', methods: ['POST'])]
+    #[Route('/api/v{version}/_action/lengow/order/reimport-failed-order', defaults: ['auth_enabled' => true], name: 'api.action.lengow.order.reimport-failed-order-old', methods: ['POST'])]
     public function reImportFailedOrder(Request $request): JsonResponse
     {
         $success = false;
@@ -213,21 +166,9 @@ class LengowOrderController extends AbstractController
         ]);
     }
 
-    /**
-     * Re-send an action for an order
-     *
-     * @Route("/api/_action/lengow/order/resend-action",
-     *     defaults={"auth_enabled"=true},
-     *     name="api.action.lengow.order.resend-action",
-     *     methods={"POST"})
-     * @Route("/api/v{version}/_action/lengow/order/resend-action",
-     *     defaults={"auth_enabled"=true},
-     *     name="api.action.lengow.order.resend-action-old",
-     *     methods={"POST"})
-     *
-     * @param Request $request
-     * @return JsonResponse
-     */
+    //Re-send an action for an order
+    #[Route('/api/_action/lengow/order/resend-action', defaults: ['auth_enabled' => true], name: 'api.action.lengow.order.resend-action', methods: ['POST'])]
+    #[Route('/api/v{version}/_action/lengow/order/resend-action', defaults: ['auth_enabled' => true], name: 'api.action.lengow.order.resend-action-old', methods: ['POST'])]
     public function reSendAction(Request $request): JsonResponse
     {
         $result = false;
@@ -240,21 +181,9 @@ class LengowOrderController extends AbstractController
         ]);
     }
 
-    /**
-     * Re-import a list of orders
-     *
-     * @Route("/api/_action/lengow/order/mass-reimport-orders",
-     *     defaults={"auth_enabled"=true},
-     *     name="api.action.lengow.order.mass-reimport-orders",
-     *     methods={"POST"})
-     * @Route("/api/v{version}/_action/lengow/order/mass-reimport-orders",
-     *     defaults={"auth_enabled"=true},
-     *     name="api.action.lengow.order.mass-reimport-orders-old",
-     *     methods={"POST"})
-     *
-     * @param Request $request
-     * @return JsonResponse
-     */
+    //Re-import a list of orders
+    #[Route('/api/_action/lengow/order/mass-reimport-orders', defaults: ['auth_enabled' => true], name: 'api.action.lengow.order.mass-reimport-orders', methods: ['POST'])]
+    #[Route('/api/v{version}/_action/lengow/order/mass-reimport-orders', defaults: ['auth_enabled' => true], name: 'api.action.lengow.order.mass-reimport-orders-old', methods: ['POST'])]
     public function massReImportOrders(Request $request): JsonResponse
     {
         $orderNew = 0;
@@ -272,21 +201,9 @@ class LengowOrderController extends AbstractController
         return new JsonResponse($messages);
     }
 
-    /**
-     * Re-send a list of actions
-     *
-     * @Route("/api/_action/lengow/order/mass-resend-actions",
-     *     defaults={"auth_enabled"=true},
-     *     name="api.action.lengow.order.mass-resend-actions",
-     *     methods={"POST"})
-     *  @Route("/api/v{version}/_action/lengow/order/mass-resend-actions",
-     *     defaults={"auth_enabled"=true},
-     *     name="api.action.lengow.order.mass-resend-actions-old",
-     *     methods={"POST"})
-     *
-     * @param Request $request
-     * @return JsonResponse
-     */
+    //Re-send a list of actions
+    #[Route('/api/_action/lengow/order/mass-resend-actions', defaults: ['auth_enabled' => true], name: 'api.action.lengow.order.mass-resend-actions', methods: ['POST'])]
+    #[Route('/api/v{version}/_action/lengow/order/mass-resend-actions', defaults: ['auth_enabled' => true], name: 'api.action.lengow.order.mass-resend-actions-old', methods: ['POST'])]
     public function massReSendActions(Request $request): JsonResponse
     {
         $actionSuccess = 0;
@@ -305,18 +222,9 @@ class LengowOrderController extends AbstractController
         return new JsonResponse($messages);
     }
 
-    /**
-     * Get all available marketplaces for filter
-     *
-     * @Route("/api/_action/lengow/order/get-available-marketplaces",
-     *     name="api.action.lengow.order.get-available-marketplaces",
-     *     methods={"GET"})
-     * @Route("/api/v{version}/_action/lengow/order/get-available-marketplaces",
-     *     name="api.action.lengow.order.get-available-marketplaces-old",
-     *     methods={"GET"})
-     *
-     * @return JsonResponse
-     */
+    //Get all available marketplaces for filter
+    #[Route('/api/_action/lengow/order/get-available-marketplaces', name: 'api.action.lengow.order.get-available-marketplaces', methods: ['GET'])]
+    #[Route('/api/v{version}/_action/lengow/order/get-available-marketplaces', name: 'api.action.lengow.order.get-available-marketplaces-old', methods: ['GET'])]
     public function getAvailableMarketplaces(): JsonResponse
     {
         $availableMarketplaces = [];
@@ -330,21 +238,9 @@ class LengowOrderController extends AbstractController
         return new JsonResponse($availableMarketplaces);
     }
 
-    /**
-     * Get all order error messages
-     *
-     * @Route("/api/_action/lengow/order/get-order-errors",
-     *     defaults={"auth_enabled"=true},
-     *     name="api.action.lengow.order.get-order-errors",
-     *     methods={"POST"})
-     * @Route("/api/v{version}/_action/lengow/order/get-order-errors",
-     *     defaults={"auth_enabled"=true},
-     *     name="api.action.lengow.order.get-order-errors-old",
-     *     methods={"POST"})
-     *
-     * @param Request $request
-     * @return JsonResponse
-     */
+    //Get all order error messages
+    #[Route('/api/_action/lengow/order/get-order-errors', defaults: ['auth_enabled' => true], name: 'api.action.lengow.order.get-order-errors', methods: ['POST'])]
+    #[Route('/api/v{version}/_action/lengow/order/get-order-errors', defaults: ['auth_enabled' => true], name: 'api.action.lengow.order.get-order-errors-old', methods: ['POST'])]
     public function getOrderErrors(Request $request): JsonResponse
     {
         $orderErrorMessages = [];

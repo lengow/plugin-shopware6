@@ -26,7 +26,7 @@
                     <!-- Sales channel selector -->
                     {% block lgw_product_list_choose_sales_channel %}
                         <div class="sw-system-config__global-sales-channel-switch">
-                            <sw-sales-channel-switch  ref="lgwSalesChannelSwitch" @change-sales-channel-id="onSalesChannelChanged">
+                            <sw-sales-channel-switch ref="lgwSalesChannelSwitch" @change-sales-channel-id="onSalesChannelChanged">
                             </sw-sales-channel-switch>
                         </div>
                     {% endblock %}
@@ -67,7 +67,9 @@
                                 <sw-switch-field class="text-center"
                                                  v-model="productSelection"
                                                  :label="$tc('lengow-connector.product.activate_selection_label')"
-                                                 @change="onActivateSelection">
+                                                @update:value="onActivateSelection"
+                                                @change="onActivateSelection"
+                                >
                                 </sw-switch-field>
                             </div>
                             <hr /><br/>
@@ -76,20 +78,20 @@
                     {% block lgw_product_list_content_section %}
                         <div class="lgw-product-grid"  v-if="(salesChannelSelected && productSelection)">
                             {% block lgw_product_list_content_grid %}
-                                <sw-entity-listing ref="swProductGrid"
-                                                   :items="products"
+                                <sw-data-grid
+                                                    ref="swProductGrid"
+                                                    :dataSource="products"
                                                    :columns="productColumns"
                                                    :repository="productRepository"
                                                    detailRoute="sw.product.detail"
                                                    :showSelection="true"
                                                    :isLoading="isLoading"
                                                    @column-sort="onStartSorting"
-                                                   @selection-change="updateSelection"
-                                                   @update-records="onColumnSort">
+                                                   @selections="updateSelection"
+                                                   @update-records="onColumnSort"
+                                >
                                     <template #delete-action>
                                         <span></span> <!-- Remove delete action from entity listing -->
-                                    </template>
-                                    <template #>
                                     </template>
                                     <template slot="bulk">
                                         {% block sw_data_grid_bulk_selected_count %}
@@ -133,7 +135,9 @@
                                                                 class="lgw-no-background"
                                                                 v-model="item.extensions.activeInLengow.active"
                                                                 :label="$tc('lengow-connector.product.column.activate')"
-                                                                @change="OnActivateOnLengow({ item })"></sw-switch-field>
+                                                                @update:value="OnActivateOnLengow({ item })"
+                                                                @change="OnActivateOnLengow({ item })"
+                                                        ></sw-switch-field>
                                                     </template>
                                                 {% endblock %}
                                             </template>
@@ -156,7 +160,7 @@
                                             </template>
                                         {% endblock %}
                                     {% endblock %}
-                                </sw-entity-listing>
+                                </sw-data-grid>
                             {% endblock %}
                             {% block lgw_product_list_grid_loader %}
                                 <sw-loader v-if="isLoading || !salesChannelSelected"></sw-loader>
@@ -185,7 +189,9 @@
                                                 v-model="activeFilterText"
                                                 :options="isActiveOptions"
                                                 :label="$tc('lengow-connector.product.filter.active_filter_label')"
-                                                @change="onActiveFilter">
+                                                @update:value="onActiveFilter"
+                                                @change="onActiveFilter"
+                                        >
                                         </sw-single-select>
                                     {% endblock %}
                                     {% block lgw_product_list_sidebar_filter_stock %}
@@ -193,7 +199,9 @@
                                                 v-model="stockFilterText"
                                                 :options="isWithStockOptions"
                                                 :label="$tc('lengow-connector.product.filter.stock_filter_label')"
-                                                @change="onStockFilter">
+                                                @update:value="onStockFilter"
+                                                @change="onStockFilter"
+                                        >
                                         </sw-single-select>
                                     {% endblock %}
                                 {% endblock %}

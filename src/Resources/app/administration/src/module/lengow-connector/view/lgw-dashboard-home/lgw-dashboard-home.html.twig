@@ -4,7 +4,7 @@
             <div class="lgw-container">
                 <div class="lgw-row">
                     <div class="lgw-box lgw-dashboard-home-header text-center">
-                        <img :src="'lengowconnector/lengow-white-big.png' | asset" alt="lengow" class="img-responsive">
+                        <img :src="assetFilter('lengowconnector/lengow-white-big.png')" alt="lengow" class="img-responsive">
                         <h1>{{ $tc('lengow-connector.dashboard.banner.title') }}</h1>
                         <sw-button :disabled="false"
                                    :square="false"
@@ -21,7 +21,7 @@
                     <div class="lgw-col-4 lgw-box-link lgw-left-block">
                         <routerLink :to="{ name: 'lengow.connector.product' }" tag='span'>
                             <div class="lgw-box">
-                                <img :src="'lengowconnector/home-products.png' | asset" class="img-responsive">
+                                <img :src="assetFilter('lengowconnector/home-products.png')" class="img-responsive">
                                 <h2>{{ $tc('lengow-connector.dashboard.products.title') }}</h2>
                                 <p>{{ $tc('lengow-connector.dashboard.products.desc') }}</p>
                             </div>
@@ -30,7 +30,7 @@
                     <div class="lgw-col-4 lgw-box-link">
                         <routerLink :to="{ name: 'lengow.connector.order' }" tag='span'>
                             <div class="lgw-box">
-                                <img :src="'lengowconnector/home-orders.png' | asset" class="img-responsive">
+                                <img :src="assetFilter('lengowconnector/home-orders.png')" class="img-responsive">
                                 <h2>{{ $tc('lengow-connector.dashboard.orders.title') }}</h2>
                                 <p>{{ $tc('lengow-connector.dashboard.orders.desc') }}</p>
                             </div>
@@ -39,7 +39,7 @@
                     <div class="lgw-col-4 lgw-box-link lgw-right-block">
                         <routerLink :to="{ name: 'lengow.connector.setting' }" tag='span'>
                             <div class="lgw-box">
-                                <img :src="'lengowconnector/home-settings.png' | asset" class="img-responsive">
+                                <img :src="assetFilter('lengowconnector/home-settings.png')" class="img-responsive">
                                 <h2>{{ $tc('lengow-connector.dashboard.settings.title') }}</h2>
                                 <p>{{ $tc('lengow-connector.dashboard.settings.desc') }}</p>
                             </div>

@@ -204,6 +204,9 @@ de:
           action_ship_sent: "Versand-Aktion gesendet"
           action_cancel_sent: "Stornierungs-Aktion gesendet"
           action_waiting_return: "Aktion gesendet, warten auf Antwort"
+        action_data:
+          return_tracking_number: "Rücksendungsverfolgungsnummer"
+          return_carrier: "Rückgabeträger"
       order_tab:
         title: "Lengow Bestell-Detailseite"
         order_id: "Bestellungs-ID"
@@ -248,7 +251,7 @@ de:
           environment: "Umgebung"
           credentials: "Anmeldeinformationen"
           sales_channel: "Verkaufskanäle"
-          security: "Sicherheit & Tracker"
+          security: "Sicherheit"
           timezone: "Zeitzone"
           exclusions: "Ausschlüsse"
           shipping: "Standard-Versandmethode"
@@ -283,15 +286,6 @@ de:
           ip:
             label: "Autorisierte IP-Adressen"
             description: "Zugang zum Export Feed für die folgende IP-Adressen freigeben.\nGetrennt durch ;"
-          tracking_enable:
-            label: "Aktivieren Sie den Lengow-Tracker"
-            description: "Mit diesem Tracker können Sie die auf Ihrer Website generierten Bestellstatistiken direkt in Lengow abrufen."
-          tracking_id:
-            label: "Tracker Product ID"
-            description: "Der Name der eindeutigen Kennung, die in Lengow angegeben ist"
-          tracking_value:
-            traking_id: "Produkt-ID"
-            traking_reference: "Produktnummer"
           timezone:
             label: "Timezone"
             description: "Wählen Sie Ihre entsprechende Zeitzone aus. Wählen Sie diese mit Bedacht aus, da diese Zeitzone beim Importieren von Bestellungen aus der Lengow-API verwendet wird"
@@ -316,6 +310,9 @@ de:
           decrease_stock:
             label: "Lagerbestand verringern für Bestellungen, die durch einen Marktplatz versandt werden"
             description: "Verwenden Sie diese Option, damit Bestellungen auf Marktplätzen in Ihrem Shopware-Backoffice miteinbezogen werden"
+          return_tracking_number:
+            label: "Erstellen oder Löschen des Feldes für die Trackingnummer von Rücksendungen"
+            description: "Aktivieren Sie diese Option, um ein Feld zu generieren, in dem der Wert der Trackingnummer für die Rücksendung ausgefüllt und beim Versand der Bestellung gesendet werden kann."
           shipping:
             label: "Standard-Versandmethode"
             description: "Wählen Sie die Standardversandmethode, die Sie auf Ihre Bestellungen anwenden möchten"

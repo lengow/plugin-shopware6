@@ -1,11 +1,9 @@
 import template from './lgw-setting-general.html.twig';
 import './lgw-setting-general.scss';
-
 const {
     Component,
     Data: { Criteria }
 } = Shopware;
-
 Component.register('lgw-setting-general', {
     template,
 
@@ -37,11 +35,9 @@ Component.register('lgw-setting-general', {
             lengowEnvironmentUrl: '.io',
             lengowIpEnabled: false,
             lengowAuthorizedIp: '',
-            lengowTrackingEnabled: false,
-            lengowTrackingId: '',
             lengowTimezone: '',
             credentialLocked: true,
-            render: false
+            render: false,
         };
     },
 
@@ -66,8 +62,6 @@ Component.register('lgw-setting-general', {
         this.lengowEnvironmentUrl = this.config.lengowEnvironmentUrl.value;
         this.lengowIpEnabled = this.config.lengowIpEnabled.value === '1';
         this.lengowAuthorizedIp = this.config.lengowAuthorizedIp.value;
-        this.lengowTrackingEnabled = this.config.lengowTrackingEnabled.value === '1';
-        this.lengowTrackingId = this.config.lengowTrackingId.value;
         this.lengowTimezone = this.config.lengowTimezone.value;
         this.credentialLocked = this.config.lengowDebugEnabled.value === '1';
     },
@@ -99,6 +93,10 @@ Component.register('lgw-setting-general', {
             return this.config.lengowStoreEnabled.some(
                 elem => elem.salesChannel.id === salesChannelId && elem.value === '1'
             );
+        },
+
+        onSwitchChange(newValue) {
+            this.lengowIpEnabled = newValue;
         }
     }
 });

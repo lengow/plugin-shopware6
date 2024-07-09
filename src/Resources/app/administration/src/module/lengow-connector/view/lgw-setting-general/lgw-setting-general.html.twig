@@ -7,10 +7,12 @@
                               :width="200"
                               tooltipPosition="right">
                 </sw-help-text>
-                <sw-select-field  class="text-center"
+                <sw-select-field class="text-center"
                                   :label="$tc('lengow-connector.setting.lengow_main_setting.environment.label')"
                                   v-model="lengowEnvironmentUrl"
-                                  @change="onSaveSettings($event, 'lengowEnvironmentUrl')">
+                                  @change="onSaveSettings($event, 'lengowEnvironmentUrl')"
+                                  @update:value="onSaveSettings($event, 'lengowEnvironmentUrl')"
+                >
                     <option value=".net">Preprod</option>
                     <option value=".io">Prod</option>
                 </sw-select-field >
@@ -51,6 +53,7 @@
                             v-if="render"
                             v-for="salesChannel in salesChannels"
                             switchSettingsKey="lengowStoreEnabled"
+                            :fieldContent.sync="salesChannel.catalogId"
                             fieldSettingsKey="lengowCatalogId"
                             :settingsSalesChannelId="salesChannel.salesChannelId"
                             :onSaveSettings="onSaveSettings"
@@ -77,7 +80,9 @@
                 <sw-switch-field class="text-center"
                                  :label="$tc('lengow-connector.setting.lengow_main_setting.ip_enable.label')"
                                  v-model="lengowIpEnabled"
-                                 @change="onSaveSettings($event, 'lengowIpEnabled')">
+                                 @update:value="onSaveSettings($event, 'lengowIpEnabled'), onSwitchChange($event)"
+                                 @change="onSaveSettings($event, 'lengowIpEnabled')"
+                >
                 </sw-switch-field>
                 <lgw-lockable-string-field :fieldContent="lengowAuthorizedIp"
                                            :locked="!lengowIpEnabled"
@@ -86,28 +91,6 @@
                                            settingsKey="lengowAuthorizedIp"
                                            :helpText="$tc('lengow-connector.setting.lengow_main_setting.ip.description')">
                 </lgw-lockable-string-field>
-                <sw-help-text class="lgw-help-text"
-                              :text="$tc('lengow-connector.setting.lengow_main_setting.tracking_enable.description')"
-                              :width="200"
-                              tooltipPosition="right">
-                </sw-help-text>
-                <sw-switch-field class="text-center"
-                                 :label="$tc('lengow-connector.setting.lengow_main_setting.tracking_enable.label')"
-                                 v-model="lengowTrackingEnabled"
-                                 @change="onSaveSettings($event, 'lengowTrackingEnabled')">
-                </sw-switch-field>
-                <sw-help-text class="lgw-help-text"
-                              :text="$tc('lengow-connector.setting.lengow_main_setting.tracking_id.description')"
-                              :width="200"
-                              tooltipPosition="right">
-                </sw-help-text>
-                <sw-select-field :label="$tc('lengow-connector.setting.lengow_main_setting.tracking_id.label')"
-                                 v-model="lengowTrackingId"
-                                 :disabled="!lengowTrackingEnabled"
-                                 @change="onSaveSettings($event, 'lengowTrackingId')">
-                    <option value="productId">{{ $tc('lengow-connector.setting.lengow_main_setting.tracking_value.traking_id') }}</option>
-                    <option value="productNumber">{{ $tc('lengow-connector.setting.lengow_main_setting.tracking_value.traking_reference') }}</option>
-                </sw-select-field>
             </sw-card>
         {% endblock %}
         {% block lgw_setting_general_timezone %}
@@ -119,7 +102,9 @@
                 <sw-select-field placeholder="Select timezone"
                                  :label="$tc('lengow-connector.setting.lengow_main_setting.timezone.label')"
                                  v-model="lengowTimezone"
-                                 @change="onSaveSettings($event, 'lengowTimezone')">
+                                @update:value="onSaveSettings($event, 'lengowTimezone')"
+                                @change="onSaveSettings($event, 'lengowTimezone')"
+                >
                     <option value="Etc/GMT+12">(GMT-12:00) International Date Line West</option>
                     <option value="Pacific/Midway">(GMT-11:00) Midway Island, Samoa</option>
                     <option value="Pacific/Honolulu">(GMT-10:00) Hawaii</option>

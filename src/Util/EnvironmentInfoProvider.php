@@ -4,6 +4,8 @@ namespace Lengow\Connector\Util;
 
 use Shopware\Core\Checkout\Payment\PaymentMethodCollection;
 use Shopware\Core\Checkout\Payment\PaymentMethodEntity;
+use Shopware\Core\Framework\DataAbstractionLayer\Search\Filter\MultiFilter;
+use Shopware\Core\Framework\DataAbstractionLayer\Search\Filter\NotFilter;
 use Shopware\Core\Kernel;
 use Shopware\Core\Framework\Context;
 use Shopware\Core\Framework\DataAbstractionLayer\EntityCollection;
@@ -11,6 +13,7 @@ use Shopware\Core\Framework\DataAbstractionLayer\EntityRepository;
 use Shopware\Core\Framework\DataAbstractionLayer\Search\Criteria;
 use Shopware\Core\Framework\DataAbstractionLayer\Search\Filter\EqualsFilter;
 use Shopware\Core\System\SalesChannel\Aggregate\SalesChannelDomain\SalesChannelDomainCollection;
+use Shopware\Core\System\SalesChannel\Aggregate\SalesChannelDomain\SalesChannelDomainEntity;
 use Shopware\Core\System\User\UserCollection;
 use Shopware\Core\System\User\UserEntity;
 use Lengow\Connector\LengowConnector;
@@ -53,7 +56,7 @@ class EnvironmentInfoProvider
     /**
      * @var string plugin version
      */
-    public const PLUGIN_VERSION = '1.2.0';
+    public const PLUGIN_VERSION = '2.0.0';
 
     /**
      * @var string Name of Lengow front controller
@@ -197,15 +200,19 @@ class EnvironmentInfoProvider
     {
         $context = Context::createDefaultContext();
         $languageId = $languageId ?? $context->getLanguageId();
+        $criteria = new Criteria();
         /** @var SalesChannelDomainCollection $salesChannelDomainCollection */
-        $salesChannelDomainCollection = $this->salesChannelDomainRepository->search(new Criteria(), $context)
+        $salesChannelDomainCollection = $this->salesChannelDomainRepository->search($criteria, $context)
             ->getEntities();
         if ($salesChannelDomainCollection->count() === 0) {
             return null;
         }
         if ($salesChannelId === null) {
             // get first domain available with default language
-            $salesChannelDomain = $salesChannelDomainCollection->filterByProperty('languageId', $languageId)->first();
+            $salesChannelDomain = $salesChannelDomainCollection->filter(function (SalesChannelDomainEntity $domain) use ($languageId) {
+                // exclude useless headless store
+                return $domain->getLanguageId() === $languageId && $domain->getUrl() !== 'default.headless0';
+            })->first();
             if ($salesChannelDomain) {
                 $baseUrl = $salesChannelDomain->getUrl();
             } else {
@@ -215,21 +222,23 @@ class EnvironmentInfoProvider
             }
         } else {
             // get domain by sales channel id and language id
-            $salesChannelDomain = $salesChannelDomainCollection->filterByProperty('salesChannelId', $salesChannelId)
-                ->filterByProperty('languageId', $languageId)
-                ->first();
+            $salesChannelDomain = $salesChannelDomainCollection->filter(function (SalesChannelDomainEntity $domain) use ($salesChannelId, $languageId) {
+                return $domain->getSalesChannelId() === $salesChannelId && $domain->getLanguageId() === $languageId && $domain->getUrl() !== 'default.headless0';
+            })->first();
             if ($salesChannelDomain) {
                 $baseUrl = $salesChannelDomain->getUrl();
             } else {
                 // get domain by sales channel id
-                $salesChannelDomain = $salesChannelDomainCollection->filterByProperty('salesChannelId', $salesChannelId)
-                    ->first();
+                $salesChannelDomain = $salesChannelDomainCollection->filter(function (SalesChannelDomainEntity $domain) use ($salesChannelId) {
+                    return $domain->getSalesChannelId() === $salesChannelId && $domain->getUrl() !== 'default.headless0';
+                })->first();
                 $baseUrl = $salesChannelDomain ? $salesChannelDomain->getUrl() : null;
             }
             if ($baseUrl === null) {
                 return $this->getBaseUrl();
             }
         }
+
         return $baseUrl;
     }
 

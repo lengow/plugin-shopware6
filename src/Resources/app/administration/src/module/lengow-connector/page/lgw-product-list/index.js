@@ -62,7 +62,7 @@ Component.register('lgw-product-list', {
             salesChannelName: '',
             salesChannelDomain: '',
             tempListActivated: [],
-            downloadLink: ''
+            downloadLink: '',
         };
     },
 
@@ -125,7 +125,6 @@ Component.register('lgw-product-list', {
                     property: `price-${item.isoCode}`,
                     dataIndex: `price.${item.id}`,
                     label: `${item.name}`,
-                    routerLink: 'lengow.export.detail',
                     allowResize: true,
                     currencyId: item.id,
                     visible: item.isSystemDefault,
@@ -309,6 +308,8 @@ Component.register('lgw-product-list', {
                     const salesChannelCriteria = new Criteria();
                     salesChannelCriteria.setIds([this.currentSalesChannelId]);
                     salesChannelCriteria.addAssociation('domains');
+
+
                     return this.salesChannelRepository
                         .search(salesChannelCriteria, Shopware.Context.api)
                         .then(salesChannelCollection => {
@@ -351,7 +352,7 @@ Component.register('lgw-product-list', {
                         product.extensions.activeInLengow.active =
                             typeof product.extensions.activeInLengow.activeArray[
                                 this.currentSalesChannelId
-                            ] !== 'undefined';
+                                ] !== 'undefined';
                     });
                     this.products = products;
                     this.baseProducts = this.products;
@@ -383,6 +384,7 @@ Component.register('lgw-product-list', {
                 .search(lengowSettingsCriteria, Shopware.Context.api)
                 .then(result => {
                     if (result.total !== 0) {
+
                         const lengowSettings = this.lengowSettingsRepository.create(Shopware.Context.api);
                         lengowSettings.id = result.first().id;
                         lengowSettings.salesChannelsId = this.currentSalesChannelId;
@@ -433,37 +435,46 @@ Component.register('lgw-product-list', {
 
         OnActivateOnLengow(selected) {
             const selectedItem = Object.values(selected)[0];
-            if (selectedItem.extensions.activeInLengow.active) {
-                const lengowProduct = this.lengowProductRepository.create(Shopware.Context.api);
-                lengowProduct.productId = selectedItem.id;
-                lengowProduct.salesChannelId = this.currentSalesChannelId;
-                this.lengowProductRepository.save(lengowProduct, Shopware.Context.api);
-                this.countLoading = true;
-                this.LengowConnectorExportService
-                    .getProductCountValue(selectedItem.id, this.currentSalesChannelId)
-                    .then(response => {
-                        if (response.success) {
-                            this.exportedCount += response.countValue;
-                        }
-                        this.countLoading = false;
-                    });
-                return;
-            }
             const lengowProductCriteria = new Criteria();
             lengowProductCriteria.addFilter(Criteria.equals('productId', selectedItem.id));
             lengowProductCriteria.addFilter(Criteria.equals('salesChannelId', this.currentSalesChannelId));
-            this.lengowProductRepository
-                .searchIds(lengowProductCriteria, Shopware.Context.api)
-                .then(result => this.lengowProductRepository.delete(result.data[0], Shopware.Context.api));
-            this.countLoading = true;
-            this.LengowConnectorExportService
-                .getProductCountValue(selectedItem.id, this.currentSalesChannelId)
-                .then(response => {
-                    if (response.success) {
-                        this.exportedCount -= response.countValue;
+
+            this.lengowProductRepository.search(lengowProductCriteria, Shopware.Context.api)
+                .then(result => {
+                    const productExists = result.total > 0;
+                    if (!productExists) {
+                        const lengowProduct = this.lengowProductRepository.create(Shopware.Context.api);
+                        lengowProduct.productId = selectedItem.id;
+                        lengowProduct.salesChannelId = this.currentSalesChannelId;
+                        return this.lengowProductRepository.save(lengowProduct, Shopware.Context.api).then(() => {
+                            this.countLoading = true;
+                            this.LengowConnectorExportService
+                                .getProductCountValue(selectedItem.id, this.currentSalesChannelId)
+                                .then(response => {
+                                    if (response.success) {
+                                        this.exportedCount += response.countValue;
+                                    }
+                                    this.countLoading = false;
+                                });
+                        });
                     }
-                    this.countLoading = false;
-                });
+                    if (productExists) {
+                        return this.lengowProductRepository.delete(result.first().id, Shopware.Context.api)
+                            .then(() => {
+                                this.countLoading = true;
+                                this.LengowConnectorExportService
+                                    .getProductCountValue(selectedItem.id, this.currentSalesChannelId)
+                                    .then(response => {
+                                        if (response.success) {
+                                            this.exportedCount -= response.countValue;
+                                        }
+                                        this.countLoading = false;
+                                    });
+                            });
+                    }
+                }).catch(error => {
+                console.error("Error:", error);
+            });
         },
 
         getCurrencyPriceByCurrencyId(currencyId, prices) {

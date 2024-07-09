@@ -1,6 +1,9 @@
 import template from './lgw-lockable-string-field.html.twig';
 
-const { Component } = Shopware;
+const {
+    Component,
+    Data: { Criteria },
+} = Shopware;
 
 Component.register('lgw-lockable-string-field', {
     template,
@@ -47,9 +50,21 @@ Component.register('lgw-lockable-string-field', {
         }
     },
 
+    watch: {
+        fieldContent(newVal) {
+            this.newFieldContent = newVal;
+        }
+    },
+
+    data(){
+        return {
+            newFieldContent: this.fieldContent
+        }
+    },
+
     methods: {
         handleChange(value) {
-            this.fieldContent = value;
+            this.newFieldContent = value;
             this.onSaveSettings(value, this.settingsKey, this.settingsSalesChannelId);
         }
     }

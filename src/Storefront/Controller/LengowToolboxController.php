@@ -12,11 +12,7 @@ use Lengow\Connector\Service\LengowLog;
 use Lengow\Connector\Service\LengowToolbox;
 use Lengow\Connector\Service\LengowTranslation;
 
-/**
- * Class LengowToolboxController
- * @package Lengow\Connector\Storefront\Controller
- * @Route(defaults={"_routeScope"={"storefront"}})
- */
+#[Route(defaults: ['_routeScope' => ['storefront']])]
 class LengowToolboxController extends LengowAbstractFrontController
 {
     /**
@@ -58,15 +54,8 @@ class LengowToolboxController extends LengowAbstractFrontController
         $this->lengowToolbox = $lengowToolbox;
     }
 
-    /**
-     * Toolbox Process
-     *
-     * @param Request $request Http request
-     *
-     * @Route("/lengow/toolbox", name="frontend.lengow.toolbox", methods={"GET"})
-     *
-     * @return Response
-     */
+    //Toolbox Process
+    #[Route('/lengow/toolbox', name: 'frontend.lengow.toolbox', methods: ['GET'])]
     public function toolbox(Request $request): Response
     {
         $accessErrorMessage = $this->checkAccess($request);

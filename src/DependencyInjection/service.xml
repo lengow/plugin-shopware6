@@ -150,6 +150,7 @@
 
         <service id="Lengow\Connector\Service\LengowProduct">
             <argument type="service" id="product.repository"/>
+            <argument type="service" id="delivery_time.repository"/>
             <argument type="service" id="Lengow\Connector\Service\LengowLog"/>
             <argument type="service" id="Lengow\Connector\Util\EnvironmentInfoProvider"/>
         </service>
@@ -177,6 +178,7 @@
         <service id="Lengow\Connector\Service\LengowTranslation">
             <argument type="service" id="Lengow\Connector\Util\EnvironmentInfoProvider"/>
         </service>
+
 
     </services>
 </container>
