@@ -41,6 +41,7 @@ Component.register('lgw-setting-import', {
             shippingMethods: [],
             render: false,
             lengowAnonymizeEmail: false,
+            lengowEncryptEmail: false
         };
     },
 
@@ -83,6 +84,7 @@ Component.register('lgw-setting-import', {
         this.lengowImportB2b = this.config.lengowImportB2b.value === '1';
         this.lengowDebugEnabled = this.config.lengowDebugEnabled.value === '1';
         this.lengowAnonymizeEmail = this.config.lengowAnonymizeEmail.value === '1';
+        this.lengowEncryptEmail = this.config.lengowEncryptEmail.value === '1';
     },
 
     computed: {

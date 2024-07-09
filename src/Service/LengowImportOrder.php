@@ -1226,8 +1226,11 @@ class LengowImportOrder
         }
 
         if ($this->lengowConfiguration->isEmailAnonymization()) {
-            list($email, $domain) = explode('@', $customerEmail, 2);
-            $customerEmail = md5($email) . '@' . $domain;
+            $domain = 'lengow.com';
+            $customerEmail = $this->marketplaceSku . '-' . $this->lengowMarketplace->getName() . '@' . $domain;
+            if ($this->lengowConfiguration->isEmailEncryption()) {
+                $customerEmail = md5($customerEmail).'@'.$domain;
+            }
         }
 
         // $this->orderData->billing_address->email

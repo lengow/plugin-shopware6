@@ -126,6 +126,15 @@
                                  v-model="lengowAnonymizeEmail"
                                  @change="onSaveSettings($event, 'lengowAnonymizeEmail')">
                 </sw-switch-field>
+                 <sw-help-text class="lgw-help-text"
+                              :text="$tc('lengow-connector.setting.lengow_import_setting.encrypt_email.description')"
+                              :width="200"
+                              tooltipPosition="right"/>
+                <sw-switch-field class="text-center"
+                                 :label="$tc('lengow-connector.setting.lengow_import_setting.encrypt_email.label')"
+                                 v-model="lengowEncryptEmail"
+                                 @change="onSaveSettings($event, 'lengowEncryptEmail')">
+                </sw-switch-field>
             </sw-card>
         {% endblock %}
         {% block lgw_setting_import_footer %}
