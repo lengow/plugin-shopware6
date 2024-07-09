@@ -335,7 +335,11 @@ de:
             description: "Aktivieren Sie diese Option, um B2B-Bestellungen ohne Steuer zu importieren"
           anonymize_email:
             label: "Aktivieren Sie die E-Mail-Anonymisierung"
-            description: "Anonymisieren Sie die E-Mail-Adressen Ihrer Kunden"
+            description: "Anonymisieren Sie die E-Mail-Adressen Ihrer Kunden, Beispiel: 123456789-amazon_fr@lengow.com"
+          encrypt_email:
+            label: "E-Mail-Adressen zu verschlüsseln"
+            description: "verschlüsselt anonymisierte E-Mail-Adressen, Beispiel: 6f7806d2d9a35c0faff5778bd28e0c72@lengow.com"
+
       toolbox:
         menu:
           overview: "Übersicht"
