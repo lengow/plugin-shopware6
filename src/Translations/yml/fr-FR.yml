@@ -241,6 +241,7 @@ fr:
         extra: "Format JSON de la commande"
         status_yes: "Oui"
         status_no: "Non"
+        not_provided: "Non fourni par la marketplace"
       setting:
         nav_bar:
           title: "Paramètres"

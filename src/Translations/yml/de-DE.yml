@@ -241,6 +241,7 @@ de:
         extra: "JSON format"
         status_yes: "Ja"
         status_no: "Nein"
+        not_provided: "Nicht vom Marketplace bereitgestellt"
       setting:
         nav_bar:
           title: "Einstellungen"
