@@ -398,6 +398,14 @@
                 "import_btob": {
                     "label": "Enable import of B2B orders without tax",
                     "description": "Activate this option to import B2B orders without tax"
+                },
+                "anonymize_email": {
+                    "label": "Enable email anonymization",
+                    "description": "Anonymize customer email addresses, example: 123456789-amazon_fr"
+                },
+                "encrypt_email": {
+                    "label": "Enable email crypted anonymization",
+                    "description": "Anonymize and encrypt customer email addresses, example: 6f7806d2d9a35c0faff5778bd28e0c72"
                 }
             }
         },

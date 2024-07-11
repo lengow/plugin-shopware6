@@ -1283,7 +1283,28 @@ class LengowImportOrder
      */
     private function getCustomer(): CustomerEntity
     {
-        $customerEmail = $this->marketplaceSku . '-' . $this->lengowMarketplace->getName() . '@lengow.com';
+        $customerEmail = $this->orderData->billing_address->email ?? null;
+        if (!$customerEmail) {
+            $cur = current($this->orderData->packages ?? []);
+            if (!empty($cur)) {
+                $customerEmail = $cur->delivery->email ?? null;
+            }
+        }
+
+        if (!$customerEmail) {
+            $customerEmail = $this->marketplaceSku . '-' . $this->lengowMarketplace->getName() . '@lengow.com';
+        }
+
+        if ($this->lengowConfiguration->isEmailAnonymization()) {
+            $domain = 'lengow.com';
+            $customerEmail = $this->marketplaceSku . '-' . $this->lengowMarketplace->getName() . '@' . $domain;
+            if ($this->lengowConfiguration->isEmailEncryption()) {
+                $customerEmail = md5($customerEmail).'@'.$domain;
+            }
+        }
+
+        // $this->orderData->billing_address->email
+        // current($this->orderData->packages)->delivery->email
         $this->lengowLog->write(
             LengowLog::CODE_IMPORT,
             $this->lengowLog->encodeMessage('log.import.generate_unique_email', [

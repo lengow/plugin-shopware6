@@ -64,6 +64,8 @@ class LengowConfiguration
     public const LAST_UPDATE_PLUGIN_DATA = 'lengowPluginDataUpdate';
     public const LAST_UPDATE_AUTHORIZATION_TOKEN = 'lengowLastAuthorizationTokenUpdate';
     public const LAST_UPDATE_PLUGIN_MODAL = 'lengowLastUpdatePluginModal';
+    public const ENCRYPT_EMAIL = 'lengowEncryptEmail';
+    public const ANONYMIZE_EMAIL = 'lengowAnonymizeEmail';
 
     /* Configuration parameters */
     public const PARAM_DEFAULT_VALUE = 'default_value';
@@ -136,6 +138,8 @@ class LengowConfiguration
         self::LAST_UPDATE_PLUGIN_DATA => 'last_update_plugin_data',
         self::LAST_UPDATE_AUTHORIZATION_TOKEN => 'last_update_authorization_token',
         self::LAST_UPDATE_PLUGIN_MODAL => 'last_update_plugin_modal',
+        self::ANONYMIZE_EMAIL => 'anonymize_email',
+        self::ENCRYPT_EMAIL => 'encrypt_email',
     ];
 
     /**
@@ -364,6 +368,18 @@ class LengowConfiguration
             self::PARAM_RETURN => self::RETURN_TYPE_INTEGER,
             self::PARAM_LOG => false,
             self::PARAM_DEFAULT_VALUE => '',
+        ],
+        self::ANONYMIZE_EMAIL => [
+            self::PARAM_GLOBAL => true,
+            self::PARAM_EXPORT_TOOLBOX => false,
+            self::PARAM_RETURN => self::RETURN_TYPE_BOOLEAN,
+            self::PARAM_DEFAULT_VALUE => '0',
+        ],
+        self::ENCRYPT_EMAIL => [
+            self::PARAM_GLOBAL => true,
+            self::PARAM_EXPORT_TOOLBOX => false,
+            self::PARAM_RETURN => self::RETURN_TYPE_BOOLEAN,
+            self::PARAM_DEFAULT_VALUE => '0',
         ],
     ];
 
@@ -687,6 +703,27 @@ class LengowConfiguration
     }
 
     /**
+     * Returns true if we should anonymize email addresses
+     *
+     * @return bool
+     */
+    public function isEmailAnonymization(): bool
+    {
+        return $this->get(self::ANONYMIZE_EMAIL);
+    }
+
+    /**
+     * Returns true if we should encrypt email addresses
+     */
+    public function isEmailEncryption(): bool
+    {
+        return $this->get(self::ENCRYPT_EMAIL);
+    }
+
+    /**
+     * Get Lengow timezone for datetime
+     *
+     * @return string
      * Get Lengow timezone for datetime.
      */
     public function getLengowTimezone(): string
