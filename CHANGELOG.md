@@ -1,3 +1,8 @@
+# v2.0.1
+ - Feature: API plan changed to API restrictions
+ - Feature : e-mail anonymize and encryption
+ - BugFix: Hydrate address for FBA orders (amazon_us)
+
 # v2.0.0
 - Bugfix: [Symfony] Change annotation route to attribute route
 - Bugfix: [VueJs] Fix template not display

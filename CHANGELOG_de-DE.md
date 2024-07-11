@@ -1,3 +1,7 @@
+# v2.0.1
+ - Feature: API plan verändert API restrictions
+ - Feature: E-Mail anonymisieren und verschlüsseln
+ - BugFix: Hydratadresse für FBA-Aufträge, wenn Felder null sind
 # v2.0.0
 - Bugfix: [Symfony] Ändern der Annotation-Route in eine Attribut-Route
 - Bugfix: [VueJs] Fix Template wird nicht angezeigt
