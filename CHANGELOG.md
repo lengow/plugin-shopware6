@@ -1,7 +1,7 @@
 # v2.0.1
  - Feature: API plan changed to API restrictions
  - Feature : e-mail anonymize and encryption
- - BugFix: Hydrate address for FBA orders (amazon_us)
+ - BugFix: Hydrate address for FBA orders, when fields are null (amazon_us)
 
 # v2.0.0
 - Bugfix: [Symfony] Change annotation route to attribute route
