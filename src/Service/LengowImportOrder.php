@@ -310,12 +310,6 @@ class LengowImportOrder
     private $relayId;
 
     /**
-     *
-     * @var LengowTranslation $translation
-     */
-    private $translation;
-
-    /**
      * @var bool re-import order
      */
     private $isReimported = false;
@@ -348,7 +342,6 @@ class LengowImportOrder
      * @param OrderConverter $orderConverter Shopware order converter service
      * @param QuantityPriceCalculator $calculator Shopware quantity price calculator service
      * @param Connection $connection Doctrine connection service
-     * @param LengowTranslation $translation
      */
     public function __construct(
         LengowConfiguration $lengowConfiguration,
@@ -366,7 +359,6 @@ class LengowImportOrder
         OrderConverter $orderConverter,
         QuantityPriceCalculator $calculator,
         Connection $connection,
-        LengowTranslation $translation
     )
     {
         $this->lengowConfiguration = $lengowConfiguration;
@@ -384,7 +376,6 @@ class LengowImportOrder
         $this->orderConverter = $orderConverter;
         $this->calculator = $calculator;
         $this->connection = $connection;
-        $this->translation = $translation;
     }
 
     /**
@@ -1047,8 +1038,7 @@ class LengowImportOrder
      */
     private function hydrateAddress($orderData, $address)
     {
-
-        $notProvided = $this->translation->t('lengow-connector.order_tab.not_provided');
+        $notProvided = $this->lengowLog->decodeMessage('lengow_log.exception.not_provided');
         $notPhone = '0000000000';
         $status = (string) $orderData->lengow_status;
         $isDeliveredByMp = false;

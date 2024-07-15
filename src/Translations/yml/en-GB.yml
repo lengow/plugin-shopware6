@@ -241,7 +241,6 @@ en:
         extra: "Order JSON format"
         status_yes: "Yes"
         status_no: "No"
-        not_provided: "Not provided by the marketplace"
       setting:
         nav_bar:
           title: "Settings"
@@ -455,6 +454,7 @@ en:
         salutation_not_found: "No salutation found in our system. Please add it into your Shopware configuration"
         shopware_customer_not_saved: "WARNING! Customer could NOT be saved in Shopware user table"
         shopware_order_not_saved: "WARNING! Order could NOT be saved in Shopware order table"
+        not_provided: "Not provided by the marketplace"
       mail_report:
         subject_report_mail: "Lengow imports errors"
         order: "Order %{marketplace_sku}"
