@@ -442,12 +442,17 @@ class LengowImport
      * @param string|null $createdFrom Import of orders since
      * @param string|null $createdTo Import of orders until
      */
-    private function setIntervalTime(int $days = null, string $createdFrom = null, string $createdTo = null): void
+    private function setIntervalTime(float $days = null, string $createdFrom = null, string $createdTo = null): void
     {
         if ($createdFrom && $createdTo) {
             // retrieval of orders created from ... until ...
             $createdFromTimestamp = strtotime($createdFrom);
-            $createdToTimestamp = strtotime($createdTo) + 86399;
+            if ($createdFrom === $createdTo) {
+                $createdToTimestamp = strtotime($createdTo) + self::MIN_INTERVAL_TIME -1;
+            } else {
+                $createdToTimestamp = strtotime($createdTo);
+            }
+
             $intervalTime = $createdToTimestamp - $createdFromTimestamp;
             $this->createdFrom = $createdFromTimestamp;
             $this->createdTo = $intervalTime > self::MAX_INTERVAL_TIME
@@ -456,12 +461,12 @@ class LengowImport
             return;
         }
         if ($days) {
-            $intervalTime = $days * 86400;
+            $intervalTime = floor($days * self::MIN_INTERVAL_TIME);
             $intervalTime = $intervalTime > self::MAX_INTERVAL_TIME ? self::MAX_INTERVAL_TIME : $intervalTime;
         } else {
             // order recovery updated since ... days
-            $importDays = (int) $this->lengowConfiguration->get(LengowConfiguration::SYNCHRONIZATION_DAY_INTERVAL);
-            $intervalTime = $importDays * 86400;
+            $importDays = (float) $this->lengowConfiguration->get(LengowConfiguration::SYNCHRONIZATION_DAY_INTERVAL);
+            $intervalTime = floor($importDays * self::MIN_INTERVAL_TIME);
             // add security for older versions of the plugin
             $intervalTime = $intervalTime < self::MIN_INTERVAL_TIME ? self::MIN_INTERVAL_TIME : $intervalTime;
             $intervalTime = $intervalTime > self::MAX_INTERVAL_TIME ? self::MAX_INTERVAL_TIME : $intervalTime;
