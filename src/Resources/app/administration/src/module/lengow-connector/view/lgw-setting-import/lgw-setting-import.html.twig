@@ -124,6 +124,7 @@
                 <sw-switch-field class="text-center"
                                  :label="$tc('lengow-connector.setting.lengow_import_setting.anonymize_email.label')"
                                  v-model="lengowAnonymizeEmail"
+                                 @update:value="onSaveSettings($event, 'lengowAnonymizeEmail')"
                                  @change="onSaveSettings($event, 'lengowAnonymizeEmail')">
                 </sw-switch-field>
                  <sw-help-text class="lgw-help-text"
@@ -133,6 +134,7 @@
                 <sw-switch-field class="text-center"
                                  :label="$tc('lengow-connector.setting.lengow_import_setting.encrypt_email.label')"
                                  v-model="lengowEncryptEmail"
+                                 @update:value="onSaveSettings($event, 'lengowEncryptEmail')"
                                  @change="onSaveSettings($event, 'lengowEncryptEmail')">
                 </sw-switch-field>
             </sw-card>
