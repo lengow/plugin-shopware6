@@ -1,6 +1,7 @@
 # v2.0.1
- - Feature: API plan verändert API restrictions
- - Feature: E-Mail anonymisieren und verschlüsseln
+ - Feature: [Connector] API plan verändert API restrictions
+ - Feature: [import] E-Mail anonymisieren und verschlüsseln
+ - Feature: [Import] Übereinstimmender Status für Auftragsimport
  - BugFix: Hydratadresse für FBA-Aufträge, wenn Felder null sind
 # v2.0.0
 - Bugfix: [Symfony] Ändern der Annotation-Route in eine Attribut-Route

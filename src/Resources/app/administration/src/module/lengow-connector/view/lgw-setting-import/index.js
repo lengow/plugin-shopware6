@@ -41,7 +41,17 @@ Component.register('lgw-setting-import', {
             shippingMethods: [],
             render: false,
             lengowAnonymizeEmail: false,
-            lengowEncryptEmail: false
+            lengowEncryptEmail: false,
+            newLocked: this.locked,
+            lengowWaitingShipmentOrderId: 'process',
+            lengowShippedOrderId: 'complete',
+            lengowCanceledOrderId: 'cancel',
+            statusOptions: [
+                { value: 'open', label: 'open' },
+                { value: 'in_progress', label: 'in_progress' },
+                { value: 'cancelled', label: 'cancelled' },
+                { value: 'completed', label: 'completed' }
+            ]
         };
     },
 
@@ -85,6 +95,9 @@ Component.register('lgw-setting-import', {
         this.lengowDebugEnabled = this.config.lengowDebugEnabled.value === '1';
         this.lengowAnonymizeEmail = this.config.lengowAnonymizeEmail.value === '1';
         this.lengowEncryptEmail = this.config.lengowEncryptEmail.value === '1';
+        this.lengowWaitingShipmentOrderId = this.config.lengowWaitingShipmentOrderId.value;
+        this.lengowShippedOrderId = this.config.lengowShippedOrderId.value;
+        this.lengowCanceledOrderId = this.config.lengowCanceledOrderId.value;
     },
 
     computed: {
@@ -127,6 +140,9 @@ Component.register('lgw-setting-import', {
             });
         },
 
+        onSwitchChange(newValue) {
+            this.newLocked = newValue;
+        },
         onChangeStatus(event, key) {
             this.LengowConnectorSyncService.onChangeStatus().then(result => {
                 if (!result.success) {

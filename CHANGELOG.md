@@ -1,6 +1,7 @@
 # v2.0.1
- - Feature: API plan changed to API restrictions
- - Feature : e-mail anonymize and encryption
+ - Feature: [Connector] API plan changed to API restrictions
+ - Feature: [import] E-mail anonymize and encryption
+ - Feature: [Import] Matching status for order import
  - BugFix: Hydrate address for FBA orders, when fields are null (amazon_us)
 
 # v2.0.0

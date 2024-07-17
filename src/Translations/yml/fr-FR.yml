@@ -257,6 +257,9 @@ fr:
           shipping: "Méthode de transport par defaut"
           marketplaces: "Marketplaces"
           others: "Autres"
+          orders_status: "Statut des commandes"
+        orders_status:
+          description: "Attribuez des status Lengow à vos commandes pour les retrouver facilement parmi l’ensemble de vos commandes."
         lengow_main_setting:
           label: "Paramètres principaux"
           description: "Vous trouverez ci-dessous vos identifiants de connexion à Lengow.\nLes ID Lengow, Access Token et Secret Token sont automatiquement complétés lors de votre première connexion : veuillez à ne pas les modifier."
@@ -348,6 +351,12 @@ fr:
           encrypt_email:
             label: "Encrypter les e-mails crypted anonymisés"
             description: "Encrypte les adresses mail, exemple: 6f7806d2d9a35c0faff5778bd28e0c72"
+          waiting_for_shipment:
+            label: "Commandes en préparation"
+          shipped:
+            label: "Commandes expédiées"
+          cancelled:
+            label: "Commandes annulées"
       toolbox:
         menu:
           overview: "Vue d'ensemble"

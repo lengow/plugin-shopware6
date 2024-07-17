@@ -259,41 +259,7 @@ class LengowOrder
     /**
      * @var array state machine state correspondence
      */
-    private $stateMachineStates = [
-        OrderStates::STATE_MACHINE => [
-            self::STATE_ACCEPTED => OrderStates::STATE_IN_PROGRESS,
-            self::STATE_WAITING_SHIPMENT => OrderStates::STATE_IN_PROGRESS,
-            self::STATE_SHIPPED => OrderStates::STATE_COMPLETED,
-            self::STATE_CLOSED => OrderStates::STATE_COMPLETED,
-            self::STATE_REFUSED => OrderStates::STATE_COMPLETED,
-            self::STATE_CANCELED => OrderStates::STATE_CANCELLED,
-            self::STATE_PARTIALLY_REFUNDED => OrderStates::STATE_COMPLETED,
-            self::STATE_REFUNDED => OrderStates::STATE_COMPLETED,
-            self::TYPE_DELIVERED_BY_MARKETPLACE => OrderStates::STATE_COMPLETED,
-        ],
-        OrderTransactionStates::STATE_MACHINE => [
-            self::STATE_ACCEPTED => OrderTransactionStates::STATE_PAID,
-            self::STATE_WAITING_SHIPMENT => OrderTransactionStates::STATE_PAID,
-            self::STATE_SHIPPED => OrderTransactionStates::STATE_PAID,
-            self::STATE_CLOSED => OrderTransactionStates::STATE_PAID,
-            self::STATE_REFUSED => OrderTransactionStates::STATE_PAID,
-            self::STATE_CANCELED => OrderTransactionStates::STATE_CANCELLED,
-            self::STATE_PARTIALLY_REFUNDED => OrderTransactionStates::STATE_REFUNDED,
-            self::STATE_REFUNDED => OrderTransactionStates::STATE_REFUNDED,
-            self::TYPE_DELIVERED_BY_MARKETPLACE => OrderTransactionStates::STATE_PAID,
-        ],
-        OrderDeliveryStates::STATE_MACHINE => [
-            self::STATE_ACCEPTED => OrderDeliveryStates::STATE_OPEN,
-            self::STATE_WAITING_SHIPMENT => OrderDeliveryStates::STATE_OPEN,
-            self::STATE_SHIPPED => OrderDeliveryStates::STATE_SHIPPED,
-            self::STATE_CLOSED => OrderDeliveryStates::STATE_SHIPPED,
-            self::STATE_REFUSED => OrderDeliveryStates::STATE_CANCELLED,
-            self::STATE_CANCELED => OrderDeliveryStates::STATE_CANCELLED,
-            self::STATE_PARTIALLY_REFUNDED => OrderDeliveryStates::STATE_CANCELLED,
-            self::STATE_REFUNDED => OrderDeliveryStates::STATE_CANCELLED,
-            self::TYPE_DELIVERED_BY_MARKETPLACE => OrderDeliveryStates::STATE_SHIPPED,
-        ],
-    ];
+    private $stateMachineStates;
 
     /**
      * LengowOrder constructor
@@ -338,6 +304,41 @@ class LengowOrder
         $this->lengowOrderLine = $lengowOrderLine;
         $this->lengowMarketplaceFactory = $lengowMarketplaceFactory;
         $this->lengowAction = $lengowAction;
+        $this->stateMachineStates = [
+            OrderStates::STATE_MACHINE => [
+                self::STATE_ACCEPTED => $this->lengowConfiguration->getStateOrderValue(OrderStates::STATE_IN_PROGRESS),
+                self::STATE_WAITING_SHIPMENT => $this->lengowConfiguration->getStateOrderValue(OrderStates::STATE_IN_PROGRESS),
+                self::STATE_SHIPPED => $this->lengowConfiguration->getStateOrderValue(OrderStates::STATE_COMPLETED),
+                self::STATE_CLOSED => $this->lengowConfiguration->getStateOrderValue(OrderStates::STATE_COMPLETED),
+                self::STATE_REFUSED => $this->lengowConfiguration->getStateOrderValue(OrderStates::STATE_COMPLETED),
+                self::STATE_CANCELED => $this->lengowConfiguration->getStateOrderValue(OrderStates::STATE_CANCELLED),
+                self::STATE_PARTIALLY_REFUNDED => $this->lengowConfiguration->getStateOrderValue(OrderStates::STATE_COMPLETED),
+                self::STATE_REFUNDED => $this->lengowConfiguration->getStateOrderValue(OrderStates::STATE_COMPLETED),
+                self::TYPE_DELIVERED_BY_MARKETPLACE => $this->lengowConfiguration->getStateOrderValue(OrderStates::STATE_COMPLETED),
+            ],
+            OrderTransactionStates::STATE_MACHINE => [
+                self::STATE_ACCEPTED => OrderTransactionStates::STATE_PAID,
+                self::STATE_WAITING_SHIPMENT => OrderTransactionStates::STATE_PAID,
+                self::STATE_SHIPPED => OrderTransactionStates::STATE_PAID,
+                self::STATE_CLOSED => OrderTransactionStates::STATE_PAID,
+                self::STATE_REFUSED => OrderTransactionStates::STATE_PAID,
+                self::STATE_CANCELED => OrderTransactionStates::STATE_CANCELLED,
+                self::STATE_PARTIALLY_REFUNDED => OrderTransactionStates::STATE_REFUNDED,
+                self::STATE_REFUNDED => OrderTransactionStates::STATE_REFUNDED,
+                self::TYPE_DELIVERED_BY_MARKETPLACE => OrderTransactionStates::STATE_PAID,
+            ],
+            OrderDeliveryStates::STATE_MACHINE => [
+                self::STATE_ACCEPTED => OrderDeliveryStates::STATE_OPEN,
+                self::STATE_WAITING_SHIPMENT => OrderDeliveryStates::STATE_OPEN,
+                self::STATE_SHIPPED => OrderDeliveryStates::STATE_SHIPPED,
+                self::STATE_CLOSED => OrderDeliveryStates::STATE_SHIPPED,
+                self::STATE_REFUSED => OrderDeliveryStates::STATE_CANCELLED,
+                self::STATE_CANCELED => OrderDeliveryStates::STATE_CANCELLED,
+                self::STATE_PARTIALLY_REFUNDED => OrderDeliveryStates::STATE_CANCELLED,
+                self::STATE_REFUNDED => OrderDeliveryStates::STATE_CANCELLED,
+                self::TYPE_DELIVERED_BY_MARKETPLACE => OrderDeliveryStates::STATE_SHIPPED,
+            ],
+        ];
     }
 
     /**
@@ -748,6 +749,7 @@ class LengowOrder
             return null;
         }
         $stateMachineStateTechnicalName = $this->stateMachineStates[$stateMachineTechnicalName][$orderStateLengow];
+
         return $this->getStateMachineState($stateMachineTechnicalName, $stateMachineStateTechnicalName);
     }
 
@@ -770,10 +772,16 @@ class LengowOrder
             new EqualsFilter('stateMachine.technicalName', $stateMachineTechnicalName),
             new EqualsFilter('technicalName', $stateMachineStateTechnicalName),
         ]));
+
         /** @var StateMachineStateCollection $stateMachineStateCollection */
         $stateMachineStateCollection = $this->stateMachineStateRepository->search($criteria, $context)->getEntities();
-        return $stateMachineStateCollection->count() !== 0 ? $stateMachineStateCollection->first() : null;
+
+        // Log the result of the search
+        $resultCount = $stateMachineStateCollection->count();
+
+        return $resultCount !== 0 ? $stateMachineStateCollection->first() : null;
     }
+
 
     /**
      * Get Shopware order by id
@@ -982,6 +990,7 @@ class LengowOrder
      */
     public function setAsReImported(LengowOrderEntity $lengowOrder) : bool
     {
+
         return $this->update($lengowOrder->getId(), [
             LengowOrderDefinition::FIELD_IS_REIMPORTED => true,
         ]);

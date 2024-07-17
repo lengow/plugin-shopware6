@@ -257,6 +257,9 @@ en:
           shipping: "Default shipping method"
           marketplaces: "Marketplaces"
           others: "Others"
+          orders_status: "Order status"
+        orders_status:
+          description: "Assign Lengow status to your orders so that you can easily find them among all your orders."
         lengow_main_setting:
           label: "Main settings"
           description: "Below you will find your Lengow login details.\nAccount ID, Access Token and Secret Token are automatically completed at your first connection : please do not change them."
@@ -348,7 +351,12 @@ en:
           encrypt_email:
             label: "Enable email crypted anonymization"
             description: "Anonymize and encrypt customer email addresses, example: 6f7806d2d9a35c0faff5778bd28e0c72"
-
+          waiting_for_shipment:
+            label: "Orders in preparation"
+          shipped:
+            label: "Orders shipped"
+          cancelled:
+            label: "Orders cancelled"
       toolbox:
         menu:
           overview: "Overview"

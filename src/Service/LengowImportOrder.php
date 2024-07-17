@@ -358,7 +358,7 @@ class LengowImportOrder
         CartService $cartService,
         OrderConverter $orderConverter,
         QuantityPriceCalculator $calculator,
-        Connection $connection,
+        Connection $connection
     )
     {
         $this->lengowConfiguration = $lengowConfiguration;
@@ -1341,13 +1341,13 @@ class LengowImportOrder
         // create a generic cart
         $cart = $this->createCart($token, $products, $salesChannelContext);
 
-
         // get and modify order data for Shopware order creation
         $orderData = $this->getOrderData($cart, $products, $salesChannelContext);
         // delete cart after order creation
         $this->cartService->deleteCart($salesChannelContext);
         // create Shopware order
         $order = $this->lengowOrder->createOrder($orderData);
+
         if (!$order) {
             throw new LengowException(
                 $this->lengowLog->encodeMessage('lengow_log.exception.shopware_order_not_saved')
@@ -1567,12 +1567,14 @@ class LengowImportOrder
             $cartPrice->getTaxRules(),
             $cartPrice->getTaxStatus()
         );
+
         // get current order state and change order state id
         $orderState = $this->lengowOrder->getStateMachineStateByOrderState(
             OrderStates::STATE_MACHINE,
             $this->orderStateLengow,
             $this->shippedByMp
         );
+
         if ($orderState) {
             $orderData['stateId'] = $orderState->getId();
         }

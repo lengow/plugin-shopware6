@@ -86,7 +86,7 @@ class LengowImport
     /**
      * @var integer interval of minutes for cron synchronization
      */
-    private const MINUTE_INTERVAL_TIME = 1;
+    private const MINUTE_INTERVAL_TIME = 0;
 
     /**
      * @var LengowConnector Lengow connector service

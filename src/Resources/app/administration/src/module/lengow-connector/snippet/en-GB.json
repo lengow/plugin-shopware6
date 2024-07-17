@@ -267,8 +267,7 @@
             "message": "Message",
             "extra": "Order JSON format",
             "status_yes": "Yes",
-            "status_no": "No",
-            "not_provided": "Not provided by the marketplace"
+            "status_no": "No"
         },
         "setting": {
             "nav_bar": {
@@ -286,7 +285,11 @@
                 "exclusions": "Exclusions",
                 "shipping": "Default shipping method",
                 "marketplaces": "Marketplaces",
-                "others": "Others"
+                "others": "Others",
+                "orders_status": "Order status"
+            },
+            "orders_status": {
+                "description": "Assign Lengow status to your orders so that you can easily find them among all your orders."
             },
             "lengow_main_setting": {
                 "label": "Main settings",
@@ -407,6 +410,15 @@
                 "encrypt_email": {
                     "label": "Enable email crypted anonymization",
                     "description": "Anonymize and encrypt customer email addresses, example: 6f7806d2d9a35c0faff5778bd28e0c72"
+                },
+                "waiting_for_shipment": {
+                    "label": "Orders in preparation"
+                },
+                "shipped": {
+                    "label": "Orders shipped"
+                },
+                "cancelled": {
+                    "label": "Orders cancelled"
                 }
             }
         },

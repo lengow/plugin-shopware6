@@ -267,8 +267,7 @@
             "message": "Message",
             "extra": "Format JSON de la commande",
             "status_yes": "Oui",
-            "status_no": "Non",
-            "not_provided": "Non fourni par la marketplace"
+            "status_no": "Non"
         },
         "setting": {
             "nav_bar": {
@@ -286,7 +285,11 @@
                 "exclusions": "Exclusions",
                 "shipping": "Méthode de transport par defaut",
                 "marketplaces": "Marketplaces",
-                "others": "Autres"
+                "others": "Autres",
+                "orders_status": "Statut des commandes"
+            },
+            "orders_status": {
+                "description": "Attribuez des status Lengow à vos commandes pour les retrouver facilement parmi l’ensemble de vos commandes."
             },
             "lengow_main_setting": {
                 "label": "Paramètres principaux",
@@ -407,6 +410,15 @@
                 "encrypt_email": {
                     "label": "Encrypter les e-mails crypted anonymisés",
                     "description": "Encrypte les adresses mail, exemple: 6f7806d2d9a35c0faff5778bd28e0c72"
+                },
+                "waiting_for_shipment": {
+                    "label": "Commandes en préparation"
+                },
+                "shipped": {
+                    "label": "Commandes expédiées"
+                },
+                "cancelled": {
+                    "label": "Commandes annulées"
                 }
             }
         },

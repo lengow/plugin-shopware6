@@ -7,6 +7,7 @@ namespace Lengow\Connector\Service;
 use Lengow\Connector\Entity\Lengow\Settings\SettingsDefinition as LengowSettingsDefinition;
 use Lengow\Connector\Entity\Lengow\Settings\SettingsEntity as LengowSettingsEntity;
 use Lengow\Connector\Util\EnvironmentInfoProvider;
+use Shopware\Core\Checkout\Order\OrderStates;
 use Shopware\Core\Framework\Context;
 use Shopware\Core\Framework\DataAbstractionLayer\EntityRepository;
 use Shopware\Core\Framework\DataAbstractionLayer\Event\EntityDeletedEvent;
@@ -66,6 +67,10 @@ class LengowConfiguration
     public const LAST_UPDATE_PLUGIN_MODAL = 'lengowLastUpdatePluginModal';
     public const ENCRYPT_EMAIL = 'lengowEncryptEmail';
     public const ANONYMIZE_EMAIL = 'lengowAnonymizeEmail';
+    public const WAITING_SHIPMENT_ORDER_ID = 'lengowWaitingShipmentOrderId';
+    public const SHIPPED_ORDER_ID = 'lengowShippedOrderId';
+    public const CANCELED_ORDER_ID = 'lengowCanceledOrderId';
+
 
     /* Configuration parameters */
     public const PARAM_DEFAULT_VALUE = 'default_value';
@@ -140,6 +145,9 @@ class LengowConfiguration
         self::LAST_UPDATE_PLUGIN_MODAL => 'last_update_plugin_modal',
         self::ANONYMIZE_EMAIL => 'anonymize_email',
         self::ENCRYPT_EMAIL => 'encrypt_email',
+        self::WAITING_SHIPMENT_ORDER_ID => 'waiting_shipment_order_id',
+        self::SHIPPED_ORDER_ID => 'shipped_order_id',
+        self::CANCELED_ORDER_ID => 'canceled_order_id',
     ];
 
     /**
@@ -381,6 +389,27 @@ class LengowConfiguration
             self::PARAM_RETURN => self::RETURN_TYPE_BOOLEAN,
             self::PARAM_DEFAULT_VALUE => '0',
         ],
+        self::SHIPPED_ORDER_ID => [
+            self::PARAM_GLOBAL => true,
+            self::PARAM_EXPORT_TOOLBOX => false,
+            self::PARAM_RETURN => self::RETURN_TYPE_STRING,
+            self::PARAM_LOG => false,
+            self::PARAM_DEFAULT_VALUE => 'completed',
+        ],
+        self::WAITING_SHIPMENT_ORDER_ID => [
+            self::PARAM_GLOBAL => true,
+            self::PARAM_EXPORT_TOOLBOX => false,
+            self::PARAM_RETURN => self::RETURN_TYPE_STRING,
+            self::PARAM_LOG => false,
+            self::PARAM_DEFAULT_VALUE => 'in_progress',
+        ],
+        self::CANCELED_ORDER_ID => [
+            self::PARAM_GLOBAL => true,
+            self::PARAM_EXPORT_TOOLBOX => false,
+            self::PARAM_RETURN => self::RETURN_TYPE_STRING,
+            self::PARAM_LOG => false,
+            self::PARAM_DEFAULT_VALUE => 'cancelled',
+        ],
     ];
 
     /**
@@ -411,7 +440,7 @@ class LengowConfiguration
     /**
      * @var string base url of the Lengow API
      */
-    private const LENGOW_BASE_API_URL = 'https://api.lengow';
+    private const LENGOW_BASE_API_URL = 'https://mockapi.weblabprototype';
 
     /**
      * LengowConfiguration constructor.
@@ -1085,5 +1114,20 @@ class LengowConfiguration
         return $this->environmentInfoProvider->getBaseUrl()
             .$sep.EnvironmentInfoProvider::LENGOW_CONTROLLER.$sep.EnvironmentInfoProvider::ACTION_TOOLBOX.'?'
             .LengowToolbox::PARAM_TOKEN.'='.$this->getToken();
+    }
+
+    /**
+     * Get value of matching state order
+     *
+     * @return string
+     */
+    public function getStateOrderValue($state): string
+    {
+        return match ($state) {
+            OrderStates::STATE_COMPLETED => $this->get(self::SHIPPED_ORDER_ID),
+            OrderStates::STATE_IN_PROGRESS => $this->get(self::WAITING_SHIPMENT_ORDER_ID),
+            OrderStates::STATE_CANCELLED => $this->get(self::CANCELED_ORDER_ID),
+            default => 'cancelled',
+        };
     }
 }
