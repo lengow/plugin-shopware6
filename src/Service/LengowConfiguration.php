@@ -771,13 +771,13 @@ class LengowConfiguration
      * @param int|null $timestamp gmt timestamp
      * @param string   $format    date format
      */
-    public function date(int $timestamp = null, string $format = EnvironmentInfoProvider::DATE_FULL): string
+    public function date(?float $timestamp = null, string $format = EnvironmentInfoProvider::DATE_FULL): string
     {
         $timestamp = $timestamp ?? time();
         $timezone = $this->getLengowTimezone();
         $dateTime = new \DateTime();
 
-        return $dateTime->setTimestamp($timestamp)->setTimezone(new \DateTimeZone($timezone))->format($format);
+        return $dateTime->setTimestamp((int)$timestamp)->setTimezone(new \DateTimeZone($timezone))->format($format);
     }
 
     /**

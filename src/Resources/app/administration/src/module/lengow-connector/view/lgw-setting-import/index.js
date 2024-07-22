@@ -42,7 +42,7 @@ Component.register('lgw-setting-import', {
             render: false,
             lengowAnonymizeEmail: false,
             lengowEncryptEmail: false,
-            newLocked: this.locked,
+            newLocked: false,
             lengowWaitingShipmentOrderId: 'process',
             lengowShippedOrderId: 'complete',
             lengowCanceledOrderId: 'cancel',
@@ -98,6 +98,7 @@ Component.register('lgw-setting-import', {
         this.lengowWaitingShipmentOrderId = this.config.lengowWaitingShipmentOrderId.value;
         this.lengowShippedOrderId = this.config.lengowShippedOrderId.value;
         this.lengowCanceledOrderId = this.config.lengowCanceledOrderId.value;
+        this.newLocked = this.config.lengowAnonymizeEmail.value === '1';
     },
 
     computed: {
