@@ -11,8 +11,8 @@
         }
     ],
     "require": {
-        "shopware/core": "*",
-        "php": ">=8.0",
+        "shopware/core": ">=6.5.8",
+        "php": ">=8.1",
         "ext-curl": "*",
         "ext-json": "*"
     },
