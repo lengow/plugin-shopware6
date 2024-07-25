@@ -771,13 +771,13 @@ class LengowConfiguration
      * @param int|null $timestamp gmt timestamp
      * @param string   $format    date format
      */
-    public function date(?float $timestamp = null, string $format = EnvironmentInfoProvider::DATE_FULL): string
+    public function date(int $timestamp = null, string $format = EnvironmentInfoProvider::DATE_FULL): string
     {
         $timestamp = $timestamp ?? time();
         $timezone = $this->getLengowTimezone();
         $dateTime = new \DateTime();
 
-        return $dateTime->setTimestamp((int)$timestamp)->setTimezone(new \DateTimeZone($timezone))->format($format);
+        return $dateTime->setTimestamp($timestamp)->setTimezone(new \DateTimeZone($timezone))->format($format);
     }
 
     /**
@@ -1121,7 +1121,7 @@ class LengowConfiguration
      *
      * @return string
      */
-    public function getStateOrderValue($state): string
+    public function getStateOrderValue(string $state): string
     {
         return match ($state) {
             OrderStates::STATE_COMPLETED => $this->get(self::SHIPPED_ORDER_ID),

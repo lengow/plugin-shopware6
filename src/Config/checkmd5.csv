@@ -437,14 +437,14 @@
 /src/Service/LengowAction.php|fa2215a0de344d3f74a961eecc928c7a
 /src/Service/LengowAccess.php|10819f326d3842d2ff34f3d5b26c49e3
 /src/Service/LengowOrderLine.php|2ec18fc660fc755bb1e4fe00d52e7e1d
-/src/Service/LengowImportOrder.php|1e33332896cc7182344f77f3b4e1cd84
+/src/Service/LengowImportOrder.php|57b372453d9899e3c146bdaf04fba3fd
 /src/Service/LengowTranslation.php|db52a8157ae86bd49a6d6d9fc11da9b6
 /src/Service/LengowOrder.php|a4059307d597f23a7075ad49da621271
 /src/Service/LengowConnector.php|58c944b556e9fe426ca98acd10607e45
 /src/Service/LengowCustomer.php|7d9619ec0c1d8f9e8ec3aa552fe32c5e
 /src/Service/LengowSync.php|0cd414b4d6521e0110d2cb4005f84b76
 /src/Service/LengowLog.php|5c89aaa002da0421acb13c0acf3f223a
-/src/Service/LengowConfiguration.php|c9ae77f3f778d91fbef67da170c94bde
+/src/Service/LengowConfiguration.php|a81f384fed08f8d06a6e42322e113c36
 /src/Service/LengowExport.php|eac853b31641acdac30f4917398bf9ab
 /src/Storefront/Controller/LengowCronController.php|4469740c55e3985dae5c806ab7d65556
 /src/Storefront/Controller/LengowExportController.php|66dce5cbe89bce68b0b67498eeae76e3

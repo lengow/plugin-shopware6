@@ -1032,11 +1032,11 @@ class LengowImportOrder
     /**
      * hydrates address data from api
      *
-     * @param type $orderData
-     * @param type $address
-     * @return type
+     * @param mixed $orderData
+     * @param mixed $address
+     * @return mixed The hydrated address.
      */
-    private function hydrateAddress($orderData, $address)
+    private function hydrateAddress(mixed $orderData, mixed $address) : mixed
     {
         $notProvided = $this->lengowLog->decodeMessage('lengow_log.exception.not_provided');
         $notPhone = '0000000000';
@@ -1280,11 +1280,9 @@ class LengowImportOrder
                 $customerEmail = $cur->delivery->email ?? null;
             }
         }
-
         if (!$customerEmail) {
             $customerEmail = $this->marketplaceSku . '-' . $this->lengowMarketplace->getName() . '@lengow.com';
         }
-
         if ($this->lengowConfiguration->isEmailAnonymization()) {
             $domain = 'lengow.com';
             $customerEmail = $this->marketplaceSku . '-' . $this->lengowMarketplace->getName() . '@' . $domain;
@@ -1292,9 +1290,6 @@ class LengowImportOrder
                 $customerEmail = md5($customerEmail).'@'.$domain;
             }
         }
-
-        // $this->orderData->billing_address->email
-        // current($this->orderData->packages)->delivery->email
         $this->lengowLog->write(
             LengowLog::CODE_IMPORT,
             $this->lengowLog->encodeMessage('log.import.generate_unique_email', [
