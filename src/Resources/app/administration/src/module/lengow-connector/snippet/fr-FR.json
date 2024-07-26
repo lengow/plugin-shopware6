@@ -285,7 +285,11 @@
                 "exclusions": "Exclusions",
                 "shipping": "Méthode de transport par defaut",
                 "marketplaces": "Marketplaces",
-                "others": "Autres"
+                "others": "Autres",
+                "orders_status": "Statut des commandes"
+            },
+            "orders_status": {
+                "description": "Attribuez des status Lengow à vos commandes pour les retrouver facilement parmi l’ensemble de vos commandes."
             },
             "lengow_main_setting": {
                 "label": "Paramètres principaux",
@@ -398,6 +402,23 @@
                 "import_btob": {
                     "label": "Activer l'import des commandes B2B sans taxes",
                     "description": "Activer cette option pour importer les commandes B2B sans taxes"
+                },
+                "anonymize_email": {
+                    "label": "Activer l'anonymisation des e-mails",
+                    "description": "Anonymiser les adresses e-mail des clients, exemple: 123456789-amazon_fr"
+                },
+                "encrypt_email": {
+                    "label": "Encrypter les e-mails crypted anonymisés",
+                    "description": "Encrypte les adresses mail, exemple: 6f7806d2d9a35c0faff5778bd28e0c72"
+                },
+                "waiting_for_shipment": {
+                    "label": "Commandes en préparation"
+                },
+                "shipped": {
+                    "label": "Commandes expédiées"
+                },
+                "cancelled": {
+                    "label": "Commandes annulées"
                 }
             }
         },

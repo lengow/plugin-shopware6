@@ -257,6 +257,9 @@ fr:
           shipping: "Méthode de transport par defaut"
           marketplaces: "Marketplaces"
           others: "Autres"
+          orders_status: "Statut des commandes"
+        orders_status:
+          description: "Attribuez des status Lengow à vos commandes pour les retrouver facilement parmi l’ensemble de vos commandes."
         lengow_main_setting:
           label: "Paramètres principaux"
           description: "Vous trouverez ci-dessous vos identifiants de connexion à Lengow.\nLes ID Lengow, Access Token et Secret Token sont automatiquement complétés lors de votre première connexion : veuillez à ne pas les modifier."
@@ -342,6 +345,18 @@ fr:
           import_btob:
             label: "Activer l'import des commandes B2B sans taxes"
             description: "Activer cette option pour importer les commandes B2B sans taxes"
+          anonymize_email:
+            label: "Activer l'anonymisation des e-mails"
+            description: "Anonymiser les adresses e-mail des clients, exemple: 123456789-amazon_fr"
+          encrypt_email:
+            label: "Encrypter les e-mails crypted anonymisés"
+            description: "Encrypte les adresses mail, exemple: 6f7806d2d9a35c0faff5778bd28e0c72"
+          waiting_for_shipment:
+            label: "Commandes en préparation"
+          shipped:
+            label: "Commandes expédiées"
+          cancelled:
+            label: "Commandes annulées"
       toolbox:
         menu:
           overview: "Vue d'ensemble"
@@ -447,6 +462,7 @@ fr:
         salutation_not_found: "Aucune salutation trouvée dans votre système. Merci de l'ajouter dans votre configuration Shopware"
         shopware_customer_not_saved: "ATTENTION ! Le client n'a pas pu être sauvegardé dans la table user de Shopware"
         shopware_order_not_saved: "ATTENTION ! La commande n'a pas pu être sauvegardée dans la table order de Shopware"
+        not_provided: "Non fourni par la marketplace"
       mail_report:
         subject_report_mail: "Erreur de l'import Lengow"
         order: "Commande %{marketplace_sku}"

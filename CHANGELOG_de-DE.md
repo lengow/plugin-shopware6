@@ -1,3 +1,9 @@
+# v2.0.1
+ - Feature: [Connector] API plan verändert API restrictions
+ - Feature: [import] E-Mail anonymisieren und verschlüsseln
+ - Feature: [Import] Übereinstimmender Status für Auftragsimport
+ - Feature: [import] Unterstützung für gebrochene Tage in der Import-Url für Bestellungen im Parameter Tage
+ - BugFix: Hydratadresse für FBA-Aufträge, wenn Felder null sind
 # v2.0.0
 - Bugfix: [Symfony] Ändern der Annotation-Route in eine Attribut-Route
 - Bugfix: [VueJs] Fix Template wird nicht angezeigt

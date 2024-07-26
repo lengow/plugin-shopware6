@@ -22,14 +22,19 @@ remove_directory(){
     fi
 }
 remove_files(){
-    DIRECTORY=$1
-    FILE=$2
-    find $DIRECTORY -name $FILE -nowarn -exec rm -rf {} \;
-    echo "- Delete $FILE : ""$VERT""DONE""$NORMAL"""
+    DIRECTORY="$1"
+    FILE="$2"
+    if [ -f "${DIRECTORY}/${FILE}" ]; then
+        find "$DIRECTORY" -name "$FILE" -exec rm -rf {} \;
+        echo -e "- Delete ${FILE} : ${VERT}DONE${NORMAL}"
+    fi
+    if [ -d "${DIRECTORY}/${FILE}" ]; then
+        rm -Rf "${DIRECTORY}/${FILE}"
+    fi
 }
 
 remove_directories(){
-    DIRECTORY=$1
+    DIRECTORY="$1"
     find $DIRECTORY -maxdepth 1 -mindepth 1 -type d -exec rm -rf {} \;
     echo "- Delete $FILE : ""$VERT""DONE""$NORMAL"""
 }
@@ -63,28 +68,33 @@ BLEU="\\033[1;36m"
 echo
 echo "#####################################################"
 echo "##                                                 ##"
-echo "##       ""$BLEU""Lengow Shopware 6""$NORMAL"" - Build Module          ##"
+echo -e "##       "${BLEU}Lengow Shopware6${NORMAL}" - Build Module           ##"
 echo "##                                                 ##"
 echo "#####################################################"
 echo
+sleep 3
 FOLDER="$(dirname "$(pwd)")"
 echo $FOLDER
+sleep 2
 if [ ! -d "$FOLDER" ]; then
-	echo "Folder doesn't exist : ""$ROUGE""ERROR""$NORMAL"""
+	echo -e "Folder doesn't exist : ${ROUGE}ERROR${NORMAL}"
 	echo
 	exit 0
 fi
 
 # generate translations
 php translate.php
-echo "- Generate translations : ""$VERT""DONE""$NORMAL"""
+echo -e "- Generate translations : ${VERT}DONE${NORMAL}"
 # create files checksum
 php checkmd5.php
-echo "- Create files checksum : ""$VERT""DONE""$NORMAL"""
+echo -e "- Create files checksum : ${VERT}DONE${NORMAL}"
+sleep 3
 # remove TMP FOLDER
+rm -Rf "$FOLDER_TMP/*"
 remove_directory $FOLDER_TMP
 # copy files
-cp -rRp $FOLDER $FOLDER_TMP
+# copy files
+rsync -a --exclude='.DS_Store' "$FOLDER/" "$FOLDER_TMP/"
 # remove .gitkeep
 remove_files $FOLDER_TMP ".gitkeep"
 # remove dod
@@ -114,30 +124,38 @@ remove_files $FOLDER_TMP "Jenkinsfile"
 remove_files $FOLDER_CONFIG "marketplaces.json"
 # clean Log Folder
 remove_files $FOLDER_LOGS "*.txt"
-echo "- Clean logs folder : ""$VERT""DONE""$NORMAL"""
+echo -e "- Clean logs folder : ${VERT}DONE${NORMAL}"
 # Clean export folder
 remove_files $FOLDER_EXPORT "*.csv"
 remove_files $FOLDER_EXPORT "*.yaml"
 remove_files $FOLDER_EXPORT "*.json"
 remove_files $FOLDER_EXPORT "*.xml"
-echo "- Clean export folder : ""$VERT""DONE""$NORMAL"""
+echo -e "- Clean export folder : ${VERT}DONE${NORMAL}"
 # remove tools folder
 remove_directory $FOLDER_TOOLS
-echo "- Remove Tools folder : ""$VERT""DONE""$NORMAL"""
+echo -e "- Remove Tools folder : ${VERT}DONE${NORMAL}"
 # remove yml translation folder
 remove_directory $FOLDER_TRANSLATION
-echo "- Remove Translation yml folder : ""$VERT""DONE""$NORMAL"""
+echo -e "- Remove Translation yml folder :${VERT}DONE${NORMAL}"
 # remove node_module folder
 remove_directory $FOLDER_NODE
-echo "- Remove node_module folder : ""$VERT""DONE""$NORMAL"""
+echo -e "- Remove node_module folder :${VERT}DONE${NORMAL}"
 # remove tests folder
 remove_directory $FOLDER_TEST
-echo "- Remove tests folder : ""$VERT""DONE""$NORMAL"""
+echo -e "- Remove tests folder : ${VERT}DONE${NORMAL}"
 # remove bin folder
 remove_directory $FOLDER_BIN
-echo "- Remove bin folder : ""$VERT""DONE""$NORMAL"""
+echo -e "- Remove bin folder : ${VERT}DONE${NORMAL}"
+sleep 3
+# make zip
 # make zip
 cd /tmp
-zip "-r" $ARCHIVE_NAME "LengowConnector"
-echo "- Build archive : ""$VERT""DONE""$NORMAL"""
-mv $ARCHIVE_NAME ~/Bureau
+zip "-r" "$ARCHIVE_NAME" "LengowConnector"
+echo -e "- Build archive : ${VERT}DONE${NORMAL}"
+if [ -d  "~/Bureau" ]; then
+    mv "$ARCHIVE_NAME" ~/Bureau
+else
+    mv "$ARCHIVE_NAME" ~/shared
+fi
+sleep 3
+echo "End of build Shopware6 plugin."
