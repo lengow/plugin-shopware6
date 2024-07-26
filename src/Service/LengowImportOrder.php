@@ -1030,6 +1030,58 @@ class LengowImportOrder
     }
 
     /**
+     * hydrates address data from api
+     *
+     * @param mixed $orderData
+     * @param mixed $address
+     * @return mixed The hydrated address.
+     */
+    private function hydrateAddress(mixed $orderData, mixed $address) : mixed
+    {
+        $notProvided = $this->lengowLog->decodeMessage('lengow_log.exception.not_provided');
+        $notPhone = '0000000000';
+        $status = (string) $orderData->lengow_status;
+        $isDeliveredByMp = false;
+        if ($status !== LengowOrder::STATE_SHIPPED) {
+            return $address;
+        }
+
+        $types = $orderData->order_types;
+
+        foreach ($types as $orderType) {
+            if ($orderType->type === LengowOrder::TYPE_DELIVERED_BY_MARKETPLACE) {
+                $isDeliveredByMp = true;
+            }
+        }
+
+        if (!$isDeliveredByMp) {
+            return $address;
+        }
+
+        if (is_null($address->first_name)
+                && is_null($address->last_name)
+                && is_null($address->full_name)) {
+            $address->first_name = $notProvided;
+            $address->last_name = $notProvided;
+            $address->full_name = $notProvided;
+        }
+
+        if (is_null($address->first_line)
+                && is_null($address->full_address)) {
+            $address->first_line = $notProvided;
+            $address->full_address = $notProvided;
+        }
+
+        if (is_null($address->phone_home)
+                && is_null($address->phone_mobile)) {
+            $address->phone_home = $notPhone;
+            $address->phone_mobile = $notPhone;
+        }
+
+        return $address;
+    }
+
+    /**
      * Create a Shopware order
      *
      * @return bool
@@ -1040,9 +1092,17 @@ class LengowImportOrder
             // search and get all products
             $products = $this->getProducts();
             // get lengow address to create all specific Shopware addresses for customer and order
+            $billingAddressApi = $this->hydrateAddress(
+                $this->orderData,
+                $this->orderData->billing_address
+            );
+            $shippingAddressApi = $this->hydrateAddress(
+                $this->orderData,
+                $this->packageData->delivery
+            );
             $this->lengowAddress->init([
-                'billing_data' => $this->orderData->billing_address,
-                'shipping_data' => $this->packageData->delivery,
+                'billing_data' => $billingAddressApi,
+                'shipping_data' => $shippingAddressApi,
                 'relay_id' => $this->relayId,
                 'vat_number' => $this->customerVatNumber,
             ]);
@@ -1213,7 +1273,23 @@ class LengowImportOrder
      */
     private function getCustomer(): CustomerEntity
     {
-        $customerEmail = $this->marketplaceSku . '-' . $this->lengowMarketplace->getName() . '@lengow.com';
+        $customerEmail = $this->orderData->billing_address->email ?? null;
+        if (!$customerEmail) {
+            $cur = current($this->orderData->packages ?? []);
+            if (!empty($cur)) {
+                $customerEmail = $cur->delivery->email ?? null;
+            }
+        }
+        if (!$customerEmail) {
+            $customerEmail = $this->marketplaceSku . '-' . $this->lengowMarketplace->getName() . '@lengow.com';
+        }
+        if ($this->lengowConfiguration->isEmailAnonymization()) {
+            $domain = 'lengow.com';
+            $customerEmail = $this->marketplaceSku . '-' . $this->lengowMarketplace->getName() . '@' . $domain;
+            if ($this->lengowConfiguration->isEmailEncryption()) {
+                $customerEmail = md5($customerEmail).'@'.$domain;
+            }
+        }
         $this->lengowLog->write(
             LengowLog::CODE_IMPORT,
             $this->lengowLog->encodeMessage('log.import.generate_unique_email', [
@@ -1260,13 +1336,13 @@ class LengowImportOrder
         // create a generic cart
         $cart = $this->createCart($token, $products, $salesChannelContext);
 
-
         // get and modify order data for Shopware order creation
         $orderData = $this->getOrderData($cart, $products, $salesChannelContext);
         // delete cart after order creation
         $this->cartService->deleteCart($salesChannelContext);
         // create Shopware order
         $order = $this->lengowOrder->createOrder($orderData);
+
         if (!$order) {
             throw new LengowException(
                 $this->lengowLog->encodeMessage('lengow_log.exception.shopware_order_not_saved')
@@ -1486,12 +1562,14 @@ class LengowImportOrder
             $cartPrice->getTaxRules(),
             $cartPrice->getTaxStatus()
         );
+
         // get current order state and change order state id
         $orderState = $this->lengowOrder->getStateMachineStateByOrderState(
             OrderStates::STATE_MACHINE,
             $this->orderStateLengow,
             $this->shippedByMp
         );
+
         if ($orderState) {
             $orderData['stateId'] = $orderState->getId();
         }

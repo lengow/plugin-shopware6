@@ -257,6 +257,9 @@ en:
           shipping: "Default shipping method"
           marketplaces: "Marketplaces"
           others: "Others"
+          orders_status: "Order status"
+        orders_status:
+          description: "Assign Lengow status to your orders so that you can easily find them among all your orders."
         lengow_main_setting:
           label: "Main settings"
           description: "Below you will find your Lengow login details.\nAccount ID, Access Token and Secret Token are automatically completed at your first connection : please do not change them."
@@ -342,6 +345,18 @@ en:
           import_btob:
             label: "Enable import of B2B orders without tax"
             description: "Activate this option to import B2B orders without tax"
+          anonymize_email:
+            label: "Enable email anonymization"
+            description: "Anonymize customer email addresses, example: 123456789-amazon_fr"
+          encrypt_email:
+            label: "Enable email crypted anonymization"
+            description: "Anonymize and encrypt customer email addresses, example: 6f7806d2d9a35c0faff5778bd28e0c72"
+          waiting_for_shipment:
+            label: "Orders in preparation"
+          shipped:
+            label: "Orders shipped"
+          cancelled:
+            label: "Orders cancelled"
       toolbox:
         menu:
           overview: "Overview"
@@ -447,6 +462,7 @@ en:
         salutation_not_found: "No salutation found in our system. Please add it into your Shopware configuration"
         shopware_customer_not_saved: "WARNING! Customer could NOT be saved in Shopware user table"
         shopware_order_not_saved: "WARNING! Order could NOT be saved in Shopware order table"
+        not_provided: "Not provided by the marketplace"
       mail_report:
         subject_report_mail: "Lengow imports errors"
         order: "Order %{marketplace_sku}"

@@ -117,6 +117,69 @@
                                 @change="onSaveSettings($event, 'lengowDebugEnabled')"
                 >
                 </sw-switch-field>
+                <sw-help-text class="lgw-help-text"
+                              :text="$tc('lengow-connector.setting.lengow_import_setting.anonymize_email.description')+'@lengow.com'"
+                              :width="200"
+                              tooltipPosition="right"/>
+                <sw-switch-field class="text-center"
+                                 :label="$tc('lengow-connector.setting.lengow_import_setting.anonymize_email.label')"
+                                 v-model="lengowAnonymizeEmail"
+                                 @update:value="onSaveSettings($event, 'lengowAnonymizeEmail'), onSwitchChange($event)"
+                                 @change="onSaveSettings($event, 'lengowAnonymizeEmail'), onSwitchChange($event)">
+                </sw-switch-field>
+                <div v-if="newLocked">
+                    <sw-help-text class="lgw-help-text"
+                                  :text="$tc('lengow-connector.setting.lengow_import_setting.encrypt_email.description')+'@lengow.com'"
+                                  :width="200"
+                                  tooltipPosition="right"/>
+                    <sw-switch-field class="text-center"
+                                     :label="$tc('lengow-connector.setting.lengow_import_setting.encrypt_email.label')"
+                                     v-model="lengowEncryptEmail"
+                                     @update:value="onSaveSettings($event, 'lengowEncryptEmail')"
+                                     @change="onSaveSettings($event, 'lengowEncryptEmail')">
+                    </sw-switch-field>
+                </div>
+            </sw-card>
+            <sw-card :title="$tc('lengow-connector.setting.title.orders_status')">
+                <p style="margin-bottom: 50px">
+                    {{ $tc('lengow-connector.setting.orders_status.description') }}
+                </p>
+                <sw-select-field style="font-weight: 800"
+                                 :label="$tc('lengow-connector.setting.lengow_import_setting.waiting_for_shipment.label')"
+                                 v-model="lengowWaitingShipmentOrderId"
+                                 @update:value="onSaveSettings($event, 'lengowWaitingShipmentOrderId')"
+                                 @change="onSaveSettings($event, 'lengowWaitingShipmentOrderId')">
+                    <option v-for="(status, index) in statusOptions"
+                            :key="index"
+                            :value="status.value"
+                            :disabled="status.value === 'cancelled' || status.value === 'completed'">
+                        {{ status.label }}
+                    </option>
+                </sw-select-field>
+                <sw-select-field style="font-weight: 800"
+                                 :label="$tc('lengow-connector.setting.lengow_import_setting.shipped.label')"
+                                 v-model="lengowShippedOrderId"
+                                 @update:value="onSaveSettings($event, 'lengowShippedOrderId')"
+                                 @change="onSaveSettings($event, 'lengowShippedOrderId')">
+                    <option v-for="(status, index) in statusOptions"
+                            :key="index"
+                            :value="status.value"
+                            :disabled="status.value === 'cancelled'">
+                        {{ status.label }}
+                    </option>
+                </sw-select-field>
+                <sw-select-field style="font-weight: 800"
+                                 :label="$tc('lengow-connector.setting.lengow_import_setting.cancelled.label')"
+                                 v-model="lengowCanceledOrderId"
+                                 @update:value="onSaveSettings($event, 'lengowCanceledOrderId')"
+                                 @change="onSaveSettings($event, 'lengowCanceledOrderId')">
+                    <option v-for="(status, index) in statusOptions"
+                            :key="index"
+                            :value="status.value"
+                            :disabled="status.value === 'open' || status.value === 'in_progress'">
+                        {{ status.label }}
+                    </option>
+                </sw-select-field>
             </sw-card>
         {% endblock %}
         {% block lgw_setting_import_footer %}

@@ -1,3 +1,10 @@
+# v2.0.1
+ - Feature: [Connector] API plan changed to API restrictions
+ - Feature: [import] E-mail anonymize and encryption
+ - Feature: [Import] Matching status for order import
+ - Feature: [import] Support for fractional days in order import url in days parameter
+ - BugFix: Hydrate address for FBA orders, when fields are null (amazon_us)
+
 # v2.0.0
 - Bugfix: [Symfony] Change annotation route to attribute route
 - Bugfix: [VueJs] Fix template not display

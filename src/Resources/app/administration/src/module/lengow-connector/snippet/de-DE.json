@@ -285,7 +285,11 @@
                 "exclusions": "Ausschlüsse",
                 "shipping": "Standard-Versandmethode",
                 "marketplaces": "Marktplätze",
-                "others": "Andere"
+                "others": "Andere",
+                "orders_status": "Bestellstatus"
+            },
+            "orders_status": {
+                "description": "Weisen Sie Ihren Bestellungen Lengow-Status zu, damit Sie sie in der Gesamtheit Ihrer Bestellungen leicht finden können."
             },
             "lengow_main_setting": {
                 "label": "Haupteinstellungen",
@@ -386,6 +390,23 @@
                 "import_btob": {
                     "label": "Import von B2B-Bestellungen ohne Steuern ermöglichen",
                     "description": "Aktivieren Sie diese Option, um B2B-Bestellungen ohne Steuer zu importieren"
+                },
+                "anonymize_email": {
+                    "label": "Aktivieren Sie die E-Mail-Anonymisierung",
+                    "description": "Anonymisieren Sie die E-Mail-Adressen Ihrer Kunden, Beispiel: 123456789-amazon_fr"
+                },
+                "encrypt_email": {
+                    "label": "E-Mail-Adressen zu verschlüsseln",
+                    "description": "verschlüsselt anonymisierte E-Mail-Adressen, Beispiel: 6f7806d2d9a35c0faff5778bd28e0c72"
+                },
+                "waiting_for_shipment": {
+                    "label": "Aufträge in Vorbereitung"
+                },
+                "shipped": {
+                    "label": "Versendete Bestellungen"
+                },
+                "cancelled": {
+                    "label": "Stornierte Aufträge"
                 }
             }
         },

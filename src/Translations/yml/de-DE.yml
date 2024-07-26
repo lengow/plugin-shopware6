@@ -257,6 +257,9 @@ de:
           shipping: "Standard-Versandmethode"
           marketplaces: "Marktplätze"
           others: "Andere"
+          orders_status: "Bestellstatus"
+        orders_status:
+          description: "Weisen Sie Ihren Bestellungen Lengow-Status zu, damit Sie sie in der Gesamtheit Ihrer Bestellungen leicht finden können."
         lengow_main_setting:
           label: "Haupteinstellungen"
           description: "Im Folgenden finden Sie Ihre Lengow Zugangsdaten.\nKonto ID, Zugangstoken, Geheimtoken werden bei der ersten Anmeldung automatisch ausgefüllt: bitte keine Änderungen eingeben!"
@@ -333,6 +336,19 @@ de:
           import_btob:
             label: "Import von B2B-Bestellungen ohne Steuern ermöglichen"
             description: "Aktivieren Sie diese Option, um B2B-Bestellungen ohne Steuer zu importieren"
+          anonymize_email:
+            label: "Aktivieren Sie die E-Mail-Anonymisierung"
+            description: "Anonymisieren Sie die E-Mail-Adressen Ihrer Kunden, Beispiel: 123456789-amazon_fr"
+          encrypt_email:
+            label: "E-Mail-Adressen zu verschlüsseln"
+            description: "verschlüsselt anonymisierte E-Mail-Adressen, Beispiel: 6f7806d2d9a35c0faff5778bd28e0c72"
+          waiting_for_shipment:
+            label: "Aufträge in Vorbereitung"
+          shipped:
+            label: "Versendete Bestellungen"
+          cancelled:
+            label: "Stornierte Aufträge"
+
       toolbox:
         menu:
           overview: "Übersicht"
@@ -438,6 +454,7 @@ de:
         salutation_not_found: "In unserem System wurde keine Anrede gefunden. Bitte fügen Sie es Ihrer Shopware Konfiguration hinzu"
         shopware_customer_not_saved: "VORSICHT! Kunde konnte NICHT in der Shopware Datenbank gespeichert werden"
         shopware_order_not_saved: "VORSICHT! Bestellung konnte NICHT in der Shopware Datenbank gespeichert werden"
+        not_provided: "Nicht vom Marketplace bereitgestellt"
       mail_report:
         subject_report_mail: "Lengow Importfehler"
         order: "Bestellungen %{marketplace_sku}"
