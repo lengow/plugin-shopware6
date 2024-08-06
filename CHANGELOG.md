@@ -1,11 +1,25 @@
-# v2.0.1
+# Changelog
+
+## [1.2.0](https://github.com/lengow/plugin-shopware6/compare/v1.1.0...v1.2.0) (2024-08-06)
+
+
+### Features
+
+* **cicd:** Setup a basic CI ([#3](https://github.com/lengow/plugin-shopware6/issues/3)) ([5107359](https://github.com/lengow/plugin-shopware6/commit/51073593178a91554e4cbd0ae2752ab447f10a0a))
+
+
+### Miscellaneous
+
+* **clean:** Remove obsolete files ([5107359](https://github.com/lengow/plugin-shopware6/commit/51073593178a91554e4cbd0ae2752ab447f10a0a))
+
+## v2.0.1
  - Feature: [Connector] API plan changed to API restrictions
  - Feature: [import] E-mail anonymize and encryption
  - Feature: [Import] Matching status for order import
  - Feature: [import] Support for fractional days in order import url in days parameter
  - BugFix: Hydrate address for FBA orders, when fields are null (amazon_us)
 
-# v2.0.0
+## v2.0.0
 - Bugfix: [Symfony] Change annotation route to attribute route
 - Bugfix: [VueJs] Fix template not display
 - Bugfix: [VueJs] Fix Vuejs comptability for v2 and v3
@@ -16,18 +30,18 @@
 - Bugfix: [Export] Fix wrong value for delivery delay by product
 - Feature: Remove Tracker from plugin
 
-# v1.2.1
+## v1.2.1
 - Bugfix: [install] Fix uninstall plugin when user want delete all data
 - Bugfix: [install] Fix wrong definition of cron url and toolbox url
 - Bugfix: [toolbox] Fix modified files feature
 - Feature: Add return_tracking_number and return_carrier field if is optional argument and send this data in order action
 - Feature: Add compatibility for Shopware 6.5.8
 
-# v1.2.0
+## v1.2.0
 - Bugfix: [import] fix add product to Shopware Cart
 - Bugfix: [action] Fix id Action is not integer
 
-# v1.1.3
+## v1.1.3
 - Bugfix: [install] fix intallation plugin
 - Bugfix: [global] Replace class EntityRepositoryInterface by EntityRepository
 - Bugfix: [front] Use new class name for icon librairy of Shopware
@@ -39,19 +53,19 @@
 - Feature: Add configurable URL environment to connect to Lengow in setting and add accessible setting in footer of module
 - Feature: get details of modified file in toolbox
 
-# v1.1.2
+## v1.1.2
 - Bugfix: [import] fix search carrier code
 
-# v1.1.1
+## v1.1.1
 - Feature: Adding the PHP version in the toolbox
 - Feature: Modification of the fallback urls of the Lengow Help Center
 - Feature: Adding extra field update date in external toolbox
 
-# v1.1.0
+## v1.1.0
 - Feature: Integration of order synchronization in the toolbox webservice
 - Feature: Retrieving the status of an order in the toolbox webservice
 
-# v1.0.2
+## v1.0.2
 - Feature: Outsourcing of the toolbox via webservice
 - Feature: Added compatibility with Shopware 6.4
 - Feature: Setting up a modal for the plugin update
@@ -59,11 +73,11 @@
 - Bugfix: [export] fix headers fields duplication
 - Bugfix: [export] fix image retrieval
 
-# v1.0.1
+## v1.0.1
 - Bugfix: [export] Add parameters in product SQL requests
 - Bugfix: [export] Use getFeedUrl() function in product grid
 
-# v1.0.0
+## v1.0.0
 - Feature: Lengow Dashboard (contact, helper center and quick links)
 - Feature: Product page with product selection by sales channel
 - Feature: Direct retrieval of the Shopware catalog in Lengow
