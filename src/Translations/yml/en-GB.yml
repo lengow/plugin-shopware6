@@ -328,6 +328,11 @@ en:
           shipping:
             label: "Default shipping method"
             description: "Select the default shipping method that you would like to apply to your orders"
+          payment:
+            label: "Payment method"
+          payment_per_marketplace:
+            label: "Create specific payment methods for each marketplace"
+            description: "Without this option, the generic lengow payment method will be used for all marketplaces"
           import_days:
             label: "Synchronize all orders updated since"
             description: "Choose a number of days (Max 10 days)"

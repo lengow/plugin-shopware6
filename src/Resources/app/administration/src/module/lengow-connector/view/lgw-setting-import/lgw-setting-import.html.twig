@@ -27,6 +27,21 @@
                 </sw-switch-field>
             </sw-card>
         {% endblock %}
+        {% block lgw_setting_import_payment %}
+            <sw-card :title="$tc('lengow-connector.setting.lengow_import_setting.payment.label')">
+                <sw-help-text class="lgw-help-text"
+                              :text="$tc('lengow-connector.setting.lengow_import_setting.payment_per_marketplace.description')"
+                              :width="200"
+                              tooltipPosition="right"/>
+                <sw-switch-field class="text-center"
+                                 :label="$tc('lengow-connector.setting.lengow_import_setting.payment_per_marketplace.label')"
+                                 v-model="lengowPaymentPerMarketplace"
+                                 @update:value="onSaveSettings($event, 'lengowPaymentPerMarketplace')"
+                                 @change="onSaveSettings($event, 'lengowPaymentPerMarketplace')"
+                >
+                </sw-switch-field>
+            </sw-card>
+        {% endblock %}
         {% block lgw_setting_import_shipping %}
             <sw-card :title="$tc('lengow-connector.setting.lengow_import_setting.shipping.label')">
                 <template v-if="render">

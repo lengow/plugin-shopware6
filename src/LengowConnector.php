@@ -109,17 +109,11 @@ class LengowConnector extends Plugin
             'description' => 'Lengow payment, DO NOT activate NOR delete',
             'pluginId' => $pluginId,
             'afterOrderEnabled' => false,
+            'active' => false,
         ];
         /** @var EntityRepository $paymentRepository */
         $paymentRepository = $this->container->get('payment_method.repository');
         $paymentRepository->upsert([$lengowPaymentData], $context);
-        // Without this workaround, paymentMethod is activated by default
-        $connection = $this->container->get(Connection::class);
-        if ($connection) {
-            $connection->exec(
-                "UPDATE `payment_method` SET `active` = 0 WHERE `id` = UNHEX('{$this->getPaymentMethodId()}');"
-            );
-        }
     }
 
     /**

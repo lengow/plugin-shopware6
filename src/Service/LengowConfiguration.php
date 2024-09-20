@@ -51,6 +51,7 @@ class LengowConfiguration
     public const B2B_WITHOUT_TAX_ENABLED = 'lengowImportB2b';
     public const SHIPPED_BY_MARKETPLACE_ENABLED = 'lengowImportShipMpEnabled';
     public const SHIPPED_BY_MARKETPLACE_STOCK_ENABLED = 'lengowImportStockShipMp';
+    public const PAYMENT_PER_MARKETPLACE_ENABLED = 'lengowPaymentPerMarketplace';
     public const SYNCHRONIZATION_IN_PROGRESS = 'lengowImportInProgress';
     public const DEFAULT_IMPORT_CARRIER_ID = 'lengowImportDefaultShippingMethod';
     public const LAST_UPDATE_EXPORT = 'lengowLastExport';
@@ -130,6 +131,7 @@ class LengowConfiguration
         self::B2B_WITHOUT_TAX_ENABLED => 'b2b_without_tax_enabled',
         self::SHIPPED_BY_MARKETPLACE_ENABLED => 'shipped_by_marketplace_enabled',
         self::SHIPPED_BY_MARKETPLACE_STOCK_ENABLED => 'shipped_by_marketplace_stock_enabled',
+        self::PAYMENT_PER_MARKETPLACE_ENABLED => 'payment_per_marketplace_enabled',
         self::SYNCHRONIZATION_IN_PROGRESS => 'synchronization_in_progress',
         self::LAST_UPDATE_EXPORT => 'last_update_export',
         self::LAST_UPDATE_CRON_SYNCHRONIZATION => 'last_update_cron_synchronization',
@@ -292,6 +294,11 @@ class LengowConfiguration
             self::PARAM_DEFAULT_VALUE => '0',
         ],
         self::SHIPPED_BY_MARKETPLACE_STOCK_ENABLED => [
+            self::PARAM_GLOBAL => true,
+            self::PARAM_RETURN => self::RETURN_TYPE_BOOLEAN,
+            self::PARAM_DEFAULT_VALUE => '0',
+        ],
+        self::PAYMENT_PER_MARKETPLACE_ENABLED => [
             self::PARAM_GLOBAL => true,
             self::PARAM_RETURN => self::RETURN_TYPE_BOOLEAN,
             self::PARAM_DEFAULT_VALUE => '0',
