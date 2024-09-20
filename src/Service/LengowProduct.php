@@ -61,6 +61,7 @@ class LengowProduct
         'ean' => 'getEan',
         'name' => 'getName',
         'quantity' => 'getAvailableStock',
+        'stock' => 'getStock',
         'weight' => 'getWeight',
         'width' => 'getWidth',
         'height' => 'getHeight',
@@ -418,6 +419,7 @@ class LengowProduct
                 case LengowExport::$defaultFields['sku_supplier']:
                 case LengowExport::$defaultFields['ean']:
                 case LengowExport::$defaultFields['quantity']:
+                case LengowExport::$defaultFields['stock']:
                 case LengowExport::$defaultFields['parent_id']:
                 case LengowExport::$defaultFields['minimal_quantity']:
                     $productData[$headerField] = $this->getUntranslatedField($headerField);
@@ -495,6 +497,11 @@ class LengowProduct
                     } else {
                         $productData[$headerField] = '';
                     }
+                    break;
+                case LengowExport::$defaultFields['release_date']:
+                    $productData[$headerField] = ($date = $this->product->getReleaseDate())
+                        ? $date->format('Y-m-d H:i:s')
+                        : '';
                     break;
                 default:
                     $value = '';
