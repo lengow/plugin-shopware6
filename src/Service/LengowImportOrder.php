@@ -5,6 +5,7 @@ namespace Lengow\Connector\Service;
 use DateTime;
 use Exception;
 use Doctrine\DBAL\Connection;
+use Lengow\Connector\Util\EnvironmentInfoProvider;
 use Shopware\Core\Checkout\Cart\Cart;
 use Shopware\Core\Checkout\Cart\LineItem\LineItem;
 use Shopware\Core\Checkout\Cart\Order\OrderConversionContext;
@@ -325,6 +326,11 @@ class LengowImportOrder
     private $errors = [];
 
     /**
+     * @var EnvironmentInfoProvider
+     */
+    private EnvironmentInfoProvider $environmentInfoProvider;
+
+    /**
      * LengowImportOrder Construct
      *
      * @param LengowConfiguration $lengowConfiguration Lengow configuration service
@@ -342,6 +348,7 @@ class LengowImportOrder
      * @param OrderConverter $orderConverter Shopware order converter service
      * @param QuantityPriceCalculator $calculator Shopware quantity price calculator service
      * @param Connection $connection Doctrine connection service
+     * @param EnvironmentInfoProvider $environmentInfoProvider
      */
     public function __construct(
         LengowConfiguration $lengowConfiguration,
@@ -358,7 +365,8 @@ class LengowImportOrder
         CartService $cartService,
         OrderConverter $orderConverter,
         QuantityPriceCalculator $calculator,
-        Connection $connection
+        Connection $connection,
+        EnvironmentInfoProvider $environmentInfoProvider
     )
     {
         $this->lengowConfiguration = $lengowConfiguration;
@@ -376,6 +384,7 @@ class LengowImportOrder
         $this->orderConverter = $orderConverter;
         $this->calculator = $calculator;
         $this->connection = $connection;
+        $this->environmentInfoProvider = $environmentInfoProvider;
     }
 
     /**
@@ -1327,12 +1336,20 @@ class LengowImportOrder
             LengowConfiguration::DEFAULT_IMPORT_CARRIER_ID,
             $this->salesChannel->getId()
         );
-        // create a specific context with all order data
-        $salesChannelContext = $this->salesChannelContextFactory->create($token, $this->salesChannel->getId(), [
+
+        $data = [
             SalesChannelContextService::CUSTOMER_ID => $customer->getId(),
             SalesChannelContextService::CURRENCY_ID => $this->currency->getId(),
-            SalesChannelContextService::SHIPPING_METHOD_ID => $shippingMethodId,
-        ]);
+            SalesChannelContextService::SHIPPING_METHOD_ID => $shippingMethodId
+        ];
+
+        $paymentMethod = $this->environmentInfoProvider->getLengowPaymentMethod();
+        if ($paymentMethod) {
+            $data[SalesChannelContextService::PAYMENT_METHOD_ID] = $paymentMethod->getId();
+        }
+
+        // Create a specific context with all order data
+        $salesChannelContext = $this->salesChannelContextFactory->create($token, $this->salesChannel->getId(), $data);
         // create a generic cart
         $cart = $this->createCart($token, $products, $salesChannelContext);
 

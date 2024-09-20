@@ -87,6 +87,7 @@
             <argument type="service" id="Shopware\Core\Checkout\Cart\Order\OrderConverter"/>
             <argument type="service" id="Shopware\Core\Checkout\Cart\Price\QuantityPriceCalculator"/>
             <argument type="service" id="Doctrine\DBAL\Connection"/>
+            <argument type="service" id="Lengow\Connector\Util\EnvironmentInfoProvider"/>
         </service>
 
         <service id="Lengow\Connector\Service\LengowExport">
