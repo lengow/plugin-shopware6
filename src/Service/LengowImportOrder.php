@@ -1374,7 +1374,7 @@ class LengowImportOrder
             SalesChannelContextService::SHIPPING_METHOD_ID => $shippingMethodId
         ];
 
-        if ($this->lengowConfiguration->get(LengowConfiguration::PAYMENT_PER_MARKETPLACE_ENABLED)) { // TODO
+        if ($this->lengowConfiguration->get(LengowConfiguration::PAYMENT_PER_MARKETPLACE_ENABLED)) {
             $data[SalesChannelContextService::PAYMENT_METHOD_ID] = $this->getOrCreateLengowPaymentMethodForSalesChannel(
                 $this->lengowMarketplace->getName(),
                 $this->salesChannel,
