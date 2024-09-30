@@ -328,6 +328,11 @@ fr:
           shipping:
             label: "Méthode de livraison par défaut"
             description: "Sélectionnez le transporteur par défaut à appliquer à vos commandes"
+          payment:
+            label: "Méthode de paiement"
+          payment_per_marketplace:
+            label: "Créer une méthode de paiement spécifique par marketplace"
+            description: "Sans cette option, la méthode de paiement générique Lengow sera utilisée pour toutes les marketplaces"
           import_days:
             label: "Synchroniser toutes les commandes mises à jour depuis"
             description: "Choisissez le nombre de jours (Max 10 jours)"

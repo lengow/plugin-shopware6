@@ -481,7 +481,7 @@ class LengowImport
                 $intervalTime = $lastIntervalTime > $intervalTime ? $intervalTime : $lastIntervalTime;
             }
         }
-        $this->updatedFrom = time() - $intervalTime;
+        $this->updatedFrom = time() - (int)$intervalTime;
         $this->updatedTo = time();
     }
 

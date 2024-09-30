@@ -319,6 +319,11 @@ de:
           shipping:
             label: "Standard-Versandmethode"
             description: "Wählen Sie die Standardversandmethode, die Sie auf Ihre Bestellungen anwenden möchten"
+          payment:
+            label: "Zahlungsmethode"
+          payment_per_marketplace:
+            label: "Erstellen einer spezifischen Zahlungsmethode pro Marktplatz"
+            description: "Ohne diese Option wird die generische Zahlungsmethode Lengow für alle Marketplaces verwendet."
           import_days:
             label: "Synchronisieren Sie alle Bestellungen, die aktualisiert wurden seit"
             description: "Anzahl der Tage auswählen (Max. 10 Tage)"

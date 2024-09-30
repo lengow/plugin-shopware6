@@ -5,6 +5,7 @@ namespace Lengow\Connector\Service;
 use DateTime;
 use Exception;
 use Doctrine\DBAL\Connection;
+use Lengow\Connector\Util\EnvironmentInfoProvider;
 use Shopware\Core\Checkout\Cart\Cart;
 use Shopware\Core\Checkout\Cart\LineItem\LineItem;
 use Shopware\Core\Checkout\Cart\Order\OrderConversionContext;
@@ -20,6 +21,7 @@ use Shopware\Core\Checkout\Order\Aggregate\OrderDelivery\OrderDeliveryStates;
 use Shopware\Core\Checkout\Order\Aggregate\OrderTransaction\OrderTransactionStates;
 use Shopware\Core\Checkout\Order\OrderEntity;
 use Shopware\Core\Checkout\Order\OrderStates;
+use Shopware\Core\Checkout\Payment\PaymentMethodEntity;
 use Shopware\Core\Content\Product\ProductEntity;
 use Shopware\Core\Defaults;
 use Shopware\Core\Framework\Context;
@@ -27,6 +29,7 @@ use Shopware\Core\Framework\DataAbstractionLayer\Doctrine\RetryableQuery;
 use Shopware\Core\Framework\DataAbstractionLayer\EntityRepository;
 use Shopware\Core\Framework\DataAbstractionLayer\Search\Criteria;
 use Shopware\Core\Framework\DataAbstractionLayer\Search\Filter\EqualsFilter;
+use Shopware\Core\Framework\Plugin\Util\PluginIdProvider;
 use Shopware\Core\Framework\Uuid\Uuid;
 use Shopware\Core\System\Currency\CurrencyCollection;
 use Shopware\Core\System\Currency\CurrencyEntity;
@@ -325,6 +328,31 @@ class LengowImportOrder
     private $errors = [];
 
     /**
+     * @var EnvironmentInfoProvider
+     */
+    private EnvironmentInfoProvider $environmentInfoProvider;
+
+    /**
+     * @var EntityRepository
+     */
+    private EntityRepository $paymentMethodRepository;
+
+    /**
+     * @var EntityRepository
+     */
+    private EntityRepository $salesChannelRepository;
+
+    /**
+     * @var PluginIdProvider
+     */
+    private PluginIdProvider $pluginIdProvider;
+
+    /**
+     * @var Context
+     */
+    private Context $context;
+
+    /**
      * LengowImportOrder Construct
      *
      * @param LengowConfiguration $lengowConfiguration Lengow configuration service
@@ -342,6 +370,10 @@ class LengowImportOrder
      * @param OrderConverter $orderConverter Shopware order converter service
      * @param QuantityPriceCalculator $calculator Shopware quantity price calculator service
      * @param Connection $connection Doctrine connection service
+     * @param EnvironmentInfoProvider $environmentInfoProvider
+     * @param EntityRepository $paymentMethodRepository
+     * @param EntityRepository $salesChannelRepository
+     * @param PluginIdProvider $pluginIdProvider
      */
     public function __construct(
         LengowConfiguration $lengowConfiguration,
@@ -358,9 +390,12 @@ class LengowImportOrder
         CartService $cartService,
         OrderConverter $orderConverter,
         QuantityPriceCalculator $calculator,
-        Connection $connection
-    )
-    {
+        Connection $connection,
+        EnvironmentInfoProvider $environmentInfoProvider,
+        EntityRepository $paymentMethodRepository,
+        EntityRepository $salesChannelRepository,
+        PluginIdProvider $pluginIdProvider
+    ) {
         $this->lengowConfiguration = $lengowConfiguration;
         $this->lengowLog = $lengowLog;
         $this->lengowMarketplaceFactory = $lengowMarketplaceFactory;
@@ -376,6 +411,11 @@ class LengowImportOrder
         $this->orderConverter = $orderConverter;
         $this->calculator = $calculator;
         $this->connection = $connection;
+        $this->environmentInfoProvider = $environmentInfoProvider;
+        $this->paymentMethodRepository = $paymentMethodRepository;
+        $this->salesChannelRepository = $salesChannelRepository;
+        $this->pluginIdProvider = $pluginIdProvider;
+        $this->context = Context::createDefaultContext();
     }
 
     /**
@@ -1327,12 +1367,33 @@ class LengowImportOrder
             LengowConfiguration::DEFAULT_IMPORT_CARRIER_ID,
             $this->salesChannel->getId()
         );
-        // create a specific context with all order data
-        $salesChannelContext = $this->salesChannelContextFactory->create($token, $this->salesChannel->getId(), [
+
+        $data = [
             SalesChannelContextService::CUSTOMER_ID => $customer->getId(),
             SalesChannelContextService::CURRENCY_ID => $this->currency->getId(),
-            SalesChannelContextService::SHIPPING_METHOD_ID => $shippingMethodId,
-        ]);
+            SalesChannelContextService::SHIPPING_METHOD_ID => $shippingMethodId
+        ];
+
+        if ($this->lengowConfiguration->get(LengowConfiguration::PAYMENT_PER_MARKETPLACE_ENABLED)) {
+            $data[SalesChannelContextService::PAYMENT_METHOD_ID] = $this->getOrCreateLengowPaymentMethodForSalesChannel(
+                $this->lengowMarketplace->getName(),
+                $this->salesChannel,
+                $this->context
+            )->getId();
+        } else {
+            $paymentMethod = $this->environmentInfoProvider->getLengowPaymentMethod();
+            if ($paymentMethod) {
+                $this->ensurePaymentMethodActiveInSalesChannel(
+                    $paymentMethod->getId(),
+                    $this->salesChannel,
+                    $this->context
+                );
+                $data[SalesChannelContextService::PAYMENT_METHOD_ID] = $paymentMethod->getId();
+            }
+        }
+
+        // Create a specific context with all order data
+        $salesChannelContext = $this->salesChannelContextFactory->create($token, $this->salesChannel->getId(), $data);
         // create a generic cart
         $cart = $this->createCart($token, $products, $salesChannelContext);
 
@@ -1683,6 +1744,94 @@ class LengowImportOrder
                     ])
                 );
             }
+        }
+    }
+
+    /**
+     * Get or create the Lengow payment method and ensure it's activated for the Sales Channel
+     *
+     * @param string $marketplaceName
+     * @param SalesChannelEntity $salesChannel
+     * @param Context $context
+     * @return PaymentMethodEntity
+     */
+    public function getOrCreateLengowPaymentMethodForSalesChannel(
+        string $marketplaceName,
+        SalesChannelEntity $salesChannel,
+        Context $context
+    ): PaymentMethodEntity {
+        // Define payment method name
+        $paymentMethodName = 'Lengow (' . $marketplaceName . ') Payment';
+
+        // Search for existing payment method
+        $criteria = new Criteria();
+        $criteria->addFilter(new EqualsFilter('name', $paymentMethodName));
+
+        $paymentMethods = $this->paymentMethodRepository->search($criteria, $context);
+
+        // If payment method exists, return it
+        if ($paymentMethods->count() > 0) {
+            $paymentMethod = $paymentMethods->first();
+        } else {
+            // If not exists, create a new payment method
+            $paymentMethodId = Uuid::randomHex();
+            $pluginId = $this->pluginIdProvider->getPluginIdByBaseClass(\Lengow\Connector\LengowConnector::class, $context);
+
+            $this->paymentMethodRepository->create([
+                [
+                    'id' => $paymentMethodId,
+                    'name' => $paymentMethodName,
+                    'description' => 'Payment method for Lengow marketplace: ' . $marketplaceName,
+                    'active' => false,
+                    'afterOrderEnabled' => false,
+                    'handlerIdentifier' => LengowPayment::class,
+                    'pluginId' => $pluginId
+                ]
+            ], $context);
+
+            $paymentMethod = $this->paymentMethodRepository->search(new Criteria([$paymentMethodId]), $context)->first();
+            $this->lengowLog->write('Import', 'Payment method created: ' . $paymentMethodName, $this->logOutput);
+        }
+
+        // Check if payment method is enabled in the sales channel
+        $this->ensurePaymentMethodActiveInSalesChannel($paymentMethod->getId(), $salesChannel, $context);
+
+        return $paymentMethod;
+    }
+
+    /**
+     * Ensure the payment method is active in the specified sales channel
+     *
+     * @param string $paymentMethodId
+     * @param SalesChannelEntity $salesChannel
+     * @param Context $context
+     */
+    private function ensurePaymentMethodActiveInSalesChannel(
+        string $paymentMethodId,
+        SalesChannelEntity $salesChannel,
+        Context $context
+    ): void {
+        $criteria = new Criteria([$salesChannel->getId()]);
+        $criteria->addAssociation('paymentMethods');
+        /* @var $salesChannelData SalesChannelEntity */
+        $salesChannelData = $this->salesChannelRepository->search($criteria, $context)->first();
+
+        // Check if payment method is already in the sales channel's active payment methods
+        $activePaymentMethodIds = $salesChannelData->getPaymentMethods()->map(function ($paymentMethod) {
+            return $paymentMethod->getId();
+        });
+
+        if (!in_array($paymentMethodId, $activePaymentMethodIds)) {
+            // Add payment method to the Sales Channel if not already active
+            $this->salesChannelRepository->update([
+                [
+                    'id' => $salesChannel->getId(),
+                    'paymentMethods' => array_map(function($paymentMethodId) {
+                        return ['id' => $paymentMethodId];
+                    }, array_merge($activePaymentMethodIds, [$paymentMethodId]))
+                ]
+            ], $context);
+            $this->lengowLog->write('Import', 'Payment method added to sales channel: ' . $salesChannelData->getName(), $this->logOutput);
         }
     }
 }
