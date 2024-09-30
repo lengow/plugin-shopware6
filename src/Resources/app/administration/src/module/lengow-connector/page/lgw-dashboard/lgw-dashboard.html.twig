@@ -33,7 +33,7 @@
                 <template v-else-if="trialExpired && !isLoading">
                     <lgw-dashboard-free-trial></lgw-dashboard-free-trial>
                 </template>
-                <template v-else>
+                <template v-else-if="isLoading">
                     <sw-loader size="50px"></sw-loader>
                 </template>
             </template>
