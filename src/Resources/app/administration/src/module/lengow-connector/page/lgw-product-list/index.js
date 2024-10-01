@@ -332,7 +332,9 @@ Component.register('lgw-product-list', {
             this.total = this.products.total;
             const productCriteria = new Criteria();
             this.naturalSorting = this.sortBy === 'productNumber';
-            productCriteria.addFilter(Criteria.equalsAny('product.id', this.productIds));
+            if (this.productIds.length > 0) {
+                productCriteria.addFilter(Criteria.equalsAny('product.id', this.productIds));
+            }
             productCriteria.addSorting(
                 Criteria.sort(this.sortBy, this.sortDirection, this.naturalSorting)
             );
