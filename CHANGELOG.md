@@ -1,5 +1,12 @@
 # Changelog
 
+## [2.1.1](https://github.com/lengow/plugin-shopware6/compare/v2.1.0...v2.1.1) (2024-10-14)
+
+
+### Bug Fixes
+
+* **connector:** [ECP-114] rate limit request for shopware ([#12](https://github.com/lengow/plugin-shopware6/issues/12)) ([1155320](https://github.com/lengow/plugin-shopware6/commit/1155320d4b2e5f2e84146f69f3092571a845cd16))
+
 ## [2.1.0](https://github.com/lengow/plugin-shopware6/compare/v1.1.0...v2.1.0) (2024-10-01)
 
 
