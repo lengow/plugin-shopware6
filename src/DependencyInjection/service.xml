@@ -183,6 +183,11 @@
             <argument type="service" id="Lengow\Connector\Util\EnvironmentInfoProvider"/>
         </service>
 
+        <service id="Lengow\Connector\EventSubscriber\EntitySearchedSubscriber"
+                 class="Lengow\Connector\EventSubscriber\EntitySearchedSubscriber">
+            <argument type="service" id="lengow_settings.repository"/>
+            <tag name="kernel.event_subscriber"/>
+        </service>
 
     </services>
 </container>
