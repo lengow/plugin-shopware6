@@ -1126,14 +1126,18 @@ class LengowConfiguration
     /**
      * Get value of matching state order
      *
+     * @param string $state
      * @return string
      */
     public function getStateOrderValue(string $state): string
     {
         return match ($state) {
-            OrderStates::STATE_COMPLETED => $this->get(self::SHIPPED_ORDER_ID),
-            OrderStates::STATE_IN_PROGRESS => $this->get(self::WAITING_SHIPMENT_ORDER_ID),
-            OrderStates::STATE_CANCELLED => $this->get(self::CANCELED_ORDER_ID),
+            OrderStates::STATE_COMPLETED => ($value = $this->get(self::SHIPPED_ORDER_ID))
+                ? $value : self::$lengowSettings[self::SHIPPED_ORDER_ID][self::PARAM_DEFAULT_VALUE],
+            OrderStates::STATE_IN_PROGRESS => ($value = $this->get(self::WAITING_SHIPMENT_ORDER_ID))
+                ? $value : self::$lengowSettings[self::WAITING_SHIPMENT_ORDER_ID][self::PARAM_DEFAULT_VALUE],
+            OrderStates::STATE_CANCELLED => ($value = $this->get(self::CANCELED_ORDER_ID))
+                ? $value : self::$lengowSettings[self::CANCELED_ORDER_ID][self::PARAM_DEFAULT_VALUE],
             default => 'cancelled',
         };
     }

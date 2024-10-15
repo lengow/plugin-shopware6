@@ -18,7 +18,7 @@
 /src/Controller/LengowOrderController.php|ec903d332408a3663b883b643500f433
 /src/Controller/LengowToolboxController.php|5c19d781e51053854f1e4356b882c3e0
 /src/Controller/LengowExportController.php|3bd59f28e29b7414b93509b9759368ef
-/src/DependencyInjection/service.xml|353bb5a1b02bb1c4ba83383441d6bcf8
+/src/DependencyInjection/service.xml|9b57ee941767ac8903e634cb85ab5cae
 /src/DependencyInjection/factory.xml|b0a2f519ba5efaecfd49bdb176c525db
 /src/DependencyInjection/subscriber.xml|4522df0bfa32107c0763521b4d617704
 /src/DependencyInjection/extension.xml|d3371b4999560d73926cf82d58206b53
@@ -429,7 +429,7 @@
 /src/Service/LengowProduct.php|8649c28bacc1b462685665d0f9d2435c
 /src/Service/LengowCustomer.php|7d9619ec0c1d8f9e8ec3aa552fe32c5e
 /src/Service/LengowExport.php|bed6b9a706720c39e62d378e75b5c5cc
-/src/Service/LengowConfiguration.php|be586ac3a138cafe9525e6aabf06d937
+/src/Service/LengowConfiguration.php|26707970673ae699802d33cad9b7ee29
 /src/Service/LengowFeed.php|0946aef9107b853e4bd30f8532b29b62
 /src/Service/LengowCatalog.php|a75d066ea0acdf668ba00d3b6eaf8845
 /src/Service/LengowConnector.php|109a80ad8c8f0e227bb2687eb2f786a4
