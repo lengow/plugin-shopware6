@@ -105,6 +105,8 @@ remove_files $FOLDER_TMP "README.md"
 remove_files $FOLDER_TMP "LICENCE.md"
 # remove .git
 remove_files $FOLDER_TMP ".git"
+# remove .github
+rm -Rf "$FOLDER_TMP/.github"
 # remove .gitignore
 remove_files $FOLDER_TMP ".gitignore"
 # remove .DS_Store
