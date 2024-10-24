@@ -73,7 +73,7 @@
                 "failed_description": "We were unable to make the connection between your Shopware and Lengow.",
                 "failed_description_first_credentials": "Unable to connect with credentials provided.",
                 "failed_description_second_credentials_prod": "Please verify that these credentials match Lengow's production environment.",
-                "failed_description_second_credentials_preprod": "Please verify that these credentials match Lengow's pre-production environment.",
+                "failed_description_second_credentials_preprod": "Please verify that these credentials match Lengow's sandbox environment.",
                 "failed_help": "If the problem persists, you can take a look at",
                 "failed_help_center": "\"Shopware guide\"",
                 "failed_help_or": "or contact our",
@@ -393,7 +393,7 @@
                 },
                 "debug_mode": {
                     "label": "Activate Debug Mode",
-                    "description": "Use Debug Mode for testing and to simulate fictitious orders. Please note that you have to activate this setting on your pre-production server ONLY"
+                    "description": "Use Debug Mode for testing and to simulate fictitious orders. Please note that you have to activate this setting on your sandbox server ONLY"
                 },
                 "report_mail_enabled": {
                     "label": "I would like to be notified when there are issues regarding order importation"
