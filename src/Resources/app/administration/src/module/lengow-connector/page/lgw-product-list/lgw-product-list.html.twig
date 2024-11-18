@@ -165,6 +165,13 @@
                             {% block lgw_product_list_grid_loader %}
                                 <sw-loader v-if="isLoading || !salesChannelSelected"></sw-loader>
                             {% endblock %}
+                            <!-- Pagination controls -->
+                            <sw-pagination
+                                    :total="total"
+                                    :limit="limit"
+                                    :page="page"
+                                    @page-change="onPageChange"
+                            />
                         </div>
                     {% endblock %}
                 </div>
