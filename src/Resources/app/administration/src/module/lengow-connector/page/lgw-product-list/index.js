@@ -63,6 +63,8 @@ Component.register('lgw-product-list', {
             salesChannelDomain: '',
             tempListActivated: [],
             downloadLink: '',
+            page: 1,
+            limit: 10,
         };
     },
 
@@ -330,7 +332,8 @@ Component.register('lgw-product-list', {
 
         updateProductList() {
             this.total = this.products.total;
-            const productCriteria = new Criteria();
+            console.log(this.page, this.limit)
+            const productCriteria = new Criteria(this.page, this.limit);
             this.naturalSorting = this.sortBy === 'productNumber';
             if (this.productIds.length > 0) {
                 productCriteria.addFilter(Criteria.equalsAny('product.id', this.productIds));
@@ -350,7 +353,6 @@ Component.register('lgw-product-list', {
                     const [products, currencies] = result;
                     this.total = products.total;
                     products.forEach(product => {
-                        // eslint-disable-next-line no-param-reassign
                         product.extensions.activeInLengow.active =
                             typeof product.extensions.activeInLengow.activeArray[
                                 this.currentSalesChannelId
@@ -560,6 +562,11 @@ Component.register('lgw-product-list', {
                         typeof item.extensions.activeInLengow.activeArray[this.currentSalesChannelId] !== 'undefined';
                 }
             });
-        }
+        },
+        onPageChange(newPage) {
+            this.page = newPage.page;
+            this.limit = newPage.limit;
+            this.updateProductList();
+        },
     }
 });
