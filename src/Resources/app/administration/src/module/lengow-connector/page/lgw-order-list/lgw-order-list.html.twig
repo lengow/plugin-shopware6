@@ -208,7 +208,9 @@
                         {% endblock %}
 
                         {% block lgw_order_list_sidebar_filter %}
-                            <sw-sidebar-item icon="solid-filter"
+                            <sw-sidebar-item
+                                             style="padding: 10px"
+                                             icon="solid-filter"
                                              :title="$tc('sw-order.list.titleSidebarItemFilter')">
 
                                 {% block lgw_order_list_sidebar_filter_items %}

@@ -883,7 +883,7 @@ class LengowExport
             ]),
             $this->logOutput
         );
-        set_time_limit(0);
+        set_time_limit(7200);
         foreach ($products as $product) {
             // if offset specified in params
             if ($this->exportConfiguration[self::PARAM_OFFSET] !== 0

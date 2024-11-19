@@ -76,6 +76,7 @@ Component.register('lgw-product-list', {
                 this.defaultSalesChannel = salesChannelId;
                 this.onSalesChannelChanged(salesChannelId);
             });
+        this.addDynamicStyle();
         this.SEARCHFILTER = 'search';
         this.ACTIVEFILTER = 'active';
         this.STOCKFILTER = 'stock';
@@ -121,6 +122,18 @@ Component.register('lgw-product-list', {
         },
 
         currenciesColumns() {
+            const test = this.currencies
+                .sort((a, b) => (b.isSystemDefault ? 1 : -1))
+                .map(item => ({
+                    property: `price-${item.isoCode}`,
+                    dataIndex: `price.${item.id}`,
+                    label: `${item.name}`,
+                    allowResize: true,
+                    currencyId: item.id,
+                    visible: item.isSystemDefault,
+                    align: 'center',
+                    useCustomSort: true,
+                }));
             return this.currencies
                 .sort((a, b) => (b.isSystemDefault ? 1 : -1))
                 .map(item => ({
@@ -130,8 +143,8 @@ Component.register('lgw-product-list', {
                     allowResize: true,
                     currencyId: item.id,
                     visible: item.isSystemDefault,
-                    align: 'right',
-                    useCustomSort: true
+                    align: 'center',
+                    useCustomSort: true,
                 }));
         },
 
@@ -219,11 +232,16 @@ Component.register('lgw-product-list', {
                 this.filters.search = null;
                 return products;
             }
-            return products.filter(
-                product => product.id.toLowerCase().includes(value.toLowerCase()) ||
-                    product.productNumber.toLowerCase().includes(value.toLowerCase()) ||
-                    product.name.toLowerCase().includes(value.toLowerCase())
-            );
+
+            return products.filter(product => {
+                const id = product.id?.toLowerCase() || '';
+                const productNumber = product.productNumber?.toLowerCase() || '';
+                const name = product.name?.toLowerCase() || '';
+
+                return id.includes(value.toLowerCase()) ||
+                    productNumber.includes(value.toLowerCase()) ||
+                    name.includes(value.toLowerCase());
+            });
         },
 
         onActiveFilter(value) {
@@ -248,9 +266,45 @@ Component.register('lgw-product-list', {
             if (!this.salesChannelSelected) {
                 return;
             }
-            this.filteredResult = this.applyOtherFilter(this.baseProducts, 'search');
-            this.filters.search = input;
-            this.products = this.searchFilter(this.filteredResult, input);
+
+            this.searchFilterText = input;
+
+            if (input) {
+                // Lancer la recherche globale uniquement si une recherche est effectuée
+                this.searchGlobally(input);
+            } else {
+                // Réinitialiser à l'affichage paginé si le champ est vide
+                this.filteredResult = this.applyOtherFilter(this.baseProducts, 'search');
+                this.filters.search = null;
+                this.updateProductList();
+            }
+        },
+
+        searchGlobally(searchValue) {
+            const criteria = new Criteria();
+
+            if (searchValue) {
+                criteria.addFilter(Criteria.multi('OR', [
+                    Criteria.contains('name', searchValue),
+                    Criteria.contains('productNumber', searchValue),
+                    Criteria.contains('id', searchValue)
+                ]));
+            }
+
+            criteria.addAssociation('cover');
+            criteria.addAssociation('manufacturer');
+            criteria.setLimit(500);
+
+            this.isLoading = true;
+
+            return this.productRepository.search(criteria, Shopware.Context.api)
+                .then(result => {
+                    this.products = result;
+                    this.total = result.total;
+                })
+                .finally(() => {
+                    this.isLoading = false;
+                });
         },
 
         resetFilters() {
@@ -332,7 +386,6 @@ Component.register('lgw-product-list', {
 
         updateProductList() {
             this.total = this.products.total;
-            console.log(this.page, this.limit)
             const productCriteria = new Criteria(this.page, this.limit);
             this.naturalSorting = this.sortBy === 'productNumber';
             if (this.productIds.length > 0) {
@@ -350,6 +403,7 @@ Component.register('lgw-product-list', {
                 this.currencyRepository.search(currencyCriteria, Shopware.Context.api)
             ])
                 .then(result => {
+
                     const [products, currencies] = result;
                     this.total = products.total;
                     products.forEach(product => {
@@ -421,6 +475,7 @@ Component.register('lgw-product-list', {
                     });
                     this.onSalesChannelChanged(this.currentSalesChannelId);
                 });
+
         },
 
         onUnpublishOnLengow() {
@@ -435,6 +490,7 @@ Component.register('lgw-product-list', {
                     });
                     this.onSalesChannelChanged(this.currentSalesChannelId);
                 });
+            this.selection = [];
         },
 
         OnActivateOnLengow(selected) {
@@ -482,7 +538,8 @@ Component.register('lgw-product-list', {
         },
 
         getCurrencyPriceByCurrencyId(currencyId, prices) {
-            const priceForProduct = prices.find(price => price.currencyId === currencyId);
+            const actualCurrencyId = currencyId.toString();
+            const priceForProduct = prices.find(price => price.currencyId === actualCurrencyId);
             if (priceForProduct) {
                 return priceForProduct;
             }
@@ -494,8 +551,12 @@ Component.register('lgw-product-list', {
             };
         },
 
+        formatCurrency(value, currencyIsoCode) {
+            return new Intl.NumberFormat('fr-FR', { style: 'currency', currency: currencyIsoCode }).format(value);
+        },
+
         getProductColumns() {
-            return [
+            const columns = [
                 {
                     property: 'extensions.activeInLengow.active',
                     label: this.$tc('lengow-connector.product.column.active_in_lengow'),
@@ -539,6 +600,7 @@ Component.register('lgw-product-list', {
                     align: 'right'
                 }
             ];
+            return columns;
         },
 
         onStartSorting() {
@@ -563,10 +625,21 @@ Component.register('lgw-product-list', {
                 }
             });
         },
+
         onPageChange(newPage) {
             this.page = newPage.page;
             this.limit = newPage.limit;
             this.updateProductList();
+        },
+
+        addDynamicStyle() {
+            const style = document.createElement('style');
+            style.innerHTML = `
+            .sw-context-menu {
+                width: fit-content !important;
+            }
+        `;
+            document.head.appendChild(style);
         },
     }
 });
