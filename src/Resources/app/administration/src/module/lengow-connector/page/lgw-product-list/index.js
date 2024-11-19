@@ -270,10 +270,8 @@ Component.register('lgw-product-list', {
             this.searchFilterText = input;
 
             if (input) {
-                // Lancer la recherche globale uniquement si une recherche est effectuée
                 this.searchGlobally(input);
             } else {
-                // Réinitialiser à l'affichage paginé si le champ est vide
                 this.filteredResult = this.applyOtherFilter(this.baseProducts, 'search');
                 this.filters.search = null;
                 this.updateProductList();
