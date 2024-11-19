@@ -205,66 +205,66 @@ Component.register('lgw-order-list', {
             return [
                 {
                     property: 'isInError',
-                    label: 'lengow-connector.order.column.actions',
+                    label: this.$tc('lengow-connector.order.column.actions'),
                     align: 'center',
                     allowResize: true
                 },
                 {
                     property: 'orderLengowState',
-                    label: 'lengow-connector.order.column.lengow_status',
+                    label: this.$tc('lengow-connector.order.column.lengow_status'),
                     align: 'center',
                     allowResize: true
                 },
                 {
                     property: 'orderTypes',
-                    label: 'lengow-connector.order.column.order_types',
+                    label: this.$tc('lengow-connector.order.column.order_types'),
                     align: 'center',
                     allowResize: true
                 },
                 {
                     property: 'marketplaceSku',
-                    label: 'lengow-connector.order.column.marketplace_sku',
+                    label: this.$tc('lengow-connector.order.column.marketplace_sku'),
                     allowResize: true
                 },
                 {
                     property: 'marketplaceLabel',
-                    label: 'lengow-connector.order.column.marketplace',
+                    label: this.$tc('lengow-connector.order.column.marketplace'),
                     allowResize: true
                 },
                 {
                     property: 'salesChannel.name',
-                    label: 'lengow-connector.order.column.sales_channel_name',
+                    label: this.$tc('lengow-connector.order.column.sales_channel_name'),
                     allowResize: true
                 },
                 {
                     property: 'order.stateMachineState.name',
-                    label: 'lengow-connector.order.column.shopware_status',
+                    label: this.$tc('lengow-connector.order.column.shopware_status'),
                     allowResize: true
                 },
                 {
                     property: 'order.orderNumber',
-                    label: 'lengow-connector.order.column.shopware_sku',
+                    label: this.$tc('lengow-connector.order.column.shopware_sku'),
                     allowResize: true
                 },
                 {
                     property: 'customerName',
-                    label: 'lengow-connector.order.column.customer_name',
+                    label: this.$tc('lengow-connector.order.column.customer_name'),
                     allowResize: true
                 },
                 {
                     property: 'orderDate',
-                    label: 'lengow-connector.order.column.order_date',
+                    label: this.$tc('lengow-connector.order.column.order_date'),
                     allowResize: true
                 },
                 {
                     property: 'deliveryCountryIso',
-                    label: 'lengow-connector.order.column.country',
+                    label: this.$tc('lengow-connector.order.column.country'),
                     align: 'center',
                     allowResize: true
                 },
                 {
                     property: 'totalPaid',
-                    label: 'lengow-connector.order.column.total_paid',
+                    label: this.$tc('lengow-connector.order.column.total_paid'),
                     align: 'right',
                     allowResize: true
                 }

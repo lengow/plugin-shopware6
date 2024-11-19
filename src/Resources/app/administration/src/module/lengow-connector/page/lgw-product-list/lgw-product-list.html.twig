@@ -4,7 +4,8 @@
             <template #search-bar>
                 <sw-search-bar initialSearchType="lengow_product"
                                :placeholder="$tc('lengow-connector.product.filter.search_filter_label')"
-                               @search="onSearchFilter">
+                               @search="onSearchFilter"
+                >
                 </sw-search-bar>
             </template>
         {% endblock %}
@@ -79,29 +80,27 @@
                         <div class="lgw-product-grid"  v-if="(salesChannelSelected && productSelection)">
                             {% block lgw_product_list_content_grid %}
                                 <sw-data-grid
-                                                    ref="swProductGrid"
-                                                    :dataSource="products"
-                                                   :columns="productColumns"
-                                                   :repository="productRepository"
-                                                   detailRoute="sw.product.detail"
-                                                   :showSelection="true"
-                                                   :isLoading="isLoading"
-                                                   @column-sort="onStartSorting"
-                                                   @selections="updateSelection"
-                                                   @update-records="onColumnSort"
+                                        ref="swProductGrid"
+                                        :dataSource="products"
+                                        :columns="productColumns"
+                                        :repository="productRepository"
+                                        detailRoute="sw.product.detail"
+                                        :showSelection="true"
+                                        :showSettings="true"
+                                        :isLoading="isLoading"
+                                        @column-sort="onStartSorting"
+                                        @selection-change="updateSelection"
+                                        @update-records="onColumnSort"
                                 >
+                                    <!-- Suppression de l'action Delete par défaut -->
                                     <template #delete-action>
-                                        <span></span> <!-- Remove delete action from entity listing -->
+                                        <span></span>
                                     </template>
-                                    <template slot="bulk">
-                                        {% block sw_data_grid_bulk_selected_count %}
-                                            <span class="sw-data-grid__bulk-selected bulk-link">
-                                                {{ $tc('lengow-connector.product.total_selected') }} :
-                                            </span>
-                                            <span class="sw-data-grid__bulk-selected sw-data-grid__bulk-selected-count">{{ totalSelected }}</span>
-                                        {% endblock %}
+
+                                    <!-- Actions bulk -->
+                                    <template #bulk>
                                         {% block sw_data_grid_bulk_selected_actions_content %}
-                                            <span class="sw-data-grid__bulk-selected bulk-link">
+                                          <span class="sw-data-grid__bulk-selected bulk-link">
                                                 <a class="link link-default" @click="onPublishOnLengow">
                                                     {{ $tc('lengow-connector.product.mass_action_publish') }}
                                                 </a>
@@ -113,18 +112,41 @@
                                             </span>
                                         {% endblock %}
                                     </template>
+
+                                    <template #actions="{ item }">
+                                        <div class="actions">
+                                            <a :href="`${downloadLink}&productIds=${item.id}`">
+                                                <span class="lgw-download-icon">
+                                                    <sw-icon name="regular-cloud-download" color="#3498db"></sw-icon>
+                                                </span>
+                                            </a>
+                                        </div>
+                                    </template>
+
+                                    <!-- Colonnes -->
                                     {% block lgw_product_list_grid_columns %}
                                         {% block lengow_export_product_list_grid_columns_name_preview %}
                                             <template #preview-name="{ item }">
                                                 <sw-media-preview-v2 :source="item.cover ? item.cover.media : null"></sw-media-preview-v2>
                                             </template>
                                         {% endblock %}
+
                                         {% block lgw_product_list_grid_columns_active %}
                                             <template #column-active="{ item }">
                                                 {% block lgw_product_list_grid_columns_active_content %}
                                                     <template>
-                                                        <sw-icon v-if="item.active" name="solid-checkmark-s" small class="is--active"></sw-icon>
-                                                        <sw-icon v-else name="regular-times-xs" small class="is--inactive"></sw-icon>
+                                                        <sw-icon
+                                                                v-if="item.active"
+                                                                name="solid-checkmark-s"
+                                                                small
+                                                                class="is--active"
+                                                        ></sw-icon>
+                                                        <sw-icon
+                                                                v-else
+                                                                name="regular-times-xs"
+                                                                small
+                                                                class="is--inactive"
+                                                        ></sw-icon>
                                                     </template>
                                                 {% endblock %}
                                             </template>
@@ -142,13 +164,19 @@
                                                 {% endblock %}
                                             </template>
                                         {% endblock %}
-                                        {% block lgw_product_list_grid_columns_price %}
-                                            <template v-for="currency in currencies"
-                                                      :slot="`column-price-${currency.isoCode}`"
-                                                      slot-scope="{ item }">
-                                                {{ getCurrencyPriceByCurrencyId(currency.id, item.price).gross | currency(currency.isoCode) }}
+
+                                        <template v-slot:column-price-EUR="{ item }">
+                                            <template v-for="currency in currencies">
+                                               <span v-if="item && item.price">
+                                                    {{ getCurrencyPriceByCurrencyId(currency.id, item.price).gross }}
+                                                </span>
+                                                <span v-else>
+                                                    N/A
+                                                </span>
+                                                {{ currency.symbol }}
                                             </template>
-                                        {% endblock %}
+                                        </template>
+
                                         {% block lgw_product_list_grid_columns_stock %}
                                             <template #column-stock="{ item, compact }">
                                                 {% block lgw_product_list_grid_columns_stock_content %}
@@ -162,16 +190,18 @@
                                     {% endblock %}
                                 </sw-data-grid>
                             {% endblock %}
+
                             {% block lgw_product_list_grid_loader %}
                                 <sw-loader v-if="isLoading || !salesChannelSelected"></sw-loader>
                             {% endblock %}
-                            <!-- Pagination controls -->
+                            {% block sw_data_grid_pagination %}
                             <sw-pagination
                                     :total="total"
                                     :limit="limit"
                                     :page="page"
-                                    @page-change="onPageChange"
-                            />
+                                    @page-change="onPageChange">
+                            </sw-pagination>
+                            {% endblock %}
                         </div>
                     {% endblock %}
                 </div>

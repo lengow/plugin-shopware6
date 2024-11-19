@@ -90,6 +90,10 @@
   float: right;
 }
 
+.lgw-download-icon:hover svg path {
+  fill: #e74c3c; /* Changez la couleur selon vos besoins */
+}
+
 .lgw-product-list .lgw-tooltip {
   position: relative;
   display: inline-block;
@@ -126,6 +130,10 @@
 .lgw-product-list .lgw-tooltip:hover .lgw-tooltip-text {
   visibility: visible;
   opacity: 1;
+}
+
+.lgw-product-grid .sw-data-grid__bulk {
+  left: 100px !important;
 }
 
 .lengow-filter-sidebar_item {
