@@ -251,6 +251,7 @@ Component.register('lgw-product-list', {
             this.filteredResult = this.applyOtherFilter(this.baseProducts, 'active');
             this.filters.active = value;
             this.products = this.activeFilter(this.filteredResult, value);
+            this.updateProductList();
         },
 
         onStockFilter(value) {
@@ -260,49 +261,17 @@ Component.register('lgw-product-list', {
             this.filteredResult = this.applyOtherFilter(this.baseProducts, 'stock');
             this.filters.stock = value;
             this.products = this.stockFilter(this.filteredResult, value);
+            this.updateProductList();
         },
 
         onSearchFilter(input) {
             if (!this.salesChannelSelected) {
                 return;
             }
-
-            this.searchFilterText = input;
-
-            if (input) {
-                this.searchGlobally(input);
-            } else {
-                this.filteredResult = this.applyOtherFilter(this.baseProducts, 'search');
-                this.filters.search = null;
-                this.updateProductList();
-            }
-        },
-
-        searchGlobally(searchValue) {
-            const criteria = new Criteria();
-
-            if (searchValue) {
-                criteria.addFilter(Criteria.multi('OR', [
-                    Criteria.contains('name', searchValue),
-                    Criteria.contains('productNumber', searchValue),
-                    Criteria.contains('id', searchValue)
-                ]));
-            }
-
-            criteria.addAssociation('cover');
-            criteria.addAssociation('manufacturer');
-            criteria.setLimit(500);
-
-            this.isLoading = true;
-
-            return this.productRepository.search(criteria, Shopware.Context.api)
-                .then(result => {
-                    this.products = result;
-                    this.total = result.total;
-                })
-                .finally(() => {
-                    this.isLoading = false;
-                });
+            this.filteredResult = this.applyOtherFilter(this.baseProducts, 'search');
+            this.filters.search = input;
+            this.products = this.searchFilter(this.filteredResult, input);
+            this.updateProductList();
         },
 
         resetFilters() {
@@ -392,6 +361,37 @@ Component.register('lgw-product-list', {
             productCriteria.addSorting(
                 Criteria.sort(this.sortBy, this.sortDirection, this.naturalSorting)
             );
+
+            if (this.filters.active) {
+                productCriteria.addFilter(Criteria.equals('active', this.filters.stock));
+            }
+
+            if (this.filters.stock) {
+                if (this.filters.stock === 'nostock') {
+                    productCriteria.addFilter({
+                        type: 'equals',
+                        field: 'stock',
+                        value: 0
+                    });
+                } else {
+                    productCriteria.addFilter({
+                        type: 'range',
+                        field: 'stock',
+                        parameters: {
+                            gte: 1
+                        }
+                    });
+                }
+            }
+
+            if (this.filters.search) {
+                productCriteria.addFilter(Criteria.multi('OR', [
+                    Criteria.contains('name', this.filters.search),
+                    Criteria.contains('productNumber', this.filters.search),
+                    Criteria.contains('id', this.filters.search)
+                ]));
+            }
+
             productCriteria.addAssociation('cover');
             productCriteria.addAssociation('manufacturer');
 
