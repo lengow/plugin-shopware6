@@ -223,7 +223,7 @@
                                 {% block lgw_product_list_sidebar_filter_items %}
                                     {% block lgw_product_list_sidebar_filter_active %}
                                         <sw-single-select
-                                                v-model="activeFilterText"
+                                                v-model:value="activeFilterText"
                                                 :options="isActiveOptions"
                                                 :label="$tc('lengow-connector.product.filter.active_filter_label')"
                                                 @update:value="onActiveFilter"
@@ -233,7 +233,7 @@
                                     {% endblock %}
                                     {% block lgw_product_list_sidebar_filter_stock %}
                                         <sw-single-select
-                                                v-model="stockFilterText"
+                                                v-model:value="stockFilterText"
                                                 :options="isWithStockOptions"
                                                 :label="$tc('lengow-connector.product.filter.stock_filter_label')"
                                                 @update:value="onStockFilter"
