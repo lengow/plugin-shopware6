@@ -362,8 +362,9 @@ Component.register('lgw-product-list', {
                 Criteria.sort(this.sortBy, this.sortDirection, this.naturalSorting)
             );
 
-            if (this.filters.active) {
-                productCriteria.addFilter(Criteria.equals('active', this.filters.stock));
+            if (this.filters.active !== null) {
+                const isActive = this.filters.active === 'active';
+                productCriteria.addFilter(Criteria.equals('active', isActive));
             }
 
             if (this.filters.stock) {
