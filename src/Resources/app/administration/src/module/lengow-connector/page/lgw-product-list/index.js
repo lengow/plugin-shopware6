@@ -122,18 +122,6 @@ Component.register('lgw-product-list', {
         },
 
         currenciesColumns() {
-            const test = this.currencies
-                .sort((a, b) => (b.isSystemDefault ? 1 : -1))
-                .map(item => ({
-                    property: `price-${item.isoCode}`,
-                    dataIndex: `price.${item.id}`,
-                    label: `${item.name}`,
-                    allowResize: true,
-                    currencyId: item.id,
-                    visible: item.isSystemDefault,
-                    align: 'center',
-                    useCustomSort: true,
-                }));
             return this.currencies
                 .sort((a, b) => (b.isSystemDefault ? 1 : -1))
                 .map(item => ({
