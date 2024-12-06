@@ -469,29 +469,34 @@ class LengowExport
         if (!$entryPoint) {
             return [];
         }
+
         $sql = '
-            SELECT DISTINCT p.`id`, p.`available_stock`, p.`active`, p.`parent_id` FROM `product` AS p
-            JOIN `product_category_tree` as pct ON p.`id` = pct.`product_id`
-            WHERE pct.`category_id` = :categoryId
-        ';
+        SELECT DISTINCT p.`id`, p.`available_stock`, p.`active`, p.`parent_id` FROM `product` AS p
+        JOIN `product_category_tree` as pct ON p.`id` = pct.`product_id`
+        WHERE pct.`category_id` = :categoryId
+    ';
         $products = $this->connexion->fetchAllAssociative($sql, [
             'categoryId' => Uuid::fromHexToBytes($entryPoint),
         ]);
+
+        $productIndex = [];
         // clean result from db before sorting
         foreach ($products as &$product) {
             $product['id'] = bin2hex($product['id']);
             if ($product['parent_id']) {
                 $product['parent_id'] = bin2hex($product['parent_id']);
             }
+            $productIndex[$product['parent_id'] ?? 'root'][] = $product;
         }
         // unset foreach ref for garbage collector
         unset($product);
         $sortedProductIds = [];
-        foreach ($products as $product) {
+        foreach ($productIndex['root'] as $product) {
             // if selection is active and product is not selected or if product is a child / skip it
-            if ($product['parent_id'] || ($lengowProductIds && !in_array($product['id'], $lengowProductIds, false))) {
+            if ($lengowProductIds && !in_array($product['id'], $lengowProductIds, false)) {
                 continue;
             }
+
             if ($this->isExportableFromSqlResult($product)) {
                 $sortedProductIds[] = [
                     'id' => $product['id'],
@@ -500,27 +505,33 @@ class LengowExport
                 // save product key to add type after attempting children recuperation
                 $parentArrayEntry = array_key_last($sortedProductIds);
                 // get child count and add child to array
-                $nbChildren = $this->getChildProductIdFromSqlResult($product, $products, $sortedProductIds);
-                if ($nbChildren > 0) {
+                $children = $productIndex[$product['id']] ?? [];
+                $childCounter = 0;
+                foreach ($children as $child) {
+                    if ($this->isExportableFromSqlResult($child, $product)) {
+                        $sortedProductIds[] = [
+                            'id' => $child['id'],
+                            'type' => 'child',
+                        ];
+                        $childCounter++;
+                    }
+                }
+
+                if ($childCounter > 0) {
                     // product is a parent
                     $this->parentProductCounter++;
-                    $sortedProductIds[$parentArrayEntry] = [
-                        'id' => $product['id'],
-                        'type' => 'parent',
-                    ];
-                    $this->childProductCounter += $nbChildren;
+                    $sortedProductIds[$parentArrayEntry]['type'] = 'parent';
+                    $this->childProductCounter += $childCounter;
                 } else {
-                    // product is a simple
                     $this->simpleProductCounter++;
-                    $sortedProductIds[$parentArrayEntry] = [
-                        'id' => $product['id'],
-                        'type' => 'simple',
-                    ];
+                    $sortedProductIds[$parentArrayEntry]['type'] = 'simple';
                 }
             }
         }
+
         return $sortedProductIds;
     }
+
 
     /**
      * retrieve all parent products for sales channel
@@ -872,6 +883,7 @@ class LengowExport
             ]),
             $this->logOutput
         );
+        set_time_limit(7200);
         foreach ($products as $product) {
             // if offset specified in params
             if ($this->exportConfiguration[self::PARAM_OFFSET] !== 0
@@ -900,7 +912,6 @@ class LengowExport
                     $this->logOutput
                 );
             }
-            gc_collect_cycles();
         }
         $this->lengowLog->write(
             LengowLog::CODE_EXPORT,
