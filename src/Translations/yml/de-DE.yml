@@ -70,7 +70,7 @@ de:
           failed_description: "Wir waren nicht in der Lage, die Verbindung zwischen Ihrem xxx und Lengow herzustellen."
           failed_description_first_credentials: "Die Verbindung kann nicht mit den angegebenen Anmeldeinformationen hergestellt werden."
           failed_description_second_credentials_prod: "Bitte überprüfen Sie, ob diese Anmeldedaten mit der Produktionsumgebung von Lengow übereinstimmen."
-          failed_description_second_credentials_preprod: "Bitte überprüfen Sie, ob diese Anmeldedaten mit der Vorproduktionsumgebung von Lengow übereinstimmen."
+          failed_description_second_credentials_preprod: "Bitte überprüfen Sie, ob diese Anmeldedaten mit der Sandbox von Lengow übereinstimmen."
           failed_help: "Wenn das Problem weiterhin besteht, schauen Sie doch einmal in den"
           failed_help_center: "\"Shopware guide\""
           failed_help_or: "oder kontaktieren Sie unser"
@@ -329,7 +329,7 @@ de:
             description: "Anzahl der Tage auswählen (Max. 10 Tage)"
           debug_mode:
             label: "Debug Mode aktivieren"
-            description: "Dieser Modus zur Prüfung und Auftragsimulation verwenden. Diese Einstellung NUR auf Ihrem Pre-Production Server aktivieren"
+            description: "Dieser Modus zur Prüfung und Auftragsimulation verwenden. Diese Einstellung NUR auf Ihrem Sandbox Server aktivieren"
           report_mail_enabled:
             label: "Bei Problemen während des Imports der Bestellungen möchte ich benachrichtigt werden"
           report_mail_address:
