@@ -1,5 +1,12 @@
 # Changelog
 
+## [2.1.2](https://github.com/lengow/plugin-shopware6/compare/v2.1.1...v2.1.2) (2024-12-17)
+
+
+### Bug Fixes
+
+* **doc:** [PST-21935] change DOD ([#20](https://github.com/lengow/plugin-shopware6/issues/20)) ([a20b75f](https://github.com/lengow/plugin-shopware6/commit/a20b75ff9aaf0c3de1d2c6824a1cfbca5f645fd8))
+
 ## [2.1.1](https://github.com/lengow/plugin-shopware6/compare/v2.1.0...v2.1.1) (2024-10-15)
 
 
