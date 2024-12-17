@@ -2,8 +2,8 @@
 
 ## Liste des critères  ##
 	
-* Recetter sa feature sur les versions 6.2 & 6.3 :
-* Coder en respectant la version de PHP 7.3.11 :
+* Recetter sa feature sur les versions 6.4 & 6.5 :
+* Coder en respectant la version de PHP 8.1 :
 * Pas de modification de comportement de fonction :
 * Principe SOLID (au moins le S) :
 * Coding Style (PSR2) :
