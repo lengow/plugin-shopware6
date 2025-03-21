@@ -515,7 +515,12 @@ class LengowProduct
                         $fieldName = substr($headerField, 7);
                         $value = $this->customFields[$fieldName] ?? (self::$parentCustomFields[$fieldName] ?? '');
                     }
-                    $productData[$headerField] = StringCleaner::cleanData((string) $value);
+                    try {
+                        $productData[$headerField] = StringCleaner::cleanData((string) $value);
+
+                    } catch (\Throwable $e) {
+                        $productData[$headerField] = '';
+                    }
             }
         }
         unset($product);
