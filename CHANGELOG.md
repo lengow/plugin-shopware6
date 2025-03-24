@@ -1,5 +1,17 @@
 # Changelog
 
+## [2.1.3](https://github.com/lengow/plugin-shopware6/compare/v2.1.2...v2.1.3) (2025-03-24)
+
+
+### Bug Fixes
+
+* **export:** [PCMT-142] fix export for shopware6 ([#22](https://github.com/lengow/plugin-shopware6/issues/22)) ([478a8de](https://github.com/lengow/plugin-shopware6/commit/478a8debbe700250cdc2889e15c401dd3fe8f2b2))
+
+
+### Miscellaneous
+
+* **settings:** [PST-21910] change preprod to sandbox word ([#15](https://github.com/lengow/plugin-shopware6/issues/15)) ([85c82f2](https://github.com/lengow/plugin-shopware6/commit/85c82f2babc0b8a3a956d6e3a28ad2351789229c))
+
 ## [2.1.2](https://github.com/lengow/plugin-shopware6/compare/v2.1.1...v2.1.2) (2024-12-17)
 
 
