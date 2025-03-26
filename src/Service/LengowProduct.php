@@ -519,6 +519,14 @@ class LengowProduct
                         $productData[$headerField] = StringCleaner::cleanData((string) $value);
 
                     } catch (\Throwable $e) {
+                        $this->lengowLog->write(
+                            LengowLog::CODE_EXPORT,
+                            $this->lengowLog->encodeMessage('log.import.uncastable_string', [
+                                'field' => $headerField,
+                                'product_id' => $this->getProductIdentifier(),
+                                'error' => $e->getMessage(),
+                            ]),
+                        );
                         $productData[$headerField] = '';
                     }
             }
