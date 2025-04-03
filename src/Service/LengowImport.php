@@ -361,7 +361,7 @@ class LengowImport
         if (!$this->lengowLock->acquireLock(self::LOCK_NAME)) {
             $this->lengowLog->write(
                 LengowLog::CODE_IMPORT,
-                $this->lengowLog->encodeMessage('lengow_log.error.cant_acquire_lock'),
+                $this->errors[0] = $this->lengowLog->encodeMessage('lengow_log.error.cant_acquire_lock'),
                 $this->logOutput
             );
 
