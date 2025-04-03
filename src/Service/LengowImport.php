@@ -67,6 +67,7 @@ class LengowImport
     public const ORDERS_IGNORED = 'orders_ignored';
     public const ORDERS_NOT_FORMATTED = 'orders_not_formatted';
     public const ERRORS = 'errors';
+    public const LOCK_NAME = 'lengow_import';
 
     /**
      * @var int max interval time for order synchronization old versions (1 day)
@@ -127,6 +128,11 @@ class LengowImport
      * @var LengowActionSync Lengow action sync service
      */
     private $lengowActionSync;
+
+    /**
+     * @var LengowLock Lengow lock service
+     */
+    private $lengowLock;
 
     /**
      * @var string order id being imported
@@ -264,6 +270,7 @@ class LengowImport
      * @param LengowOrderError $lengowOrderError Lengow order error service
      * @param LengowSync $lengowSync Lengow sync service
      * @param LengowActionSync $lengowActionSync Lengow action sync service
+     * @param LengowLock $lengowLock Lengow lock service
      */
     public function __construct(
         LengowConnector $lengowConnector,
@@ -273,7 +280,8 @@ class LengowImport
         LengowOrder $lengowOrder,
         LengowOrderError $lengowOrderError,
         LengowSync $lengowSync,
-        LengowActionSync $lengowActionSync
+        LengowActionSync $lengowActionSync,
+        LengowLock $lengowLock
     )
     {
         $this->lengowConnector = $lengowConnector;
@@ -284,6 +292,7 @@ class LengowImport
         $this->lengowOrderError = $lengowOrderError;
         $this->lengowSync = $lengowSync;
         $this->lengowActionSync = $lengowActionSync;
+        $this->lengowLock = $lengowLock;
     }
 
     /**
@@ -313,6 +322,7 @@ class LengowImport
         $this->forceSync = isset($params[self::PARAM_FORCE_SYNC]) && $params[self::PARAM_FORCE_SYNC];
         $this->logOutput = $params[self::PARAM_LOG_OUTPUT] ?? false;
         $this->salesChannelId = $params[self::PARAM_SALES_CHANNEL_ID] ?? null;
+        $this->lengowLock->setDisplay($this->logOutput);
         // get params for synchronize one or all orders
         if (isset($params[self::PARAM_MARKETPLACE_SKU], $params[self::PARAM_MARKETPLACE_NAME])
             && $this->salesChannelId
@@ -347,8 +357,20 @@ class LengowImport
     public function exec(): array
     {
         $syncOk = true;
+
+        if (!$this->lengowLock->acquireLock(self::LOCK_NAME)) {
+            $this->lengowLog->write(
+                LengowLog::CODE_IMPORT,
+                $this->lengowLog->encodeMessage('lengow_log.error.cant_acquire_lock'),
+                $this->logOutput
+            );
+
+            return $this->getResult();
+        }
+
         // checks if a synchronization is not already in progress
         if (!$this->canExecuteSynchronization()) {
+            $this->lengowLock->releaseLock(self::LOCK_NAME);
             return $this->getResult();
         }
         // starts some processes necessary for synchronization
@@ -382,6 +404,8 @@ class LengowImport
         }
         // complete synchronization and start all necessary processes
         $this->finishSynchronization();
+        $this->lengowLock->releaseLock(self::LOCK_NAME);
+
         return $result;
     }
 

@@ -436,6 +436,7 @@ en:
         nb_action_success: "%{nb_action} action(s) successfully sent"
         nb_action_error: "%{nb_action} action(s) blocked by an error"
         rest_time_to_import: "Please wait %{rest_time} seconds before syncing your orders again"
+        cant_acquire_lock: "An import is already in process"
         credentials_not_valid: "Account ID, token access or secret token are not valid"
         no_catalog_for_sales_channel: "No catalogue ID valid for the sales channel %{sales_channel_name} (%{sales_channel_id})"
         order_not_found: "Lengow error: order cannot be found in Lengow feed"

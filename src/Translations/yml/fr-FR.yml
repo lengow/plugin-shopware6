@@ -436,6 +436,7 @@ fr:
         nb_action_success: "%{nb_action} action(s) envoyées avec succès"
         nb_action_error: "%{nb_action} action(s) bloquées par une erreur"
         rest_time_to_import: "Attendez %{rest_time} secondes avant de synchroniser de nouveau vos commandes"
+        cant_acquire_lock: "Un import est déjà en cours"
         credentials_not_valid: "Votre identifiant de compte, votre jeton d'accès ou votre jeton secret ne sont pas valides"
         no_catalog_for_sales_channel: "Aucun identifiant de catalogue valide pour le sales channel %{sales_channel_name} (%{sales_channel_id})"
         order_not_found: "Erreur Lengow : la commande ne peut être trouvée dans le flux Lengow"

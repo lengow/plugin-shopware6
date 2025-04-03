@@ -69,6 +69,7 @@
             <argument type="service" id="Lengow\Connector\Service\LengowOrderError"/>
             <argument type="service" id="Lengow\Connector\Service\LengowSync"/>
             <argument type="service" id="Lengow\Connector\Service\LengowActionSync"/>
+            <argument type="service" id="Lengow\Connector\Service\LengowLock"/>
         </service>
 
         <service id="Lengow\Connector\Service\LengowImportOrder">
@@ -188,6 +189,12 @@
             <argument type="service" id="lengow_settings.repository"/>
             <tag name="kernel.event_subscriber"/>
         </service>
+
+        <service id="Lengow\Connector\Service\LengowLock">
+            <argument type="service" id="Doctrine\DBAL\Connection" />
+            <argument type="service" id="Lengow\Connector\Service\LengowLog"/>
+        </service>
+
 
     </services>
 </container>

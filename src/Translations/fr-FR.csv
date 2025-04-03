@@ -6,6 +6,7 @@ lengow_log.error.no_action_notification|Pas de nouvelle notification sur vos act
 lengow_log.error.nb_action_success|%{nb_action} action(s) envoyées avec succès
 lengow_log.error.nb_action_error|%{nb_action} action(s) bloquées par une erreur
 lengow_log.error.rest_time_to_import|Attendez %{rest_time} secondes avant de synchroniser de nouveau vos commandes
+lengow_log.error.cant_acquire_lock|Un import est déjà en cours
 lengow_log.error.credentials_not_valid|Votre identifiant de compte, votre jeton d'accès ou votre jeton secret ne sont pas valides
 lengow_log.error.no_catalog_for_sales_channel|Aucun identifiant de catalogue valide pour le sales channel %{sales_channel_name} (%{sales_channel_id})
 lengow_log.error.order_not_found|Erreur Lengow : la commande ne peut être trouvée dans le flux Lengow
