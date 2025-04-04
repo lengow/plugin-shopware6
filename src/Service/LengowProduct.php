@@ -1083,7 +1083,7 @@ class LengowProduct
         if ($mainCategory) {
             $breadcrumbArray = $mainCategory->getBreadcrumb();
             foreach ($breadcrumbArray as $catName) {
-                $breadcrumb .= $catName;
+                $breadcrumb .= StringCleaner::cleanData((string) $catName);
                 if (end($breadcrumbArray) !== $catName) {
                     $breadcrumb .= ' > ';
                 }
