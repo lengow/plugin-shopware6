@@ -81,6 +81,7 @@ en:
         order_not_synchronized_with_lengow: "WARNING! Order could NOT be synchronised with Lengow webservice (ORDER ID %{order_id})"
         unable_verify_date: "unable to check if the order is too old"
         unable_find_order: "Unable to find the requested order"
+        uncastable_string: "Unable to cast in string the value for the field %{field} of the product %{product_id} error: %{error}"
       order_action:
         check_completed_action: "check completed actions"
         check_old_action: "check and finish old actions"
