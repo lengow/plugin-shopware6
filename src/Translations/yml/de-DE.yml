@@ -428,6 +428,7 @@ de:
         nb_action_success: "%{nb_action} Aktion(en) erfolgreich gesendet"
         nb_action_error: "%{nb_action} durch einen Fehler blockierte Aktion(en)"
         rest_time_to_import: "Bitte warten Sie %{rest_time} Sekunden, bevor Sie Ihre Bestellungen erneut synchronisieren"
+        cant_acquire_lock: "Ein Import ist bereits im Gange"
         credentials_not_valid: "Konto-Nr., Access-Token oder Access-Token-Secret ungültig"
         no_catalog_for_sales_channel: "Keine gültige Katalog-Nr. für den sales channel %{sales_channel_name} (%{sales_channel_id})"
         order_not_found: "Fehler Lengow: Bestellung kann in Lengow nicht gefunden werden"
