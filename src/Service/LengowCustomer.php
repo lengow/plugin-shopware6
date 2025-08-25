@@ -178,4 +178,58 @@ class LengowCustomer
         }
         return $this->getCustomerById($customerId);
     }
+
+    /**
+     * Update (or create) customer's billing & shipping addresses.
+     *
+     * @param CustomerEntity $customer
+     * @return CustomerEntity|null Updated customer entity or null on failure
+     */
+    public function updateCustomerAddresses(CustomerEntity $customer): ?CustomerEntity
+    {
+        $context = Context::createDefaultContext();
+
+        $billingAddressData = $this->lengowAddress->getAddressData(LengowAddress::TYPE_BILLING);
+        $shippingAddressData = $this->lengowAddress->getAddressData(LengowAddress::TYPE_SHIPPING);
+
+        $billingAddressData['salutationId'] = $billingAddressData['salutationId'] ?? $customer->getSalutationId();
+        $shippingAddressData['salutationId'] = $shippingAddressData['salutationId'] ?? $customer->getSalutationId();
+
+        $billingId = $customer->getDefaultBillingAddressId() ?: Uuid::randomHex();
+        $shippingId = $customer->getDefaultShippingAddressId() ?: Uuid::randomHex();
+
+        $billingAddressData['id'] = $billingId;
+        $billingAddressData['customerId'] = $customer->getId();
+
+        $shippingAddressData['id'] = $shippingId;
+        $shippingAddressData['customerId'] = $customer->getId();
+
+        $payload = [
+            [
+                'id' => $customer->getId(),
+                'defaultBillingAddressId' => $billingId,
+                'defaultShippingAddressId' => $shippingId,
+                'addresses' => [
+                    $billingAddressData,
+                    $shippingAddressData,
+                ],
+            ]
+        ];
+
+        try {
+            $this->customerRepository->update($payload, $context);
+        } catch (Exception $e) {
+            $errorMessage = '[Shopware error]: "' . $e->getMessage()
+                . '" in ' . $e->getFile() . ' on line ' . $e->getLine();
+            $this->lengowLog->write(
+                LengowLog::CODE_ORM,
+                $this->lengowLog->encodeMessage('log.orm.record_update_failed', [
+                    'decoded_message' => str_replace(PHP_EOL, '', $errorMessage),
+                ])
+            );
+            return null;
+        }
+
+        return $this->getCustomerById($customer->getId());
+    }
 }

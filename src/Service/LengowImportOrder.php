@@ -1341,6 +1341,8 @@ class LengowImportOrder
         $customer = $this->lengowCustomer->getCustomerByEmail($this->salesChannel, $customerEmail);
         if ($customer === null) {
             $customer = $this->lengowCustomer->createCustomer($this->salesChannel, $customerEmail);
+        } else {
+            $customer = $this->lengowCustomer->updateCustomerAddresses($customer);
         }
         if ($customer === null) {
             throw new LengowException(
