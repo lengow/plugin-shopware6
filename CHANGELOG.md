@@ -1,5 +1,24 @@
 # Changelog
 
+## [2.1.5](https://github.com/lengow/plugin-shopware6/compare/v2.1.3...v2.1.5) (2025-09-03)
+
+
+### chore
+
+* release 2.1.5 ([#29](https://github.com/lengow/plugin-shopware6/issues/29)) ([39d33f6](https://github.com/lengow/plugin-shopware6/commit/39d33f66a09912f2c96f0edc1c474935bcb536a3))
+
+
+### Bug Fixes
+
+* **breadcrumb:** [PCMT-142] shopware6 catalog module connections csv error ([#26](https://github.com/lengow/plugin-shopware6/issues/26)) ([8f80c19](https://github.com/lengow/plugin-shopware6/commit/8f80c19b11b991da47b9feec135aa5e7a3880092))
+* **catalog:** [PCMT-142] Catalog module connections issue 404 log ([#24](https://github.com/lengow/plugin-shopware6/issues/24)) ([82cc7e3](https://github.com/lengow/plugin-shopware6/commit/82cc7e383faf5d3fc1853e4d157b3aed431285e2))
+* **import:** [PCMT-800] update customer addresses if they already exists ([#28](https://github.com/lengow/plugin-shopware6/issues/28)) ([336df08](https://github.com/lengow/plugin-shopware6/commit/336df083ea94c5fa7b3b115ee4f969451021980c))
+
+
+### Miscellaneous
+
+* **import:** [PCMT-279] add SQL lock mechanism to prevent duplicate process ([#25](https://github.com/lengow/plugin-shopware6/issues/25)) ([5cc7264](https://github.com/lengow/plugin-shopware6/commit/5cc72641a299e888f99ffbd9c6abadda4ece1f57))
+
 ## [2.1.3](https://github.com/lengow/plugin-shopware6/compare/v2.1.2...v2.1.3) (2025-03-24)
 
 
