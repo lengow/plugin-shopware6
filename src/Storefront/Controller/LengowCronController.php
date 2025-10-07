@@ -183,6 +183,7 @@ class LengowCronController extends LengowAbstractFrontController
                 : null,
             LengowImport::PARAM_LOG_OUTPUT => $request->query->get(LengowImport::PARAM_LOG_OUTPUT) === '1',
             LengowImport::PARAM_DAYS => (float) $request->query->get(LengowImport::PARAM_DAYS),
+            LengowImport::PARAM_MINUTES => (float) $request->query->get(LengowImport::PARAM_MINUTES),
             LengowImport::PARAM_CREATED_FROM => $request->query->get(LengowImport::PARAM_CREATED_FROM),
             LengowImport::PARAM_CREATED_TO => $request->query->get(LengowImport::PARAM_CREATED_TO),
             LengowImport::PARAM_LIMIT => (int) $request->query->get(LengowImport::PARAM_LIMIT),
