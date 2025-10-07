@@ -56,7 +56,7 @@ class EnvironmentInfoProvider
     /**
      * @var string plugin version
      */
-    public const PLUGIN_VERSION = '2.1.5'; // x-release-please-version
+    public const PLUGIN_VERSION = '2.2.0'; // x-release-please-version
 
     /**
      * @var string Name of Lengow front controller

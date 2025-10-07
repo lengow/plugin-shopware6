@@ -1,5 +1,17 @@
 # Changelog
 
+## [2.2.0](https://github.com/lengow/plugin-shopware6/compare/v2.1.5...v2.2.0) (2025-10-07)
+
+
+### Features
+
+* **fast-orders:** add minutes param ([#30](https://github.com/lengow/plugin-shopware6/issues/30)) ([14ed836](https://github.com/lengow/plugin-shopware6/commit/14ed8367a953a0b111d5455d3324a242e2dc8f71))
+
+
+### Bug Fixes
+
+* **cicd:** Upgrade Release-please ([#31](https://github.com/lengow/plugin-shopware6/issues/31)) ([4005c7a](https://github.com/lengow/plugin-shopware6/commit/4005c7a1433fe202ed5f3e2896bea2159a463008))
+
 ## [2.1.5](https://github.com/lengow/plugin-shopware6/compare/v2.1.3...v2.1.5) (2025-09-03)
 
 
