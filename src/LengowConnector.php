@@ -110,6 +110,7 @@ class LengowConnector extends Plugin
             'pluginId' => $pluginId,
             'afterOrderEnabled' => false,
             'active' => false,
+            'technicalName' => 'lengow_payment',
         ];
         /** @var EntityRepository $paymentRepository */
         $paymentRepository = $this->container->get('payment_method.repository');

@@ -1787,7 +1787,8 @@ class LengowImportOrder
                     'active' => false,
                     'afterOrderEnabled' => false,
                     'handlerIdentifier' => LengowPayment::class,
-                    'pluginId' => $pluginId
+                    'pluginId' => $pluginId,
+                    'technicalName' => 'lengow_payment',
                 ]
             ], $context);
 
