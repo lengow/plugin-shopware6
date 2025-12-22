@@ -1,5 +1,12 @@
 # Changelog
 
+## [2.2.1](https://github.com/lengow/plugin-shopware6/compare/v2.2.0...v2.2.1) (2025-12-22)
+
+
+### Bug Fixes
+
+* **import:** fix wrong qty if max. order qty &lt; order qty ([#33](https://github.com/lengow/plugin-shopware6/issues/33)) ([2d1de45](https://github.com/lengow/plugin-shopware6/commit/2d1de4518d13dc297597176171eb60ad14536ea5))
+
 ## [2.2.0](https://github.com/lengow/plugin-shopware6/compare/v2.1.5...v2.2.0) (2025-10-07)
 
 
