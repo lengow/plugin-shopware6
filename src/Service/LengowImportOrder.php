@@ -1444,7 +1444,31 @@ class LengowImportOrder
             throw new LengowException($this->lengowLog->encodeMessage('lengow_log.exception.no_product_to_cart'));
         }
         // recalculate the cart with new products and sales channel context
-        return $this->cartService->recalculate($cart, $salesChannelContext);
+        $calculatedCart = $this->cartService->recalculate($cart, $salesChannelContext);
+
+        foreach ($calculatedCart->getLineItems() as $lineItem) {
+            $productId = $lineItem->getReferencedId();
+
+            // Check if this line item corresponds to one of our products
+            if (isset($products[$productId])) {
+                $requestedQuantity = (int) $products[$productId]['quantity'];
+                $actualQuantity = $lineItem->getQuantity();
+
+                // If Shopware reduced the quantity (due to Max Order Qty or Plugins)
+                if ($actualQuantity < $requestedQuantity) {
+                    // Get product number for better logging
+                    /** @var ProductEntity $product */
+                    $product = $products[$productId]['shopware_product'];
+                    $productNumber = $product ? $product->getProductNumber() : $productId;
+
+                    throw new LengowException(
+                        "Import failed: Product {$productNumber} quantity limited by Shopware settings. Requested: {$requestedQuantity}, Allowed: {$actualQuantity}."
+                    );
+                }
+            }
+        }
+
+        return $calculatedCart;
     }
 
     /**
