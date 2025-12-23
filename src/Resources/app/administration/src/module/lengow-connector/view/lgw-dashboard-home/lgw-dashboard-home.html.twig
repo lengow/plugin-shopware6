@@ -19,7 +19,7 @@
             <div class="lgw-row lgw-home-menu text-center">
                 <div class="lgw-col-4 lgw-box-link lgw-left-block">
                     <router-link :to="{ name: 'lengow.connector.product' }" custom v-slot="{ navigate }">
-                        <div class="lgw-box" @click="navigate" role="link">
+                        <div class="lgw-box" @click="navigate" @keydown.enter="navigate" role="link" tabindex="0">
                             <img :src="assetFilter('lengowconnector/home-products.png')" class="img-responsive">
                             <h2>{{ $tc('lengow-connector.dashboard.products.title') }}</h2>
                             <p>{{ $tc('lengow-connector.dashboard.products.desc') }}</p>
@@ -28,7 +28,7 @@
                 </div>
                 <div class="lgw-col-4 lgw-box-link">
                     <router-link :to="{ name: 'lengow.connector.order' }" custom v-slot="{ navigate }">
-                        <div class="lgw-box" @click="navigate" role="link">
+                        <div class="lgw-box" @click="navigate" @keydown.enter="navigate" role="link" tabindex="0">
                             <img :src="assetFilter('lengowconnector/home-orders.png')" class="img-responsive">
                             <h2>{{ $tc('lengow-connector.dashboard.orders.title') }}</h2>
                             <p>{{ $tc('lengow-connector.dashboard.orders.desc') }}</p>
@@ -37,7 +37,7 @@
                 </div>
                 <div class="lgw-col-4 lgw-box-link lgw-right-block">
                     <router-link :to="{ name: 'lengow.connector.setting' }" custom v-slot="{ navigate }">
-                        <div class="lgw-box" @click="navigate" role="link">
+                        <div class="lgw-box" @click="navigate" @keydown.enter="navigate" role="link" tabindex="0">
                             <img :src="assetFilter('lengowconnector/home-settings.png')" class="img-responsive">
                             <h2>{{ $tc('lengow-connector.dashboard.settings.title') }}</h2>
                             <p>{{ $tc('lengow-connector.dashboard.settings.desc') }}</p>
