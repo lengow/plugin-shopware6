@@ -1,4 +1,4 @@
-import template from './lgw-catalog-select.hmtl.twig';
+import template from './lgw-catalog-select.html.twig';
 import './lgw-catalog-select.scss';
 
 const { Component } = Shopware;

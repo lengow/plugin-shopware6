@@ -45,9 +45,9 @@
                             </p>
                             <p v-else>
                                 {{ $tc('lengow-connector.order.no_report_sent') }}
-                                <routerLink :to="{ name: 'lengow.connector.settings' }">
+                                <router-link :to="{ name: 'lengow.connector.settings' }">
                                     {{ $tc('lengow-connector.order.change_this') }}
-                                </routerLink>
+                                </router-link>
                             </p>
                         </div>
                         <sw-loader v-else size="20px"></sw-loader>
