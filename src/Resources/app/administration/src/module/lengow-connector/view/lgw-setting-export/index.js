@@ -109,10 +109,15 @@ Component.register('lgw-setting-export', {
                             salesChannelId: salesChannel.id,
                             salesChannelName: salesChannel.name,
                             name: shippingMethod.name,
-                            value: shippingMethod.id
+                            value: shippingMethod.id,
+                            label: shippingMethod.name
                         }];
                 });
             });
+        },
+        
+        getShippingMethodsForSalesChannel(salesChannelId) {
+            return this.shippingMethods.filter(method => method.salesChannelId === salesChannelId);
         }
     }
 });

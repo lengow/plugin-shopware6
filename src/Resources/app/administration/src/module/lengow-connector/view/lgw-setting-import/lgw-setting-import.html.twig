@@ -49,19 +49,15 @@
                                   :text="$tc('lengow-connector.setting.lengow_import_setting.shipping.description')"
                                   :width="200"
                                   tooltipPosition="right"/>
-                    <sw-select-field v-for="salesChannel in salesChannels"
+                    <sw-single-select v-for="salesChannel in salesChannels"
+                                     :key="salesChannel.salesChannelId"
                                      :label="salesChannel.label"
+                                     :options="getShippingMethodsForSalesChannel(salesChannel.salesChannelId)"
                                      v-model="salesChannel.defaultShippingMethod"
                                     @update:value="onSaveSettings($event, 'lengowImportDefaultShippingMethod', salesChannel.salesChannelId)"
                                     @change="onSaveSettings($event, 'lengowImportDefaultShippingMethod', salesChannel.salesChannelId)"
                     >
-                        <template v-for="shippingMethod in shippingMethods">
-                            <option v-if="salesChannel.salesChannelId === shippingMethod.salesChannelId"
-                                    :value="shippingMethod.value">
-                                {{ shippingMethod.name }}
-                            </option>
-                        </template>
-                    </sw-select-field>
+                    </sw-single-select>
                 </template>
                 <template v-else>
                     <sw-loader></sw-loader>
@@ -159,42 +155,27 @@
                 <p style="margin-bottom: 50px">
                     {{ $tc('lengow-connector.setting.orders_status.description') }}
                 </p>
-                <sw-select-field style="font-weight: 800"
+                <sw-single-select style="font-weight: 800"
                                  :label="$tc('lengow-connector.setting.lengow_import_setting.waiting_for_shipment.label')"
+                                 :options="waitingShipmentStatusOptions"
                                  v-model="lengowWaitingShipmentOrderId"
                                  @update:value="onSaveSettings($event, 'lengowWaitingShipmentOrderId')"
                                  @change="onSaveSettings($event, 'lengowWaitingShipmentOrderId')">
-                    <option v-for="(status, index) in statusOptions"
-                            :key="index"
-                            :value="status.value"
-                            :disabled="status.value === 'cancelled' || status.value === 'completed'">
-                        {{ status.label }}
-                    </option>
-                </sw-select-field>
-                <sw-select-field style="font-weight: 800"
+                </sw-single-select>
+                <sw-single-select style="font-weight: 800"
                                  :label="$tc('lengow-connector.setting.lengow_import_setting.shipped.label')"
+                                 :options="shippedStatusOptions"
                                  v-model="lengowShippedOrderId"
                                  @update:value="onSaveSettings($event, 'lengowShippedOrderId')"
                                  @change="onSaveSettings($event, 'lengowShippedOrderId')">
-                    <option v-for="(status, index) in statusOptions"
-                            :key="index"
-                            :value="status.value"
-                            :disabled="status.value === 'cancelled'">
-                        {{ status.label }}
-                    </option>
-                </sw-select-field>
-                <sw-select-field style="font-weight: 800"
+                </sw-single-select>
+                <sw-single-select style="font-weight: 800"
                                  :label="$tc('lengow-connector.setting.lengow_import_setting.cancelled.label')"
+                                 :options="cancelledStatusOptions"
                                  v-model="lengowCanceledOrderId"
                                  @update:value="onSaveSettings($event, 'lengowCanceledOrderId')"
                                  @change="onSaveSettings($event, 'lengowCanceledOrderId')">
-                    <option v-for="(status, index) in statusOptions"
-                            :key="index"
-                            :value="status.value"
-                            :disabled="status.value === 'open' || status.value === 'in_progress'">
-                        {{ status.label }}
-                    </option>
-                </sw-select-field>
+                </sw-single-select>
             </sw-card>
         {% endblock %}
         {% block lgw_setting_import_footer %}
