@@ -11,9 +11,8 @@
                     <template v-for="salesChannel in salesChannels">
                         <sw-switch-field class="text-center"
                                          :label="salesChannel.name"
-                                         v-model="salesChannel.exportDisabled"
-                                        @update:value="onSaveSettings($event, 'lengowExportDisabledProduct', salesChannel.salesChannelId)"
-                                        @change="onSaveSettings($event, 'lengowExportDisabledProduct', salesChannel.salesChannelId)"
+                                         v-model:value="salesChannel.exportDisabled"
+                                         @update:value="onSaveSettings($event, 'lengowExportDisabledProduct', salesChannel.salesChannelId)"
                         >
                         </sw-switch-field>
                     </template>
@@ -25,9 +24,8 @@
                     <template v-for="salesChannel in salesChannels">
                         <sw-switch-field class="text-center"
                                          :label="salesChannel.name"
-                                         v-model="salesChannel.exportSelection"
-                                        @update:value="onSaveSettings($event, 'lengowSelectionEnabled', salesChannel.salesChannelId)"
-                                        @change="onSaveSettings($event, 'lengowSelectionEnabled', salesChannel.salesChannelId)"
+                                         v-model:value="salesChannel.exportSelection"
+                                         @update:value="onSaveSettings($event, 'lengowSelectionEnabled', salesChannel.salesChannelId)"
                         >
                         </sw-switch-field>
                     </template>

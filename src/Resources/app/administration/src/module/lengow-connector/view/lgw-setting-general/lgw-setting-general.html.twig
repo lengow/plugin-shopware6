@@ -77,9 +77,8 @@
                 </sw-help-text>
                 <sw-switch-field class="text-center"
                                  :label="$tc('lengow-connector.setting.lengow_main_setting.ip_enable.label')"
-                                 v-model="lengowIpEnabled"
+                                 v-model:value="lengowIpEnabled"
                                  @update:value="onSaveSettings($event, 'lengowIpEnabled'), onSwitchChange($event)"
-                                 @change="onSaveSettings($event, 'lengowIpEnabled')"
                 >
                 </sw-switch-field>
                 <lgw-lockable-string-field :fieldContent="lengowAuthorizedIp"

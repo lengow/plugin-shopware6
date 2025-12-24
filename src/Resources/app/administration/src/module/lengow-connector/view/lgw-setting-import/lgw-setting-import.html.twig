@@ -8,9 +8,8 @@
                               tooltipPosition="right"/>
                 <sw-switch-field class="text-center"
                                  :label="$tc('lengow-connector.setting.lengow_import_setting.ship_mp_enabled.label')"
-                                 v-model="lengowImportShipMpEnabled"
-                                @update:value="onSaveSettings($event, 'lengowImportShipMpEnabled')"
-                                @change="onSaveSettings($event, 'lengowImportShipMpEnabled')"
+                                 v-model:value="lengowImportShipMpEnabled"
+                                 @update:value="onSaveSettings($event, 'lengowImportShipMpEnabled')"
                 >
                 </sw-switch-field>
                 <sw-help-text class="lgw-help-text"
@@ -20,9 +19,8 @@
                 <sw-switch-field class="text-center"
                                  :label="$tc('lengow-connector.setting.lengow_import_setting.decrease_stock.label')"
                                  :disabled="!lengowImportShipMpEnabled"
-                                 v-model="lengowImportStockShipMp"
-                                @update:value="onSaveSettings($event, 'lengowImportStockShipMp')"
-                                @change="onSaveSettings($event, 'lengowImportStockShipMp')"
+                                 v-model:value="lengowImportStockShipMp"
+                                 @update:value="onSaveSettings($event, 'lengowImportStockShipMp')"
                 >
                 </sw-switch-field>
             </sw-card>
@@ -35,9 +33,8 @@
                               tooltipPosition="right"/>
                 <sw-switch-field class="text-center"
                                  :label="$tc('lengow-connector.setting.lengow_import_setting.payment_per_marketplace.label')"
-                                 v-model="lengowPaymentPerMarketplace"
+                                 v-model:value="lengowPaymentPerMarketplace"
                                  @update:value="onSaveSettings($event, 'lengowPaymentPerMarketplace')"
-                                 @change="onSaveSettings($event, 'lengowPaymentPerMarketplace')"
                 >
                 </sw-switch-field>
             </sw-card>
@@ -75,15 +72,13 @@
                                  :value="lengowImportDays"
                                  :digits="2"
                                  :label="$tc('lengow-connector.setting.lengow_import_setting.import_days.label')"
-                                    @update:value="onSaveSettings($event, 'lengowImportDays')"
-                                    @change="onSaveSettings($event, 'lengowImportDays')"
+                                 @update:value="onSaveSettings($event, 'lengowImportDays')"
                 >
                 </sw-number-field>
                 <sw-switch-field class="text-center"
                                  :label="$tc('lengow-connector.setting.lengow_import_setting.report_mail_enabled.label')"
-                                 v-model="lengowReportMailEnabled"
-                                @update:value="onSaveSettings($event, 'lengowReportMailEnabled')"
-                                @change="onSaveSettings($event, 'lengowReportMailEnabled')"
+                                 v-model:value="lengowReportMailEnabled"
+                                 @update:value="onSaveSettings($event, 'lengowReportMailEnabled')"
                 >
                 </sw-switch-field>
                 <lgw-lockable-string-field :fieldContent="lengowReportMailAddress"
@@ -100,9 +95,8 @@
                 </sw-help-text>
                 <sw-switch-field class="text-center"
                                  :label="$tc('lengow-connector.setting.lengow_import_setting.currency_conversion_title.label')"
-                                 v-model="lengowCurrencyConversion"
-                                @update:value="onSaveSettings($event, 'lengowCurrencyConversion')"
-                                @change="onSaveSettings($event, 'lengowCurrencyConversion')"
+                                 v-model:value="lengowCurrencyConversion"
+                                 @update:value="onSaveSettings($event, 'lengowCurrencyConversion')"
                 >
                 </sw-switch-field>
                 <sw-help-text class="lgw-help-text"
@@ -111,9 +105,8 @@
                               tooltipPosition="right"/>
                 <sw-switch-field class="text-center"
                                  :label="$tc('lengow-connector.setting.lengow_import_setting.import_btob.label')"
-                                 v-model="lengowImportB2b"
-                                @update:value="onSaveSettings($event, 'lengowImportB2b')"
-                                @change="onSaveSettings($event, 'lengowImportB2b')"
+                                 v-model:value="lengowImportB2b"
+                                 @update:value="onSaveSettings($event, 'lengowImportB2b')"
                 >
                 </sw-switch-field>
                 <sw-help-text class="lgw-help-text"
@@ -122,9 +115,8 @@
                               tooltipPosition="right"/>
                 <sw-switch-field class="text-center"
                                  :label="$tc('lengow-connector.setting.lengow_import_setting.debug_mode.label')"
-                                 v-model="lengowDebugEnabled"
-                                @update:value="onSaveSettings($event, 'lengowDebugEnabled')"
-                                @change="onSaveSettings($event, 'lengowDebugEnabled')"
+                                 v-model:value="lengowDebugEnabled"
+                                 @update:value="onSaveSettings($event, 'lengowDebugEnabled')"
                 >
                 </sw-switch-field>
                 <sw-help-text class="lgw-help-text"
@@ -133,9 +125,8 @@
                               tooltipPosition="right"/>
                 <sw-switch-field class="text-center"
                                  :label="$tc('lengow-connector.setting.lengow_import_setting.anonymize_email.label')"
-                                 v-model="lengowAnonymizeEmail"
-                                 @update:value="onSaveSettings($event, 'lengowAnonymizeEmail'), onSwitchChange($event)"
-                                 @change="onSaveSettings($event, 'lengowAnonymizeEmail'), onSwitchChange($event)">
+                                 v-model:value="lengowAnonymizeEmail"
+                                 @update:value="onSaveSettings($event, 'lengowAnonymizeEmail'), onSwitchChange($event)">
                 </sw-switch-field>
                 <div v-if="newLocked">
                     <sw-help-text class="lgw-help-text"
@@ -144,9 +135,8 @@
                                   tooltipPosition="right"/>
                     <sw-switch-field class="text-center"
                                      :label="$tc('lengow-connector.setting.lengow_import_setting.encrypt_email.label')"
-                                     v-model="lengowEncryptEmail"
-                                     @update:value="onSaveSettings($event, 'lengowEncryptEmail')"
-                                     @change="onSaveSettings($event, 'lengowEncryptEmail')">
+                                     v-model:value="lengowEncryptEmail"
+                                     @update:value="onSaveSettings($event, 'lengowEncryptEmail')">
                     </sw-switch-field>
                 </div>
             </sw-card>
