@@ -18,7 +18,12 @@ Component.register('lgw-toolbox-base', {
     computed: {
         overviewData() {
             const state = Shopware.State.get('lgwToolbox');
-            return state && state.overviewData ? state.overviewData : {};
+            return state && state.overviewData ? state.overviewData : {
+                checklist: {},
+                plugin: {},
+                synchronization: {},
+                shops: []
+            };
         },
         
         loading() {
@@ -27,7 +32,8 @@ Component.register('lgw-toolbox-base', {
         },
 
         isLoading() {
-            return Shopware.State.getters['lgwToolbox/isLoading'];
+            const getters = Shopware.State.getters['lgwToolbox/isLoading'];
+            return getters !== undefined ? getters : false;
         }
     },
 
