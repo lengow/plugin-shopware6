@@ -21,7 +21,7 @@ class Migration1606313662Init extends MigrationStep
          * order (FK order_id)
          * sales_channel (FK sales_channel_id)
          */
-        $connection->executeUpdate('
+        $connection->executeStatement('
             CREATE TABLE IF NOT EXISTS `lengow_order` (
                 `id`                   BINARY(16)    NOT NULL,
                 `order_id`             BINARY(16)    NULL DEFAULT NULL,
@@ -73,7 +73,7 @@ class Migration1606313662Init extends MigrationStep
          * order (FK order_id)
          * product (FK product_id)
          */
-        $connection->executeUpdate('
+        $connection->executeStatement('
             CREATE TABLE IF NOT EXISTS `lengow_order_line` (
                 `id`            BINARY(16)   NOT NULL,
                 `order_id`      BINARY(16)   NOT NULL,
@@ -91,7 +91,7 @@ class Migration1606313662Init extends MigrationStep
          * this table reference another lengow table :
          * lengow_order (FK lengow_order_id)
          */
-        $connection->executeUpdate('
+        $connection->executeStatement('
             CREATE TABLE IF NOT EXISTS `lengow_order_error` (
                 `id`              BINARY(16)  NOT NULL,
                 `lengow_order_id` BINARY(16)  NOT NULL,
@@ -111,7 +111,7 @@ class Migration1606313662Init extends MigrationStep
          * this table reference 1 shopware base table :
          * order (FK order_id)
          */
-        $connection->executeUpdate('
+        $connection->executeStatement('
             CREATE TABLE IF NOT EXISTS `lengow_action` (
                 `id`             BINARY(16)   NOT NULL,
                 `order_id`       BINARY(16)   NOT NULL,
@@ -133,7 +133,7 @@ class Migration1606313662Init extends MigrationStep
          * this table reference 1 shopware base table :
          * sales_channel (FK sales_channel_id)
          */
-        $connection->executeUpdate('
+        $connection->executeStatement('
             CREATE TABLE IF NOT EXISTS `lengow_settings` (
                 `id`               BINARY(16)   NOT NULL,
                 `sales_channel_id` BINARY(16)   NULL DEFAULT NULL,
@@ -153,7 +153,7 @@ class Migration1606313662Init extends MigrationStep
          * product (FK product_id)
          * sales_channel (FK sales_channel_id)
          */
-        $connection->executeUpdate('
+        $connection->executeStatement('
             CREATE TABLE IF NOT EXISTS `lengow_product` (
                 `id`               BINARY(16)  NOT NULL,
                 `product_id`       BINARY(16)  NOT NULL,
@@ -171,7 +171,7 @@ class Migration1606313662Init extends MigrationStep
          * order state are linked to state_machine (order.state here)
          */
         $StateUuid = Uuid::randomHex(); // Generate new uuid for insert
-        $connection->executeUpdate('
+        $connection->executeStatement('
             INSERT IGNORE INTO state_machine_state VALUES (
                 UNHEX("' . $StateUuid . '"),
                 "lengow_technical_error",
@@ -197,7 +197,7 @@ class Migration1606313662Init extends MigrationStep
              */
             $uuid = Uuid::randomHex(); // Generate new uuid for insert
             $availableStateUuid = Uuid::fromBytesToHex($state['id']);
-            $connection->executeUpdate('
+            $connection->executeStatement('
                 INSERT IGNORE INTO state_machine_transition VALUES (
                     UNHEX("' . $uuid . '"),
                     "technical_error",
@@ -219,7 +219,7 @@ class Migration1606313662Init extends MigrationStep
             ');
         }
         $uuid = Uuid::randomHex(); // Generate new uuid for insert
-        $connection->executeUpdate('
+        $connection->executeStatement('
             INSERT IGNORE INTO state_machine_transition VALUES (
                 UNHEX("' . $uuid . '"),
                 "cancel_technical_error",
@@ -252,7 +252,7 @@ class Migration1606313662Init extends MigrationStep
         foreach ($languageAvailable as $language) {
             $languageId = Uuid::fromBytesToHex($language['id']);
             if ($languageId) {
-                $connection->executeUpdate('
+                $connection->executeStatement('
                     INSERT IGNORE INTO state_machine_state_translation VALUES (
                         UNHEX("' . $languageId . '"),
                         (
@@ -272,7 +272,7 @@ class Migration1606313662Init extends MigrationStep
 
     public function updateDestructive(Connection $connection): void
     {
-        $connection->executeUpdate('
+        $connection->executeStatement('
             DROP TABLE IF EXISTS
             `lengow_settings`,
             `lengow_product`,
