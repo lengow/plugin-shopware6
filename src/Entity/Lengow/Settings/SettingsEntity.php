@@ -32,12 +32,12 @@ class SettingsEntity extends Entity
     protected $value;
 
     /**
-     * @var DateTimeInterface
+     * @var DateTimeInterface|null
      */
     protected $createdAt;
 
     /**
-     * @var DateTimeInterface
+     * @var DateTimeInterface|null
      */
     protected $updatedAt;
 
@@ -90,33 +90,33 @@ class SettingsEntity extends Entity
     }
 
     /**
-     * @return DateTimeInterface
+     * @return DateTimeInterface|null
      */
-    public function getCreatedAt(): DateTimeInterface
+    public function getCreatedAt(): ?DateTimeInterface
     {
         return $this->createdAt;
     }
 
     /**
-     * @param DateTimeInterface $createdAt
+     * @param DateTimeInterface|null $createdAt
      */
-    public function setCreatedAt(DateTimeInterface $createdAt): void
+    public function setCreatedAt(?DateTimeInterface $createdAt): void
     {
         $this->createdAt = $createdAt;
     }
 
     /**
-     * @return DateTimeInterface
+     * @return DateTimeInterface|null
      */
-    public function getUpdatedAt(): DateTimeInterface
+    public function getUpdatedAt(): ?DateTimeInterface
     {
         return $this->updatedAt;
     }
 
     /**
-     * @param DateTimeInterface $updatedAt
+     * @param DateTimeInterface|null $updatedAt
      */
-    public function setUpdatedAt(DateTimeInterface $updatedAt): void
+    public function setUpdatedAt(?DateTimeInterface $updatedAt): void
     {
         $this->updatedAt = $updatedAt;
     }
