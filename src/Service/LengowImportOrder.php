@@ -1807,6 +1807,7 @@ class LengowImportOrder
                 [
                     'id' => $paymentMethodId,
                     'name' => $paymentMethodName,
+                    'technicalName' => 'lengow_' . strtolower(str_replace(' ', '_', $marketplaceName)) . '_payment',
                     'description' => 'Payment method for Lengow marketplace: ' . $marketplaceName,
                     'active' => false,
                     'afterOrderEnabled' => false,
