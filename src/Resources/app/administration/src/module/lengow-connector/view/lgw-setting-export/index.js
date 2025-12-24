@@ -18,7 +18,7 @@ Component.register('lgw-setting-export', {
             default: {}
         },
         onSaveSettings: {
-            type: Object,
+            type: Function,
             required: true
         }
     },
@@ -109,10 +109,15 @@ Component.register('lgw-setting-export', {
                             salesChannelId: salesChannel.id,
                             salesChannelName: salesChannel.name,
                             name: shippingMethod.name,
-                            value: shippingMethod.id
+                            value: shippingMethod.id,
+                            label: shippingMethod.name
                         }];
                 });
             });
+        },
+        
+        getShippingMethodsForSalesChannel(salesChannelId) {
+            return this.shippingMethods.filter(method => method.salesChannelId === salesChannelId);
         }
     }
 });

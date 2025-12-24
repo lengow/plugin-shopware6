@@ -1,12 +1,10 @@
 {% block lgw_free_trial_warning %}
-    <template>
-        <span class="lgw-free-trial-warning" >
-            {{ $tc('lengow-connector.global.trial_1') }}
-            {{ dayLeft }}
-            {{ $tc('lengow-connector.global.trial_2') }}
-            <a :href="link" target="_blank">
-                {{ $tc('lengow-connector.global.upgrade_account') }}
-            </a>
-        </span>
-    </template>
+    <span class="lgw-free-trial-warning" >
+        {{ $tc('lengow-connector.global.trial_1') }}
+        {{ dayLeft }}
+        {{ $tc('lengow-connector.global.trial_2') }}
+        <a :href="link" target="_blank">
+            {{ $tc('lengow-connector.global.upgrade_account') }}
+        </a>
+    </span>
 {% endblock %}

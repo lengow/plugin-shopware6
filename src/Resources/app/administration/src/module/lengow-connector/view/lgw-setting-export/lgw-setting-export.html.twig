@@ -11,9 +11,8 @@
                     <template v-for="salesChannel in salesChannels">
                         <sw-switch-field class="text-center"
                                          :label="salesChannel.name"
-                                         v-model="salesChannel.exportDisabled"
-                                        @update:value="onSaveSettings($event, 'lengowExportDisabledProduct', salesChannel.salesChannelId)"
-                                        @change="onSaveSettings($event, 'lengowExportDisabledProduct', salesChannel.salesChannelId)"
+                                         v-model:value="salesChannel.exportDisabled"
+                                         @update:value="onSaveSettings($event, 'lengowExportDisabledProduct', salesChannel.salesChannelId)"
                         >
                         </sw-switch-field>
                     </template>
@@ -25,9 +24,8 @@
                     <template v-for="salesChannel in salesChannels">
                         <sw-switch-field class="text-center"
                                          :label="salesChannel.name"
-                                         v-model="salesChannel.exportSelection"
-                                        @update:value="onSaveSettings($event, 'lengowSelectionEnabled', salesChannel.salesChannelId)"
-                                        @change="onSaveSettings($event, 'lengowSelectionEnabled', salesChannel.salesChannelId)"
+                                         v-model:value="salesChannel.exportSelection"
+                                         @update:value="onSaveSettings($event, 'lengowSelectionEnabled', salesChannel.salesChannelId)"
                         >
                         </sw-switch-field>
                     </template>
@@ -44,19 +42,14 @@
                                   :text="$tc('lengow-connector.setting.lengow_export_setting.shipping.description')"
                                   :width="200"
                                   tooltipPosition="right"/>
-                    <sw-select-field v-for="salesChannel in salesChannels"
+                    <sw-single-select v-for="salesChannel in salesChannels"
+                                     :key="salesChannel.salesChannelId"
                                      :label="salesChannel.name"
-                                     v-model="salesChannel.defaultShippingMethod"
+                                     :options="getShippingMethodsForSalesChannel(salesChannel.salesChannelId)"
+                                     v-model:value="salesChannel.defaultShippingMethod"
                                     @update:value="onSaveSettings($event, 'lengowExportDefaultShippingMethod', salesChannel.salesChannelId)"
-                                    @change="onSaveSettings($event, 'lengowExportDefaultShippingMethod', salesChannel.salesChannelId)"
                     >
-                        <template v-for="shippingMethod in shippingMethods">
-                            <option v-if="salesChannel.salesChannelId === shippingMethod.salesChannelId"
-                                    :value="shippingMethod.value">
-                                {{ shippingMethod.name }}
-                            </option>
-                        </template>
-                    </sw-select-field>
+                    </sw-single-select>
                 </template>
                 <template v-else>
                     <sw-loader></sw-loader>

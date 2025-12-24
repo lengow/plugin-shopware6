@@ -1,28 +1,26 @@
 {% block lgw_conditional_string_field %}
-    <template>
-        <div>
-            <sw-help-text class="lgw-help-text"
-                          v-if="switchHelpText"
-                          :text="switchHelpText"
-                          :width="200"
-                          tooltipPosition="right">
-            </sw-help-text>
-            <sw-switch-field class="text-center"
-                             :label="switchLabel"
-                             v-model="locked"
-                             @update:value="onSaveSettings($event, switchSettingsKey, settingsSalesChannelId), onSwitchChange($event)"
-                             @change="onSaveSettings($event, switchSettingsKey, settingsSalesChannelId), onSwitchChange($event)"
-            >
-            </sw-switch-field>
-            <lgw-lockable-string-field :fieldContent="fieldContent"
-                                       :locked="!newLocked"
-                                       :fieldPlaceholder="fieldPlaceholder"
-                                       :fieldLabel="fieldLabel"
-                                       :onSaveSettings="onSaveSettings"
-                                       :settingsKey="fieldSettingsKey"
-                                       :helpText="helpText"
-                                       :settingsSalesChannelId="settingsSalesChannelId">
-            </lgw-lockable-string-field>
-        </div>
-    </template>
+    <div>
+        <sw-help-text class="lgw-help-text"
+                      v-if="switchHelpText"
+                      :text="switchHelpText"
+                      :width="200"
+                      tooltipPosition="right">
+        </sw-help-text>
+        <sw-switch-field class="text-center"
+                         :label="switchLabel"
+                         v-model="locked"
+                         @update:value="onSaveSettings($event, switchSettingsKey, settingsSalesChannelId), onSwitchChange($event)"
+                         @change="onSaveSettings($event, switchSettingsKey, settingsSalesChannelId), onSwitchChange($event)"
+        >
+        </sw-switch-field>
+        <lgw-lockable-string-field :fieldContent="fieldContent"
+                                   :locked="!newLocked"
+                                   :fieldPlaceholder="fieldPlaceholder"
+                                   :fieldLabel="fieldLabel"
+                                   :onSaveSettings="onSaveSettings"
+                                   :settingsKey="fieldSettingsKey"
+                                   :helpText="helpText"
+                                   :settingsSalesChannelId="settingsSalesChannelId">
+        </lgw-lockable-string-field>
+    </div>
 {% endblock %}

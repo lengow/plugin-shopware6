@@ -5,7 +5,6 @@ const {
     Filter,
     Data: { Criteria }
 } = Shopware;
-const { mapState } = Shopware.Component.getComponentHelper();
 
 Component.register('lgw-connection-catalog', {
     template,
@@ -30,7 +29,20 @@ Component.register('lgw-connection-catalog', {
     },
 
     computed: {
-        ...mapState('lgwConnection', ['catalogList', 'catalogSelected', 'optionIsLoading']),
+        catalogList() {
+            const state = Shopware.State.get('lgwConnection');
+            return state && state.catalogList ? state.catalogList : [];
+        },
+        
+        catalogSelected() {
+            const state = Shopware.State.get('lgwConnection');
+            return state && state.catalogSelected ? state.catalogSelected : [];
+        },
+        
+        optionIsLoading() {
+            const state = Shopware.State.get('lgwConnection');
+            return state && state.optionIsLoading ? state.optionIsLoading : false;
+        },
 
         assetFilter() {
             return Filter.getByName('asset');
