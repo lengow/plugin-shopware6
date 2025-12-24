@@ -106,6 +106,7 @@ class LengowConnector extends Plugin
             // payment handler will be selected by the identifier
             'handlerIdentifier' => LengowPayment::class,
             'name' => 'Lengow payment',
+            'technicalName' => 'lengow_payment',
             'description' => 'Lengow payment, DO NOT activate NOR delete',
             'pluginId' => $pluginId,
             'afterOrderEnabled' => false,

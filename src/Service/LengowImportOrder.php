@@ -1803,11 +1803,16 @@ class LengowImportOrder
             $paymentMethodId = Uuid::randomHex();
             $pluginId = $this->pluginIdProvider->getPluginIdByBaseClass(\Lengow\Connector\LengowConnector::class, $context);
 
+            // Generate a technical name with proper sanitization
+            $sanitizedMarketplace = preg_replace('/[^a-z0-9]/', '_', strtolower($marketplaceName));
+            $sanitizedMarketplace = preg_replace('/_+/', '_', $sanitizedMarketplace); // Remove duplicate underscores
+            $sanitizedMarketplace = trim($sanitizedMarketplace, '_'); // Remove leading/trailing underscores
+            
             $this->paymentMethodRepository->create([
                 [
                     'id' => $paymentMethodId,
                     'name' => $paymentMethodName,
-                    'technicalName' => 'lengow_' . strtolower(str_replace(' ', '_', $marketplaceName)) . '_payment',
+                    'technicalName' => 'lengow_' . $sanitizedMarketplace . '_payment',
                     'description' => 'Payment method for Lengow marketplace: ' . $marketplaceName,
                     'active' => false,
                     'afterOrderEnabled' => false,
