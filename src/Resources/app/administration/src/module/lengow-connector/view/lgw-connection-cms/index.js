@@ -8,8 +8,6 @@ const {
     Data: { Criteria }
 } = Shopware;
 
-const { mapState } = Shopware.Component.getComponentHelper() || {};
-
 Component.register('lgw-connection-cms', {
     template,
 
@@ -40,12 +38,12 @@ Component.register('lgw-connection-cms', {
         assetFilter() {
             return Filter.getByName('asset');
         },
-        ...(mapState ? mapState('lgwConnection', ['catalogList']) : {
-            catalogList() {
-                const state = Shopware.State.get('lgwConnection');
-                return state ? state.catalogList : [];
-            }
-        }),
+        
+        catalogList() {
+            const state = Shopware.State.get('lgwConnection');
+            return state && state.catalogList ? state.catalogList : [];
+        },
+        
         lengowConfigRepository() {
             return this.repositoryFactory.create('lengow_settings');
         }

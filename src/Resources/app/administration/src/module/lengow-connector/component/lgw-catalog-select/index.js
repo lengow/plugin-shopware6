@@ -2,7 +2,6 @@ import template from './lgw-catalog-select.html.twig';
 import './lgw-catalog-select.scss';
 
 const { Component } = Shopware;
-const { mapState } = Shopware.Component.getComponentHelper();
 
 Component.register('lgw-catalog-select', {
     template,
@@ -39,7 +38,20 @@ Component.register('lgw-catalog-select', {
     },
 
     computed: {
-        ...mapState('lgwConnection', ['catalogList', 'catalogSelected', 'catalogSelectionChanged'])
+        catalogList() {
+            const state = Shopware.State.get('lgwConnection');
+            return state && state.catalogList ? state.catalogList : [];
+        },
+        
+        catalogSelected() {
+            const state = Shopware.State.get('lgwConnection');
+            return state && state.catalogSelected ? state.catalogSelected : {};
+        },
+        
+        catalogSelectionChanged() {
+            const state = Shopware.State.get('lgwConnection');
+            return state && state.catalogSelectionChanged ? state.catalogSelectionChanged : false;
+        }
     },
 
     watch: {

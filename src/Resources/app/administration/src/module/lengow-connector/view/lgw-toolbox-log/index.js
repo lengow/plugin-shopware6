@@ -2,7 +2,6 @@ import template from './lgw-toolbox-log.html.twig';
 import './lgw-toolbox-log.scss';
 
 const { Component } = Shopware;
-const { mapState, mapGetters } = Shopware.Component.getComponentHelper() || {};
 
 Component.register('lgw-toolbox-log', {
     template,
@@ -26,20 +25,14 @@ Component.register('lgw-toolbox-log', {
     },
 
     computed: {
-        ...(mapState ? mapState('lgwToolbox', ['logData']) : {
-            logData() {
-                const state = Shopware.State.get('lgwToolbox');
-                return state ? state.logData : [];
-            }
-        }),
+        logData() {
+            const state = Shopware.State.get('lgwToolbox');
+            return state && state.logData ? state.logData : [];
+        },
 
-        ...(mapGetters ? mapGetters('lgwToolbox', {
-            isToolboxLoading: 'isLoading'
-        }) : {
-            isToolboxLoading() {
-                return Shopware.State.getters['lgwToolbox/isLoading'];
-            }
-        })
+        isToolboxLoading() {
+            return Shopware.State.getters['lgwToolbox/isLoading'];
+        }
     },
 
     watch: {
