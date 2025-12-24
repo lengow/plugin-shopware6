@@ -10,8 +10,7 @@
                 <sw-single-select class="text-center"
                                   :label="$tc('lengow-connector.setting.lengow_main_setting.environment.label')"
                                   :options="environmentOptions"
-                                  v-model="lengowEnvironmentUrl"
-                                  @change="onSaveSettings($event, 'lengowEnvironmentUrl')"
+                                  v-model:value="lengowEnvironmentUrl"
                                   @update:value="onSaveSettings($event, 'lengowEnvironmentUrl')"
                 >
                 </sw-single-select>
@@ -101,9 +100,8 @@
                 <sw-single-select placeholder="Select timezone"
                                  :label="$tc('lengow-connector.setting.lengow_main_setting.timezone.label')"
                                  :options="timezoneOptions"
-                                 v-model="lengowTimezone"
+                                 v-model:value="lengowTimezone"
                                 @update:value="onSaveSettings($event, 'lengowTimezone')"
-                                @change="onSaveSettings($event, 'lengowTimezone')"
                 >
                 </sw-single-select>
             </sw-card>

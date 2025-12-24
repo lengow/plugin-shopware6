@@ -53,9 +53,8 @@
                                      :key="salesChannel.salesChannelId"
                                      :label="salesChannel.label"
                                      :options="getShippingMethodsForSalesChannel(salesChannel.salesChannelId)"
-                                     v-model="salesChannel.defaultShippingMethod"
+                                     v-model:value="salesChannel.defaultShippingMethod"
                                     @update:value="onSaveSettings($event, 'lengowImportDefaultShippingMethod', salesChannel.salesChannelId)"
-                                    @change="onSaveSettings($event, 'lengowImportDefaultShippingMethod', salesChannel.salesChannelId)"
                     >
                     </sw-single-select>
                 </template>
@@ -158,23 +157,20 @@
                 <sw-single-select style="font-weight: 800"
                                  :label="$tc('lengow-connector.setting.lengow_import_setting.waiting_for_shipment.label')"
                                  :options="waitingShipmentStatusOptions"
-                                 v-model="lengowWaitingShipmentOrderId"
-                                 @update:value="onSaveSettings($event, 'lengowWaitingShipmentOrderId')"
-                                 @change="onSaveSettings($event, 'lengowWaitingShipmentOrderId')">
+                                 v-model:value="lengowWaitingShipmentOrderId"
+                                 @update:value="onSaveSettings($event, 'lengowWaitingShipmentOrderId')">
                 </sw-single-select>
                 <sw-single-select style="font-weight: 800"
                                  :label="$tc('lengow-connector.setting.lengow_import_setting.shipped.label')"
                                  :options="shippedStatusOptions"
-                                 v-model="lengowShippedOrderId"
-                                 @update:value="onSaveSettings($event, 'lengowShippedOrderId')"
-                                 @change="onSaveSettings($event, 'lengowShippedOrderId')">
+                                 v-model:value="lengowShippedOrderId"
+                                 @update:value="onSaveSettings($event, 'lengowShippedOrderId')">
                 </sw-single-select>
                 <sw-single-select style="font-weight: 800"
                                  :label="$tc('lengow-connector.setting.lengow_import_setting.cancelled.label')"
                                  :options="cancelledStatusOptions"
-                                 v-model="lengowCanceledOrderId"
-                                 @update:value="onSaveSettings($event, 'lengowCanceledOrderId')"
-                                 @change="onSaveSettings($event, 'lengowCanceledOrderId')">
+                                 v-model:value="lengowCanceledOrderId"
+                                 @update:value="onSaveSettings($event, 'lengowCanceledOrderId')">
                 </sw-single-select>
             </sw-card>
         {% endblock %}

@@ -48,9 +48,8 @@
                                      :key="salesChannel.salesChannelId"
                                      :label="salesChannel.name"
                                      :options="getShippingMethodsForSalesChannel(salesChannel.salesChannelId)"
-                                     v-model="salesChannel.defaultShippingMethod"
+                                     v-model:value="salesChannel.defaultShippingMethod"
                                     @update:value="onSaveSettings($event, 'lengowExportDefaultShippingMethod', salesChannel.salesChannelId)"
-                                    @change="onSaveSettings($event, 'lengowExportDefaultShippingMethod', salesChannel.salesChannelId)"
                     >
                     </sw-single-select>
                 </template>
