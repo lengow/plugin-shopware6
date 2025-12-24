@@ -32,14 +32,14 @@ class SettingsEntity extends Entity
     protected $value;
 
     /**
-     * @var DateTimeInterface|null
+     * @var \DateTimeInterface|null
      */
-    protected $createdAt;
+    protected ?\DateTimeInterface $createdAt = null;
 
     /**
-     * @var DateTimeInterface|null
+     * @var \DateTimeInterface|null
      */
-    protected $updatedAt;
+    protected ?\DateTimeInterface $updatedAt = null;
 
     /**
      * @return ShopwareSalesChannelEntity|null
@@ -90,7 +90,7 @@ class SettingsEntity extends Entity
     }
 
     /**
-     * @return DateTimeInterface|null
+     * @return \DateTimeInterface|null
      */
     public function getCreatedAt(): ?DateTimeInterface
     {
@@ -98,7 +98,7 @@ class SettingsEntity extends Entity
     }
 
     /**
-     * @param DateTimeInterface|null $createdAt
+     * @param \DateTimeInterface|null $createdAt
      */
     public function setCreatedAt(?DateTimeInterface $createdAt): void
     {
@@ -106,7 +106,7 @@ class SettingsEntity extends Entity
     }
 
     /**
-     * @return DateTimeInterface|null
+     * @return \DateTimeInterface|null
      */
     public function getUpdatedAt(): ?DateTimeInterface
     {
@@ -114,7 +114,7 @@ class SettingsEntity extends Entity
     }
 
     /**
-     * @param DateTimeInterface|null $updatedAt
+     * @param \DateTimeInterface|null $updatedAt
      */
     public function setUpdatedAt(?DateTimeInterface $updatedAt): void
     {

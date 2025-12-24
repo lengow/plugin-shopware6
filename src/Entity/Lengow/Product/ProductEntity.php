@@ -26,9 +26,9 @@ class ProductEntity extends Entity
     protected $salesChannel;
 
     /**
-     * @var DateTimeInterface|null
+     * @var \DateTimeInterface|null
      */
-    protected $createdAt;
+    protected ?\DateTimeInterface $createdAt = null;
 
     /**
      * @return string
@@ -63,7 +63,7 @@ class ProductEntity extends Entity
     }
 
     /**
-     * @return DateTimeInterface|null
+     * @return \DateTimeInterface|null
      */
     public function getCreatedAt(): ?DateTimeInterface
     {
@@ -71,7 +71,7 @@ class ProductEntity extends Entity
     }
 
     /**
-     * @param DateTimeInterface|null $createdAt
+     * @param \DateTimeInterface|null $createdAt
      */
     public function setCreatedAt(?DateTimeInterface $createdAt): void
     {
