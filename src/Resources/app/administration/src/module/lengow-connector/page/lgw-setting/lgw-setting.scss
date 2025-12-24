@@ -7,3 +7,9 @@
   float: right;
   margin-top: 3px;
 }
+
+.lgw-bold-label {
+  .sw-field__label {
+    font-weight: 800;
+  }
+}

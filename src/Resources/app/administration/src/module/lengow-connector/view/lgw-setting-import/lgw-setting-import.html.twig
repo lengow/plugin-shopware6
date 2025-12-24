@@ -9,9 +9,9 @@
                 <sw-switch-field class="text-center"
                                  :label="$tc('lengow-connector.setting.lengow_import_setting.ship_mp_enabled.label')"
                                  v-model:value="lengowImportShipMpEnabled"
-                                 @update:value="onSaveSettings($event, 'lengowImportShipMpEnabled')"
-                >
+                                 @update:value="onSaveSettings($event, 'lengowImportShipMpEnabled')">
                 </sw-switch-field>
+
                 <sw-help-text class="lgw-help-text"
                               :text="$tc('lengow-connector.setting.lengow_import_setting.decrease_stock.description')"
                               :width="200"
@@ -20,11 +20,11 @@
                                  :label="$tc('lengow-connector.setting.lengow_import_setting.decrease_stock.label')"
                                  :disabled="!lengowImportShipMpEnabled"
                                  v-model:value="lengowImportStockShipMp"
-                                 @update:value="onSaveSettings($event, 'lengowImportStockShipMp')"
-                >
+                                 @update:value="onSaveSettings($event, 'lengowImportStockShipMp')">
                 </sw-switch-field>
             </sw-card>
         {% endblock %}
+
         {% block lgw_setting_import_payment %}
             <sw-card :title="$tc('lengow-connector.setting.lengow_import_setting.payment.label')">
                 <sw-help-text class="lgw-help-text"
@@ -34,11 +34,11 @@
                 <sw-switch-field class="text-center"
                                  :label="$tc('lengow-connector.setting.lengow_import_setting.payment_per_marketplace.label')"
                                  v-model:value="lengowPaymentPerMarketplace"
-                                 @update:value="onSaveSettings($event, 'lengowPaymentPerMarketplace')"
-                >
+                                 @update:value="onSaveSettings($event, 'lengowPaymentPerMarketplace')">
                 </sw-switch-field>
             </sw-card>
         {% endblock %}
+
         {% block lgw_setting_import_shipping %}
             <sw-card :title="$tc('lengow-connector.setting.lengow_import_setting.shipping.label')">
                 <template v-if="render">
@@ -46,20 +46,22 @@
                                   :text="$tc('lengow-connector.setting.lengow_import_setting.shipping.description')"
                                   :width="200"
                                   tooltipPosition="right"/>
+
                     <sw-single-select v-for="salesChannel in salesChannels"
-                                     :key="salesChannel.salesChannelId"
-                                     :label="salesChannel.label"
-                                     :options="getShippingMethodsForSalesChannel(salesChannel.salesChannelId)"
-                                     v-model:value="salesChannel.defaultShippingMethod"
-                                    @update:value="onSaveSettings($event, 'lengowImportDefaultShippingMethod', salesChannel.salesChannelId)"
-                    >
+                                      :key="salesChannel.salesChannelId"
+                                      :label="salesChannel.label"
+                                      :options="getShippingMethodsForSalesChannel(salesChannel.salesChannelId)"
+                                      v-model:value="salesChannel.defaultShippingMethod"
+                                      @update:value="onSaveSettings($event, 'lengowImportDefaultShippingMethod', salesChannel.salesChannelId)">
                     </sw-single-select>
                 </template>
+
                 <template v-else>
                     <sw-loader></sw-loader>
                 </template>
             </sw-card>
         {% endblock %}
+
         {% block lgw_setting_import_other %}
             <sw-card :title="$tc('lengow-connector.setting.title.others')">
                 <sw-help-text class="lgw-help-text"
@@ -72,15 +74,15 @@
                                  :value="lengowImportDays"
                                  :digits="2"
                                  :label="$tc('lengow-connector.setting.lengow_import_setting.import_days.label')"
-                                 @update:value="onSaveSettings($event, 'lengowImportDays')"
-                >
+                                 @update:value="onSaveSettings($event, 'lengowImportDays')">
                 </sw-number-field>
+
                 <sw-switch-field class="text-center"
                                  :label="$tc('lengow-connector.setting.lengow_import_setting.report_mail_enabled.label')"
                                  v-model:value="lengowReportMailEnabled"
-                                 @update:value="onSaveSettings($event, 'lengowReportMailEnabled')"
-                >
+                                 @update:value="onSaveSettings($event, 'lengowReportMailEnabled')">
                 </sw-switch-field>
+
                 <lgw-lockable-string-field :fieldContent="lengowReportMailAddress"
                                            :locked="!lengowReportMailEnabled"
                                            :fieldLabel="$tc('lengow-connector.setting.lengow_import_setting.report_mail_address.label')"
@@ -88,51 +90,57 @@
                                            settingsKey="lengowReportMailAddress"
                                            :helpText="$tc('lengow-connector.setting.lengow_import_setting.report_mail_address.description')">
                 </lgw-lockable-string-field>
+
                 <sw-help-text class="lgw-help-text"
                               :text="$tc('lengow-connector.setting.lengow_import_setting.currency_conversion_title.description')"
                               :width="200"
-                              tooltipPosition="right">
-                </sw-help-text>
+                              tooltipPosition="right"/>
+
                 <sw-switch-field class="text-center"
                                  :label="$tc('lengow-connector.setting.lengow_import_setting.currency_conversion_title.label')"
                                  v-model:value="lengowCurrencyConversion"
-                                 @update:value="onSaveSettings($event, 'lengowCurrencyConversion')"
-                >
+                                 @update:value="onSaveSettings($event, 'lengowCurrencyConversion')">
                 </sw-switch-field>
+
                 <sw-help-text class="lgw-help-text"
                               :text="$tc('lengow-connector.setting.lengow_import_setting.import_btob.description')"
                               :width="200"
                               tooltipPosition="right"/>
+
                 <sw-switch-field class="text-center"
                                  :label="$tc('lengow-connector.setting.lengow_import_setting.import_btob.label')"
                                  v-model:value="lengowImportB2b"
-                                 @update:value="onSaveSettings($event, 'lengowImportB2b')"
-                >
+                                 @update:value="onSaveSettings($event, 'lengowImportB2b')">
                 </sw-switch-field>
+
                 <sw-help-text class="lgw-help-text"
                               :text="$tc('lengow-connector.setting.lengow_import_setting.debug_mode.description')"
                               :width="200"
                               tooltipPosition="right"/>
+
                 <sw-switch-field class="text-center"
                                  :label="$tc('lengow-connector.setting.lengow_import_setting.debug_mode.label')"
                                  v-model:value="lengowDebugEnabled"
-                                 @update:value="onSaveSettings($event, 'lengowDebugEnabled')"
-                >
+                                 @update:value="onSaveSettings($event, 'lengowDebugEnabled')">
                 </sw-switch-field>
+
                 <sw-help-text class="lgw-help-text"
-                              :text="$tc('lengow-connector.setting.lengow_import_setting.anonymize_email.description')+'@lengow.com'"
+                              :text="$tc('lengow-connector.setting.lengow_import_setting.anonymize_email.description') + '@lengow.com'"
                               :width="200"
                               tooltipPosition="right"/>
+
                 <sw-switch-field class="text-center"
                                  :label="$tc('lengow-connector.setting.lengow_import_setting.anonymize_email.label')"
                                  v-model:value="lengowAnonymizeEmail"
                                  @update:value="onSaveSettings($event, 'lengowAnonymizeEmail'), onSwitchChange($event)">
                 </sw-switch-field>
+
                 <div v-if="newLocked">
                     <sw-help-text class="lgw-help-text"
-                                  :text="$tc('lengow-connector.setting.lengow_import_setting.encrypt_email.description')+'@lengow.com'"
+                                  :text="$tc('lengow-connector.setting.lengow_import_setting.encrypt_email.description') + '@lengow.com'"
                                   :width="200"
                                   tooltipPosition="right"/>
+
                     <sw-switch-field class="text-center"
                                      :label="$tc('lengow-connector.setting.lengow_import_setting.encrypt_email.label')"
                                      v-model:value="lengowEncryptEmail"
@@ -140,30 +148,35 @@
                     </sw-switch-field>
                 </div>
             </sw-card>
+
             <sw-card :title="$tc('lengow-connector.setting.title.orders_status')">
                 <p style="margin-bottom: 50px">
                     {{ $tc('lengow-connector.setting.orders_status.description') }}
                 </p>
-                <sw-single-select style="font-weight: 800"
-                                 :label="$tc('lengow-connector.setting.lengow_import_setting.waiting_for_shipment.label')"
-                                 :options="waitingShipmentStatusOptions"
-                                 v-model:value="lengowWaitingShipmentOrderId"
-                                 @update:value="onSaveSettings($event, 'lengowWaitingShipmentOrderId')">
+
+                <sw-single-select class="lgw-bold-label"
+                                  :label="$tc('lengow-connector.setting.lengow_import_setting.waiting_for_shipment.label')"
+                                  :options="waitingShipmentStatusOptions"
+                                  v-model:value="lengowWaitingShipmentOrderId"
+                                  @update:value="onSaveSettings($event, 'lengowWaitingShipmentOrderId')">
                 </sw-single-select>
-                <sw-single-select style="font-weight: 800"
-                                 :label="$tc('lengow-connector.setting.lengow_import_setting.shipped.label')"
-                                 :options="shippedStatusOptions"
-                                 v-model:value="lengowShippedOrderId"
-                                 @update:value="onSaveSettings($event, 'lengowShippedOrderId')">
+
+                <sw-single-select class="lgw-bold-label"
+                                  :label="$tc('lengow-connector.setting.lengow_import_setting.shipped.label')"
+                                  :options="shippedStatusOptions"
+                                  v-model:value="lengowShippedOrderId"
+                                  @update:value="onSaveSettings($event, 'lengowShippedOrderId')">
                 </sw-single-select>
-                <sw-single-select style="font-weight: 800"
-                                 :label="$tc('lengow-connector.setting.lengow_import_setting.cancelled.label')"
-                                 :options="cancelledStatusOptions"
-                                 v-model:value="lengowCanceledOrderId"
-                                 @update:value="onSaveSettings($event, 'lengowCanceledOrderId')">
+
+                <sw-single-select class="lgw-bold-label"
+                                  :label="$tc('lengow-connector.setting.lengow_import_setting.cancelled.label')"
+                                  :options="cancelledStatusOptions"
+                                  v-model:value="lengowCanceledOrderId"
+                                  @update:value="onSaveSettings($event, 'lengowCanceledOrderId')">
                 </sw-single-select>
             </sw-card>
         {% endblock %}
+
         {% block lgw_setting_import_footer %}
             <lgw-footer></lgw-footer>
         {% endblock %}
