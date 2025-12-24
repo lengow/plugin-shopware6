@@ -36,7 +36,8 @@ Component.register('lgw-toolbox-checksum', {
     computed: {
         ...(mapState ? mapState('lgwToolbox', ['checksumData']) : {
             checksumData() {
-                return Shopware.State.get('lgwToolbox').checksumData;
+                const state = Shopware.State.get('lgwToolbox');
+                return state ? state.checksumData : {};
             }
         }),
 

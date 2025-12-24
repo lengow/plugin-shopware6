@@ -19,10 +19,12 @@ Component.register('lgw-toolbox-base', {
     computed: {
         ...(mapState ? mapState('lgwToolbox', ['overviewData', 'loading']) : {
             overviewData() {
-                return Shopware.State.get('lgwToolbox').overviewData;
+                const state = Shopware.State.get('lgwToolbox');
+                return state ? state.overviewData : {};
             },
             loading() {
-                return Shopware.State.get('lgwToolbox').loading;
+                const state = Shopware.State.get('lgwToolbox');
+                return state ? state.loading : {};
             }
         }),
 

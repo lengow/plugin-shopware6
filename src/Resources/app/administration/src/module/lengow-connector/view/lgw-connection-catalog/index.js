@@ -32,13 +32,16 @@ Component.register('lgw-connection-catalog', {
     computed: {
         ...(mapState ? mapState('lgwConnection', ['catalogList', 'catalogSelected', 'optionIsLoading']) : {
             catalogList() {
-                return Shopware.State.get('lgwConnection').catalogList;
+                const state = Shopware.State.get('lgwConnection');
+                return state ? state.catalogList : [];
             },
             catalogSelected() {
-                return Shopware.State.get('lgwConnection').catalogSelected;
+                const state = Shopware.State.get('lgwConnection');
+                return state ? state.catalogSelected : [];
             },
             optionIsLoading() {
-                return Shopware.State.get('lgwConnection').optionIsLoading;
+                const state = Shopware.State.get('lgwConnection');
+                return state ? state.optionIsLoading : false;
             }
         }),
 

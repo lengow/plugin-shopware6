@@ -42,7 +42,8 @@ Component.register('lgw-connection-cms', {
         },
         ...(mapState ? mapState('lgwConnection', ['catalogList']) : {
             catalogList() {
-                return Shopware.State.get('lgwConnection').catalogList;
+                const state = Shopware.State.get('lgwConnection');
+                return state ? state.catalogList : [];
             }
         }),
         lengowConfigRepository() {

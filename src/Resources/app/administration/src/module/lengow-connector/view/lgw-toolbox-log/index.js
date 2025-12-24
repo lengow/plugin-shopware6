@@ -28,7 +28,8 @@ Component.register('lgw-toolbox-log', {
     computed: {
         ...(mapState ? mapState('lgwToolbox', ['logData']) : {
             logData() {
-                return Shopware.State.get('lgwToolbox').logData;
+                const state = Shopware.State.get('lgwToolbox');
+                return state ? state.logData : [];
             }
         }),
 
