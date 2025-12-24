@@ -18,11 +18,11 @@ Component.register('lgw-setting-import', {
             default: {}
         },
         onSaveSettings: {
-            type: Object,
+            type: Function,
             required: true
         },
         onChangeStatus: {
-            type: Object,
+            type: Function,
             required: true
         }
     },

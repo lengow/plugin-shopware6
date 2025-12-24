@@ -21,7 +21,7 @@ Component.register('lgw-setting-general', {
             default: {}
         },
         onSaveSettings: {
-            type: Object,
+            type: Function,
             required: true
         }
     },

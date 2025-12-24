@@ -18,7 +18,7 @@ Component.register('lgw-setting-export', {
             default: {}
         },
         onSaveSettings: {
-            type: Object,
+            type: Function,
             required: true
         }
     },
