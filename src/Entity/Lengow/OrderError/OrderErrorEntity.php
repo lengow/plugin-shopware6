@@ -42,14 +42,14 @@ class OrderErrorEntity extends Entity
     protected $mail;
 
     /**
-     * @var DateTimeInterface|null
+     * @var \DateTimeInterface|null
      */
-    protected $createdAt;
+    protected ?\DateTimeInterface $createdAt = null;
 
     /**
-     * @var DateTimeInterface|null
+     * @var \DateTimeInterface|null
      */
-    protected $updatedAt;
+    protected ?\DateTimeInterface $updatedAt = null;
 
     /**
      * @return LengowOrderEntity

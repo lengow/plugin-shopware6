@@ -66,10 +66,9 @@
                             </div>
                             <div class="lgw-float-center">
                                 <sw-switch-field class="text-center"
-                                                 v-model="productSelection"
+                                                 v-model:value="productSelection"
                                                  :label="$tc('lengow-connector.product.activate_selection_label')"
-                                                @update:value="onActivateSelection"
-                                                @change="onActivateSelection"
+                                                 @update:value="onActivateSelection"
                                 >
                                 </sw-switch-field>
                             </div>
@@ -155,10 +154,9 @@
                                                     <template>
                                                         <sw-switch-field
                                                                 class="lgw-no-background"
-                                                                v-model="item.extensions.activeInLengow.active"
+                                                                v-model:value="item.extensions.activeInLengow.active"
                                                                 :label="$tc('lengow-connector.product.column.activate')"
                                                                 @update:value="OnActivateOnLengow({ item })"
-                                                                @change="OnActivateOnLengow({ item })"
                                                         ></sw-switch-field>
                                                     </template>
                                                 {% endblock %}
@@ -227,7 +225,6 @@
                                                 :options="isActiveOptions"
                                                 :label="$tc('lengow-connector.product.filter.active_filter_label')"
                                                 @update:value="onActiveFilter"
-                                                @change="onActiveFilter"
                                         >
                                         </sw-single-select>
                                     {% endblock %}
@@ -237,7 +234,6 @@
                                                 :options="isWithStockOptions"
                                                 :label="$tc('lengow-connector.product.filter.stock_filter_label')"
                                                 @update:value="onStockFilter"
-                                                @change="onStockFilter"
                                         >
                                         </sw-single-select>
                                     {% endblock %}

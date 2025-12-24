@@ -18,11 +18,11 @@ Component.register('lgw-setting-import', {
             default: {}
         },
         onSaveSettings: {
-            type: Object,
+            type: Function,
             required: true
         },
         onChangeStatus: {
-            type: Object,
+            type: Function,
             required: true
         }
     },
@@ -71,7 +71,8 @@ Component.register('lgw-setting-import', {
                             salesChannelId: salesChannel.id,
                             salesChannelName: salesChannel.name,
                             name: shippingMethod.name,
-                            value: shippingMethod.id
+                            value: shippingMethod.id,
+                            label: shippingMethod.name
                         }];
                     });
                 });
@@ -122,6 +123,24 @@ Component.register('lgw-setting-import', {
 
         salesChannelShippingMethodRepository() {
             return this.repositoryFactory.create('sales_channel_shipping_method');
+        },
+        
+        waitingShipmentStatusOptions() {
+            return this.statusOptions.filter(status => 
+                status.value !== 'cancelled' && status.value !== 'completed'
+            );
+        },
+        
+        shippedStatusOptions() {
+            return this.statusOptions.filter(status => 
+                status.value !== 'cancelled'
+            );
+        },
+        
+        cancelledStatusOptions() {
+            return this.statusOptions.filter(status => 
+                status.value !== 'open' && status.value !== 'in_progress'
+            );
         }
     },
 
@@ -141,6 +160,10 @@ Component.register('lgw-setting-import', {
             return this.shippingMethodRepository.search(shippingMethodCriteria, Shopware.Context.api).then(result => {
                 return result.total !== 0 ? result.first().id : 'Not found';
             });
+        },
+
+        getShippingMethodsForSalesChannel(salesChannelId) {
+            return this.shippingMethods.filter(method => method.salesChannelId === salesChannelId);
         },
 
         onSwitchChange(newValue) {

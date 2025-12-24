@@ -1,12 +1,10 @@
 {% block lgw_update_warning %}
-    <template>
-        <span class="lgw-update-warning" >
-            {{ $tc('lengow-connector.global.new_version_available_1') }}
-            {{ version }}
-            {{ $tc('lengow-connector.global.new_version_available_2') }}
-            <button @click.prevent="onClick" class="lgw-btn-link">
-                {{ $tc('lengow-connector.global.download_plugin') }}
-            </button>
-        </span>
-    </template>
+    <span class="lgw-update-warning" >
+        {{ $tc('lengow-connector.global.new_version_available_1') }}
+        {{ version }}
+        {{ $tc('lengow-connector.global.new_version_available_2') }}
+        <button @click.prevent="onClick" class="lgw-btn-link">
+            {{ $tc('lengow-connector.global.download_plugin') }}
+        </button>
+    </span>
 {% endblock %}

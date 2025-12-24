@@ -163,14 +163,14 @@ class OrderEntity extends Entity
     protected $message;
 
     /**
-     * @var DateTimeInterface|null
+     * @var \DateTimeInterface|null
      */
-    protected $createdAt;
+    protected ?\DateTimeInterface $createdAt = null;
 
     /**
-     * @var DateTimeInterface|null
+     * @var \DateTimeInterface|null
      */
-    protected $updatedAt;
+    protected ?\DateTimeInterface $updatedAt = null;
 
     /**
      * @var DateTimeInterface|null
