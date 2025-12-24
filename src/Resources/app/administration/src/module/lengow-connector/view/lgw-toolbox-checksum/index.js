@@ -2,7 +2,7 @@ import template from './lgw-toolbox-checksum.html.twig';
 import './lgw-toolbox-checksum.scss';
 
 const { Component } = Shopware;
-const { mapState, mapGetters } = Shopware.Component.getComponentHelper();
+const { mapState, mapGetters } = Shopware.Component.getComponentHelper() || {};
 
 Component.register('lgw-toolbox-checksum', {
     template,
@@ -34,10 +34,18 @@ Component.register('lgw-toolbox-checksum', {
     },
 
     computed: {
-        ...mapState('lgwToolbox', ['checksumData']),
+        ...(mapState ? mapState('lgwToolbox', ['checksumData']) : {
+            checksumData() {
+                return Shopware.State.get('lgwToolbox').checksumData;
+            }
+        }),
 
-        ...mapGetters('lgwToolbox', {
+        ...(mapGetters ? mapGetters('lgwToolbox', {
             isToolboxLoading: 'isLoading'
+        }) : {
+            isToolboxLoading() {
+                return Shopware.State.getters['lgwToolbox/isLoading'];
+            }
         })
     },
 

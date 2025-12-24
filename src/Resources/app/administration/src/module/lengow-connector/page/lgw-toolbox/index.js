@@ -3,7 +3,7 @@ import './lgw-toolbox.scss';
 import lgwToolboxState from './state';
 
 const { Component } = Shopware;
-const { mapGetters } = Shopware.Component.getComponentHelper();
+const { mapGetters } = Shopware.Component.getComponentHelper() || {};
 
 Component.register('lgw-toolbox', {
     template,
@@ -35,7 +35,11 @@ Component.register('lgw-toolbox', {
     },
 
     computed: {
-        ...mapGetters('lgwToolbox', ['isLoading'])
+        ...(mapGetters ? mapGetters('lgwToolbox', ['isLoading']) : {
+            isLoading() {
+                return Shopware.State.getters['lgwToolbox/isLoading'];
+            }
+        })
     },
 
     methods: {
