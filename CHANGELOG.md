@@ -1,5 +1,12 @@
 # Changelog
 
+## [2.2.2](https://github.com/lengow/plugin-shopware6/compare/v2.2.1...v2.2.2) (2026-04-15)
+
+
+### Miscellaneous
+
+* push version 2.2.2 ([#40](https://github.com/lengow/plugin-shopware6/issues/40)) ([f32721f](https://github.com/lengow/plugin-shopware6/commit/f32721f455c339ebd752ad97cb668ede941297df))
+
 ## [2.2.1](https://github.com/lengow/plugin-shopware6/compare/v2.2.0...v2.2.1) (2025-12-22)
 
 
