@@ -445,6 +445,24 @@ class LengowExport
     }
 
     /**
+     * @return bool
+     */
+    public function isStreamExport(): bool
+    {
+        return (bool) ($this->exportConfiguration[self::PARAM_STREAM] ?? true);
+    }
+
+    /**
+     * @return array
+     */
+    public function getStreamHeaders(): array
+    {
+        return $this->lengowFeed->getStreamHeaders(
+            $this->exportConfiguration[self::PARAM_FORMAT] ?? LengowFeed::FORMAT_CSV
+        );
+    }
+
+    /**
      * Get all product ID in export (all exportable products)
      *
      * @param array $LengowSelectionProductIds can be used to narrow the function scope to specific products

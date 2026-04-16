@@ -152,12 +152,6 @@ class LengowFeed
     {
         switch ($type) {
             case self::HEADER:
-                if ($this->stream) {
-                    header($this->getHtmlHeader());
-                    if ($this->format === self::FORMAT_CSV) {
-                        header('Content-Disposition: attachment; filename=feed.csv');
-                    }
-                }
                 $header = $this->getHeader($data);
                 $this->flush($header);
                 break;
@@ -201,6 +195,25 @@ class LengowFeed
     }
 
     /**
+     * @param string $format
+     *
+     * @return array
+     */
+    public function getStreamHeaders(string $format): array
+    {
+        $headers = [
+            'Content-Type' => $this->getHtmlHeader($format),
+        ];
+
+        $fileName = $this->getDownloadFileName($format);
+        if ($fileName !== null) {
+            $headers['Content-Disposition'] = 'attachment; filename=' . $fileName;
+        }
+
+        return $headers;
+    }
+
+    /**
      * Get export generated file path
      *
      * @return string
@@ -228,23 +241,37 @@ class LengowFeed
 
 
     /**
-     * Return HTML header according to the given format
+     * Return content type according to the given format
      *
      * @return string
      */
-    protected function getHtmlHeader() : string
+    protected function getHtmlHeader(string $format) : string
     {
-        switch ($this->format) {
+        switch ($format) {
             case self::FORMAT_CSV:
             default:
-                return 'Content-Type: text/csv; charset=UTF-8';
+                return 'text/csv; charset=UTF-8';
             case self::FORMAT_XML:
-                return 'Content-Type: application/xml; charset=UTF-8';
+                return 'application/xml; charset=UTF-8';
             case self::FORMAT_JSON:
-                return 'Content-Type: application/json; charset=UTF-8';
+                return 'application/json; charset=UTF-8';
             case self::FORMAT_YAML:
-                return 'Content-Type: text/x-yaml; charset=UTF-8';
+                return 'text/x-yaml; charset=UTF-8';
         }
+    }
+
+    /**
+     * @param string $format
+     *
+     * @return string|null
+     */
+    protected function getDownloadFileName(string $format) : ?string
+    {
+        if ($format === self::FORMAT_CSV) {
+            return 'feed.csv';
+        }
+
+        return null;
     }
 
     /**
