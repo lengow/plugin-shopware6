@@ -545,8 +545,23 @@ class LengowProduct
     private function getProductForExportById(string $productId) : ?ProductEntity
     {
         $context = Context::createDefaultContext();
+        $productCriteria = $this->buildProductExportCriteria($productId);
+        $productCollection = $this->productRepository->search($productCriteria, $context)->getEntities();
+        return $productCollection->count() > 0 ? $productCollection->first() : null;
+    }
+
+    /**
+     * Build product criteria with all associations needed for export.
+     *
+     * @param string $productId
+     *
+     * @return Criteria
+     */
+    private function buildProductExportCriteria(string $productId): Criteria
+    {
         $productCriteria = new Criteria();
-        $productCriteria->setIds([$productId])
+
+        return $productCriteria->setIds([$productId])
             ->addAssociation('mainCategories')
             ->addAssociation('mainCategories.category')
             ->addAssociation('categories')
@@ -560,14 +575,12 @@ class LengowProduct
             ->addAssociation('properties.translations')
             ->addAssociation('manufacturer')
             ->addAssociation('media')
-            ->addAssociation('productMedia.media')
+            ->addAssociation('media.media')
             ->addAssociation('options')
             ->addAssociation('options.group')
             ->addAssociation('options.translations')
             ->addAssociation('translations')
             ->addAssociation('customFields');
-        $productCollection = $this->productRepository->search($productCriteria, $context)->getEntities();
-        return $productCollection->count() > 0 ? $productCollection->first() : null;
     }
 
     /**
