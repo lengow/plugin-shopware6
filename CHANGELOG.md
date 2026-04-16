@@ -1,5 +1,13 @@
 # Changelog
 
+## [2.2.3](https://github.com/lengow/plugin-shopware6/compare/v2.2.2...v2.2.3) (2026-04-16)
+
+
+### Bug Fixes
+
+* **export:** fix images not exporting ([#43](https://github.com/lengow/plugin-shopware6/issues/43)) ([93debcb](https://github.com/lengow/plugin-shopware6/commit/93debcbf75d08c4d4a600e1b90c8c3d028805769))
+* **export:** fix php warning headers already sent by using a StreamedResponse ([#42](https://github.com/lengow/plugin-shopware6/issues/42)) ([81c5f2e](https://github.com/lengow/plugin-shopware6/commit/81c5f2edecaa670456a122bea6ae8cef773b1af1))
+
 ## [2.2.2](https://github.com/lengow/plugin-shopware6/compare/v2.2.1...v2.2.2) (2026-04-15)
 
 
