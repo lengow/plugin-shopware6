@@ -5,6 +5,7 @@ namespace Lengow\Connector\Storefront\Controller;
 use Symfony\Component\Routing\Annotation\Route;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\Response;
+use Symfony\Component\HttpFoundation\StreamedResponse;
 use Lengow\Connector\Service\LengowAccess;
 use Lengow\Connector\Service\LengowConfiguration;
 use Lengow\Connector\Service\LengowExport;
@@ -63,6 +64,16 @@ class LengowExportController extends LengowAbstractFrontController
         if ($exportArgs[LengowExport::PARAM_MODE]) {
             return new Response((string) $this->modeSize($exportArgs[LengowExport::PARAM_MODE]));
         }
+        if ($this->lengowExport->isStreamExport()) {
+            return new StreamedResponse(
+                function (): void {
+                    $this->lengowExport->exec();
+                },
+                Response::HTTP_OK,
+                $this->lengowExport->getStreamHeaders()
+            );
+        }
+
         $this->lengowExport->exec();
         return new Response();
     }
