@@ -231,10 +231,11 @@ class LengowProduct
         foreach ($this->productApiNodes as $node) {
             $productData[$node] = $api->{$node};
         }
-        if (isset($productData['amount'], $productData['quantity'])) {
-            $productData['price_unit'] = (float) $productData['amount'] / (float) $productData['quantity'];
+        if (isset($productData['amount'], $productData['quantity']) && (float) $productData['quantity'] > 0.0) {
+            $priceUnitQuantity = (float) $productData['quantity'];
+            $productData['price_unit'] = (float) $productData['amount'] / $priceUnitQuantity;
         } else {
-            $productData['price_unit'] = 0;
+            $productData['price_unit'] = 0.0;
         }
         return $productData;
     }
