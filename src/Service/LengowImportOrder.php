@@ -1549,14 +1549,12 @@ class LengowImportOrder
             $productData = $products[$lineItem['productId']];
             $calculatedPrice = $lineItem['price'];
             $priceUnit = $productData['price_unit'] ?? null;
-            if ($priceUnit === null || !is_float($priceUnit)) {
+            if (!is_float($priceUnit)) {
                 // price_unit is missing or non-float: try to derive it from amount and quantity
                 $amount = isset($productData['amount']) ? (float) $productData['amount'] : null;
                 $quantity = isset($productData['quantity']) ? (float) $productData['quantity'] : null;
                 if ($amount !== null && $quantity !== null && $quantity > 0.0) {
                     $priceUnit = $amount / $quantity;
-                } elseif ($amount !== null) {
-                    $priceUnit = $amount;
                 } else {
                     throw new LengowException(
                         $this->lengowLog->encodeMessage('lengow_log.exception.price_unit_not_valid', [
