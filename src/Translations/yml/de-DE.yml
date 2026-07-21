@@ -461,6 +461,7 @@ de:
         shopware_customer_not_saved: "VORSICHT! Kunde konnte NICHT in der Shopware Datenbank gespeichert werden"
         shopware_order_not_saved: "VORSICHT! Bestellung konnte NICHT in der Shopware Datenbank gespeichert werden"
         not_provided: "Nicht vom Marketplace bereitgestellt"
+        price_unit_not_valid: "Produkt %{product_id} konnte nicht importiert werden: Stückpreis fehlt oder ist ungültig in den Marketplace-Daten"
       mail_report:
         subject_report_mail: "Lengow Importfehler"
         order: "Bestellungen %{marketplace_sku}"
