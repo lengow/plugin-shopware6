@@ -1549,8 +1549,10 @@ class LengowImportOrder
             $productData = $products[$lineItem['productId']];
             $calculatedPrice = $lineItem['price'];
             $priceUnit = $productData['price_unit'] ?? null;
-            if (!is_float($priceUnit)) {
-                // price_unit is missing or non-float: try to derive it from amount and quantity
+            if ($priceUnit !== null && is_numeric($priceUnit)) {
+                $priceUnit = (float) $priceUnit;
+            } else {
+                // price_unit is missing or non-numeric: try to derive it from amount and quantity
                 $amount = isset($productData['amount']) ? (float) $productData['amount'] : null;
                 $quantity = isset($productData['quantity']) ? (float) $productData['quantity'] : null;
                 if ($amount !== null && $quantity !== null && $quantity > 0.0) {
