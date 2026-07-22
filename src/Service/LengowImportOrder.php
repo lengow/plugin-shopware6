@@ -1140,6 +1140,10 @@ class LengowImportOrder
                 $this->orderData,
                 $this->packageData->delivery
             );
+            // get company from billing address if empty in shipping address
+            if (empty($shippingAddressApi->company) && !empty($billingAddressApi->company)) {
+                $shippingAddressApi->company = $billingAddressApi->company;
+            }
             $this->lengowAddress->init([
                 'billing_data' => $billingAddressApi,
                 'shipping_data' => $shippingAddressApi,
