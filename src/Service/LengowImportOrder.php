@@ -1122,6 +1122,60 @@ class LengowImportOrder
     }
 
     /**
+     * Common legal entity suffixes used to detect company names in address lines.
+     * When Amazon (and some other marketplaces) send B2B orders, they sometimes put the
+     * company name in first_line and the actual street in second_line, leaving company null.
+     */
+    private const COMPANY_SUFFIXES = [
+        // German
+        'gmbh', ' ag', ' kg', ' ohg', 'e.k.', ' ek', ' gbr', ' ug',
+        // English
+        ' ltd', ' inc', ' llc', ' corp', ' plc', ' co.',
+        // French
+        ' sas', ' sarl', ' eurl',
+        // Dutch/Belgian
+        ' bv', ' nv',
+        // Italian
+        ' srl',
+        // Spanish
+        ' sl',
+        // General
+        ' sa', ' se',
+    ];
+
+    /**
+     * Detect and fix company name placed in first_line instead of company field.
+     * Amazon B2B sometimes sends: company=null, first_line="Company GmbH", second_line="Street 1"
+     * This method moves company to the company field and street to first_line.
+     *
+     * @param mixed $address API address object
+     */
+    private function normalizeCompanyInAddressLines($address): void
+    {
+        if (!empty($address->company) || empty($address->first_line) || empty($address->second_line)) {
+            return;
+        }
+        $firstLineLower = mb_strtolower($address->first_line);
+        foreach (self::COMPANY_SUFFIXES as $suffix) {
+            if (str_contains($firstLineLower, $suffix)) {
+                $this->lengowLog->write(
+                    LengowLog::CODE_IMPORT,
+                    $this->lengowLog->encodeMessage('log.import.company_detected_in_address_line', [
+                        'company' => $address->first_line,
+                        'street' => $address->second_line,
+                    ]),
+                    $this->logOutput,
+                    $this->marketplaceSku
+                );
+                $address->company = $address->first_line;
+                $address->first_line = $address->second_line;
+                $address->second_line = null;
+                return;
+            }
+        }
+    }
+
+    /**
      * Create a Shopware order
      *
      * @return bool
@@ -1140,13 +1194,11 @@ class LengowImportOrder
                 $this->orderData,
                 $this->packageData->delivery
             );
-            // get company from billing address if empty in shipping address (only for B2B orders)
-            if (
-                isset($this->orderTypes[LengowOrder::TYPE_BUSINESS])
-                && $this->orderTypes[LengowOrder::TYPE_BUSINESS]
-                && empty($shippingAddressApi->company)
-                && !empty($billingAddressApi->company)
-            ) {
+            // detect company name in address lines (Amazon B2B pattern)
+            $this->normalizeCompanyInAddressLines($billingAddressApi);
+            $this->normalizeCompanyInAddressLines($shippingAddressApi);
+            // copy company from billing to shipping if still empty
+            if (empty($shippingAddressApi->company) && !empty($billingAddressApi->company)) {
                 $shippingAddressApi->company = $billingAddressApi->company;
             }
             $this->lengowAddress->init([
