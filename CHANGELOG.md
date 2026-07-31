@@ -1,5 +1,13 @@
 # Changelog
 
+## [2.2.4](https://github.com/lengow/plugin-shopware6/compare/v2.2.3...v2.2.4) (2026-07-30)
+
+
+### Bug Fixes
+
+* **import:** copy company from billing to shipping address when empty ([#47](https://github.com/lengow/plugin-shopware6/issues/47)) ([062c0e3](https://github.com/lengow/plugin-shopware6/commit/062c0e310ca7ff7ca454123d9125b16dbf0ad6e6))
+* **orders:** [PCMT-1773] prevent null unit price crash during order i… ([#46](https://github.com/lengow/plugin-shopware6/issues/46)) ([84faf50](https://github.com/lengow/plugin-shopware6/commit/84faf5090f7348bb8a5929b69a0125dab303e0a4))
+
 ## [2.2.3](https://github.com/lengow/plugin-shopware6/compare/v2.2.2...v2.2.3) (2026-04-16)
 
 
