@@ -1,0 +1,24 @@
+src/Config/checkmd5.csv
+  s_77a700de371c07::t_ba1949985a79a8 441
+tests/LengowImportOrderTest.php
+  s_77a700de371c07::t_a3d7b93d12a0b9 44-61
+  s_77a700de371c07::t_50ea10530181c6 62-71
+src/Service/LengowImportOrder.php
+  s_77a700de371c07::t_a3d7b93d12a0b9 1564
+---
+{
+  "schema_version": "authorship/3.0.0",
+  "git_ai_version": "1.6.20",
+  "base_commit_sha": "7b5464bf262e8a42655e31796f1abe065727b2b4",
+  "prompts": {},
+  "sessions": {
+    "s_77a700de371c07": {
+      "agent_id": {
+        "tool": "github-copilot-cli",
+        "id": "c58e1751-f52b-41d9-96fd-6f682de00c16",
+        "model": "unknown"
+      },
+      "human_author": "Arnaud Hours <arnaud.hours@lengow.com>"
+    }
+  }
+}
