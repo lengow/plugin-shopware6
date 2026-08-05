@@ -1555,7 +1555,21 @@ class LengowImportOrder
     ): array
     {
         foreach ($orderData['lineItems'] as $key => $lineItem) {
-            $productData = $products[$lineItem['productId']];
+            $productId = $lineItem['productId'] ?? null;
+            if ($productId === null || !isset($products[$productId])) {
+                // Auxiliary cart lines keep the price calculated by Shopware.
+                $this->lengowLog->write(
+                    LengowLog::CODE_IMPORT,
+                    $this->lengowLog->encodeMessage('log.import.unmapped_cart_line', [
+                        'product_id' => (string) $productId,
+                        'line_item_type' => (string) ($lineItem['type'] ?? 'unknown'),
+                    ]),
+                    $this->logOutput,
+                    $this->marketplaceSku
+                );
+                continue;
+            }
+            $productData = $products[$productId];
             $calculatedPrice = $lineItem['price'];
             $priceUnit = $productData['price_unit'] ?? null;
             if ($priceUnit !== null && is_numeric($priceUnit)) {
@@ -1569,7 +1583,7 @@ class LengowImportOrder
                 } else {
                     throw new LengowException(
                         $this->lengowLog->encodeMessage('lengow_log.exception.price_unit_not_valid', [
-                            'product_id' => $lineItem['productId'],
+                            'product_id' => $productId,
                         ])
                     );
                 }
