@@ -1561,7 +1561,7 @@ class LengowImportOrder
                 $this->lengowLog->write(
                     LengowLog::CODE_IMPORT,
                     $this->lengowLog->encodeMessage('log.import.unmapped_cart_line', [
-                        'product_id' => (string) $productId,
+                        'product_id' => (string) ($productId ?? 'unknown'),
                         'line_item_type' => (string) ($lineItem['type'] ?? 'unknown'),
                     ]),
                     $this->logOutput,

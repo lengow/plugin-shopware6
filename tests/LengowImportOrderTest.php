@@ -8,7 +8,6 @@ use Lengow\Connector\Service\LengowLog;
 use PHPUnit\Framework\TestCase;
 use ReflectionClass;
 use ReflectionMethod;
-use ReflectionProperty;
 use Shopware\Core\System\SalesChannel\SalesChannelContext;
 
 class LengowImportOrderTest extends TestCase
@@ -32,6 +31,34 @@ class LengowImportOrderTest extends TestCase
         $orderData = [
             'lineItems' => [[
                 'productId' => 'auxiliary-product',
+                'type' => 'custom',
+                'price' => $price,
+            ]],
+        ];
+
+        $result = $this->invokeChangeProductPrice($order, $orderData, []);
+
+        self::assertSame($price, $result['lineItems'][0]['price']);
+    }
+
+    public function testCartLineWithoutProductIdUsesActionableLogContext(): void
+    {
+        $lengowLog = $this->createMock(LengowLog::class);
+        $lengowLog->expects(self::once())
+            ->method('encodeMessage')
+            ->with('log.import.unmapped_cart_line', [
+                'product_id' => 'unknown',
+                'line_item_type' => 'custom',
+            ])
+            ->willReturn('unmapped cart line');
+        $lengowLog->expects(self::once())
+            ->method('write')
+            ->with(LengowLog::CODE_IMPORT, 'unmapped cart line', false, 'marketplace-sku');
+
+        $order = $this->createImportOrder($lengowLog);
+        $price = new \stdClass();
+        $orderData = [
+            'lineItems' => [[
                 'type' => 'custom',
                 'price' => $price,
             ]],
