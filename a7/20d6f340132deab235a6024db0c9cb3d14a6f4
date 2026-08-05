@@ -1,0 +1,28 @@
+tests/LengowImportOrderTest.php
+  s_77a700de371c07::t_e602e9e9185525 1-99,101-106
+  s_77a700de371c07::t_d21e29a5b381ae 100
+src/Translations/yml/log.yml
+  s_77a700de371c07::t_e602e9e9185525 72
+src/Translations/en-GB.csv
+  s_77a700de371c07::t_e602e9e9185525 114
+src/Config/checkmd5.csv
+  s_77a700de371c07::t_3165c5360d8ce4 12,441
+src/Service/LengowImportOrder.php
+  s_77a700de371c07::t_e602e9e9185525 1558-1572,1586
+---
+{
+  "schema_version": "authorship/3.0.0",
+  "git_ai_version": "1.6.20",
+  "base_commit_sha": "a720d6f340132deab235a6024db0c9cb3d14a6f4",
+  "prompts": {},
+  "sessions": {
+    "s_77a700de371c07": {
+      "agent_id": {
+        "tool": "github-copilot-cli",
+        "id": "c58e1751-f52b-41d9-96fd-6f682de00c16",
+        "model": "unknown"
+      },
+      "human_author": "Arnaud Hours <arnaud.hours@lengow.com>"
+    }
+  }
+}
