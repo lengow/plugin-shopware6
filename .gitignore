@@ -3,6 +3,7 @@
 src/Logs/*.txt
 .eslintrc.js
 .eslintrc.json
+dist/
 node_modules
 package-lock.json
 src/Config/marketplaces.json
