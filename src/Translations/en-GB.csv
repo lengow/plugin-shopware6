@@ -111,6 +111,7 @@ log.import.rewrite_processing_fee|rewrite amount without processing fee
 log.import.rewrite_shipping_cost|rewrite amount without shipping cost
 log.import.order_shipped_by_marketplace|order shipped by %{marketplace_name}
 log.import.product_state_canceled|product %{product_id} could not be added - status: %{product_state}
+log.import.unmapped_cart_line|marketplace price override skipped for unmapped %{line_item_type} cart line %{product_id}
 log.import.product_advanced_search|product not found with field %{attribute_name} (%{attribute_value}). Using advanced search
 log.import.product_be_found|product %{product_number} (%{product_id}) found with field %{attribute_name} (%{attribute_value}) and attribute %{search_field}
 log.import.generate_unique_email|generate a unique email %{email}
