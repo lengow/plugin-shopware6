@@ -1,0 +1,23 @@
+.gitignore
+  s_95aaf40518e851::t_880d33389c73a6 6
+tools/build.sh
+  s_95aaf40518e851::t_8f5682bb6a4907 5,254-258
+  s_95aaf40518e851::t_cee6c113d0ee99 107-111
+  s_95aaf40518e851::t_880d33389c73a6 1-4,6-40,44-106,112-131,133-135,137-151,153-159,161-195,198-253,259-302,304-305
+---
+{
+  "schema_version": "authorship/3.0.0",
+  "git_ai_version": "1.6.21",
+  "base_commit_sha": "777aeced181d2b8627a2995a9c1274a6381879bf",
+  "prompts": {},
+  "sessions": {
+    "s_95aaf40518e851": {
+      "agent_id": {
+        "tool": "github-copilot-cli",
+        "id": "79f66b26-1034-4c40-bf4f-fafdd221e9f8",
+        "model": "unknown"
+      },
+      "human_author": "Arnaud Hours <arnaud.hours@lengow.com>"
+    }
+  }
+}
