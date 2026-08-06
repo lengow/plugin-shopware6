@@ -29,11 +29,6 @@ die()
     exit 1
 }
 
-warn()
-{
-    printf 'Warning: %s\n' "$*" >&2
-}
-
 cleanup()
 {
     if [[ -n "${WORKSPACE}" && -d "${WORKSPACE}" ]]; then
@@ -44,75 +39,6 @@ cleanup()
 require_command()
 {
     command -v "$1" >/dev/null 2>&1 || die "Missing required command: $1"
-}
-
-is_expected_root_entry()
-{
-    local entry="$1"
-    local expected_entry
-    local -a expected_entries=(
-        '.agent'
-        '.agent-kit'
-        '.claude'
-        '.codex'
-        '.gemini'
-        '.git'
-        '.gitattributes'
-        '.github'
-        '.gitignore'
-        '.idea'
-        '.openai'
-        '.opencode'
-        '.skills'
-        '.vscode'
-        'AGENTS.md'
-        'CHANGELOG.md'
-        'CHANGELOG_de-DE.md'
-        'CLAUDE.md'
-        'COPILOT.md'
-        'GEMINI.md'
-        'Jenkinsfile'
-        'LICENCE.md'
-        'README.md'
-        'bin'
-        'composer.json'
-        'dist'
-        'dod.md'
-        'node_modules'
-        'package-lock.json'
-        'phpunit.xml.dist'
-        'project-context.md'
-        'scripts'
-        'src'
-        'tests'
-        'tools'
-    )
-
-    for expected_entry in "${expected_entries[@]}"; do
-        if [[ "${entry}" == "${expected_entry}" ]]; then
-            return 0
-        fi
-    done
-
-    return 1
-}
-
-audit_root_entries()
-{
-    local path
-    local entry
-
-    while IFS= read -r -d '' path; do
-        entry="${path##*/}"
-        case "${entry}" in
-            .DS_Store|._*|.Spotlight-V100|.Trashes|Thumbs.db|Desktop.ini|ehthumbs.db|__MACOSX)
-                continue
-                ;;
-        esac
-        if ! is_expected_root_entry "${entry}"; then
-            warn "unexpected project-root entry excluded: ${entry}"
-        fi
-    done < <(find "${REPOSITORY_ROOT}" -mindepth 1 -maxdepth 1 -print0)
 }
 
 validate_version()
@@ -247,8 +173,6 @@ main()
     require_command zip
     php -r 'exit(function_exists("yaml_parse_file") ? 0 : 1);' \
         || die 'The PHP YAML extension is required'
-
-    audit_root_entries
 
     output_directory="$(resolve_output_directory "${output_directory}")"
     case "${output_directory}" in
