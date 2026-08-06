@@ -1,5 +1,12 @@
 # Changelog
 
+## [2.2.5](https://github.com/lengow/plugin-shopware6/compare/v2.2.4...v2.2.5) (2026-08-06)
+
+
+### Bug Fixes
+
+* **orders:** [PCMT-1832] preserve unmapped cart line prices ([#50](https://github.com/lengow/plugin-shopware6/issues/50)) ([3264365](https://github.com/lengow/plugin-shopware6/commit/32643658dbd350b13bd4b5d0962b5ab4b8d850fd))
+
 ## [2.2.4](https://github.com/lengow/plugin-shopware6/compare/v2.2.3...v2.2.4) (2026-07-30)
 
 

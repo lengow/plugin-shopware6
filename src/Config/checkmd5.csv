@@ -1,4 +1,4 @@
-/composer.json|6a15dc943a4716173502685a806a9937
+/composer.json|b813b5e1b2c3979d1ab3aa1c1ab14ff5
 /src/LengowConnector.php|51dadc1d41a22e4954a8c6cc2f4c44dc
 /src/Resources/public/bag.png|d812d529e1b5404cf7b92d4f36ab7abd
 /src/Resources/public/clock.png|499ea8d7905f77624cb64b1af3f955b5
@@ -55,7 +55,7 @@
 /src/Migration/Migration1624606589Update102.php|71fde83c63ad0f755a80a916e2140eba
 /src/Resources/app/administration/src/init/api-service-init.js|e674dbfc62c6353347c43e15a9d4644b
 /src/Resources/app/administration/src/main.js|e61c8b2686c83657420bfed7ed544f4c
-/src/Resources/app/administration/src/module/const.js|63c224dcd4a81983380fb6689979ccce
+/src/Resources/app/administration/src/module/const.js|059dbbfdb4532be405fab0acabb168f3
 /src/Resources/app/administration/src/module/lengow-connector/component/lgw-catalog-select/index.js|8c947c26a902e1898d2cfe2162beebe4
 /src/Resources/app/administration/src/module/lengow-connector/component/lgw-catalog-select/lgw-catalog-select.html.twig|6bbd76afcc2e1b1ad4d46dfd859f9128
 /src/Resources/app/administration/src/module/lengow-connector/component/lgw-catalog-select/lgw-catalog-select.scss|8724f806d4b9aa658164d87dbba99c34
@@ -456,5 +456,5 @@
 /src/Subscriber/SalesChannelWrittenSubscriber.php|ed293f365f13171505469d64bb7510c3
 /src/Subscriber/SendActionSubscriber.php|ad14f17a6e3ca17694f7e3370b22667a
 /src/Subscriber/ProductExtensionSubscriber.php|8800a75de535e30d14b80444f4534d70
-/src/Util/EnvironmentInfoProvider.php|da764c4bcbac3c117ef9f0cefa843372
+/src/Util/EnvironmentInfoProvider.php|9f4318e6f3def817a7da1fe5f052ac2a
 /src/Util/StringCleaner.php|752a3e6e13877fed16915d632418e386
