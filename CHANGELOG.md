@@ -1,5 +1,12 @@
 # Changelog
 
+## [2.3.0](https://github.com/lengow/plugin-shopware6/compare/v2.2.5...v2.3.0) (2026-08-25)
+
+
+### Features
+
+* align reviewer assignment ([#53](https://github.com/lengow/plugin-shopware6/issues/53)) ([0fc0bb9](https://github.com/lengow/plugin-shopware6/commit/0fc0bb9484109f16a34c39c1e0f23644596bc19a))
+
 ## [2.2.5](https://github.com/lengow/plugin-shopware6/compare/v2.2.4...v2.2.5) (2026-08-06)
 
 
