@@ -1520,11 +1520,11 @@ class LengowImportOrder
      */
     private function setOrderVatMode(Cart $cart): Cart
     {
-        // if b2b import is activated and order is b2b type : set order as vat free
+        // if b2b import is activated and order is b2b type without source tax: set order as vat free
         if (isset($this->orderTypes[LengowOrder::TYPE_BUSINESS])
             && $this->orderTypes[LengowOrder::TYPE_BUSINESS]
             && $this->lengowConfiguration->get(LengowConfiguration::B2B_WITHOUT_TAX_ENABLED)
-            && !$this->isGermanOrder()
+            && !$this->hasSourceTax()
         ) {
             $cart->setPrice(
                 new CartPrice(
@@ -1541,18 +1541,15 @@ class LengowImportOrder
     }
 
     /**
-     * Check whether the order is delivered in Germany.
+     * Check whether the marketplace order includes tax.
      *
      * @return bool
      */
-    private function isGermanOrder(): bool
+    private function hasSourceTax(): bool
     {
-        $countryIso = $this->packageData->delivery->common_country_iso_a2
-            ?? $this->orderData->billing_address->common_country_iso_a2
-            ?? $this->orderData->marketplace_country_iso2
-            ?? '';
+        $totalTax = $this->orderData->total_tax ?? $this->orderData->original_total_tax ?? 0;
 
-        return strtoupper((string) $countryIso) === 'DE';
+        return (float) $totalTax > 0;
     }
 
     /**

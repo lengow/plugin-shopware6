@@ -103,7 +103,7 @@ class LengowImportOrderTest extends TestCase
         );
     }
 
-    public function testGermanB2bOrderDoesNotForceTaxFreeCart(): void
+    public function testB2bOrderWithSourceTaxDoesNotForceTaxFreeCart(): void
     {
         $configuration = $this->createMock(LengowConfiguration::class);
         $configuration->expects(self::once())
@@ -115,13 +115,13 @@ class LengowImportOrderTest extends TestCase
         $order = $this->createVatOrder(
             $configuration,
             ['is_business' => true],
-            (object) ['delivery' => (object) ['common_country_iso_a2' => 'DE']]
+            (object) ['total_tax' => '10.62']
         );
 
         self::assertSame($cart, $this->invokeSetOrderVatMode($order, $cart));
     }
 
-    public function testNonGermanB2bOrderForcesTaxFreeCart(): void
+    public function testB2bOrderWithoutSourceTaxForcesTaxFreeCart(): void
     {
         $configuration = $this->createMock(LengowConfiguration::class);
         $configuration->expects(self::once())
@@ -137,7 +137,7 @@ class LengowImportOrderTest extends TestCase
         $order = $this->createVatOrder(
             $configuration,
             ['is_business' => true],
-            (object) ['delivery' => (object) ['common_country_iso_a2' => 'FR']]
+            (object) ['total_tax' => '0.00']
         );
 
         self::assertSame($cart, $this->invokeSetOrderVatMode($order, $cart));
@@ -152,7 +152,7 @@ class LengowImportOrderTest extends TestCase
         $order = $this->createVatOrder(
             $configuration,
             [],
-            (object) ['delivery' => (object) ['common_country_iso_a2' => 'FR']]
+            (object) ['total_tax' => '0.00']
         );
 
         self::assertSame($cart, $this->invokeSetOrderVatMode($order, $cart));
@@ -185,7 +185,7 @@ class LengowImportOrderTest extends TestCase
     private function createVatOrder(
         LengowConfiguration $configuration,
         array $orderTypes,
-        object $packageData
+        object $orderData
     ): LengowImportOrder {
         $reflection = new ReflectionClass(LengowImportOrder::class);
         /** @var LengowImportOrder $order */
@@ -193,8 +193,7 @@ class LengowImportOrderTest extends TestCase
 
         $this->setProperty($reflection, $order, 'lengowConfiguration', $configuration);
         $this->setProperty($reflection, $order, 'orderTypes', $orderTypes);
-        $this->setProperty($reflection, $order, 'packageData', $packageData);
-        $this->setProperty($reflection, $order, 'orderData', (object) []);
+        $this->setProperty($reflection, $order, 'orderData', $orderData);
 
         return $order;
     }
