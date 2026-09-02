@@ -11,6 +11,7 @@ use Shopware\Core\Checkout\Cart\LineItem\LineItem;
 use Shopware\Core\Checkout\Cart\Order\OrderConversionContext;
 use Shopware\Core\Checkout\Cart\Order\OrderConverter;
 use Shopware\Core\Checkout\Cart\Price\QuantityPriceCalculator;
+use Shopware\Core\Checkout\Cart\Price\Struct\CalculatedPrice;
 use Shopware\Core\Checkout\Cart\Price\Struct\CartPrice;
 use Shopware\Core\Checkout\Cart\Price\Struct\QuantityPriceDefinition;
 use Shopware\Core\Checkout\Cart\SalesChannel\CartService;
@@ -1520,10 +1521,11 @@ class LengowImportOrder
      */
     private function setOrderVatMode(Cart $cart): Cart
     {
-        // if b2b import is activated and order is b2b type : set order as vat free
+        // if b2b import is activated and order is b2b type without source tax: set order as vat free
         if (isset($this->orderTypes[LengowOrder::TYPE_BUSINESS])
             && $this->orderTypes[LengowOrder::TYPE_BUSINESS]
             && $this->lengowConfiguration->get(LengowConfiguration::B2B_WITHOUT_TAX_ENABLED)
+            && !$this->hasSourceTax()
         ) {
             $cart->setPrice(
                 new CartPrice(
@@ -1537,6 +1539,46 @@ class LengowImportOrder
             );
         }
         return $cart;
+    }
+
+    /**
+     * Check whether the marketplace order includes tax.
+     *
+     * @return bool
+     */
+    private function hasSourceTax(): bool
+    {
+        $totalTax = $this->orderData->total_tax ?? $this->orderData->original_total_tax ?? 0;
+
+        return (float) $totalTax > 0;
+    }
+
+    /**
+     * Check whether the order is imported without tax
+     *
+     * @param array $orderData Shopware order data
+     *
+     * @return bool
+     */
+    private function isTaxFreeOrder(array $orderData): bool
+    {
+        $cartPrice = $orderData['price'] ?? null;
+
+        return $cartPrice instanceof CartPrice && $cartPrice->getTaxStatus() === CartPrice::TAX_STATE_FREE;
+    }
+
+    /**
+     * Get the tax rules to apply on a marketplace price
+     *
+     * @param CalculatedPrice $calculatedPrice Shopware calculated price
+     * @param bool $taxFree Whether the order is imported without tax
+     *
+     * @return TaxRuleCollection
+     */
+    private function getMarketplacePriceTaxRules(CalculatedPrice $calculatedPrice, bool $taxFree): TaxRuleCollection
+    {
+        // a tax free order must not carry any vat on its positions and shipping costs
+        return $taxFree ? new TaxRuleCollection() : $calculatedPrice->getTaxRules();
     }
 
     /**
@@ -1554,6 +1596,7 @@ class LengowImportOrder
         SalesChannelContext $salesChannelContext
     ): array
     {
+        $taxFree = $this->isTaxFreeOrder($orderData);
         foreach ($orderData['lineItems'] as $key => $lineItem) {
             $productId = $lineItem['productId'] ?? null;
             if ($productId === null || !isset($products[$productId])) {
@@ -1590,7 +1633,7 @@ class LengowImportOrder
             }
             $definition = new QuantityPriceDefinition(
                 $priceUnit,
-                $calculatedPrice->getTaxRules(),
+                $this->getMarketplacePriceTaxRules($calculatedPrice, $taxFree),
                 $productData['quantity'],
                 true
             );
@@ -1622,7 +1665,7 @@ class LengowImportOrder
         $calculatedPrice = $orderData['shippingCosts'];
         $definition = new QuantityPriceDefinition(
             $shippingCosts,
-            $calculatedPrice->getTaxRules(),
+            $this->getMarketplacePriceTaxRules($calculatedPrice, $this->isTaxFreeOrder($orderData)),
             1
         );
         $orderData['shippingCosts'] = $this->calculator->calculate($definition, $salesChannelContext);
