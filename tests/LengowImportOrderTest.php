@@ -3,11 +3,14 @@
 namespace Lengow\Connector\tests;
 
 use Lengow\Connector\Exception\LengowException;
+use Lengow\Connector\Service\LengowConfiguration;
 use Lengow\Connector\Service\LengowImportOrder;
 use Lengow\Connector\Service\LengowLog;
 use PHPUnit\Framework\TestCase;
 use ReflectionClass;
 use ReflectionMethod;
+use Shopware\Core\Checkout\Cart\Cart;
+use Shopware\Core\Checkout\Cart\Price\Struct\CartPrice;
 use Shopware\Core\System\SalesChannel\SalesChannelContext;
 
 class LengowImportOrderTest extends TestCase
@@ -100,6 +103,61 @@ class LengowImportOrderTest extends TestCase
         );
     }
 
+    public function testGermanB2bOrderDoesNotForceTaxFreeCart(): void
+    {
+        $configuration = $this->createMock(LengowConfiguration::class);
+        $configuration->expects(self::once())
+            ->method('get')
+            ->with(LengowConfiguration::B2B_WITHOUT_TAX_ENABLED)
+            ->willReturn(true);
+        $cart = $this->createMock(Cart::class);
+        $cart->expects(self::never())->method('setPrice');
+        $order = $this->createVatOrder(
+            $configuration,
+            ['is_business' => true],
+            (object) ['delivery' => (object) ['common_country_iso_a2' => 'DE']]
+        );
+
+        self::assertSame($cart, $this->invokeSetOrderVatMode($order, $cart));
+    }
+
+    public function testNonGermanB2bOrderForcesTaxFreeCart(): void
+    {
+        $configuration = $this->createMock(LengowConfiguration::class);
+        $configuration->expects(self::once())
+            ->method('get')
+            ->with(LengowConfiguration::B2B_WITHOUT_TAX_ENABLED)
+            ->willReturn(true);
+        $cart = $this->createMock(Cart::class);
+        $cart->expects(self::once())
+            ->method('setPrice')
+            ->with(self::callback(
+                static fn (CartPrice $price): bool => $price->getTaxStatus() === CartPrice::TAX_STATE_FREE
+            ));
+        $order = $this->createVatOrder(
+            $configuration,
+            ['is_business' => true],
+            (object) ['delivery' => (object) ['common_country_iso_a2' => 'FR']]
+        );
+
+        self::assertSame($cart, $this->invokeSetOrderVatMode($order, $cart));
+    }
+
+    public function testNonB2bOrderDoesNotForceTaxFreeCart(): void
+    {
+        $configuration = $this->createMock(LengowConfiguration::class);
+        $configuration->expects(self::never())->method('get');
+        $cart = $this->createMock(Cart::class);
+        $cart->expects(self::never())->method('setPrice');
+        $order = $this->createVatOrder(
+            $configuration,
+            [],
+            (object) ['delivery' => (object) ['common_country_iso_a2' => 'FR']]
+        );
+
+        self::assertSame($cart, $this->invokeSetOrderVatMode($order, $cart));
+    }
+
     private function createImportOrder(LengowLog $lengowLog): LengowImportOrder
     {
         $reflection = new ReflectionClass(LengowImportOrder::class);
@@ -122,6 +180,31 @@ class LengowImportOrderTest extends TestCase
         $salesChannelContext = (new ReflectionClass(SalesChannelContext::class))->newInstanceWithoutConstructor();
 
         return $method->invoke($order, $orderData, $products, $salesChannelContext);
+    }
+
+    private function createVatOrder(
+        LengowConfiguration $configuration,
+        array $orderTypes,
+        object $packageData
+    ): LengowImportOrder {
+        $reflection = new ReflectionClass(LengowImportOrder::class);
+        /** @var LengowImportOrder $order */
+        $order = $reflection->newInstanceWithoutConstructor();
+
+        $this->setProperty($reflection, $order, 'lengowConfiguration', $configuration);
+        $this->setProperty($reflection, $order, 'orderTypes', $orderTypes);
+        $this->setProperty($reflection, $order, 'packageData', $packageData);
+        $this->setProperty($reflection, $order, 'orderData', (object) []);
+
+        return $order;
+    }
+
+    private function invokeSetOrderVatMode(LengowImportOrder $order, Cart $cart): Cart
+    {
+        $method = new ReflectionMethod(LengowImportOrder::class, 'setOrderVatMode');
+        $method->setAccessible(true);
+
+        return $method->invoke($order, $cart);
     }
 
     private function setProperty(ReflectionClass $reflection, LengowImportOrder $order, string $name, mixed $value): void

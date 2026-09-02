@@ -1524,6 +1524,7 @@ class LengowImportOrder
         if (isset($this->orderTypes[LengowOrder::TYPE_BUSINESS])
             && $this->orderTypes[LengowOrder::TYPE_BUSINESS]
             && $this->lengowConfiguration->get(LengowConfiguration::B2B_WITHOUT_TAX_ENABLED)
+            && !$this->isGermanOrder()
         ) {
             $cart->setPrice(
                 new CartPrice(
@@ -1537,6 +1538,21 @@ class LengowImportOrder
             );
         }
         return $cart;
+    }
+
+    /**
+     * Check whether the order is delivered in Germany.
+     *
+     * @return bool
+     */
+    private function isGermanOrder(): bool
+    {
+        $countryIso = $this->packageData->delivery->common_country_iso_a2
+            ?? $this->orderData->billing_address->common_country_iso_a2
+            ?? $this->orderData->marketplace_country_iso2
+            ?? '';
+
+        return strtoupper((string) $countryIso) === 'DE';
     }
 
     /**
