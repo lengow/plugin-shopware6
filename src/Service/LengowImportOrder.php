@@ -1520,10 +1520,11 @@ class LengowImportOrder
      */
     private function setOrderVatMode(Cart $cart): Cart
     {
-        // if b2b import is activated and order is b2b type : set order as vat free
+        // if b2b import is activated and order is b2b type without source tax: set order as vat free
         if (isset($this->orderTypes[LengowOrder::TYPE_BUSINESS])
             && $this->orderTypes[LengowOrder::TYPE_BUSINESS]
             && $this->lengowConfiguration->get(LengowConfiguration::B2B_WITHOUT_TAX_ENABLED)
+            && !$this->hasSourceTax()
         ) {
             $cart->setPrice(
                 new CartPrice(
@@ -1537,6 +1538,18 @@ class LengowImportOrder
             );
         }
         return $cart;
+    }
+
+    /**
+     * Check whether the marketplace order includes tax.
+     *
+     * @return bool
+     */
+    private function hasSourceTax(): bool
+    {
+        $totalTax = $this->orderData->total_tax ?? $this->orderData->original_total_tax ?? 0;
+
+        return (float) $totalTax > 0;
     }
 
     /**
