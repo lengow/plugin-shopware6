@@ -1,0 +1,11 @@
+{
+  "main.js": {
+    "file": "assets/lengow-connector-B_niNsUc.js",
+    "name": "lengow-connector",
+    "src": "main.js",
+    "isEntry": true,
+    "css": [
+      "assets/lengow-connector-BfYo729c.css"
+    ]
+  }
+}

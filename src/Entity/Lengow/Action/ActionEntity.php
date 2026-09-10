@@ -17,7 +17,17 @@ class ActionEntity extends Entity
     use EntityIdTrait;
 
     /**
-     * @var ShopwareOrderEntity
+     * @var string|null
+     */
+    protected $orderId;
+
+    /**
+     * @var string|null
+     */
+    protected $orderVersionId;
+
+    /**
+     * @var ShopwareOrderEntity|null
      */
     protected $order;
 
@@ -51,28 +61,52 @@ class ActionEntity extends Entity
      */
     protected $state;
 
-    /**
-     * @var \DateTimeInterface|null
-     */
-    protected ?\DateTimeInterface $createdAt = null;
+
 
     /**
-     * @var \DateTimeInterface|null
+     * @return string|null
      */
-    protected ?\DateTimeInterface $updatedAt = null;
+    public function getOrderId(): ?string
+    {
+        return $this->orderId;
+    }
 
     /**
-     * @return ShopwareOrderEntity
+     * @param string|null $orderId
      */
-    public function getOrder(): ShopwareOrderEntity
+    public function setOrderId(?string $orderId): void
+    {
+        $this->orderId = $orderId;
+    }
+
+    /**
+     * @return string|null
+     */
+    public function getOrderVersionId(): ?string
+    {
+        return $this->orderVersionId;
+    }
+
+    /**
+     * @param string|null $orderVersionId
+     */
+    public function setOrderVersionId(?string $orderVersionId): void
+    {
+        $this->orderVersionId = $orderVersionId;
+    }
+
+    /**
+     * @return ShopwareOrderEntity|null
+     */
+    public function getOrder(): ?ShopwareOrderEntity
     {
         return $this->order;
     }
 
     /**
-     * @param ShopwareOrderEntity$order
+     * @param ShopwareOrderEntity|null $order
      */
-    public function setOrder(ShopwareOrderEntity $order): void
+    public function setOrder(?ShopwareOrderEntity $order): void
     {
         $this->order = $order;
     }

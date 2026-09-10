@@ -171,7 +171,31 @@ Component.register('lgw-product-list', {
         }
     },
 
-    filters: {
+    methods: {
+        normalizeSelectionPayload(selected) {
+            if (!selected) {
+                return [];
+            }
+
+            if (Array.isArray(selected)) {
+                return selected;
+            }
+
+            if (Array.isArray(selected.selection)) {
+                return selected.selection;
+            }
+
+            if (selected.selection && typeof selected.selection === 'object') {
+                return Object.values(selected.selection);
+            }
+
+            if (typeof selected === 'object') {
+                return Object.values(selected);
+            }
+
+            return [];
+        },
+
         stockColorVariant(value) {
             if (value > 25) {
                 return 'success';
@@ -180,10 +204,8 @@ Component.register('lgw-product-list', {
                 return 'warning';
             }
             return 'error';
-        }
-    },
+        },
 
-    methods: {
         applyOtherFilter(products, current) {
             let productFiltered = products;
             if (current !== this.ACTIVEFILTER && this.filters.active) {
@@ -309,6 +331,8 @@ Component.register('lgw-product-list', {
             this.salesChannelSelected = true;
             this.isLoading = true;
             this.countLoading = true;
+            this.selection = [];
+            this.totalSelected = 0;
             this.resetFilters();
             this.currentSalesChannelId = salesChannelId ? salesChannelId : this.defaultSalesChannel;
             this.setupSelectionActivated();
@@ -413,11 +437,10 @@ Component.register('lgw-product-list', {
         },
 
         updateSelection(selected) {
-            const selectedItem = Object.values(selected);
-            this.selection = [];
-            selectedItem.forEach(item => {
-                this.selection.push(item.id);
-            });
+            const selectedItems = this.normalizeSelectionPayload(selected);
+            this.selection = selectedItems
+                .map(item => (typeof item === 'string' ? item : item?.id))
+                .filter(itemId => typeof itemId === 'string' && itemId.length > 0);
             this.totalSelected = this.selection.length;
         },
 
@@ -432,7 +455,7 @@ Component.register('lgw-product-list', {
 
                         const lengowSettings = this.lengowSettingsRepository.create(Shopware.Context.api);
                         lengowSettings.id = result.first().id;
-                        lengowSettings.salesChannelsId = this.currentSalesChannelId;
+                        lengowSettings.salesChannelId = this.currentSalesChannelId;
                         lengowSettings.name = 'lengowSelectionEnabled';
                         lengowSettings.value = $active === true ? '1' : '0';
                         this.lengowSettingsRepository.sync([lengowSettings], Shopware.Context.api).then(() => {

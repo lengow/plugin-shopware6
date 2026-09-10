@@ -36,169 +36,175 @@
         {% endblock %}
         {% block lgw_toolbox_base_plugin %}
             <sw-card :title="$tc('lengow-connector.toolbox.plugin.title')">
-                <sw-container slot="grid" type="row">
-                    <sw-card-section>
-                        <sw-container columns="repeat(auto-fit, minmax(250px, 1fr))" gap="30px 30px">
+                <template #grid>
+                    <sw-container type="row">
+                        <sw-card-section>
+                            <sw-container columns="repeat(auto-fit, minmax(250px, 1fr))" gap="30px 30px">
+                                <sw-description-list columns="1fr" grid="1fr">
+                                    <lgw-description-list-element
+                                            :title="$tc('lengow-connector.toolbox.plugin.version')"
+                                            :value="overviewData.plugin.cms_version">
+                                    </lgw-description-list-element>
+                                    <lgw-description-list-element
+                                            :title="$tc('lengow-connector.toolbox.plugin.plugin_version')"
+                                            :value="overviewData.plugin.plugin_version">
+                                    </lgw-description-list-element>
+                                    <lgw-description-list-element
+                                        :title="$tc('lengow-connector.toolbox.plugin.php_version')"
+                                        :value="overviewData.plugin.php_version">
+                                    </lgw-description-list-element>
+                                    <lgw-description-list-element
+                                            :title="$tc('lengow-connector.toolbox.plugin.debug_disabled')"
+                                            :value="overviewData.plugin.debug_mode_disable"
+                                            :type="'bool'">
+                                    </lgw-description-list-element>
+                                </sw-description-list>
+                                <sw-description-list columns="1fr" grid="1fr">
+                                    <lgw-description-list-element
+                                            :title="$tc('lengow-connector.toolbox.plugin.server_ip')"
+                                            :value="overviewData.plugin.server_ip">
+                                    </lgw-description-list-element>
+                                    <lgw-description-list-element
+                                            :title="$tc('lengow-connector.toolbox.plugin.authorized_ip_enable')"
+                                            :value="overviewData.plugin.authorized_ip_enable"
+                                            :type="'bool'">
+                                    </lgw-description-list-element>
+                                    <lgw-description-list-element
+                                            :title="$tc('lengow-connector.toolbox.plugin.authorized_ips')"
+                                            :value="overviewData.plugin.authorized_ips"
+                                            :type="'array'">
+                                    </lgw-description-list-element>
+                                    <lgw-description-list-element
+                                        :title="$tc('lengow-connector.toolbox.plugin.write_permission')"
+                                        :value="overviewData.plugin.write_permission"
+                                        :type="'bool'">
+                                    </lgw-description-list-element>
+                                </sw-description-list>
+                            </sw-container>
+                        </sw-card-section>
+                        <sw-card-section divider="top" secondary slim>
                             <sw-description-list columns="1fr" grid="1fr">
                                 <lgw-description-list-element
-                                        :title="$tc('lengow-connector.toolbox.plugin.version')"
-                                        :value="overviewData.plugin.cms_version">
-                                </lgw-description-list-element>
-                                <lgw-description-list-element
-                                        :title="$tc('lengow-connector.toolbox.plugin.plugin_version')"
-                                        :value="overviewData.plugin.plugin_version">
-                                </lgw-description-list-element>
-                                <lgw-description-list-element
-                                    :title="$tc('lengow-connector.toolbox.plugin.php_version')"
-                                    :value="overviewData.plugin.php_version">
-                                </lgw-description-list-element>
-                                <lgw-description-list-element
-                                        :title="$tc('lengow-connector.toolbox.plugin.debug_disabled')"
-                                        :value="overviewData.plugin.debug_mode_disable"
-                                        :type="'bool'">
+                                    :title="$tc('lengow-connector.toolbox.plugin.toolbox_url')"
+                                    :value="overviewData.plugin.toolbox_url">
                                 </lgw-description-list-element>
                             </sw-description-list>
-                            <sw-description-list columns="1fr" grid="1fr">
-                                <lgw-description-list-element
-                                        :title="$tc('lengow-connector.toolbox.plugin.server_ip')"
-                                        :value="overviewData.plugin.server_ip">
-                                </lgw-description-list-element>
-                                <lgw-description-list-element
-                                        :title="$tc('lengow-connector.toolbox.plugin.authorized_ip_enable')"
-                                        :value="overviewData.plugin.authorized_ip_enable"
-                                        :type="'bool'">
-                                </lgw-description-list-element>
-                                <lgw-description-list-element
-                                        :title="$tc('lengow-connector.toolbox.plugin.authorized_ips')"
-                                        :value="overviewData.plugin.authorized_ips"
-                                        :type="'array'">
-                                </lgw-description-list-element>
-                                <lgw-description-list-element
-                                    :title="$tc('lengow-connector.toolbox.plugin.write_permission')"
-                                    :value="overviewData.plugin.write_permission"
-                                    :type="'bool'">
-                                </lgw-description-list-element>
-                            </sw-description-list>
-                        </sw-container>
-                    </sw-card-section>
-                    <sw-card-section divider="top" secondary slim>
-                        <sw-description-list columns="1fr" grid="1fr">
-                            <lgw-description-list-element
-                                :title="$tc('lengow-connector.toolbox.plugin.toolbox_url')"
-                                :value="overviewData.plugin.toolbox_url">
-                            </lgw-description-list-element>
-                        </sw-description-list>
-                    </sw-card-section>
-                </sw-container>
+                        </sw-card-section>
+                    </sw-container>
+                </template>
             </sw-card>
         {% endblock %}
         {% block lgw_toolbox_base_import %}
             <sw-card :title="$tc('lengow-connector.toolbox.import.title')">
-                <sw-container slot="grid" type="row">
-                    <sw-card-section>
-                        <sw-description-list columns="1fr" grid="1fr">
-                            <lgw-description-list-element
-                                    :title="$tc('lengow-connector.toolbox.import.global_token')"
-                                    :value="overviewData.synchronization.cms_token">
-                            </lgw-description-list-element>
-                            <lgw-description-list-element
-                                    :title="$tc('lengow-connector.toolbox.import.url_import')"
-                                    :value="overviewData.synchronization.cron_url">
-                            </lgw-description-list-element>
-                        </sw-description-list>
-                    </sw-card-section>
-                    <sw-card-section divider="top" secondary slim>
-                        <sw-container columns="repeat(auto-fit, minmax(250px, 1fr))" gap="30px 30px">
+                <template #grid>
+                    <sw-container type="row">
+                        <sw-card-section>
                             <sw-description-list columns="1fr" grid="1fr">
                                 <lgw-description-list-element
-                                        :title="$tc('lengow-connector.toolbox.import.import_in_progress')"
-                                        :value="overviewData.synchronization.synchronization_in_progress"
-                                        :helpText="$tc('lengow-connector.toolbox.import.no_import')"
-                                        :type="'bool'">
+                                        :title="$tc('lengow-connector.toolbox.import.global_token')"
+                                        :value="overviewData.synchronization.cms_token">
                                 </lgw-description-list-element>
                                 <lgw-description-list-element
-                                        :title="$tc('lengow-connector.toolbox.import.last_import')"
-                                        :value="overviewData.synchronization.last_synchronization"
-                                        :type="'date'">
-                                </lgw-description-list-element>
-                                <lgw-description-list-element
-                                        :title="$tc('lengow-connector.toolbox.import.last_import_type')"
-                                        :value="overviewData.synchronization.last_synchronization_type">
+                                        :title="$tc('lengow-connector.toolbox.import.url_import')"
+                                        :value="overviewData.synchronization.cron_url">
                                 </lgw-description-list-element>
                             </sw-description-list>
-                            <sw-description-list columns="1fr" grid="1fr">
-                                <lgw-description-list-element
-                                        :title="$tc('lengow-connector.toolbox.import.nb_order_imported')"
-                                        :value="overviewData.synchronization.number_orders_imported">
-                                </lgw-description-list-element>
-                                <lgw-description-list-element
-                                        :title="$tc('lengow-connector.toolbox.import.nb_order_to_be_sent')"
-                                        :value="overviewData.synchronization.number_orders_waiting_shipment">
-                                </lgw-description-list-element>
-                                <lgw-description-list-element
-                                        :title="$tc('lengow-connector.toolbox.import.nb_order_with_error')"
-                                        :value="overviewData.synchronization.number_orders_in_error">
-                                </lgw-description-list-element>
-                            </sw-description-list>
-                        </sw-container>
-                    </sw-card-section>
-                </sw-container>
+                        </sw-card-section>
+                        <sw-card-section divider="top" secondary slim>
+                            <sw-container columns="repeat(auto-fit, minmax(250px, 1fr))" gap="30px 30px">
+                                <sw-description-list columns="1fr" grid="1fr">
+                                    <lgw-description-list-element
+                                            :title="$tc('lengow-connector.toolbox.import.import_in_progress')"
+                                            :value="overviewData.synchronization.synchronization_in_progress"
+                                            :helpText="$tc('lengow-connector.toolbox.import.no_import')"
+                                            :type="'bool'">
+                                    </lgw-description-list-element>
+                                    <lgw-description-list-element
+                                            :title="$tc('lengow-connector.toolbox.import.last_import')"
+                                            :value="overviewData.synchronization.last_synchronization"
+                                            :type="'date'">
+                                    </lgw-description-list-element>
+                                    <lgw-description-list-element
+                                            :title="$tc('lengow-connector.toolbox.import.last_import_type')"
+                                            :value="overviewData.synchronization.last_synchronization_type">
+                                    </lgw-description-list-element>
+                                </sw-description-list>
+                                <sw-description-list columns="1fr" grid="1fr">
+                                    <lgw-description-list-element
+                                            :title="$tc('lengow-connector.toolbox.import.nb_order_imported')"
+                                            :value="overviewData.synchronization.number_orders_imported">
+                                    </lgw-description-list-element>
+                                    <lgw-description-list-element
+                                            :title="$tc('lengow-connector.toolbox.import.nb_order_to_be_sent')"
+                                            :value="overviewData.synchronization.number_orders_waiting_shipment">
+                                    </lgw-description-list-element>
+                                    <lgw-description-list-element
+                                            :title="$tc('lengow-connector.toolbox.import.nb_order_with_error')"
+                                            :value="overviewData.synchronization.number_orders_in_error">
+                                    </lgw-description-list-element>
+                                </sw-description-list>
+                            </sw-container>
+                        </sw-card-section>
+                    </sw-container>
+                </template>
             </sw-card>
         {% endblock %}
         {% block lgw_toolbox_base_export %}
             <sw-card v-for="sales_channel in overviewData.shops" :title="sales_channel.shop_name">
-                <sw-container slot="grid" type="row">
-                    <sw-card-section>
-                        <sw-description-list columns="1fr" grid="1fr">
-                            <lgw-description-list-element
-                                    :title="$tc('lengow-connector.toolbox.export.id')"
-                                    :value="sales_channel.shop_id">
-                            </lgw-description-list-element>
-                            <lgw-description-list-element
-                                    :title="$tc('lengow-connector.toolbox.export.domain_url')"
-                                    :value="sales_channel.domain_url">
-                            </lgw-description-list-element>
-                            <lgw-description-list-element
-                                    :title="$tc('lengow-connector.toolbox.export.token')"
-                                    :value="sales_channel.shop_token">
-                            </lgw-description-list-element>
-                            <lgw-description-list-element
-                                    :title="$tc('lengow-connector.toolbox.export.feed_url')"
-                                    :value="sales_channel.feed_url">
-                            </lgw-description-list-element>
-                        </sw-description-list>
-                    </sw-card-section>
-                    <sw-card-section divider="top" secondary slim>
-                        <sw-container columns="repeat(auto-fit, minmax(250px, 1fr))" gap="30px 30px">
+                <template #grid>
+                    <sw-container type="row">
+                        <sw-card-section>
                             <sw-description-list columns="1fr" grid="1fr">
-                                <lgw-description-list-element :title="$tc('lengow-connector.toolbox.export.enabled')"
-                                                  :value="sales_channel.enabled"
-                                                  :type="'bool'">
+                                <lgw-description-list-element
+                                        :title="$tc('lengow-connector.toolbox.export.id')"
+                                        :value="sales_channel.shop_id">
                                 </lgw-description-list-element>
                                 <lgw-description-list-element
-                                        :title="$tc('lengow-connector.toolbox.export.catalog_id')"
-                                        :value="sales_channel.catalog_ids"
-                                        :type="'array'">
+                                        :title="$tc('lengow-connector.toolbox.export.domain_url')"
+                                        :value="sales_channel.domain_url">
                                 </lgw-description-list-element>
                                 <lgw-description-list-element
-                                        :title="$tc('lengow-connector.toolbox.export.last_export')"
-                                        :value="sales_channel.last_export"
-                                        :type="'date'">
+                                        :title="$tc('lengow-connector.toolbox.export.token')"
+                                        :value="sales_channel.shop_token">
+                                </lgw-description-list-element>
+                                <lgw-description-list-element
+                                        :title="$tc('lengow-connector.toolbox.export.feed_url')"
+                                        :value="sales_channel.feed_url">
                                 </lgw-description-list-element>
                             </sw-description-list>
-                            <sw-description-list>
-                                <lgw-description-list-element
-                                        :title="$tc('lengow-connector.toolbox.export.total_product_number')"
-                                        :value="sales_channel.number_products_available">
-                                </lgw-description-list-element>
-                                <lgw-description-list-element
-                                        :title="$tc('lengow-connector.toolbox.export.exported_product_number')"
-                                        :value="sales_channel.number_products_exported">
-                                </lgw-description-list-element>
-                            </sw-description-list>
-                        </sw-container>
-                    </sw-card-section>
-                </sw-container>
+                        </sw-card-section>
+                        <sw-card-section divider="top" secondary slim>
+                            <sw-container columns="repeat(auto-fit, minmax(250px, 1fr))" gap="30px 30px">
+                                <sw-description-list columns="1fr" grid="1fr">
+                                    <lgw-description-list-element :title="$tc('lengow-connector.toolbox.export.enabled')"
+                                                      :value="sales_channel.enabled"
+                                                      :type="'bool'">
+                                    </lgw-description-list-element>
+                                    <lgw-description-list-element
+                                            :title="$tc('lengow-connector.toolbox.export.catalog_id')"
+                                            :value="sales_channel.catalog_ids"
+                                            :type="'array'">
+                                    </lgw-description-list-element>
+                                    <lgw-description-list-element
+                                            :title="$tc('lengow-connector.toolbox.export.last_export')"
+                                            :value="sales_channel.last_export"
+                                            :type="'date'">
+                                    </lgw-description-list-element>
+                                </sw-description-list>
+                                <sw-description-list>
+                                    <lgw-description-list-element
+                                            :title="$tc('lengow-connector.toolbox.export.total_product_number')"
+                                            :value="sales_channel.number_products_available">
+                                    </lgw-description-list-element>
+                                    <lgw-description-list-element
+                                            :title="$tc('lengow-connector.toolbox.export.exported_product_number')"
+                                            :value="sales_channel.number_products_exported">
+                                    </lgw-description-list-element>
+                                </sw-description-list>
+                            </sw-container>
+                        </sw-card-section>
+                    </sw-container>
+                </template>
             </sw-card>
         {% endblock %}
     </div>

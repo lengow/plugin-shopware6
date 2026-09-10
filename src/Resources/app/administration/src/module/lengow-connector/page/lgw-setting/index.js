@@ -48,6 +48,18 @@ Component.register('lgw-setting', {
     },
 
     methods: {
+        normalizeSettingValue(event) {
+            if (
+                event !== null
+                && typeof event === 'object'
+                && Object.prototype.hasOwnProperty.call(event, 'value')
+            ) {
+                return event.value;
+            }
+
+            return event;
+        },
+
         onChangeSelectedTab(selectedTab) {
             switch (selectedTab) {
                 case 'export':
@@ -69,6 +81,7 @@ Component.register('lgw-setting', {
 
         onSaveSettings(event, key, salesChannelId) {
             let reload = false;
+            const normalizedEvent = this.normalizeSettingValue(event);
             const lengowConfigCriteria = new Criteria();
             if (salesChannelId) {
                 lengowConfigCriteria.addFilter(Criteria.equals('salesChannelId', salesChannelId));
@@ -78,10 +91,10 @@ Component.register('lgw-setting', {
             this.lengowConfigRepository.search(lengowConfigCriteria, Shopware.Context.api).then(result => {
                 if (result.total > 0) {
                     const lengowConfig = result.first();
-                    if (typeof event === 'boolean') {
-                        lengowConfig.value = event ? '1' : '0';
+                    if (typeof normalizedEvent === 'boolean') {
+                        lengowConfig.value = normalizedEvent ? '1' : '0';
                     } else {
-                        lengowConfig.value = String(event);
+                        lengowConfig.value = String(normalizedEvent);
                     }
                     if (key === 'lengowDebugEnabled') { // activate debug mode need to reload config data
                         reload = true;
@@ -105,17 +118,19 @@ Component.register('lgw-setting', {
 
         async loadConfig() {
             const lengowConfigCriteria = new Criteria(1, 500);
+            lengowConfigCriteria.addAssociation('salesChannel');
             // eslint-disable-next-line no-return-await
             return await this.lengowConfigRepository.search(lengowConfigCriteria, Shopware.Context.api).then(result => {
                 result.forEach(config => {
-                    if (config.salesChannel) {
+                    if (config.salesChannel || config.salesChannelId) {
                         if (typeof this.config[config.name] === 'undefined') {
                             this.config[config.name] = [];
                         }
                         this.config[config.name].push({
                             name: config.name,
                             value: config.value,
-                            salesChannel: config.salesChannel
+                            salesChannelId: config.salesChannel ? config.salesChannel.id : config.salesChannelId,
+                            salesChannel: config.salesChannel || null
                         });
                     } else {
                         this.config[config.name] = {

@@ -13,26 +13,28 @@
             </template>
         {% endblock %}
         {% block lgw_contact_content %}
-            <sw-card-view slot="content">
-                <sw-card>
-                    <h2>{{ $tc('lengow-connector.contact.title') }}</h2>
-                    <p>
-                        <br/>
-                        {{ $tc('lengow-connector.contact.contain_text_support') }}
-                        <a :href="supportLink" target="_blank">
-                            {{ $tc('lengow-connector.contact.title_lengow_support') }}
-                        </a>
-                        <br/><br/>
-                        {{ $tc('lengow-connector.contact.contain_text_support_hour') }}
-                        <br/><br/>
-                        {{ $tc('lengow-connector.contact.find_answer') }}
-                        <a :href="helpCenterLink" target="_blank">
-                            {{ $tc('lengow-connector.contact.link_magento_guide') }}
-                        </a>
-                    </p>
-                </sw-card>
-                <lgw-footer></lgw-footer>
-            </sw-card-view>
+            <template #content>
+                <sw-card-view>
+                    <sw-card>
+                        <h2>{{ $tc('lengow-connector.contact.title') }}</h2>
+                        <p>
+                            <br/>
+                            {{ $tc('lengow-connector.contact.contain_text_support') }}
+                            <a :href="supportLink" target="_blank">
+                                {{ $tc('lengow-connector.contact.title_lengow_support') }}
+                            </a>
+                            <br/><br/>
+                            {{ $tc('lengow-connector.contact.contain_text_support_hour') }}
+                            <br/><br/>
+                            {{ $tc('lengow-connector.contact.find_answer') }}
+                            <a :href="helpCenterLink" target="_blank">
+                                {{ $tc('lengow-connector.contact.link_magento_guide') }}
+                            </a>
+                        </p>
+                    </sw-card>
+                    <lgw-footer></lgw-footer>
+                </sw-card-view>
+            </template>
         {% endblock %}
     </sw-page>
 {% endblock %}

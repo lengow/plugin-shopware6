@@ -556,7 +556,7 @@ class LengowExport
      *
      * @return array
      */
-    public function getAllProductIdForSalesChannel(): array
+    public function getAllProductIdForSalesChannel(bool $includeVariants = false): array
     {
         $entryPoint = $this->salesChannel->getNavigationCategoryId();
         // if no entry point is found, we can't retrieve the products
@@ -564,11 +564,19 @@ class LengowExport
             return [];
         }
         $productIds = [];
-        $sql = '
-            SELECT DISTINCT p.`id` FROM `product` AS p
-            JOIN `product_category_tree` as pct ON p.`id` = pct.`product_id`
-            WHERE pct.`category_id` = :categoryId AND p.`parent_id` IS NULL
-        ';
+        if ($includeVariants) {
+            $sql = '
+                SELECT DISTINCT p.`id` FROM `product` AS p
+                JOIN `product_category_tree` as pct ON IFNULL(p.`parent_id`, p.`id`) = pct.`product_id`
+                WHERE pct.`category_id` = :categoryId
+            ';
+        } else {
+            $sql = '
+                SELECT DISTINCT p.`id` FROM `product` AS p
+                JOIN `product_category_tree` as pct ON p.`id` = pct.`product_id`
+                WHERE pct.`category_id` = :categoryId AND p.`parent_id` IS NULL
+            ';
+        }
         $products = $this->connexion->fetchAllAssociative($sql, [
             'categoryId' => Uuid::fromHexToBytes($entryPoint),
         ]);

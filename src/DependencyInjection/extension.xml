@@ -8,6 +8,12 @@
         <service id="Lengow\Connector\EntityExtension\Extension\ProductExtension">
             <tag name="shopware.entity.extension"/>
         </service>
+        <service id="Lengow\Connector\EntityExtension\Extension\OrderExtension">
+            <tag name="shopware.entity.extension"/>
+        </service>
+        <service id="Lengow\Connector\EntityExtension\Extension\SalesChannelExtension">
+            <tag name="shopware.entity.extension"/>
+        </service>
     </services>
 </container>
  

@@ -96,11 +96,57 @@ class LengowConnectionController extends AbstractController
         if (!$cmsExist) {
             $syncData = json_encode($this->lengowSync->getSyncData());
             $result = $this->lengowConnector->queryApi(LengowConnector::POST, LengowConnector::API_CMS, [], $syncData);
-            if (isset($result->common_account)) {
+            if ($result === null) {
+                // Some API versions return an empty body on successful CMS creation.
+                $cmsConnected = true;
+                $this->waitForCmsVisibility();
+                $messageKey = 'log.connection.cms_creation_success';
+            } elseif ($this->isCmsCreationSuccessful($result, $cmsToken)) {
                 $cmsConnected = true;
                 $messageKey = 'log.connection.cms_creation_success';
             } else {
-                $messageKey = 'log.connection.cms_creation_failed';
+                $this->lengowLog->write(
+                    LengowLog::CODE_CONNECTION,
+                    'connect-cms POST response (attempt 1): ' . $this->stringifyApiResult($result)
+                );
+                // Some API versions may return a different POST payload while still creating the CMS.
+                // Re-check via GET /cms before considering the connection as failed.
+                $cmsConnected = $this->waitForCmsVisibility();
+                if (!$cmsConnected) {
+                    $this->lengowLog->write(
+                        LengowLog::CODE_CONNECTION,
+                        'connect-cms GET /cms fallback after attempt 1 did not find token ' . $cmsToken
+                    );
+                    // Token collisions can happen when a previously created token exists remotely.
+                    // Regenerate the CMS token and retry once with a fresh payload.
+                    $cmsToken = $this->lengowConfiguration->generateToken();
+                    $syncData = json_encode($this->lengowSync->getSyncData());
+                    $result = $this->lengowConnector->queryApi(LengowConnector::POST, LengowConnector::API_CMS, [], $syncData);
+                    if ($this->isCmsCreationSuccessful($result, $cmsToken)) {
+                        $cmsConnected = true;
+                    } else {
+                        $this->lengowLog->write(
+                            LengowLog::CODE_CONNECTION,
+                            'connect-cms POST response (attempt 2): ' . $this->stringifyApiResult($result)
+                        );
+                        // If the API returns null here too, we also treat it as successful creation.
+                        if ($result === null) {
+                            $cmsConnected = true;
+                            $this->waitForCmsVisibility();
+                        } else {
+                            $cmsConnected = $this->waitForCmsVisibility();
+                        }
+                        if (!$cmsConnected) {
+                            $this->lengowLog->write(
+                                LengowLog::CODE_CONNECTION,
+                                'connect-cms GET /cms fallback after attempt 2 did not find token ' . $cmsToken
+                            );
+                        }
+                    }
+                }
+                $messageKey = $cmsConnected
+                    ? 'log.connection.cms_creation_success'
+                    : 'log.connection.cms_creation_failed';
             }
         } else {
             $messageKey = 'log.connection.cms_already_exist';
@@ -111,9 +157,9 @@ class LengowConnectionController extends AbstractController
                 'cms_token' => $cmsToken,
             ])
         );
-        // reset access ids if cms creation failed
+        // Keep API credentials even if CMS creation fails so the merchant can retry
+        // without re-entering credentials. Only reset temporary authorization token.
         if (!$cmsExist && !$cmsConnected) {
-            $this->lengowConfiguration->resetAccessIds();
             $this->lengowConfiguration->resetAuthorizationToken();
         }
         return new JsonResponse([
@@ -167,5 +213,120 @@ class LengowConnectionController extends AbstractController
         return new JsonResponse([
             'success' => $catalogsLinked,
         ]);
+    }
+
+    /**
+     * A CMS creation response is considered successful when it contains either a known account field
+     * or a token matching the CMS token sent by the plugin.
+     *
+     * @param mixed $result
+     * @param string $cmsToken
+     *
+     * @return bool
+     */
+    private function isCmsCreationSuccessful($result, string $cmsToken): bool
+    {
+        if (!is_object($result) && !is_array($result)) {
+            return false;
+        }
+
+        if ($this->hasResultField($result, 'error')) {
+            return false;
+        }
+
+        if ($this->hasResultField($result, 'common_account')
+            || $this->hasResultField($result, 'commonAccount')
+            || $this->hasResultField($result, 'account_id')
+            || $this->hasResultField($result, 'accountId')
+            || $this->hasResultField($result, 'id')
+        ) {
+            return true;
+        }
+
+        $resultToken = $this->getResultField($result, 'token');
+        if (is_string($resultToken) && $resultToken === $cmsToken) {
+            return true;
+        }
+
+        // Defensive fallback for future API payload variants: a non-error object
+        // that looks like a CMS payload should be treated as a successful creation.
+        return $this->hasResultField($result, 'shops')
+            && $this->hasResultField($result, 'domain_name');
+    }
+
+    /**
+     * @param mixed $result
+     * @param string $field
+     */
+    private function hasResultField($result, string $field): bool
+    {
+        if (is_array($result)) {
+            return array_key_exists($field, $result);
+        }
+
+        return is_object($result) && property_exists($result, $field);
+    }
+
+    /**
+     * @param mixed $result
+     * @param string $field
+     *
+     * @return mixed|null
+     */
+    private function getResultField($result, string $field)
+    {
+        if (is_array($result) && array_key_exists($field, $result)) {
+            return $result[$field];
+        }
+
+        if (is_object($result) && property_exists($result, $field)) {
+            return $result->$field;
+        }
+
+        return null;
+    }
+
+    /**
+     * @param mixed $result
+     */
+    private function stringifyApiResult($result): string
+    {
+        if ($result === false) {
+            return 'false';
+        }
+
+        if ($result === null) {
+            return 'null';
+        }
+
+        if (is_string($result)) {
+            return $result;
+        }
+
+        if (is_array($result) || is_object($result)) {
+            $encoded = json_encode($result, JSON_UNESCAPED_UNICODE | JSON_UNESCAPED_SLASHES);
+
+            return $encoded !== false ? $encoded : '[json_encode_failed]';
+        }
+
+        return (string) $result;
+    }
+
+    /**
+     * API write/read can be eventually consistent for a short duration.
+     * We retry visibility checks to avoid false negatives right after POST.
+     */
+    private function waitForCmsVisibility(): bool
+    {
+        $maxAttempts = 3;
+        $sleepMicroseconds = 400000;
+        for ($attempt = 0; $attempt < $maxAttempts; $attempt++) {
+            if ($this->lengowSync->syncCatalog(true)) {
+                return true;
+            }
+            usleep($sleepMicroseconds);
+        }
+
+        return false;
     }
 }

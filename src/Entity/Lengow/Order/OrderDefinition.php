@@ -16,13 +16,16 @@ use Shopware\Core\Framework\DataAbstractionLayer\Field\IdField;
 use Shopware\Core\Framework\DataAbstractionLayer\Field\DateTimeField;
 use Shopware\Core\Framework\DataAbstractionLayer\Field\StringField;
 use Shopware\Core\Framework\DataAbstractionLayer\Field\BoolField;
-use Shopware\Core\Framework\DataAbstractionLayer\Field\OneToOneAssociationField;
+use Shopware\Core\Framework\DataAbstractionLayer\Field\ManyToOneAssociationField;
+use Shopware\Core\Framework\DataAbstractionLayer\Field\OneToManyAssociationField;
+use Shopware\Core\Framework\DataAbstractionLayer\Field\ReferenceVersionField;
 use Shopware\Core\Framework\DataAbstractionLayer\Field\JsonField;
 // Model Return Type
 use Shopware\Core\Framework\DataAbstractionLayer\FieldCollection;
 // OneToOne association class
 use Shopware\Core\Checkout\Order\OrderDefinition as ShopwareOrderDefinition;
 use Shopware\Core\System\SalesChannel\SalesChannelDefinition as ShopwareSalesChannelDefinition;
+use Lengow\Connector\Entity\Lengow\OrderError\OrderErrorDefinition as LengowOrderErrorDefinition;
 // Entity class
 use Lengow\Connector\Entity\Lengow\Order\OrderEntity as LengowOrderEntity;
 
@@ -104,12 +107,13 @@ class OrderDefinition extends EntityDefinition
         return new FieldCollection(
             [
                 (new IdField('id', self::FIELD_ID))->addFlags(new Required(), new PrimaryKey()),
-                (new IdField('order_id', self::FIELD_ORDER_ID)),
-                (new OneToOneAssociationField('order', 'order_id', 'id', ShopwareOrderDefinition::class))
+                (new FkField('order_id', self::FIELD_ORDER_ID, ShopwareOrderDefinition::class)),
+                (new ReferenceVersionField(ShopwareOrderDefinition::class, 'order_version_id')),
+                (new ManyToOneAssociationField('order', 'order_id', ShopwareOrderDefinition::class, 'id'))
                     ->addFlags(new setNullOnDelete()),
                 (new StringField ('order_sku', self::FIELD_ORDER_SKU)),
-                (new IdField('sales_channel_id', self::FIELD_SALES_CHANNEL_ID)),
-                (new OneToOneAssociationField('salesChannel', 'sales_channel_id', 'id', ShopwareSalesChannelDefinition::class))
+                (new FkField('sales_channel_id', self::FIELD_SALES_CHANNEL_ID, ShopwareSalesChannelDefinition::class)),
+                (new ManyToOneAssociationField('salesChannel', 'sales_channel_id', ShopwareSalesChannelDefinition::class, 'id'))
                     ->addFlags(new setNullOnDelete()),
                 (new IntField('delivery_address_id', self::FIELD_DELIVERY_ADDRESS_ID)),
                 (new StringField('delivery_country_iso', self::FIELD_DELIVERY_COUNTRY_ISO)),
@@ -139,6 +143,7 @@ class OrderDefinition extends EntityDefinition
                 (new StringField('message', self::FIELD_MESSAGE)),
                 (new DateTimeField('imported_at', self::FIELD_IMPORTED_AT)),
                 (new JsonField('extra', self::FIELD_EXTRA)),
+                (new OneToManyAssociationField('errors', LengowOrderErrorDefinition::class, 'lengow_order_id', 'id')),
             ]
         );
     }
