@@ -3,8 +3,12 @@
 src/Logs/*.txt
 .eslintrc.js
 .eslintrc.json
+dist/
 node_modules
 package-lock.json
 src/Config/marketplaces.json
 src/Export/*
 !src/Export/index.php
+
+# Source maps are build artefacts, they never ship to a merchant
+*.js.map
