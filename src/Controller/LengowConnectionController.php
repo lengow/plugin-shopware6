@@ -97,10 +97,13 @@ class LengowConnectionController extends AbstractController
             $syncData = json_encode($this->lengowSync->getSyncData());
             $result = $this->lengowConnector->queryApi(LengowConnector::POST, LengowConnector::API_CMS, [], $syncData);
             if ($result === null) {
-                // Some API versions return an empty body on successful CMS creation.
-                $cmsConnected = true;
-                $this->waitForCmsVisibility();
-                $messageKey = 'log.connection.cms_creation_success';
+                // An empty body is how some API versions answer a successful creation,
+                // but queryApi() also returns null for any unparseable payload. Only the
+                // visibility check tells the two apart, so its result decides here.
+                $cmsConnected = $this->waitForCmsVisibility();
+                $messageKey = $cmsConnected
+                    ? 'log.connection.cms_creation_success'
+                    : 'log.connection.cms_creation_failed';
             } elseif ($this->isCmsCreationSuccessful($result, $cmsToken)) {
                 $cmsConnected = true;
                 $messageKey = 'log.connection.cms_creation_success';
@@ -129,13 +132,9 @@ class LengowConnectionController extends AbstractController
                             LengowLog::CODE_CONNECTION,
                             'connect-cms POST response (attempt 2): ' . $this->stringifyApiResult($result)
                         );
-                        // If the API returns null here too, we also treat it as successful creation.
-                        if ($result === null) {
-                            $cmsConnected = true;
-                            $this->waitForCmsVisibility();
-                        } else {
-                            $cmsConnected = $this->waitForCmsVisibility();
-                        }
+                        // A null body is not proof of creation either: the visibility
+                        // check decides, whatever the second POST answered.
+                        $cmsConnected = $this->waitForCmsVisibility();
                         if (!$cmsConnected) {
                             $this->lengowLog->write(
                                 LengowLog::CODE_CONNECTION,

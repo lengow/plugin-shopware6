@@ -108,7 +108,7 @@ class OrderDefinition extends EntityDefinition
             [
                 (new IdField('id', self::FIELD_ID))->addFlags(new Required(), new PrimaryKey()),
                 (new FkField('order_id', self::FIELD_ORDER_ID, ShopwareOrderDefinition::class)),
-                (new ReferenceVersionField(ShopwareOrderDefinition::class, 'order_version_id')),
+                (new ReferenceVersionField(ShopwareOrderDefinition::class, 'order_version_id'))->addFlags(new Required()),
                 (new ManyToOneAssociationField('order', 'order_id', ShopwareOrderDefinition::class, 'id'))
                     ->addFlags(new setNullOnDelete()),
                 (new StringField ('order_sku', self::FIELD_ORDER_SKU)),

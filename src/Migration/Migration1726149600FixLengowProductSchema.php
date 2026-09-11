@@ -59,15 +59,19 @@ class Migration1726149600FixLengowProductSchema extends MigrationStep
             ]
         ) > 0;
 
-        if ($columnExists) {
-            return;
-        }
 
-        $connection->executeStatement(sprintf(
-            'ALTER TABLE `%s` ADD `%s` BINARY(16) NULL',
-            $tableName,
-            $columnName
-        ));
+        // Each ALTER TABLE commits on its own in MySQL, so a run interrupted between
+        // the three statements can leave the column added but neither backfilled nor
+        // converted. Guarding the whole helper on the column would skip those two
+        // steps for good: only the ADD is conditional, the backfill and the NOT NULL
+        // conversion are idempotent and always run.
+        if (!$columnExists) {
+            $connection->executeStatement(sprintf(
+                'ALTER TABLE `%s` ADD `%s` BINARY(16) NULL',
+                $tableName,
+                $columnName
+            ));
+        }
         $connection->executeStatement(sprintf(
             'UPDATE `%s` SET `%s` = UNHEX(\'%s\') WHERE `%s` IS NULL',
             $tableName,

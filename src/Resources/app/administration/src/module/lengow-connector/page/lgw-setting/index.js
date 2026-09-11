@@ -119,6 +119,10 @@ Component.register('lgw-setting', {
         async loadConfig() {
             const lengowConfigCriteria = new Criteria(1, 500);
             lengowConfigCriteria.addAssociation('salesChannel');
+            // Rebuilt from scratch: sales channel entries are pushed into arrays, so
+            // reloading without clearing would append a second copy of every entry and
+            // leave find()/some() reading the stale one.
+            this.config = {};
             // eslint-disable-next-line no-return-await
             return await this.lengowConfigRepository.search(lengowConfigCriteria, Shopware.Context.api).then(result => {
                 result.forEach(config => {
