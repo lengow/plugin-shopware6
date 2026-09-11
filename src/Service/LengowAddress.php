@@ -562,7 +562,7 @@ class LengowAddress
      *
      * @return CountryStateEntity|null
      */
-    private function getState(CountryEntity $country, string $postcode, string $stateRegion = null): ?CountryStateEntity
+    private function getState(CountryEntity $country, string $postcode, ?string $stateRegion = null): ?CountryStateEntity
     {
         $state = null;
         if (in_array($country->getIso(), [self::ISO_A2_FR, self::ISO_A2_ES, self::ISO_A2_IT], true)) {

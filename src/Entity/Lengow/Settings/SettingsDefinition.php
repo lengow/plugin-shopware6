@@ -11,8 +11,8 @@ use Shopware\Core\Framework\DataAbstractionLayer\Field\Flag\SetNullOnDelete;
 // Field types
 use Shopware\Core\Framework\DataAbstractionLayer\Field\FkField;
 use Shopware\Core\Framework\DataAbstractionLayer\Field\IdField;
+use Shopware\Core\Framework\DataAbstractionLayer\Field\ManyToOneAssociationField;
 use Shopware\Core\Framework\DataAbstractionLayer\Field\StringField;
-use Shopware\Core\Framework\DataAbstractionLayer\Field\OneToOneAssociationField;
 // Model Return Type
 use Shopware\Core\Framework\DataAbstractionLayer\FieldCollection;
 // OneToOne association class
@@ -67,7 +67,7 @@ class SettingsDefinition extends EntityDefinition
             [
                 (new IdField('id', self::FIELD_ID))->addFlags(new Required(), new PrimaryKey()),
                 (new FkField('sales_channel_id', self::FIELD_SALES_CHANNEL_ID, ShopwareSalesChannelDefinition::class)),
-                (new OneToOneAssociationField('salesChannel', 'sales_channel_id', 'id', ShopwareSalesChannelDefinition::class))
+                (new ManyToOneAssociationField('salesChannel', 'sales_channel_id', ShopwareSalesChannelDefinition::class, 'id'))
                     ->addFlags(new setNullOnDelete()),
                 (new StringField('name', self::FIELD_NAME))->addFlags(new Required()),
                 (new StringField('value', self::FIELD_VALUE, 20000)),

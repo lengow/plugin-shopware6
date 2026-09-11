@@ -12,6 +12,7 @@ use Shopware\Core\Framework\Plugin\Context\InstallContext;
 use Shopware\Core\Framework\Plugin\Context\UninstallContext;
 use Shopware\Core\Framework\Plugin\Util\PluginIdProvider;
 use Shopware\Core\Framework\Plugin\Context\ActivateContext;
+use Shopware\Core\Framework\Plugin\Context\UpdateContext;
 use Shopware\Core\Framework\Uuid\Uuid;
 use Symfony\Component\Config\FileLocator;
 use Symfony\Component\DependencyInjection\ContainerBuilder;
@@ -28,6 +29,13 @@ use Lengow\Connector\Service\LengowConfiguration;
  */
 class LengowConnector extends Plugin
 {
+    private const LIVE_VERSION_ID = '0fa91ce3e96a4bc2be4bd9ce752c3425';
+
+    public function getMigrationNamespace(): string
+    {
+        return 'Lengow\\Connector\\Migration';
+    }
+
     /**
      * {@inheritdoc}
      */
@@ -49,17 +57,25 @@ class LengowConnector extends Plugin
     public function install(InstallContext $installContext): void
     {
         parent::Install($installContext);
+        $this->ensureShopware67SchemaCompatibility();
         $this->addPaymentMethod($installContext->getContext());
     }
 
     public function activate(ActivateContext $activateContext): void
     {
+        $this->ensureShopware67SchemaCompatibility();
         LengowConfiguration::createDefaultSalesChannelConfig(
             $this->container->get('sales_channel.repository'),
             $this->container->get('shipping_method.repository'),
             $this->container->get('lengow_settings.repository')
         );
         parent::activate($activateContext);
+    }
+
+    public function update(UpdateContext $updateContext): void
+    {
+        $this->ensureShopware67SchemaCompatibility();
+        parent::update($updateContext);
     }
 
     public function uninstall(UninstallContext $uninstallContext): void
@@ -159,5 +175,163 @@ class LengowConnector extends Plugin
             return null;
         }
         return $paymentIds->getIds()[0];
+    }
+
+    private function ensureShopware67SchemaCompatibility(): void
+    {
+        /** @var Connection $connection */
+        $connection = $this->container->get(Connection::class);
+
+        $this->addVersionReferenceColumnIfMissing($connection, 'lengow_action', 'order_version_id');
+        $this->addVersionReferenceColumnIfMissing($connection, 'lengow_order', 'order_version_id');
+        $this->addVersionReferenceColumnIfMissing($connection, 'lengow_order_line', 'order_version_id');
+        $this->addVersionReferenceColumnIfMissing($connection, 'lengow_order_line', 'product_version_id');
+        $this->addVersionReferenceColumnIfMissing($connection, 'lengow_product', 'product_version_id');
+
+        $primaryKeyExists = (int) $connection->fetchOne(
+            'SELECT COUNT(*)
+            FROM information_schema.statistics
+            WHERE table_schema = DATABASE()
+              AND table_name = :table
+              AND index_name = :indexName',
+            [
+                'table' => 'lengow_product',
+                'indexName' => 'PRIMARY',
+            ]
+        ) > 0;
+        if (!$primaryKeyExists) {
+            $connection->executeStatement('ALTER TABLE `lengow_product` ADD PRIMARY KEY (`id`)');
+        }
+
+        $this->dropLegacyProductForeignKey($connection);
+        $this->ensureCompositeProductForeignKey($connection);
+    }
+
+    private function addVersionReferenceColumnIfMissing(
+        Connection $connection,
+        string $tableName,
+        string $columnName
+    ): void {
+        $columnExists = (int) $connection->fetchOne(
+            'SELECT COUNT(*)
+            FROM information_schema.columns
+            WHERE table_schema = DATABASE()
+              AND table_name = :table
+              AND column_name = :column',
+            [
+                'table' => $tableName,
+                'column' => $columnName,
+            ]
+        ) > 0;
+
+        // Each ALTER TABLE commits on its own in MySQL, so a run interrupted between
+        // the three statements can leave the column added but neither backfilled nor
+        // converted. Guarding the whole helper on the column would skip those two
+        // steps for good: only the ADD is conditional, the backfill and the NOT NULL
+        // conversion are idempotent and always run.
+        if (!$columnExists) {
+            $connection->executeStatement(sprintf(
+                'ALTER TABLE `%s` ADD `%s` BINARY(16) NULL',
+                $tableName,
+                $columnName
+            ));
+        }
+        $connection->executeStatement(sprintf(
+            'UPDATE `%s` SET `%s` = UNHEX(\'%s\') WHERE `%s` IS NULL',
+            $tableName,
+            $columnName,
+            self::LIVE_VERSION_ID,
+            $columnName
+        ));
+        $connection->executeStatement(sprintf(
+            'ALTER TABLE `%s` MODIFY `%s` BINARY(16) NOT NULL',
+            $tableName,
+            $columnName
+        ));
+    }
+
+    private function dropLegacyProductForeignKey(Connection $connection): void
+    {
+        $legacyKeys = $connection->fetchFirstColumn(
+            'SELECT constraint_name
+            FROM (
+                SELECT
+                    constraint_name,
+                    GROUP_CONCAT(column_name ORDER BY ordinal_position) AS fk_columns,
+                    GROUP_CONCAT(referenced_column_name ORDER BY ordinal_position) AS ref_columns
+                FROM information_schema.key_column_usage
+                WHERE table_schema = DATABASE()
+                  AND table_name = :table
+                  AND referenced_table_name = :refTable
+                GROUP BY constraint_name
+            ) AS constraints_map
+            WHERE fk_columns = :legacyFkColumns
+              AND ref_columns = :legacyRefColumns',
+            [
+                'table' => 'lengow_product',
+                'refTable' => 'product',
+                'legacyFkColumns' => 'product_id',
+                'legacyRefColumns' => 'id',
+            ]
+        );
+
+        foreach ($legacyKeys as $foreignKey) {
+            $connection->executeStatement(sprintf('ALTER TABLE `lengow_product` DROP FOREIGN KEY `%s`', $foreignKey));
+        }
+    }
+
+    private function ensureCompositeProductForeignKey(Connection $connection): void
+    {
+        $compositeKeyExists = (int) $connection->fetchOne(
+            'SELECT COUNT(*)
+            FROM (
+                SELECT
+                    GROUP_CONCAT(column_name ORDER BY ordinal_position) AS fk_columns,
+                    GROUP_CONCAT(referenced_column_name ORDER BY ordinal_position) AS ref_columns
+                FROM information_schema.key_column_usage
+                WHERE table_schema = DATABASE()
+                  AND table_name = :table
+                  AND referenced_table_name = :refTable
+                GROUP BY constraint_name
+            ) AS constraints_map
+            WHERE fk_columns = :compositeFkColumns
+              AND ref_columns = :compositeRefColumns',
+            [
+                'table' => 'lengow_product',
+                'refTable' => 'product',
+                'compositeFkColumns' => 'product_id,product_version_id',
+                'compositeRefColumns' => 'id,version_id',
+            ]
+        ) > 0;
+
+        if ($compositeKeyExists) {
+            return;
+        }
+
+        $indexExists = (int) $connection->fetchOne(
+            'SELECT COUNT(*)
+            FROM information_schema.statistics
+            WHERE table_schema = DATABASE()
+              AND table_name = :table
+              AND index_name = :index',
+            [
+                'table' => 'lengow_product',
+                'index' => 'idx_lengow_product_product_version',
+            ]
+        ) > 0;
+
+        if (!$indexExists) {
+            $connection->executeStatement(
+                'CREATE INDEX `idx_lengow_product_product_version` ON `lengow_product` (`product_id`, `product_version_id`)'
+            );
+        }
+
+        $connection->executeStatement(
+            'ALTER TABLE `lengow_product`
+                ADD CONSTRAINT `fk_lengow_product_product_version`
+                FOREIGN KEY (`product_id`, `product_version_id`)
+                REFERENCES `product` (`id`, `version_id`)
+                ON DELETE CASCADE'
+        );
     }
 }

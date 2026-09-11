@@ -10,6 +10,8 @@ use Shopware\Core\Framework\DataAbstractionLayer\Field\Flag\Required;
 // Field types
 use Shopware\Core\Framework\DataAbstractionLayer\Field\FkField;
 use Shopware\Core\Framework\DataAbstractionLayer\Field\IdField;
+use Shopware\Core\Framework\DataAbstractionLayer\Field\ManyToOneAssociationField;
+use Shopware\Core\Framework\DataAbstractionLayer\Field\ReferenceVersionField;
 // Model Return Type
 use Shopware\Core\Framework\DataAbstractionLayer\FieldCollection;
 // OneToOne association class
@@ -50,13 +52,16 @@ class ProductDefinition extends EntityDefinition
     /**
      * @return FieldCollection
      */
-    public function defineFields(): FieldCollection
+    protected function defineFields(): FieldCollection
     {
         return new FieldCollection(
             [
                 (new IdField('id', self::FIELD_ID))->addFlags(new Required(), new PrimaryKey()),
-                (new FkField('product_id', self::FIELD_PRODUCT_ID, ShopwareProductDefinition::class)),
+                (new FkField('product_id', self::FIELD_PRODUCT_ID, ShopwareProductDefinition::class))->addFlags(new Required()),
+                (new ReferenceVersionField(ShopwareProductDefinition::class, 'product_version_id'))->addFlags(new Required()),
                 (new FkField('sales_channel_id', self::FIELD_SALES_CHANNEL_ID, ShopwareSalesChannelDefinition::class)),
+                (new ManyToOneAssociationField('product', 'product_id', ShopwareProductDefinition::class, 'id')),
+                (new ManyToOneAssociationField('salesChannel', 'sales_channel_id', ShopwareSalesChannelDefinition::class, 'id')),
             ]
         );
     }

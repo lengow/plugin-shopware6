@@ -190,7 +190,7 @@ class LengowOrderError
      *
      * @return EntityCollection|null
      */
-    public function getOrderErrors(string $lengowOrderId, int $type = null, bool $finished = null): ?EntityCollection
+    public function getOrderErrors(string $lengowOrderId, ?int $type = null, ?bool $finished = null): ?EntityCollection
     {
         $context = Context::createDefaultContext();
         $criteria = new Criteria();

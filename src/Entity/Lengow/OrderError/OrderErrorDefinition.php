@@ -9,11 +9,12 @@ use Shopware\Core\Framework\DataAbstractionLayer\Field\Flag\PrimaryKey;
 use Shopware\Core\Framework\DataAbstractionLayer\Field\Flag\Required;
 use Shopware\Core\Framework\DataAbstractionLayer\Field\Flag\SetNullOnDelete;
 // Field types
+use Shopware\Core\Framework\DataAbstractionLayer\Field\FkField;
 use Shopware\Core\Framework\DataAbstractionLayer\Field\IntField;
 use Shopware\Core\Framework\DataAbstractionLayer\Field\IdField;
+use Shopware\Core\Framework\DataAbstractionLayer\Field\ManyToOneAssociationField;
 use Shopware\Core\Framework\DataAbstractionLayer\Field\StringField;
 use Shopware\Core\Framework\DataAbstractionLayer\Field\BoolField;
-use Shopware\Core\Framework\DataAbstractionLayer\Field\OneToOneAssociationField;
 // Model Return Type
 use Shopware\Core\Framework\DataAbstractionLayer\FieldCollection;
 // OneToOne association class
@@ -72,8 +73,8 @@ class OrderErrorDefinition extends EntityDefinition
         return new FieldCollection(
             [
                 (new IdField('id', self::FIELD_ID))->addFlags(new Required(), new PrimaryKey()),
-                (new IdField('lengow_order_id', self::FIELD_LENGOW_ORDER_ID)),
-                (new OneToOneAssociationField('order', 'lengow_order_id', 'id', LengowOrderDefinition::class))
+                (new FkField('lengow_order_id', self::FIELD_LENGOW_ORDER_ID, LengowOrderDefinition::class)),
+                (new ManyToOneAssociationField('order', 'lengow_order_id', LengowOrderDefinition::class, 'id'))
                     ->addFlags(new setNullOnDelete()),
                 (new StringField('message', self::FIELD_MESSAGE)),
                 (new IntField('type', self::FIELD_TYPE))->addFlags(new Required()),

@@ -145,15 +145,28 @@ Component.register('lgw-setting-import', {
     },
 
     methods: {
+        getConfigEntries(key) {
+            const value = this.config[key];
+            return Array.isArray(value) ? value : [];
+        },
+
+        salesChannelMatches(entry, salesChannelId) {
+            if (!entry) {
+                return false;
+            }
+            const entrySalesChannelId = entry.salesChannel?.id || entry.salesChannelId;
+            return entrySalesChannelId === salesChannelId;
+        },
+
         getConfigImportDefaultShippingMethod(salesChannelId) {
             let defaultShippingMethodId = '';
-            this.config.lengowImportDefaultShippingMethod.forEach(defaultShippingMethod => {
-                if (defaultShippingMethod.salesChannel.id === salesChannelId) {
+            this.getConfigEntries('lengowImportDefaultShippingMethod').forEach(defaultShippingMethod => {
+                if (this.salesChannelMatches(defaultShippingMethod, salesChannelId)) {
                     defaultShippingMethodId = defaultShippingMethod.value;
                 }
             });
             if (defaultShippingMethodId === '') {
-                return 'Not found';
+                return Promise.resolve('Not found');
             }
             const shippingMethodCriteria = new Criteria();
             shippingMethodCriteria.addFilter(Criteria.equals('id', defaultShippingMethodId));

@@ -1,163 +1,282 @@
-#!/bin/bash
-# Build archive for Shopware 6 module
-# Step :
-#     - Remove .DS_Store
-#     - Remove .README.md
-#     - Remove .idea
-#     - Clean export folder
-#     - Clean logs folder
-#     - Clean translation folder
-#     - Clean tools folder
-#     - Remove .gitFolder and .gitignore
+#!/usr/bin/env bash
 
-remove_if_exist(){
-    if [ -f $1 ]; then
-      rm $1
+set -Eeuo pipefail
+IFS=$'\n\t'
+umask 022
+
+readonly PACKAGE_DIRECTORY='LengowConnector'
+readonly ARCHIVE_PREFIX='lengow.shopware6'
+readonly ADMINISTRATION_SOURCE='src/Resources/app/administration/src'
+readonly ADMINISTRATION_OUTPUT='src/Resources/public/administration'
+readonly SCRIPT_DIRECTORY="$(cd -- "$(dirname -- "${BASH_SOURCE[0]}")" && pwd -P)"
+readonly REPOSITORY_ROOT="$(cd -- "${SCRIPT_DIRECTORY}/.." && pwd -P)"
+
+WORKSPACE=''
+
+usage()
+{
+    cat <<'EOF'
+Usage:
+  tools/build.sh <version> [--output <directory>]
+
+Build a Shopware plugin archive containing only composer.json and src/.
+The default output directory is <repository>/dist. Relative output paths are
+resolved from the repository root.
+EOF
+}
+
+die()
+{
+    printf 'Error: %s\n' "$*" >&2
+    exit 1
+}
+
+cleanup()
+{
+    if [[ -n "${WORKSPACE}" && -d "${WORKSPACE}" ]]; then
+        rm -rf -- "${WORKSPACE}"
     fi
 }
 
-remove_directory(){
-    if [ -d "$1" ]; then
-        rm -rf $1
-    fi
-}
-remove_files(){
-    DIRECTORY="$1"
-    FILE="$2"
-    if [ -f "${DIRECTORY}/${FILE}" ]; then
-        find "$DIRECTORY" -name "$FILE" -exec rm -rf {} \;
-        echo -e "- Delete ${FILE} : ${VERT}DONE${NORMAL}"
-    fi
-    if [ -d "${DIRECTORY}/${FILE}" ]; then
-        rm -Rf "${DIRECTORY}/${FILE}"
-    fi
+require_command()
+{
+    command -v "$1" >/dev/null 2>&1 || die "Missing required command: $1"
 }
 
-remove_directories(){
-    DIRECTORY="$1"
-    find $DIRECTORY -maxdepth 1 -mindepth 1 -type d -exec rm -rf {} \;
-    echo "- Delete $FILE : ""$VERT""DONE""$NORMAL"""
+validate_version()
+{
+    local version="$1"
+
+    [[ "${version}" =~ ^[0-9]+([.][0-9]+){0,2}([-+][0-9A-Za-z][0-9A-Za-z.-]*)?$ ]] \
+        || die "Invalid version: ${version}"
 }
-# check parameters
-if [ -z "$1" ]; then
-	echo 'Version parameter is not set'
-	echo
-	exit 0
-else
-	VERSION="$1"
-	ARCHIVE_NAME='lengow.shopware6.'$VERSION'.zip'
-fi
 
-# variables
-FOLDER_TMP="/tmp/LengowConnector"
-FOLDER_LOGS="/tmp/LengowConnector/src/Logs"
-FOLDER_EXPORT="/tmp/LengowConnector/src/Export"
-FOLDER_TOOLS="/tmp/LengowConnector/tools"
-FOLDER_TEST="/tmp/LengowConnector/tests"
-FOLDER_NODE="/tmp/LengowConnector/node_modules"
-FOLDER_BIN="/tmp/LengowConnector/bin"
-FOLDER_CONFIG="/tmp/LengowConnector/src/Config"
-FOLDER_TRANSLATION="/tmp/LengowConnector/src/Translations/yml"
+resolve_output_directory()
+{
+    local output_directory="$1"
 
-VERT="\\033[1;32m"
-ROUGE="\\033[1;31m"
-NORMAL="\\033[0;39m"
-BLEU="\\033[1;36m"
+    if [[ "${output_directory}" != /* ]]; then
+        output_directory="${REPOSITORY_ROOT}/${output_directory}"
+    fi
 
-# process
-echo
-echo "#####################################################"
-echo "##                                                 ##"
-echo -e "##       "${BLEU}Lengow Shopware6${NORMAL}" - Build Module           ##"
-echo "##                                                 ##"
-echo "#####################################################"
-echo
-sleep 3
-FOLDER="$(dirname "$(pwd)")"
-echo $FOLDER
-sleep 2
-if [ ! -d "$FOLDER" ]; then
-	echo -e "Folder doesn't exist : ${ROUGE}ERROR${NORMAL}"
-	echo
-	exit 0
-fi
+    mkdir -p -- "${output_directory}"
+    cd -- "${output_directory}" && pwd -P
+}
 
-# generate translations
-php translate.php
-echo -e "- Generate translations : ${VERT}DONE${NORMAL}"
-# create files checksum
-php checkmd5.php
-echo -e "- Create files checksum : ${VERT}DONE${NORMAL}"
-sleep 3
-# remove TMP FOLDER
-rm -Rf "$FOLDER_TMP/*"
-remove_directory $FOLDER_TMP
-# copy files
-# copy files
-rsync -a --exclude='.DS_Store' "$FOLDER/" "$FOLDER_TMP/"
-# remove .gitkeep
-remove_files $FOLDER_TMP ".gitkeep"
-# remove dod
-remove_files $FOLDER_TMP "dod.md"
-# remove Readme
-remove_files $FOLDER_TMP "README.md"
-# remove licence
-remove_files $FOLDER_TMP "LICENCE.md"
-# remove .git
-remove_files $FOLDER_TMP ".git"
-# remove .github
-rm -Rf "$FOLDER_TMP/.github"
-# remove .gitignore
-remove_files $FOLDER_TMP ".gitignore"
-# remove .DS_Store
-remove_files $FOLDER_TMP ".DS_Store"
-# remove .idea
-remove_files $FOLDER_TMP ".idea"
-# remove .eslintrc
-remove_files $FOLDER_TMP ".eslintrc.js"
-remove_files $FOLDER_TMP ".eslintrc.json"
-# remove package-lock
-remove_files $FOLDER_TMP "package-lock.json"
-# remove phpunit
-remove_files $FOLDER_TMP "phpunit.xml.dist"
-# remove Jenkinsfile
-remove_files $FOLDER_TMP "Jenkinsfile"
-# clean Config Folder
-remove_files $FOLDER_CONFIG "marketplaces.json"
-# clean Log Folder
-remove_files $FOLDER_LOGS "*.txt"
-echo -e "- Clean logs folder : ${VERT}DONE${NORMAL}"
-# Clean export folder
-remove_files $FOLDER_EXPORT "*.csv"
-remove_files $FOLDER_EXPORT "*.yaml"
-remove_files $FOLDER_EXPORT "*.json"
-remove_files $FOLDER_EXPORT "*.xml"
-echo -e "- Clean export folder : ${VERT}DONE${NORMAL}"
-# remove tools folder
-remove_directory $FOLDER_TOOLS
-echo -e "- Remove Tools folder : ${VERT}DONE${NORMAL}"
-# remove yml translation folder
-remove_directory $FOLDER_TRANSLATION
-echo -e "- Remove Translation yml folder :${VERT}DONE${NORMAL}"
-# remove node_module folder
-remove_directory $FOLDER_NODE
-echo -e "- Remove node_module folder :${VERT}DONE${NORMAL}"
-# remove tests folder
-remove_directory $FOLDER_TEST
-echo -e "- Remove tests folder : ${VERT}DONE${NORMAL}"
-# remove bin folder
-remove_directory $FOLDER_BIN
-echo -e "- Remove bin folder : ${VERT}DONE${NORMAL}"
-sleep 3
-# make zip
-# make zip
-cd /tmp
-zip "-r" "$ARCHIVE_NAME" "LengowConnector"
-echo -e "- Build archive : ${VERT}DONE${NORMAL}"
-if [ -d  "~/Bureau" ]; then
-    mv "$ARCHIVE_NAME" ~/Bureau
-else
-    mv "$ARCHIVE_NAME" ~/shared
-fi
-sleep 3
-echo "End of build Shopware6 plugin."
+validate_administration_build()
+{
+    local source_directory="${REPOSITORY_ROOT}/${ADMINISTRATION_SOURCE}"
+    local output_directory="${REPOSITORY_ROOT}/${ADMINISTRATION_OUTPUT}"
+    local legacy_bundle="${output_directory}/js/lengow-connector.js"
+    local vite_manifest="${output_directory}/.vite/entrypoints.json"
+    local vite_bundle
+    local bundle
+    local newer
+
+    [[ -d "${source_directory}" ]] || die 'Missing administration sources'
+
+    # Shopware resolves the administration bundle differently depending on the major:
+    #   6.6 loads administration/js/<plugin>.js by convention
+    #   6.7 reads administration/.vite/entrypoints.json and loads assets/<plugin>-<hash>.js
+    # Each major ignores the other output, so a single archive carries both. Producing
+    # them means running the administration build once per major and keeping both
+    # results side by side: a build overwrites only its own format.
+    [[ -f "${legacy_bundle}" ]] \
+        || die "Missing the 6.6 administration bundle (${ADMINISTRATION_OUTPUT}/js/): run the administration build on Shopware 6.6"
+
+    [[ -f "${vite_manifest}" ]] \
+        || die "Missing the 6.7 administration manifest (${ADMINISTRATION_OUTPUT}/.vite/): run the administration build on Shopware 6.7"
+
+    vite_bundle="$(find "${output_directory}/assets" -maxdepth 1 -name '*.js' ! -name '*.map' -print -quit 2>/dev/null || true)"
+    [[ -n "${vite_bundle}" ]] \
+        || die "Missing the 6.7 administration bundle (${ADMINISTRATION_OUTPUT}/assets/): run the administration build on Shopware 6.7"
+
+    # An administration source newer than a built bundle means the archive would ship
+    # compiled code that does not match the sources it is built from.
+    for bundle in "${legacy_bundle}" "${vite_bundle}"; do
+        newer="$(find "${source_directory}" -type f -newer "${bundle}" -print -quit)"
+        [[ -z "${newer}" ]] \
+            || die "Administration bundle is stale (${newer#"${REPOSITORY_ROOT}/"} is newer than ${bundle#"${REPOSITORY_ROOT}/"}): rebuild the administration"
+    done
+}
+
+validate_archive()
+{
+    local archive_path="$1"
+    local archive_contents="${WORKSPACE}/archive-contents.txt"
+    local entry
+
+    unzip -Z1 "${archive_path}" > "${archive_contents}"
+
+    if ! grep -Fxq "${PACKAGE_DIRECTORY}/composer.json" "${archive_contents}"; then
+        die 'Archive is missing composer.json'
+    fi
+
+    if ! grep -Fxq "${PACKAGE_DIRECTORY}/src/LengowConnector.php" "${archive_contents}"; then
+        die 'Archive is missing the plugin entry point'
+    fi
+
+    if ! grep -Fxq "${PACKAGE_DIRECTORY}/src/Config/checkmd5.csv" "${archive_contents}"; then
+        die 'Archive is missing generated checksums'
+    fi
+
+    if ! grep -Fxq "${PACKAGE_DIRECTORY}/src/Translations/en-GB.csv" "${archive_contents}"; then
+        die 'Archive is missing generated translations'
+    fi
+
+    if ! grep -Fxq "${PACKAGE_DIRECTORY}/${ADMINISTRATION_OUTPUT}/js/lengow-connector.js" "${archive_contents}"; then
+        die 'Archive is missing the 6.6 administration bundle'
+    fi
+
+    if ! grep -Fxq "${PACKAGE_DIRECTORY}/${ADMINISTRATION_OUTPUT}/.vite/entrypoints.json" "${archive_contents}"; then
+        die 'Archive is missing the 6.7 administration manifest'
+    fi
+
+    while IFS= read -r entry; do
+        case "${entry}" in
+            "${PACKAGE_DIRECTORY}/")
+                continue
+                ;;
+            "${PACKAGE_DIRECTORY}/composer.json"|"${PACKAGE_DIRECTORY}/src/"*)
+                ;;
+            *)
+                die "Archive contains an unexpected root entry: ${entry}"
+                ;;
+        esac
+
+        case "${entry}" in
+            */.DS_Store|*/._*|*/.Spotlight-V100/*|*/.Trashes/*|*/Thumbs.db|*/Desktop.ini|*/ehthumbs.db|*/__MACOSX/*)
+                die "Archive contains operating-system metadata: ${entry}"
+                ;;
+            *.map)
+                die "Archive contains a source map: ${entry}"
+                ;;
+            "${PACKAGE_DIRECTORY}/src/Config/marketplaces.json")
+                die 'Archive contains local marketplace configuration'
+                ;;
+            "${PACKAGE_DIRECTORY}/src/Translations/yml/"*)
+                die "Archive contains translation source: ${entry}"
+                ;;
+            "${PACKAGE_DIRECTORY}/src/Logs/"|"${PACKAGE_DIRECTORY}/src/Logs/index.php")
+                ;;
+            "${PACKAGE_DIRECTORY}/src/Logs/"*)
+                die "Archive contains runtime log data: ${entry}"
+                ;;
+            "${PACKAGE_DIRECTORY}/src/Export/"|"${PACKAGE_DIRECTORY}/src/Export/index.php")
+                ;;
+            "${PACKAGE_DIRECTORY}/src/Export/"*)
+                die "Archive contains export data: ${entry}"
+                ;;
+        esac
+    done < "${archive_contents}"
+}
+
+main()
+{
+    local version
+    local output_directory="${REPOSITORY_ROOT}/dist"
+    local archive_name
+    local archive_path
+    local temporary_archive
+    local staging_root
+
+    if [[ "${1:-}" == '--help' || "${1:-}" == '-h' ]]; then
+        usage
+        return 0
+    fi
+
+    [[ $# -ge 1 ]] || {
+        usage >&2
+        die 'Version parameter is required'
+    }
+
+    version="$1"
+    shift
+    validate_version "${version}"
+
+    while [[ $# -gt 0 ]]; do
+        case "$1" in
+            --output)
+                [[ $# -ge 2 ]] || die 'Missing directory after --output'
+                output_directory="$2"
+                shift 2
+                ;;
+            --output=*)
+                output_directory="${1#--output=}"
+                [[ -n "${output_directory}" ]] || die 'Missing directory after --output='
+                shift
+                ;;
+            *)
+                die "Unknown option: $1"
+                ;;
+        esac
+    done
+
+    [[ -f "${REPOSITORY_ROOT}/composer.json" ]] || die 'Missing composer.json'
+    [[ -d "${REPOSITORY_ROOT}/src" ]] || die 'Missing src directory'
+    [[ -f "${REPOSITORY_ROOT}/tools/translate.php" ]] || die 'Missing translation generator'
+    [[ -f "${REPOSITORY_ROOT}/tools/checkmd5.php" ]] || die 'Missing checksum generator'
+
+    validate_administration_build
+
+    require_command php
+    require_command rsync
+    require_command unzip
+    require_command zip
+    php -r 'exit(function_exists("yaml_parse_file") ? 0 : 1);' \
+        || die 'The PHP YAML extension is required'
+
+    output_directory="$(resolve_output_directory "${output_directory}")"
+    case "${output_directory}" in
+        "${REPOSITORY_ROOT}/src"|"${REPOSITORY_ROOT}/src/"*)
+            die 'Output directory must not be inside src'
+            ;;
+    esac
+    archive_name="${ARCHIVE_PREFIX}.${version}.zip"
+    archive_path="${output_directory}/${archive_name}"
+
+    WORKSPACE="$(mktemp -d "${TMPDIR:-/tmp}/lengow-shopware6.XXXXXX")"
+    trap cleanup EXIT
+    staging_root="${WORKSPACE}/${PACKAGE_DIRECTORY}"
+    temporary_archive="${WORKSPACE}/${archive_name}"
+
+    mkdir -p -- "${staging_root}"
+    rsync -a -- "${REPOSITORY_ROOT}/composer.json" "${staging_root}/"
+
+    # Keep only runtime placeholders in the local log and export directories.
+    rsync -a -m \
+        --include='/Logs/' \
+        --include='/Logs/index.php' \
+        --exclude='/Logs/***' \
+        --include='/Export/' \
+        --include='/Export/index.php' \
+        --exclude='/Export/***' \
+        --exclude='/Config/marketplaces.json' \
+        --exclude='*.map' \
+        --exclude='.DS_Store' \
+        --exclude='._*' \
+        --exclude='.Spotlight-V100/***' \
+        --exclude='.Trashes/***' \
+        --exclude='Thumbs.db' \
+        --exclude='Desktop.ini' \
+        --exclude='ehthumbs.db' \
+        --exclude='__MACOSX/***' \
+        -- "${REPOSITORY_ROOT}/src/" "${staging_root}/src/"
+
+    mkdir -p -- "${staging_root}/tools"
+    cp -- "${REPOSITORY_ROOT}/tools/translate.php" "${REPOSITORY_ROOT}/tools/checkmd5.php" "${staging_root}/tools/"
+    php "${staging_root}/tools/translate.php"
+    php "${staging_root}/tools/checkmd5.php"
+    rm -rf -- "${staging_root}/tools" "${staging_root}/src/Translations/yml"
+
+    (
+        cd -- "${WORKSPACE}"
+        zip -qr "${temporary_archive}" "${PACKAGE_DIRECTORY}"
+    )
+    validate_archive "${temporary_archive}"
+    mv -f -- "${temporary_archive}" "${archive_path}"
+
+    printf 'Archive created: %s\n' "${archive_path}"
+}
+
+main "$@"

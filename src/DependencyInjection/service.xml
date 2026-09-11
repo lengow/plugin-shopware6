@@ -9,6 +9,7 @@
         <service id="Lengow\Connector\Service\LengowAccess">
             <argument type="service" id="Lengow\Connector\Service\LengowConfiguration"/>
             <argument type="service" id="sales_channel.repository"/>
+            <argument type="service" id="request_stack"/>
         </service>
 
         <service id="Lengow\Connector\Service\LengowAction">
@@ -149,8 +150,7 @@
         </service>
 
         <service id="Lengow\Connector\Service\LengowPayment">
-            <argument type="service" id="Shopware\Core\Checkout\Order\Aggregate\OrderTransaction\OrderTransactionStateHandler"/>
-            <tag name="shopware.payment.method.sync" />
+            <tag name="shopware.payment.method" />
         </service>
 
         <service id="Lengow\Connector\Service\LengowProduct">

@@ -108,7 +108,7 @@ class LengowLog
      *
      * @return string
      */
-    public function decodeMessage(string $message, string $isoCode = null, array $params = []): string
+    public function decodeMessage(string $message, ?string $isoCode = null, array $params = []): string
     {
         if (preg_match('/^(([a-z\_]*\.){1,3}[a-z\_]*)(\[(.*)\]|)$/', $message, $result) && $result[1] ?? false) {
             $key = $result[1];
@@ -137,7 +137,7 @@ class LengowLog
         string $category,
         string $message = '',
         bool $display = false,
-        string $marketplaceSku = null
+        ?string $marketplaceSku = null
     ): void
     {
         $decodedMessage = $this->decodeMessage($message, LengowTranslation::DEFAULT_ISO_CODE);
@@ -232,7 +232,7 @@ class LengowLog
      *
      * @param string|null $date date for a specific log file
      */
-    public function download(string $date = null): void
+    public function download(?string $date = null): void
     {
         /** @var LengowFile[] $logFiles */
         if ($date && preg_match('/^(\d{4}-\d{2}-\d{2})$/', $date)) {

@@ -81,8 +81,8 @@ class LengowMarketplace
         string $marketplaceCode,
         $marketplaceData,
         LengowAction $lengowAction,
-        Lengowlog $lengowLog,
-        lengowConfiguration $lengowConfiguration
+        LengowLog $lengowLog,
+        LengowConfiguration $lengowConfiguration
     )
     {
         $this->name = $marketplaceCode;
@@ -237,8 +237,8 @@ class LengowMarketplace
         string $action,
         LengowOrderEntity $lengowOrder,
         OrderEntity $order,
-        OrderDeliveryEntity $orderDelivery = null,
-        string $orderLineId = null
+        ?OrderDeliveryEntity $orderDelivery = null,
+        ?string $orderLineId = null
     ): bool
     {
         // check the action and order data
@@ -350,7 +350,7 @@ class LengowMarketplace
         array $marketplaceArguments,
         LengowOrderEntity $lengowOrder,
         OrderEntity $order,
-        OrderDeliveryEntity $orderDelivery = null
+        ?OrderDeliveryEntity $orderDelivery = null
     ): array
     {
         $params = [];
