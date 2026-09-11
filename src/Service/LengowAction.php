@@ -442,7 +442,7 @@ class LengowAction
      *
      * @return bool
      */
-    public function finishActions(string $orderId, string $actionType = null): bool
+    public function finishActions(string $orderId, ?string $actionType = null): bool
     {
         $result = true;
         $context = Context::createDefaultContext();

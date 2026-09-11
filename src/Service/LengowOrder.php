@@ -508,7 +508,7 @@ class LengowOrder
      *
      * @return LengowOrderEntity|null
      */
-    public function getLengowOrderByOrderNumber(string $orderNumber, string $marketplaceSku = null): ?LengowOrderEntity
+    public function getLengowOrderByOrderNumber(string $orderNumber, ?string $marketplaceSku = null): ?LengowOrderEntity
     {
         $context = Context::createDefaultContext();
         $criteria = new Criteria();
@@ -1148,7 +1148,7 @@ class LengowOrder
      *
      * @return bool
      */
-    public function callAction(string $action, OrderEntity $order, OrderDeliveryEntity $orderDelivery = null): bool
+    public function callAction(string $action, OrderEntity $order, ?OrderDeliveryEntity $orderDelivery = null): bool
     {
         $success = true;
         $lengowOrder = $this->getLengowOrderByOrderId($order->getId());

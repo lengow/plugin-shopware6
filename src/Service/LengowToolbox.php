@@ -304,7 +304,7 @@ class LengowToolbox
      *
      * @param string|null $fileName name of file to download
      */
-    public function downloadLog(string $fileName = null): void
+    public function downloadLog(?string $fileName = null): void
     {
         $this->lengowLog->download($fileName);
     }
@@ -340,8 +340,8 @@ class LengowToolbox
      * @return array
      */
     public function getOrderData(
-        string $marketplaceSku = null,
-        string $marketplaceName = null,
+        ?string $marketplaceSku = null,
+        ?string $marketplaceName = null,
         string $type = self::DATA_TYPE_ORDER
     ): array
     {
@@ -456,7 +456,7 @@ class LengowToolbox
             self::PLUGIN_PHP_VERSION => PHP_VERSION,
             self::PLUGIN_DEBUG_MODE_DISABLE => !$this->lengowConfiguration->debugModeIsActive(),
             self::PLUGIN_WRITE_PERMISSION => $this->testWritePermission(),
-            self::PLUGIN_SERVER_IP => $_SERVER['SERVER_ADDR'],
+            self::PLUGIN_SERVER_IP => $_SERVER['SERVER_ADDR'] ?? '',
             self::PLUGIN_AUTHORIZED_IP_ENABLE => $this->lengowConfiguration->get(
                 LengowConfiguration::AUTHORIZED_IP_ENABLED
             ),
@@ -729,7 +729,7 @@ class LengowToolbox
      *
      * @return array
      */
-    private function getAllOrderData(LengowOrderEntity $lengowOrder, OrderEntity $order = null): array
+    private function getAllOrderData(LengowOrderEntity $lengowOrder, ?OrderEntity $order = null): array
     {
         $orderTypes = $lengowOrder->getOrderTypes();
         // get merchant order id

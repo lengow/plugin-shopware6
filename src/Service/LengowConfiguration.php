@@ -475,7 +475,7 @@ class LengowConfiguration
      *
      * @return array|bool|float|int|string|null
      */
-    public function get(string $key, string $salesChannelId = null)
+    public function get(string $key, ?string $salesChannelId = null)
     {
         // get a Lengow configuration
         if (array_key_exists($key, self::$lengowSettings)) {
@@ -493,7 +493,7 @@ class LengowConfiguration
      *
      * @return EntityWrittenContainerEvent|void|null
      */
-    public function set(string $key, string $value, string $salesChannelId = null)
+    public function set(string $key, string $value, ?string $salesChannelId = null)
     {
         // set a Lengow configuration
         if (array_key_exists($key, self::$lengowSettings)) {
@@ -508,7 +508,7 @@ class LengowConfiguration
      *
      * @param string|null $salesChannelId Shopware sales channel id
      */
-    public function getToken(string $salesChannelId = null): string
+    public function getToken(?string $salesChannelId = null): string
     {
         if ($salesChannelId) {
             $token = $this->get(self::SHOP_TOKEN, $salesChannelId);
@@ -527,7 +527,7 @@ class LengowConfiguration
      *
      * @param string|null $salesChannelId Shopware sales channel id
      */
-    public function generateToken(string $salesChannelId = null): string
+    public function generateToken(?string $salesChannelId = null): string
     {
         $token = bin2hex(openssl_random_pseudo_bytes(16));
         if ($salesChannelId) {
@@ -778,7 +778,7 @@ class LengowConfiguration
      * @param int|null $timestamp gmt timestamp
      * @param string   $format    date format
      */
-    public function date(int $timestamp = null, string $format = EnvironmentInfoProvider::DATE_FULL): string
+    public function date(?int $timestamp = null, string $format = EnvironmentInfoProvider::DATE_FULL): string
     {
         $timestamp = $timestamp ?? time();
         $timezone = $this->getLengowTimezone();
@@ -793,7 +793,7 @@ class LengowConfiguration
      * @param int|null $timestamp gmt timestamp
      * @param string   $format    date format
      */
-    public function gmtDate(int $timestamp = null, string $format = EnvironmentInfoProvider::DATE_FULL): string
+    public function gmtDate(?int $timestamp = null, string $format = EnvironmentInfoProvider::DATE_FULL): string
     {
         $timestamp = $timestamp ?? time();
         $dateTime = new \DateTime();
@@ -806,7 +806,7 @@ class LengowConfiguration
      *
      * @param string|null $salesChannelId Shopware sales channel id
      */
-    public function getLengowActiveSalesChannels(string $salesChannelId = null): array
+    public function getLengowActiveSalesChannels(?string $salesChannelId = null): array
     {
         $result = [];
         /** @var SalesChannelCollection $salesChannelCollection */
@@ -848,7 +848,7 @@ class LengowConfiguration
      * @param string|null $salesChannelId Shopware sales channel id
      * @param bool        $toolbox        get all values for toolbox or not
      */
-    public function getAllValues(string $salesChannelId = null, bool $toolbox = false): array
+    public function getAllValues(?string $salesChannelId = null, bool $toolbox = false): array
     {
         $rows = [];
         foreach (self::$lengowSettings as $key => $keyParams) {
@@ -878,7 +878,7 @@ class LengowConfiguration
      *
      * @return array|bool|float|int|string|null
      */
-    private function getInShopwareConfig(string $key, string $salesChannelId = null)
+    private function getInShopwareConfig(string $key, ?string $salesChannelId = null)
     {
         return $this->systemConfigService->get($key, $salesChannelId);
     }
@@ -889,7 +889,7 @@ class LengowConfiguration
      *
      * @return array|bool|int|string|null
      */
-    private function getInLengowConfig(string $key, string $salesChannelId = null)
+    private function getInLengowConfig(string $key, ?string $salesChannelId = null)
     {
         $criteria = new Criteria();
         $criteria->addFilter(new MultiFilter(MultiFilter::CONNECTION_AND, [
@@ -927,7 +927,7 @@ class LengowConfiguration
     private function setInLengowConfig(
         string $key,
         string $value,
-        string $salesChannelId = null
+        ?string $salesChannelId = null
     ): ?EntityWrittenContainerEvent {
         $id = $this->getId($key, $salesChannelId, true);
         $data = [
@@ -948,7 +948,7 @@ class LengowConfiguration
      * @param string      $value          new config value
      * @param string|null $salesChannelId sales channel
      */
-    private function setInShopwareConfig(string $key, string $value, string $salesChannelId = null): void
+    private function setInShopwareConfig(string $key, string $value, ?string $salesChannelId = null): void
     {
         $this->systemConfigService->set($key, $value, $salesChannelId);
     }
@@ -957,7 +957,7 @@ class LengowConfiguration
      * @param string      $key            config name
      * @param string|null $salesChannelId sales channel
      */
-    private function getId(string $key, string $salesChannelId = null, bool $lengowSetting = false): ?string
+    private function getId(string $key, ?string $salesChannelId = null, bool $lengowSetting = false): ?string
     {
         $criteria = new Criteria();
         if ($lengowSetting) {
@@ -1042,7 +1042,7 @@ class LengowConfiguration
     public static function lengowSettingExist(
         EntityRepository $settingsRepository,
         string $key,
-        string $salesChannelId = null
+        ?string $salesChannelId = null
     ): bool {
         $criteria = new Criteria();
         $criteria->addFilter(new EqualsFilter(LengowSettingsDefinition::FIELD_NAME, $key));
