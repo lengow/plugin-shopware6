@@ -1,5 +1,18 @@
 # Changelog
 
+## [2.3.0](https://github.com/lengow/plugin-shopware6/compare/v2.2.5...v2.3.0) (2026-09-15)
+
+
+### Features
+
+* align reviewer assignment ([#53](https://github.com/lengow/plugin-shopware6/issues/53)) ([0fc0bb9](https://github.com/lengow/plugin-shopware6/commit/0fc0bb9484109f16a34c39c1e0f23644596bc19a))
+
+
+### Bug Fixes
+
+* **compatibility:** support Shopware 6.6.5 through 6.7.14 ([#58](https://github.com/lengow/plugin-shopware6/issues/58)) ([573264e](https://github.com/lengow/plugin-shopware6/commit/573264e0becb8af230df94be4e79cd19e8ec1c77))
+* **performance:** load the lengow products of one product.loaded event in a single query ([#57](https://github.com/lengow/plugin-shopware6/issues/57)) ([6f0c9ef](https://github.com/lengow/plugin-shopware6/commit/6f0c9ef1ce3ca2d5e22e5f1fb48ac7a00f703786))
+
 ## [2.2.5](https://github.com/lengow/plugin-shopware6/compare/v2.2.4...v2.2.5) (2026-08-06)
 
 
