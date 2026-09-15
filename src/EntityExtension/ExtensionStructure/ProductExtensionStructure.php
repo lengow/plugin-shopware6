@@ -29,7 +29,10 @@ class ProductExtensionStructure extends Struct
     public function __construct($activeInLengow = false, $activeArray = [])
     {
         foreach ($activeArray as $active) {
-            $this->activeArray[$active->salesChannelId] = true;
+            // Through the getter rather than the property: Entity::__get() would
+            // return it either way, but that leaves the code depending on magic
+            // access to a protected member.
+            $this->activeArray[$active->getSalesChannelId()] = true;
         }
         $this->active= $activeInLengow;
     }
