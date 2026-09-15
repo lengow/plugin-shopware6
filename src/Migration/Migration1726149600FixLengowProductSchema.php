@@ -79,11 +79,29 @@ class Migration1726149600FixLengowProductSchema extends MigrationStep
             self::LIVE_VERSION_ID,
             $columnName
         ));
-        $connection->executeStatement(sprintf(
-            'ALTER TABLE `%s` MODIFY `%s` BINARY(16) NOT NULL',
-            $tableName,
-            $columnName
-        ));
+        // MODIFY rebuilds the table and takes a metadata lock, so it must not run on
+        // every install, update and activation once the column is already NOT NULL.
+        // Reading is_nullable keeps the step both cheap and resumable: an interrupted
+        // run leaves the column nullable and the next one converts it.
+        $columnIsNullable = $connection->fetchOne(
+            'SELECT is_nullable
+            FROM information_schema.columns
+            WHERE table_schema = DATABASE()
+              AND table_name = :tableName
+              AND column_name = :columnName',
+            [
+                'tableName' => $tableName,
+                'columnName' => $columnName,
+            ]
+        ) === 'YES';
+
+        if ($columnIsNullable) {
+            $connection->executeStatement(sprintf(
+                'ALTER TABLE `%s` MODIFY `%s` BINARY(16) NOT NULL',
+                $tableName,
+                $columnName
+            ));
+        }
     }
 
     private function dropLegacyProductForeignKey(Connection $connection): void

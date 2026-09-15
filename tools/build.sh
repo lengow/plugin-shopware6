@@ -63,13 +63,39 @@ resolve_output_directory()
     cd -- "${output_directory}" && pwd -P
 }
 
+# Paths, relative to the administration output, of every file the Vite manifest
+# points Shopware at. Parsed with php, already a hard requirement of this script.
+referenced_administration_assets()
+{
+    local manifest="$1"
+
+    php -r '''
+        $manifest = json_decode(file_get_contents($argv[1]), true);
+        if (!is_array($manifest) || empty($manifest["entryPoints"])) {
+            exit(1);
+        }
+        $base = rtrim($manifest["base"] ?? "", "/") . "/";
+        foreach ($manifest["entryPoints"] as $entryPoint) {
+            foreach (["js", "css"] as $kind) {
+                foreach ($entryPoint[$kind] ?? [] as $file) {
+                    echo strpos($file, $base) === 0
+                        ? substr($file, strlen($base))
+                        : ltrim($file, "/"), PHP_EOL;
+                }
+            }
+        }
+    ''' -- "${manifest}"
+}
+
 validate_administration_build()
 {
     local source_directory="${REPOSITORY_ROOT}/${ADMINISTRATION_SOURCE}"
     local output_directory="${REPOSITORY_ROOT}/${ADMINISTRATION_OUTPUT}"
     local legacy_bundle="${output_directory}/js/lengow-connector.js"
     local vite_manifest="${output_directory}/.vite/entrypoints.json"
-    local vite_bundle
+    local referenced_assets
+    local vite_assets=()
+    local asset
     local bundle
     local newer
 
@@ -87,13 +113,25 @@ validate_administration_build()
     [[ -f "${vite_manifest}" ]] \
         || die "Missing the 6.7 administration manifest (${ADMINISTRATION_OUTPUT}/.vite/): run the administration build on Shopware 6.7"
 
-    vite_bundle="$(find "${output_directory}/assets" -maxdepth 1 -name '*.js' ! -name '*.map' -print -quit 2>/dev/null || true)"
-    [[ -n "${vite_bundle}" ]] \
-        || die "Missing the 6.7 administration bundle (${ADMINISTRATION_OUTPUT}/assets/): run the administration build on Shopware 6.7"
+    # Follow the manifest rather than picking a file out of assets/: an orphaned hash
+    # left by an earlier build would otherwise satisfy the check while the entry the
+    # manifest actually names is missing, shipping a broken 6.7 administration.
+    referenced_assets="$(referenced_administration_assets "${vite_manifest}")" \
+        || die "Unreadable 6.7 administration manifest (${ADMINISTRATION_OUTPUT}/.vite/entrypoints.json): rebuild the administration on Shopware 6.7"
+
+    [[ -n "${referenced_assets}" ]] \
+        || die "The 6.7 administration manifest references no asset: rebuild the administration on Shopware 6.7"
+
+    while IFS= read -r asset; do
+        [[ -n "${asset}" ]] || continue
+        [[ -f "${output_directory}/${asset}" ]] \
+            || die "The 6.7 administration manifest references a missing file (${ADMINISTRATION_OUTPUT}/${asset}): rebuild the administration on Shopware 6.7"
+        vite_assets+=("${output_directory}/${asset}")
+    done <<< "${referenced_assets}"
 
     # An administration source newer than a built bundle means the archive would ship
     # compiled code that does not match the sources it is built from.
-    for bundle in "${legacy_bundle}" "${vite_bundle}"; do
+    for bundle in "${legacy_bundle}" "${vite_assets[@]}"; do
         newer="$(find "${source_directory}" -type f -newer "${bundle}" -print -quit)"
         [[ -z "${newer}" ]] \
             || die "Administration bundle is stale (${newer#"${REPOSITORY_ROOT}/"} is newer than ${bundle#"${REPOSITORY_ROOT}/"}): rebuild the administration"

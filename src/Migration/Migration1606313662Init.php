@@ -155,13 +155,19 @@ class Migration1606313662Init extends MigrationStep
          */
         $connection->executeStatement('
             CREATE TABLE IF NOT EXISTS `lengow_product` (
-                `id`               BINARY(16)  NOT NULL,
-                `product_id`       BINARY(16)  NOT NULL,
-                `sales_channel_id` BINARY(16)  NOT NULL,
-                `created_at`       DATETIME(3) NOT NULL,
-                `updated_at`       DATETIME(3),
+                `id`                 BINARY(16)  NOT NULL,
+                `product_id`         BINARY(16)  NOT NULL,
+                `product_version_id` BINARY(16)  NOT NULL,
+                `sales_channel_id`   BINARY(16)  NOT NULL,
+                `created_at`         DATETIME(3) NOT NULL,
+                `updated_at`         DATETIME(3),
+                PRIMARY KEY (`id`),
                 FOREIGN KEY (`sales_channel_id`) REFERENCES sales_channel(`id`),
-                FOREIGN KEY (`product_id`)       REFERENCES product(`id`),
+                CONSTRAINT `fk_lengow_product_product_version`
+                    FOREIGN KEY (`product_id`, `product_version_id`)
+                    REFERENCES `product` (`id`, `version_id`)
+                    ON DELETE CASCADE,
+                INDEX `idx_lengow_product_product_version` (`product_id`, `product_version_id`),
                 INDEX (`product_id`, `sales_channel_id`)
             ) DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
         ');
