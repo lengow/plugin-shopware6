@@ -67,7 +67,7 @@ abstract class LengowAbstractFrontController extends StorefrontController
                 $errorMessage = $this->lengowLog->decodeMessage(
                     'log.export.unauthorised_ip',
                     LengowTranslation::DEFAULT_ISO_CODE,
-                    ['ip' => $_SERVER['REMOTE_ADDR']]
+                    ['ip' => $request->getClientIp() ?? '']
                 );
             } else {
                 $errorMessage = ($token && $token !== '')

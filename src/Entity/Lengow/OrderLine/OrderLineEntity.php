@@ -18,12 +18,32 @@ class OrderLineEntity extends Entity
     use EntityIdTrait;
 
     /**
-     * @var ShopwareOrderEntity
+     * @var string|null
+     */
+    protected $orderId;
+
+    /**
+     * @var string|null
+     */
+    protected $orderVersionId;
+
+    /**
+     * @var string|null
+     */
+    protected $productId;
+
+    /**
+     * @var string|null
+     */
+    protected $productVersionId;
+
+    /**
+     * @var ShopwareOrderEntity|null
      */
     protected $order;
 
     /**
-     * @var ShopwareProductEntity
+     * @var ShopwareProductEntity|null
      */
     protected $product;
 
@@ -32,44 +52,100 @@ class OrderLineEntity extends Entity
      */
     protected $orderLineId;
 
-    /**
-     * @var \DateTimeInterface|null
-     */
-    protected ?\DateTimeInterface $createdAt = null;
+
 
     /**
-     * @var \DateTimeInterface|null
+     * @return string|null
      */
-    protected ?\DateTimeInterface $updatedAt = null;
+    public function getOrderId(): ?string
+    {
+        return $this->orderId;
+    }
 
     /**
-     * @return ShopwareOrderEntity
+     * @param string|null $orderId
      */
-    public function getOrder(): ShopwareOrderEntity
+    public function setOrderId(?string $orderId): void
+    {
+        $this->orderId = $orderId;
+    }
+
+    /**
+     * @return string|null
+     */
+    public function getOrderVersionId(): ?string
+    {
+        return $this->orderVersionId;
+    }
+
+    /**
+     * @param string|null $orderVersionId
+     */
+    public function setOrderVersionId(?string $orderVersionId): void
+    {
+        $this->orderVersionId = $orderVersionId;
+    }
+
+    /**
+     * @return string|null
+     */
+    public function getProductId(): ?string
+    {
+        return $this->productId;
+    }
+
+    /**
+     * @param string|null $productId
+     */
+    public function setProductId(?string $productId): void
+    {
+        $this->productId = $productId;
+    }
+
+    /**
+     * @return string|null
+     */
+    public function getProductVersionId(): ?string
+    {
+        return $this->productVersionId;
+    }
+
+    /**
+     * @param string|null $productVersionId
+     */
+    public function setProductVersionId(?string $productVersionId): void
+    {
+        $this->productVersionId = $productVersionId;
+    }
+
+    /**
+     * @return ShopwareOrderEntity|null
+     */
+    public function getOrder(): ?ShopwareOrderEntity
     {
         return $this->order;
     }
 
     /**
-     * @param ShopwareOrderEntity $order
+     * @param ShopwareOrderEntity|null $order
      */
-    public function setOrder(ShopwareOrderEntity $order): void
+    public function setOrder(?ShopwareOrderEntity $order): void
     {
         $this->order = $order;
     }
 
     /**
-     * @return ShopwareProductEntity
+     * @return ShopwareProductEntity|null
      */
-    public function getProduct(): ShopwareProductEntity
+    public function getProduct(): ?ShopwareProductEntity
     {
         return $this->product;
     }
 
     /**
-     * @param ShopwareProductEntity $product
+     * @param ShopwareProductEntity|null $product
      */
-    public function setProduct(ShopwareProductEntity $product): void
+    public function setProduct(?ShopwareProductEntity $product): void
     {
         $this->product = $product;
     }

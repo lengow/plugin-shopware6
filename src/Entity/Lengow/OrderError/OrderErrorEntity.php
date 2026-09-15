@@ -17,7 +17,12 @@ class OrderErrorEntity extends Entity
     use EntityIdTrait;
 
     /**
-     * @var LengowOrderEntity
+     * @var string|null
+     */
+    protected $lengowOrderId;
+
+    /**
+     * @var LengowOrderEntity|null
      */
     protected $order;
 
@@ -41,28 +46,36 @@ class OrderErrorEntity extends Entity
      */
     protected $mail;
 
-    /**
-     * @var \DateTimeInterface|null
-     */
-    protected ?\DateTimeInterface $createdAt = null;
+
 
     /**
-     * @var \DateTimeInterface|null
+     * @return string|null
      */
-    protected ?\DateTimeInterface $updatedAt = null;
+    public function getLengowOrderId(): ?string
+    {
+        return $this->lengowOrderId;
+    }
 
     /**
-     * @return LengowOrderEntity
+     * @param string|null $lengowOrderId
      */
-    public function getOrder(): LengowOrderEntity
+    public function setLengowOrderId(?string $lengowOrderId): void
+    {
+        $this->lengowOrderId = $lengowOrderId;
+    }
+
+    /**
+     * @return LengowOrderEntity|null
+     */
+    public function getOrder(): ?LengowOrderEntity
     {
         return $this->order;
     }
 
     /**
-     * @param LengowOrderEntity $order
+     * @param LengowOrderEntity|null $order
      */
-    public function setOrder(LengowOrderEntity $order): void
+    public function setOrder(?LengowOrderEntity $order): void
     {
         $this->order = $order;
     }
@@ -103,6 +116,14 @@ class OrderErrorEntity extends Entity
      * @return bool
      */
     public function isFinished(): bool
+    {
+        return $this->isFinished;
+    }
+
+    /**
+     * @return bool
+     */
+    public function getIsFinished(): bool
     {
         return $this->isFinished;
     }

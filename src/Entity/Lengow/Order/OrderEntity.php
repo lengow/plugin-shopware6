@@ -6,6 +6,7 @@ use DateTimeInterface;
 use Shopware\Core\Framework\DataAbstractionLayer\Entity;
 use Shopware\Core\Framework\DataAbstractionLayer\EntityIdTrait;
 // OneToOne association class
+use Lengow\Connector\Entity\Lengow\OrderError\OrderErrorCollection as LengowOrderErrorCollection;
 use Shopware\Core\Checkout\Order\OrderEntity as ShopwareOrderEntity;
 use Shopware\Core\System\SalesChannel\SalesChannelEntity as ShopwareSalesChannelEntity;
 
@@ -18,17 +19,32 @@ class OrderEntity extends Entity
     use EntityIdTrait;
 
     /**
+     * @var string|null
+     */
+    protected $orderId;
+
+    /**
+     * @var string|null
+     */
+    protected $orderVersionId;
+
+    /**
      * @var ShopwareOrderEntity|null
      */
     protected $order;
 
     /**
-     * @var int|null
+     * @var string|null
      */
     protected $orderSku;
 
     /**
-     * @var ShopwareSalesChannelEntity
+     * @var string|null
+     */
+    protected $salesChannelId;
+
+    /**
+     * @var ShopwareSalesChannelEntity|null
      */
     protected $salesChannel;
 
@@ -162,15 +178,7 @@ class OrderEntity extends Entity
      */
     protected $message;
 
-    /**
-     * @var \DateTimeInterface|null
-     */
-    protected ?\DateTimeInterface $createdAt = null;
 
-    /**
-     * @var \DateTimeInterface|null
-     */
-    protected ?\DateTimeInterface $updatedAt = null;
 
     /**
      * @var DateTimeInterface|null
@@ -181,6 +189,43 @@ class OrderEntity extends Entity
      * @var array|null
      */
     protected $extra;
+
+    /**
+     * @var LengowOrderErrorCollection|null
+     */
+    protected $errors;
+
+    /**
+     * @return string|null
+     */
+    public function getOrderId(): ?string
+    {
+        return $this->orderId;
+    }
+
+    /**
+     * @param string|null $orderId
+     */
+    public function setOrderId(?string $orderId): void
+    {
+        $this->orderId = $orderId;
+    }
+
+    /**
+     * @return string|null
+     */
+    public function getOrderVersionId(): ?string
+    {
+        return $this->orderVersionId;
+    }
+
+    /**
+     * @param string|null $orderVersionId
+     */
+    public function setOrderVersionId(?string $orderVersionId): void
+    {
+        $this->orderVersionId = $orderVersionId;
+    }
 
     /**
      * @return ShopwareOrderEntity|null
@@ -199,33 +244,49 @@ class OrderEntity extends Entity
     }
 
     /**
-     * @return int|null
+     * @return string|null
      */
-    public function getOrderSku(): ?int
+    public function getOrderSku(): ?string
     {
         return $this->orderSku;
     }
 
     /**
-     * @param int|null $orderSku
+     * @param string|null $orderSku
      */
-    public function setOrderSku(?int $orderSku): void
+    public function setOrderSku(?string $orderSku): void
     {
         $this->orderSku = $orderSku;
     }
 
     /**
-     * @return ShopwareSalesChannelEntity
+     * @return string|null
      */
-    public function getSalesChannel(): ShopwareSalesChannelEntity
+    public function getSalesChannelId(): ?string
+    {
+        return $this->salesChannelId;
+    }
+
+    /**
+     * @param string|null $salesChannelId
+     */
+    public function setSalesChannelId(?string $salesChannelId): void
+    {
+        $this->salesChannelId = $salesChannelId;
+    }
+
+    /**
+     * @return ShopwareSalesChannelEntity|null
+     */
+    public function getSalesChannel(): ?ShopwareSalesChannelEntity
     {
         return $this->salesChannel;
     }
 
     /**
-     * @param ShopwareSalesChannelEntity $salesChannel
+     * @param ShopwareSalesChannelEntity|null $salesChannel
      */
-    public function setSalesChannel(ShopwareSalesChannelEntity $salesChannel): void
+    public function setSalesChannel(?ShopwareSalesChannelEntity $salesChannel): void
     {
         $this->salesChannel = $salesChannel;
     }
@@ -607,6 +668,14 @@ class OrderEntity extends Entity
     }
 
     /**
+     * @return bool
+     */
+    public function getIsInError(): bool
+    {
+        return $this->isInError;
+    }
+
+    /**
      * @param bool $isInError
      */
     public function setIsInError(bool $isInError): void
@@ -618,6 +687,14 @@ class OrderEntity extends Entity
      * @return bool
      */
     public function isReimported(): bool
+    {
+        return $this->isReimported;
+    }
+
+    /**
+     * @return bool
+     */
+    public function getIsReimported(): bool
     {
         return $this->isReimported;
     }
@@ -708,5 +785,21 @@ class OrderEntity extends Entity
     public function setExtra(?array $extra): void
     {
         $this->extra = $extra;
+    }
+
+    /**
+     * @return LengowOrderErrorCollection|null
+     */
+    public function getErrors(): ?LengowOrderErrorCollection
+    {
+        return $this->errors;
+    }
+
+    /**
+     * @param LengowOrderErrorCollection $errors
+     */
+    public function setErrors(LengowOrderErrorCollection $errors): void
+    {
+        $this->errors = $errors;
     }
 }

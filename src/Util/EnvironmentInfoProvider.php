@@ -196,7 +196,7 @@ class EnvironmentInfoProvider
      *
      * @return string|null
      */
-    public function getBaseUrl(string $salesChannelId = null, string $languageId = null): ?string
+    public function getBaseUrl(?string $salesChannelId = null, ?string $languageId = null): ?string
     {
         $context = Context::createDefaultContext();
         $languageId = $languageId ?? $context->getLanguageId();

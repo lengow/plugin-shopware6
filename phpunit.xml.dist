@@ -1,14 +1,15 @@
 <?xml version="1.0" encoding="UTF-8"?>
 
 <phpunit xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
-         xsi:noNamespaceSchemaLocation="http://schema.phpunit.de/7.1/phpunit.xsd"
-         bootstrap="../../../vendor/shopware/platform/src/Core/TestBootstrap.php"
-         cacheResult="false">
+         xsi:noNamespaceSchemaLocation="https://schema.phpunit.de/10.5/phpunit.xsd"
+         bootstrap="../../../vendor/shopware/core/TestBootstrap.php"
+         cacheDirectory=".phpunit.cache"
+         displayDetailsOnTestsThatTriggerWarnings="true"
+         displayDetailsOnTestsThatTriggerErrors="true">
 
     <php>
         <ini name="error_reporting" value="-1"/>
-        <server name="KERNEL_CLASS" value="Shopware\Development\Kernel"/>
-        <env name="APP_ENV" value=""/>
+        <env name="APP_ENV" value="test"/>
         <env name="APP_DEBUG" value="1"/>
         <env name="SHELL_VERBOSITY" value="-1"/>
     </php>
@@ -19,9 +20,12 @@
         </testsuite>
     </testsuites>
 
-    <filter>
-        <whitelist>
-            <directory suffix=".php">./</directory>
-        </whitelist>
-    </filter>
+    <source>
+        <include>
+            <directory suffix=".php">src/</directory>
+        </include>
+        <exclude>
+            <directory suffix=".php">src/Resources</directory>
+        </exclude>
+    </source>
 </phpunit>

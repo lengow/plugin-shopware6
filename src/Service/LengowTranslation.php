@@ -49,7 +49,7 @@ class LengowTranslation
      *
      * @return string
      */
-    public function t(string $message, array $args = [], string $isoCode = null): string
+    public function t(string $message, array $args = [], ?string $isoCode = null): string
     {
         if ($isoCode === null) {
             $isoCode = $this->environmentInfoProvider->getLocaleCode();

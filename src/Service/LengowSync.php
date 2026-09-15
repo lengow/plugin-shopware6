@@ -501,7 +501,7 @@ class LengowSync
      *
      * @return array
      */
-    public function getPluginLinks(string $isoCode = null): array
+    public function getPluginLinks(?string $isoCode = null): array
     {
         $pluginData = $this->getPluginData();
         if (!$pluginData) {

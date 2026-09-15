@@ -9,9 +9,11 @@ use Shopware\Core\Framework\DataAbstractionLayer\Field\Flag\PrimaryKey;
 use Shopware\Core\Framework\DataAbstractionLayer\Field\Flag\Required;
 use Shopware\Core\Framework\DataAbstractionLayer\Field\Flag\SetNullOnDelete;
 // Field types
+use Shopware\Core\Framework\DataAbstractionLayer\Field\FkField;
 use Shopware\Core\Framework\DataAbstractionLayer\Field\IdField;
+use Shopware\Core\Framework\DataAbstractionLayer\Field\ManyToOneAssociationField;
+use Shopware\Core\Framework\DataAbstractionLayer\Field\ReferenceVersionField;
 use Shopware\Core\Framework\DataAbstractionLayer\Field\StringField;
-use Shopware\Core\Framework\DataAbstractionLayer\Field\OneToOneAssociationField;
 // Model Return Type
 use Shopware\Core\Framework\DataAbstractionLayer\FieldCollection;
 // OneToOne association class
@@ -66,11 +68,13 @@ class OrderLineDefinition extends EntityDefinition
         return new FieldCollection(
             [
                 (new IdField('id', self::FIELD_ID))->addFlags(new Required(), new PrimaryKey()),
-                (new IdField('order_id', self::FIELD_ORDER_ID)),
-                (new OneToOneAssociationField('order', 'order_id', 'id', ShopwareOrderDefinition::class))
+                (new FkField('order_id', self::FIELD_ORDER_ID, ShopwareOrderDefinition::class))->addFlags(new Required()),
+                (new ReferenceVersionField(ShopwareOrderDefinition::class, 'order_version_id'))->addFlags(new Required()),
+                (new ManyToOneAssociationField('order', 'order_id', ShopwareOrderDefinition::class, 'id'))
                     ->addFlags(new setNullOnDelete()),
-                (new IdField('product_id', self::FIELD_PRODUCT_ID)),
-                (new OneToOneAssociationField('product', 'product_id', 'id', ShopwareProductDefinition::class))
+                (new FkField('product_id', self::FIELD_PRODUCT_ID, ShopwareProductDefinition::class))->addFlags(new Required()),
+                (new ReferenceVersionField(ShopwareProductDefinition::class, 'product_version_id'))->addFlags(new Required()),
+                (new ManyToOneAssociationField('product', 'product_id', ShopwareProductDefinition::class, 'id'))
                     ->addFlags(new SetNullOnDelete()),
                 (new StringField('order_line_id', self::FIELD_ORDER_LINE_ID))->addFlags(new Required()),
             ]

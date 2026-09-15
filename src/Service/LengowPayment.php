@@ -2,43 +2,58 @@
 
 namespace Lengow\Connector\Service;
 
-use Shopware\Core\Checkout\Payment\Cart\PaymentHandler\SynchronousPaymentHandlerInterface;
-use Shopware\Core\Checkout\Payment\Cart\SyncPaymentTransactionStruct;
-use Shopware\Core\Checkout\Order\Aggregate\OrderTransaction\OrderTransactionStateHandler;
-use Shopware\Core\Framework\Validation\DataBag\RequestDataBag;
-use Shopware\Core\System\SalesChannel\SalesChannelContext;
+use Shopware\Core\Checkout\Payment\Cart\PaymentHandler\AbstractPaymentHandler;
+use Shopware\Core\Checkout\Payment\Cart\PaymentHandler\PaymentHandlerType;
+use Shopware\Core\Checkout\Payment\Cart\PaymentTransactionStruct;
+use Shopware\Core\Framework\Context;
+use Shopware\Core\Framework\Struct\Struct;
+use Symfony\Component\HttpFoundation\RedirectResponse;
+use Symfony\Component\HttpFoundation\Request;
 
 /**
  * Class LengowPayment
  * @package Lengow\Connector\Service
+ *
+ * Payment handler attached to the Lengow payment method. Orders imported from
+ * a marketplace are already paid there, so nothing has to be captured here.
+ *
+ * Extends AbstractPaymentHandler, which is available from Shopware 6.6 and is
+ * the only remaining payment handler contract in 6.7: the former
+ * SynchronousPaymentHandlerInterface was removed in that version.
  */
-class LengowPayment implements SynchronousPaymentHandlerInterface
+class LengowPayment extends AbstractPaymentHandler
 {
     /**
-     * @var OrderTransactionStateHandler
-     */
-    private $transactionStateHandler;
-
-    /**
-     * LengowPayment constructor
+     * No refund, recurring or prepared payment flow is handled by this method
      *
-     * @param OrderTransactionStateHandler $transactionStateHandler
+     * @param PaymentHandlerType $type payment handler type to check
+     * @param string $paymentMethodId payment method id
+     * @param Context $context shopware context
+     *
+     * @return bool
      */
-    public function __construct(OrderTransactionStateHandler $transactionStateHandler)
+    public function supports(PaymentHandlerType $type, string $paymentMethodId, Context $context): bool
     {
-        $this->transactionStateHandler = $transactionStateHandler;
+        return false;
     }
 
     /**
-     * @param SyncPaymentTransactionStruct $transaction
-     * @param RequestDataBag $dataBag
-     * @param SalesChannelContext $salesChannelContext
+     * Nothing to capture: the marketplace already collected the payment
+     *
+     * @param Request $request current request
+     * @param PaymentTransactionStruct $transaction payment transaction
+     * @param Context $context shopware context
+     * @param Struct|null $validateStruct data returned by validate()
+     *
+     * @return RedirectResponse|null always null, no redirect is required
      */
     public function pay(
-        SyncPaymentTransactionStruct $transaction,
-        RequestDataBag $dataBag,
-        SalesChannelContext $salesChannelContext
-    ): void
+        Request $request,
+        PaymentTransactionStruct $transaction,
+        Context $context,
+        ?Struct $validateStruct
+    ): ?RedirectResponse
     {
+        return null;
     }
 }

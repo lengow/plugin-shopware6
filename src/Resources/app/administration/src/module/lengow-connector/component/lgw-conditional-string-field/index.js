@@ -67,9 +67,20 @@ Component.register('lgw-conditional-string-field', {
         }
     },
 
+    watch: {
+        locked(newVal) {
+            this.newLocked = this.normalizeSwitchValue(newVal);
+        }
+    },
+
     methods: {
+        normalizeSwitchValue(value) {
+            return value === true || value === 1 || value === '1';
+        },
+
         onSwitchChange(newValue) {
-            this.newLocked = newValue;
+            this.newLocked = this.normalizeSwitchValue(newValue);
+            this.onSaveSettings(this.newLocked, this.switchSettingsKey, this.settingsSalesChannelId);
         }
     }
 });

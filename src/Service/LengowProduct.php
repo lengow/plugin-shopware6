@@ -254,7 +254,7 @@ class LengowProduct
         string $attributeName,
         string $attributeValue,
         bool $logOutput = false,
-        string $marketplaceSku = null
+        ?string $marketplaceSku = null
     ): ?ProductEntity
     {
         // remove _FBA from product id
@@ -989,7 +989,7 @@ class LengowProduct
      *
      * @return float|null
      */
-    private function getAppliedShippingRule(float $price = null, float $weight = null, float $volume = null): ?float
+    private function getAppliedShippingRule(?float $price = null, ?float $weight = null, ?float $volume = null): ?float
     {
         $costsByPriority = [];
         if ($this->shippingMethod->getPrices()->count() > 0) {
@@ -1079,7 +1079,7 @@ class LengowProduct
      *
      * @return string the breadcrumb
      */
-    private function getProductCategory(ProductEntity $product, ProductEntity $parentProduct = null): string
+    private function getProductCategory(ProductEntity $product, ?ProductEntity $parentProduct = null): string
     {
         $mainCategory = null;
         $breadcrumb = '';

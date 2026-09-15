@@ -23,7 +23,7 @@ Component.register('lgw-toolbox', {
         this.createdComponent();
     },
 
-    beforeDestroy() {
+    beforeUnmount() {
         Shopware.State.unregisterModule('lgwToolbox');
     },
 

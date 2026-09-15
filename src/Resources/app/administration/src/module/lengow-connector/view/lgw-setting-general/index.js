@@ -174,17 +174,32 @@ Component.register('lgw-setting-general', {
     },
 
     methods: {
+        getConfigEntries(key) {
+            const value = this.config[key];
+            return Array.isArray(value) ? value : [];
+        },
+
+        salesChannelMatches(entry, salesChannelId) {
+            if (!entry) {
+                return false;
+            }
+            const entrySalesChannelId = entry.salesChannel?.id || entry.salesChannelId;
+            return entrySalesChannelId === salesChannelId;
+        },
+
         getConfigCatalogIdValue(salesChannelId) {
-            const catalogIdValue = this.config.lengowCatalogId.find(elem => elem.salesChannel.id === salesChannelId);
-            if (catalogIdValue !== 'undefined') {
+            const catalogIdValue = this.getConfigEntries('lengowCatalogId').find(
+                elem => this.salesChannelMatches(elem, salesChannelId)
+            );
+            if (catalogIdValue && typeof catalogIdValue.value !== 'undefined') {
                 return catalogIdValue.value;
             }
             return '';
         },
 
         getConfigSalesChannelEnabledValue(salesChannelId) {
-            return this.config.lengowStoreEnabled.some(
-                elem => elem.salesChannel.id === salesChannelId && elem.value === '1'
+            return this.getConfigEntries('lengowStoreEnabled').some(
+                elem => this.salesChannelMatches(elem, salesChannelId) && elem.value === '1'
             );
         },
 

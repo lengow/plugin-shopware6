@@ -17,6 +17,11 @@ class SettingsEntity extends Entity
     use EntityIdTrait;
 
     /**
+     * @var string|null
+     */
+    protected $salesChannelId;
+
+    /**
      * @var ShopwareSalesChannelEntity|null
      */
     protected $salesChannel;
@@ -31,15 +36,23 @@ class SettingsEntity extends Entity
      */
     protected $value;
 
-    /**
-     * @var \DateTimeInterface|null
-     */
-    protected ?\DateTimeInterface $createdAt = null;
+
 
     /**
-     * @var \DateTimeInterface|null
+     * @return string|null
      */
-    protected ?\DateTimeInterface $updatedAt = null;
+    public function getSalesChannelId(): ?string
+    {
+        return $this->salesChannelId;
+    }
+
+    /**
+     * @param string|null $salesChannelId
+     */
+    public function setSalesChannelId(?string $salesChannelId): void
+    {
+        $this->salesChannelId = $salesChannelId;
+    }
 
     /**
      * @return ShopwareSalesChannelEntity|null

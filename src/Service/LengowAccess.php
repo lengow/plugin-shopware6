@@ -7,6 +7,7 @@ use Shopware\Core\Framework\DataAbstractionLayer\Search\Criteria;
 use Shopware\Core\Framework\DataAbstractionLayer\Search\Filter\EqualsFilter;
 use Shopware\Core\Framework\DataAbstractionLayer\EntityRepository;
 use Shopware\Core\Framework\Uuid\Uuid;
+use Symfony\Component\HttpFoundation\RequestStack;
 
 /**
  * Class LengowAccess
@@ -58,18 +59,39 @@ class LengowAccess
     private $salesChannelRepository;
 
     /**
+     * @var RequestStack $requestStack current request stack
+     */
+    private $requestStack;
+
+    /**
      * LengowAccess constructor
      *
      * @param LengowConfiguration $lengowConfiguration configuration access service
      * @param EntityRepository $salesChannelRepository shopware sales channel repository
+     * @param RequestStack $requestStack current request stack
      */
     public function __construct(
         LengowConfiguration $lengowConfiguration,
-        EntityRepository $salesChannelRepository
+        EntityRepository $salesChannelRepository,
+        RequestStack $requestStack
     )
     {
         $this->lengowConfiguration = $lengowConfiguration;
         $this->salesChannelRepository = $salesChannelRepository;
+        $this->requestStack = $requestStack;
+    }
+
+    /**
+     * Get the client ip of the current request
+     *
+     * Relies on the request stack so trusted proxy headers are honoured, and
+     * stays defined when no request is available (cli, scheduled tasks).
+     *
+     * @return string client ip or an empty string
+     */
+    private function getClientIp(): string
+    {
+        return $this->requestStack->getCurrentRequest()?->getClientIp() ?? '';
     }
 
     /**
@@ -79,7 +101,7 @@ class LengowAccess
      *
      * @return string|null
      */
-    public function checkSalesChannel(string $salesChannelId = null): ?string
+    public function checkSalesChannel(?string $salesChannelId = null): ?string
     {
         if ($salesChannelId === null || !Uuid::isValid($salesChannelId)) {
             return null;
@@ -105,9 +127,9 @@ class LengowAccess
      *
      * @return bool
      */
-    public function checkWebserviceAccess(string $token = null, string $salesChannelId = null): bool
+    public function checkWebserviceAccess(?string $token = null, ?string $salesChannelId = null): bool
     {
-        return $this->checkIp($_SERVER['REMOTE_ADDR'])
+        return $this->checkIp($this->getClientIp())
             || ($token
                 && !$this->lengowConfiguration->get(LengowConfiguration::AUTHORIZED_IP_ENABLED)
                 && $this->checkToken($token, $salesChannelId)
@@ -152,7 +174,7 @@ class LengowAccess
      *
      * @return bool
      */
-    public function checkToken(string $token, string $salesChannelId = null): bool
+    public function checkToken(string $token, ?string $salesChannelId = null): bool
     {
         $configToken = $this->lengowConfiguration->getToken($salesChannelId);
         if ($token && !empty($configToken)) {

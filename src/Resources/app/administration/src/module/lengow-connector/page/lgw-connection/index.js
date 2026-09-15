@@ -33,7 +33,7 @@ Component.register('lgw-connection', {
         this.createdComponent();
     },
 
-    beforeDestroy() {
+    beforeUnmount() {
         Shopware.State.unregisterModule('lgwConnection');
     },
 

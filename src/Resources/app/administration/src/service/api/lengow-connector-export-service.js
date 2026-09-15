@@ -50,14 +50,17 @@ class LengowConnectorExportService extends ApiService {
             });
     }
 
-    getProductList(salesChannelId) {
+    getProductList(salesChannelId, includeVariants = false) {
         const headers = this.getBasicHeaders();
         return this.httpClient
             .get(
                 `_action/${this.getApiBasePath()}/export/get-product-list`,
                 {
                     headers: headers,
-                    params: { salesChannelId: salesChannelId }
+                    params: {
+                        salesChannelId: salesChannelId,
+                        includeVariants: includeVariants
+                    }
                 }
             )
             .then((response) => {

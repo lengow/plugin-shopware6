@@ -38,7 +38,7 @@
                           :closable="false"
                           :isLoading="modalLoading">
                     {{ $tc('lengow-connector.order_tab.check_cancel_and_reimport') }}
-                    <template slot="modal-footer">
+                    <template #modal-footer>
                         <sw-button
                                    :square="false"
                                    :block="false"
@@ -61,91 +61,93 @@
                     </template>
                 </sw-modal>
             </div>
-            <sw-container slot="grid" type="row">
-                <sw-card-section>
-                    <sw-container columns="repeat(auto-fit, minmax(250px, 1fr))" gap="30px 30px">
+            <template #grid>
+                <sw-container type="row">
+                    <sw-card-section>
+                        <sw-container columns="repeat(auto-fit, minmax(250px, 1fr))" gap="30px 30px">
+                            <sw-description-list columns="1fr" grid="1fr">
+                                <dt>{{ $tc('lengow-connector.order_tab.order_id') }}</dt>
+                                <dd>{{ marketplaceSku }}</dd>
+
+                                <dt>{{ $tc('lengow-connector.order_tab.marketplace') }}</dt>
+                                <dd>{{ marketplaceName }}</dd>
+
+                                <dt>{{ $tc('lengow-connector.order_tab.delivery_address_id') }}</dt>
+                                <dd>{{ deliveryAddressId }}</dd>
+
+                                <dt>{{ $tc('lengow-connector.order_tab.order_status') }}</dt>
+                                <dd>{{ orderLengowState }}</dd>
+
+                                <dt>{{ $tc('lengow-connector.order_tab.total_paid') }}</dt>
+                                <dd>{{ totalPaid }}</dd>
+
+                                <dt>{{ $tc('lengow-connector.order_tab.commission') }}</dt>
+                                <dd>{{ commission }}</dd>
+
+                                <dt>{{ $tc('lengow-connector.order_tab.currency') }}</dt>
+                                <dd>{{ currency }}</dd>
+
+                                <dt>{{ $tc('lengow-connector.order_tab.customer_name') }}</dt>
+                                <dd>{{ customerName }}</dd>
+
+                                <dt>{{ $tc('lengow-connector.order_tab.customer_email') }}</dt>
+                                <dd>{{ customerEmail }}</dd>
+
+                                <dt>{{ $tc('lengow-connector.order_tab.carrier') }}</dt>
+                                <dd>{{ carrier }}</dd>
+                            </sw-description-list>
+                            <sw-description-list columns="1fr" grid="1fr">
+                                <dt>{{ $tc('lengow-connector.order_tab.carrier_method') }}</dt>
+                                <dd>{{ carrierMethod }}</dd>
+
+                                <dt>{{ $tc('lengow-connector.order_tab.carrier_tracking') }}</dt>
+                                <dd>{{ carrierTracking }}</dd>
+
+                                <dt>{{ $tc('lengow-connector.order_tab.carrier_id_relay') }}</dt>
+                                <dd>{{ carrierIdRelay }}</dd>
+
+                                <dt>{{ $tc('lengow-connector.order_tab.is_express') }}</dt>
+                                <dd>
+                                    <span v-if="isExpress">{{ $tc('lengow-connector.order_tab.status_yes') }}</span>
+                                    <span v-else>{{ $tc('lengow-connector.order_tab.status_no') }}</span>
+                                </dd>
+
+                                <dt>{{ $tc('lengow-connector.order_tab.is_delivered_by_marketplace') }}</dt>
+                                <dd>
+                                    <span v-if="isShippedByMarketplace">{{ $tc('lengow-connector.order_tab.status_yes') }}</span>
+                                    <span v-else>{{ $tc('lengow-connector.order_tab.status_no') }}</span>
+                                </dd>
+
+                                <dt>{{ $tc('lengow-connector.order_tab.is_business') }}</dt>
+                                <dd>
+                                    <span v-if="isB2b">{{ $tc('lengow-connector.order_tab.status_yes') }}</span>
+                                    <span v-else>{{ $tc('lengow-connector.order_tab.status_no') }}</span>
+                                </dd>
+
+                                <dt>{{ $tc('lengow-connector.order_tab.vat_number') }}</dt>
+                                <dd>{{ customerVatNumber }}</dd>
+
+                                <dt>{{ $tc('lengow-connector.order_tab.order_date') }}</dt>
+                                <dd>{{ orderDate }}</dd>
+
+                                <dt>{{ $tc('lengow-connector.order_tab.import_date') }}</dt>
+                                <dd>{{ importedAt }}</dd>
+
+                                <dt>{{ $tc('lengow-connector.order_tab.message') }}</dt>
+                                <dd>{{ message }}</dd>
+                            </sw-description-list>
+                        </sw-container>
+                    </sw-card-section>
+                    <sw-card-section divider="top" secondary slim>
                         <sw-description-list columns="1fr" grid="1fr">
-                            <dt>{{ $tc('lengow-connector.order_tab.order_id') }}</dt>
-                            <dd>{{ marketplaceSku }}</dd>
-
-                            <dt>{{ $tc('lengow-connector.order_tab.marketplace') }}</dt>
-                            <dd>{{ marketplaceName }}</dd>
-
-                            <dt>{{ $tc('lengow-connector.order_tab.delivery_address_id') }}</dt>
-                            <dd>{{ deliveryAddressId }}</dd>
-
-                            <dt>{{ $tc('lengow-connector.order_tab.order_status') }}</dt>
-                            <dd>{{ orderLengowState }}</dd>
-
-                            <dt>{{ $tc('lengow-connector.order_tab.total_paid') }}</dt>
-                            <dd>{{ totalPaid }}</dd>
-
-                            <dt>{{ $tc('lengow-connector.order_tab.commission') }}</dt>
-                            <dd>{{ commission }}</dd>
-
-                            <dt>{{ $tc('lengow-connector.order_tab.currency') }}</dt>
-                            <dd>{{ currency }}</dd>
-
-                            <dt>{{ $tc('lengow-connector.order_tab.customer_name') }}</dt>
-                            <dd>{{ customerName }}</dd>
-
-                            <dt>{{ $tc('lengow-connector.order_tab.customer_email') }}</dt>
-                            <dd>{{ customerEmail }}</dd>
-
-                            <dt>{{ $tc('lengow-connector.order_tab.carrier') }}</dt>
-                            <dd>{{ carrier }}</dd>
+                            <dt>{{ $tc('lengow-connector.order_tab.extra') }}</dt>
+                            <dd>
+                                <textarea class="lgw-text-wrapper" rows="10">{{ extra }}</textarea>
+                            </dd>
                         </sw-description-list>
-                        <sw-description-list columns="1fr" grid="1fr">
-                            <dt>{{ $tc('lengow-connector.order_tab.carrier_method') }}</dt>
-                            <dd>{{ carrierMethod }}</dd>
-
-                            <dt>{{ $tc('lengow-connector.order_tab.carrier_tracking') }}</dt>
-                            <dd>{{ carrierTracking }}</dd>
-
-                            <dt>{{ $tc('lengow-connector.order_tab.carrier_id_relay') }}</dt>
-                            <dd>{{ carrierIdRelay }}</dd>
-
-                            <dt>{{ $tc('lengow-connector.order_tab.is_express') }}</dt>
-                            <dd>
-                                <span v-if="isExpress">{{ $tc('lengow-connector.order_tab.status_yes') }}</span>
-                                <span v-else>{{ $tc('lengow-connector.order_tab.status_no') }}</span>
-                            </dd>
-
-                            <dt>{{ $tc('lengow-connector.order_tab.is_delivered_by_marketplace') }}</dt>
-                            <dd>
-                                <span v-if="isShippedByMarketplace">{{ $tc('lengow-connector.order_tab.status_yes') }}</span>
-                                <span v-else>{{ $tc('lengow-connector.order_tab.status_no') }}</span>
-                            </dd>
-
-                            <dt>{{ $tc('lengow-connector.order_tab.is_business') }}</dt>
-                            <dd>
-                                <span v-if="isB2b">{{ $tc('lengow-connector.order_tab.status_yes') }}</span>
-                                <span v-else>{{ $tc('lengow-connector.order_tab.status_no') }}</span>
-                            </dd>
-
-                            <dt>{{ $tc('lengow-connector.order_tab.vat_number') }}</dt>
-                            <dd>{{ customerVatNumber }}</dd>
-
-                            <dt>{{ $tc('lengow-connector.order_tab.order_date') }}</dt>
-                            <dd>{{ orderDate }}</dd>
-
-                            <dt>{{ $tc('lengow-connector.order_tab.import_date') }}</dt>
-                            <dd>{{ importedAt }}</dd>
-
-                            <dt>{{ $tc('lengow-connector.order_tab.message') }}</dt>
-                            <dd>{{ message }}</dd>
-                        </sw-description-list>
-                    </sw-container>
-                </sw-card-section>
-                <sw-card-section divider="top" secondary slim>
-                    <sw-description-list columns="1fr" grid="1fr">
-                        <dt>{{ $tc('lengow-connector.order_tab.extra') }}</dt>
-                        <dd>
-                            <textarea class="lgw-text-wrapper" rows="10">{{ extra }}</textarea>
-                        </dd>
-                    </sw-description-list>
-                </sw-card-section>
-            </sw-container>
+                    </sw-card-section>
+                </sw-container>
+            </template>
         </template>
         <template v-else>
             <sw-container>

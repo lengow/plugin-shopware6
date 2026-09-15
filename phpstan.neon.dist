@@ -1,0 +1,17 @@
+parameters:
+    level: 5
+    paths:
+        - src
+    excludePaths:
+        analyse:
+            - src/Resources/app
+            - src/Resources/public
+    # The plugin has no vendor of its own: it is analysed from inside a
+    # Shopware installation, so the host autoloader is what resolves
+    # Shopware\Core\* and Symfony\* classes.
+    bootstrapFiles:
+        - ../../../vendor/autoload.php
+    treatPhpDocTypesAsCertain: false
+    # tests/ is analysed only when the dev dependencies are installed:
+    # a production Shopware install has no PHPUnit in its autoloader.
+    reportUnmatchedIgnoredErrors: false

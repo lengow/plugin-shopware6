@@ -86,6 +86,7 @@ class LengowConnector
         CURLOPT_RETURNTRANSFER => true,
         CURLOPT_TIMEOUT => 10,
         CURLOPT_USERAGENT => 'lengow-cms-shopware6',
+        CURLOPT_ENCODING => '',
     ];
 
     /**

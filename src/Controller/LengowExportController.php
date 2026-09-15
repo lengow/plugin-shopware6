@@ -100,12 +100,13 @@ class LengowExportController extends AbstractController
     {
         if ($request->get('salesChannelId')) {
             $salesChannelId = $request->get('salesChannelId');
+            $includeVariants = filter_var($request->get('includeVariants'), FILTER_VALIDATE_BOOLEAN);
             $this->lengowExport->init([
                 LengowExport::PARAM_SALES_CHANNEL_ID => $salesChannelId,
             ]);
             $response = [
                 'success' => true,
-                'productList' => $this->lengowExport->getAllProductIdForSalesChannel(),
+                'productList' => $this->lengowExport->getAllProductIdForSalesChannel($includeVariants),
             ];
         } else {
             $response = [

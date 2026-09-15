@@ -69,15 +69,28 @@ Component.register('lgw-setting-export', {
     },
 
     methods: {
+        getConfigEntries(key) {
+            const value = this.config[key];
+            return Array.isArray(value) ? value : [];
+        },
+
+        salesChannelMatches(entry, salesChannelId) {
+            if (!entry) {
+                return false;
+            }
+            const entrySalesChannelId = entry.salesChannel?.id || entry.salesChannelId;
+            return entrySalesChannelId === salesChannelId;
+        },
+
         getConfigExportDefaultShippingMethod(salesChannelId) {
             let defaultShippingMethodId = '';
-            this.config.lengowExportDefaultShippingMethod.forEach(defaultShippingMethod => {
-                if (defaultShippingMethod.salesChannel.id === salesChannelId) {
+            this.getConfigEntries('lengowExportDefaultShippingMethod').forEach(defaultShippingMethod => {
+                if (this.salesChannelMatches(defaultShippingMethod, salesChannelId)) {
                     defaultShippingMethodId = defaultShippingMethod.value;
                 }
             });
             if (defaultShippingMethodId === '') {
-                return 'Not found';
+                return Promise.resolve('Not found');
             }
             const shippingMethodCriteria = new Criteria();
             shippingMethodCriteria.addFilter(Criteria.equals('id', defaultShippingMethodId));
@@ -87,14 +100,14 @@ Component.register('lgw-setting-export', {
         },
 
         getConfigExportDisabledProduct(salesChannelId) {
-            return this.config.lengowExportDisabledProduct.some(
-                elem => elem.salesChannel.id === salesChannelId && elem.value === '1'
+            return this.getConfigEntries('lengowExportDisabledProduct').some(
+                elem => this.salesChannelMatches(elem, salesChannelId) && elem.value === '1'
             );
         },
 
         getConfigExportSelection(salesChannelId) {
-            return this.config.lengowSelectionEnabled.some(
-                elem => elem.salesChannel.id === salesChannelId && elem.value === '1'
+            return this.getConfigEntries('lengowSelectionEnabled').some(
+                elem => this.salesChannelMatches(elem, salesChannelId) && elem.value === '1'
             );
         },
 
